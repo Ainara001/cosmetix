@@ -10,19 +10,18 @@ import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
-import 'package:cosmetix/widgets/product_art.dart';
 import 'package:cosmetix/widgets/product_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   static const _categories = [
-    ('Макияж', Icons.brush_outlined),
-    ('Уход за лицом', Icons.spa_outlined),
-    ('Парфюмерия', Icons.water_drop_outlined),
-    ('Тело и ванна', Icons.bathtub_outlined),
-    ('Волосы', Icons.content_cut),
-    ('Подарки', Icons.card_giftcard),
+    ('Макияж', '💄'),
+    ('Уход за лицом', '🧴'),
+    ('Парфюмерия', '🌸'),
+    ('Тело и ванна', '🛁'),
+    ('Волосы', '💇'),
+    ('Подарки', '🎁'),
   ];
 
   @override
@@ -86,10 +85,10 @@ class HomeScreen extends StatelessWidget {
                         customBorder: const CircleBorder(),
                         child: Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(
+                          child: Text(
                             c.$2,
-                            size: 28,
-                            color: AppColors.primaryDark,
+                            textScaler: TextScaler.noScaling,
+                            style: const TextStyle(fontSize: 28),
                           ),
                         ),
                       ),
@@ -177,83 +176,55 @@ class _Banner extends StatelessWidget {
       ),
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        height: 150,
+        height: 175,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: const Color(0xFFBFE0E6),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            const Positioned(
-              right: 14,
-              top: 14,
-              bottom: 14,
-              width: 150,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ProductArt(
-                      art: 'bottle',
-                      color: 0xFF7CC0CF,
-                      radius: 16,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: ProductArt(
-                      art: 'cream',
-                      color: 0xFF4FA3B5,
-                      radius: 16,
-                    ),
-                  ),
-                ],
-              ),
+            Image.asset(
+              'assets/photos/banner.jpg',
+              fit: BoxFit.cover,
+              cacheWidth: 900,
+              errorBuilder: (_, _, _) => const SizedBox(),
             ),
             Positioned(
-              left: 12,
+              right: 12,
               top: 12,
-              right: 176, // keep clear of the two photos on the right
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.92),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.local_florist_outlined,
-                      size: 16,
-                      color: AppColors.primaryDark,
-                    ),
-                    SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        'Специальное предложение',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.small,
+              left: 60,
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.local_florist_outlined,
+                        size: 16,
+                        color: AppColors.primaryDark,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 14,
-              bottom: 14,
-              width: 170,
-              child: Text(
-                'Скидки до 70%',
-                maxLines: 2,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1E5560),
+                      SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Специальное предложение',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.small,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
