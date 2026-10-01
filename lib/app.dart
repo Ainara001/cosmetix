@@ -115,6 +115,11 @@ class _CosmetixAppState extends State<CosmetixApp> {
                 GlobalCupertinoLocalizations.delegate,
               ],
               initialRoute: _auth.isLoggedIn ? AppRoutes.main : AppRoutes.login,
+              // Flutter would also build '/' under '/main' (an "unavailable
+              // screen" you could pop back to); start with the single route.
+              onGenerateInitialRoutes: (name) => [
+                AppRoutes.onGenerate(RouteSettings(name: name)),
+              ],
               onGenerateRoute: AppRoutes.onGenerate,
             ),
           ),

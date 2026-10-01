@@ -39,7 +39,8 @@ class ProductArt extends StatelessWidget {
                 child: Image.asset(
                   'assets/photos/$art.jpg',
                   fit: BoxFit.cover,
-                  cacheWidth: 480, // small decode: smooth scrolling in lists
+                  cacheWidth:
+                      720, // reduced decode: smooth lists, still sharp on 3x phones
                   gaplessPlayback: true,
                   errorBuilder: (_, _, _) => drawn,
                 ),

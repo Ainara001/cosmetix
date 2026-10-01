@@ -72,6 +72,17 @@ void main() {
     await pumpUntil(tester, find.text('Фильтры'));
     expect(tester.takeException(), isNull);
 
+    // regression: a cold start with a saved session used to leave an
+    // "unavailable screen" ('/') under the main screen
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(CosmetixApp(helper: helper));
+    await pumpUntil(tester, find.text('Кабинет'));
+    expect(
+      tester.state<NavigatorState>(find.byType(Navigator).first).canPop(),
+      isFalse,
+    );
+    expect(find.text('Экран недоступен'), findsNothing);
+
     // let the background SQLite loads finish before the test ends
     for (var i = 0; i < 10; i++) {
       await tester.runAsync(
