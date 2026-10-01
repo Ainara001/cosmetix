@@ -82,17 +82,19 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product.brand,
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.primaryDark,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.brand,
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.primaryDark,
+                            ),
                           ),
-                        ),
-                        Text(product.name, style: AppTextStyles.bodyBold),
-                      ],
+                          Text(product.name, style: AppTextStyles.bodyBold),
+                        ],
+                      ),
                     ),
                   ],
                 ),

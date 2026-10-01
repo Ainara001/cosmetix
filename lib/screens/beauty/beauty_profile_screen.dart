@@ -107,13 +107,16 @@ class BeautyProfileScreen extends StatelessWidget {
             style: AppTextStyles.small.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 14),
-          GridView.count(
-            crossAxisCount: 2,
+          GridView(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 2.1,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              // grows with the system font size, so the tile never overflows
+              mainAxisExtent: MediaQuery.textScalerOf(context).scale(76),
+            ),
             children: [
               tile(
                 'Тип кожи',

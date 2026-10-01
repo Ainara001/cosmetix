@@ -29,7 +29,7 @@ class _CartScreenState extends State<CartScreen> {
   bool _busy = false;
 
   Future<void> _openFilters(CartProvider cart) async {
-    final result = await Navigator.pushNamed<ProductFilter>(
+    final picked = await Navigator.pushNamed<Object?>(
       context,
       AppRoutes.filters,
       arguments: FiltersArgs(
@@ -37,7 +37,7 @@ class _CartScreenState extends State<CartScreen> {
         products: [for (final i in cart.items) i.product],
       ),
     );
-    if (result != null && mounted) setState(() => _filter = result);
+    if (picked is ProductFilter && mounted) setState(() => _filter = picked);
   }
 
   Future<void> _clear(CartProvider cart) async {
@@ -184,7 +184,7 @@ class _CartScreenState extends State<CartScreen> {
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                    gridDelegate: productGridDelegate(extent: 290),
+                    gridDelegate: productGridDelegate(context, extent: 290),
                     itemCount: items.length,
                     itemBuilder: (_, i) => _CartCard(item: items[i]),
                   ),

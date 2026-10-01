@@ -57,8 +57,9 @@ class SeedData {
         // newer products have a later date (used by "По новизне")
         'created_at': now - i * 86400000,
       });
-      // The same product in 3 stores: base price, +700, +3000.
-      final extras = [0, 700, 3000];
+      // The same product in 3 stores. Nearest store is the priciest, the middle
+      // one is cheapest, so "cheap first" and "closest" give different order.
+      final extras = [1200, 0, 600];
       for (var s = 0; s < 3; s++) {
         batch.insert('product_prices', {
           'product_id': id,

@@ -167,14 +167,15 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     AppChip(
                       label: 'Сначала дешёвые',
                       selected: _cheapFirst,
                       onTap: () => setState(() => _cheapFirst = true),
                     ),
-                    const SizedBox(width: 8),
                     AppChip(
                       label: 'Ближе ко мне',
                       selected: !_cheapFirst,

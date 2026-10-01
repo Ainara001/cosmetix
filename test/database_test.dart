@@ -21,6 +21,19 @@ void main() {
   late CartRepository cart;
   late SafetyRepository safety;
 
+  test(
+    'store prices: cheapest-first and nearest-first give different order',
+    () async {
+      final prices = await products.getStorePrices(1);
+      final byPrice = prices.map((e) => e.storeId).toList();
+      final byDistance =
+          ([...prices]..sort((a, b) => a.distanceM.compareTo(b.distanceM)))
+              .map((e) => e.storeId)
+              .toList();
+      expect(byPrice, isNot(byDistance));
+    },
+  );
+
   setUp(() async {
     helper = DatabaseHelper(path: inMemoryDatabasePath);
     users = UserRepository(helper);
@@ -120,14 +133,14 @@ void main() {
       expect(items.length, 2);
       final first = items.firstWhere((i) => i.product.id == 1);
       expect(first.quantity, 2);
-      expect(first.unitPrice, 2500); // price of store 1
+      expect(first.unitPrice, 2500 + 1200); // price of store 1
       final second = items.firstWhere((i) => i.product.id == 8);
-      expect(second.unitPrice, 1500 + 700); // price of store 2
+      expect(second.unitPrice, 1500); // price of store 2
 
       await cart.setQuantity(second.cartId, 3);
       final order = await cart.checkout(1);
       expect(order, isNotNull);
-      expect(order!.total, 2500 * 2 + 2200 * 3);
+      expect(order!.total, 3700 * 2 + 1500 * 3);
       expect(await cart.getItems(1), isEmpty);
       expect((await users.getById(1))!.bonusPoints, order.bonus);
       expect((await cart.getOrders(1)).single.lines.length, 2);

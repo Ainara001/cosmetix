@@ -12,7 +12,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 1;
+  static const dbVersion = 2;
 
   final String? path;
   Database? _db;

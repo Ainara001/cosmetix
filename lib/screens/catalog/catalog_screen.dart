@@ -46,15 +46,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   Future<void> _openFilters(CatalogProvider catalog) async {
-    final result = await Navigator.pushNamed<ProductFilter>(
+    final picked = await Navigator.pushNamed<Object?>(
       context,
       AppRoutes.filters,
       arguments: FiltersArgs(initial: _filter, products: catalog.products),
     );
-    if (result == null || !mounted) return;
+    if (picked is! ProductFilter || !mounted) return;
     setState(() {
-      _filter = result;
-      _search.text = result.name;
+      _filter = picked;
+      _search.text = picked.name;
     });
   }
 
@@ -190,7 +190,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     }
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      gridDelegate: productGridDelegate(),
+      gridDelegate: productGridDelegate(context),
       itemCount: items.length,
       itemBuilder: (context, i) {
         final p = items[i];

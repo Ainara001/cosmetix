@@ -57,6 +57,21 @@ void main() {
     expect(find.text('Корзина'), findsWidgets);
     expect(find.text('ИИ Чат'), findsWidgets);
 
+    // regression: "Фильтры" used to crash on a route type cast and do nothing
+    await pumpUntil(tester, find.text('Весь каталог'));
+    await tester.tap(find.text('Весь каталог'));
+    await pumpUntil(tester, find.text('Фильтры'));
+    await tester.tap(find.text('Фильтры'));
+    await pumpUntil(tester, find.text('Категория')); // filters screen opened
+    await tester.scrollUntilVisible(
+      find.text('Применить'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Применить'));
+    await pumpUntil(tester, find.text('Фильтры'));
+    expect(tester.takeException(), isNull);
+
     // let the background SQLite loads finish before the test ends
     for (var i = 0; i < 10; i++) {
       await tester.runAsync(

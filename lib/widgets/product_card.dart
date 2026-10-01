@@ -189,11 +189,14 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-/// Grid delegate with a fixed card height: no overflow on narrow phones.
-SliverGridDelegate productGridDelegate({double extent = 250}) =>
-    SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      mainAxisExtent: extent,
-    );
+/// Grid delegate with a fixed card height (grows with the system font size,
+/// so the text block never overflows).
+SliverGridDelegate productGridDelegate(
+  BuildContext context, {
+  double extent = 250,
+}) => SliverGridDelegateWithFixedCrossAxisCount(
+  crossAxisCount: 2,
+  mainAxisSpacing: 12,
+  crossAxisSpacing: 12,
+  mainAxisExtent: extent + MediaQuery.textScalerOf(context).scale(70) - 70,
+);

@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: productGridDelegate(extent: 240),
+                gridDelegate: productGridDelegate(context, extent: 240),
                 itemCount: catalog.featured.length,
                 itemBuilder: (context, i) {
                   final p = catalog.featured[i];

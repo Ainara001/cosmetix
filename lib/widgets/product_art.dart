@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Local placeholder illustration of a cosmetic product, drawn with solid
-/// colors only (used instead of photos that cannot be exported from Figma).
+/// Product picture: a real photo from assets/photos (see CREDITS.txt) when one
+/// exists for this kind of product, otherwise a locally drawn illustration.
 class ProductArt extends StatelessWidget {
   const ProductArt({
     super.key,
@@ -14,16 +14,37 @@ class ProductArt extends StatelessWidget {
   final int color;
   final double radius;
 
+  /// Art kinds that have a photo; 'box' has none and keeps the illustration.
+  static const photos = {
+    'palette',
+    'tube',
+    'perfume',
+    'compact',
+    'cream',
+    'bottle',
+  };
+
   @override
   Widget build(BuildContext context) {
     final base = Color(color);
+    final drawn = SizedBox.expand(
+      child: CustomPaint(painter: _ArtPainter(art, base)),
+    );
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: ColoredBox(
         color: Color.lerp(base, Colors.white, 0.8)!,
-        child: SizedBox.expand(
-          child: CustomPaint(painter: _ArtPainter(art, base)),
-        ),
+        child: photos.contains(art)
+            ? SizedBox.expand(
+                child: Image.asset(
+                  'assets/photos/$art.jpg',
+                  fit: BoxFit.cover,
+                  cacheWidth: 480, // small decode: smooth scrolling in lists
+                  gaplessPlayback: true,
+                  errorBuilder: (_, _, _) => drawn,
+                ),
+              )
+            : drawn,
       ),
     );
   }

@@ -72,10 +72,14 @@ class ReactionsScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          Formatters.date(r.date),
-                          style: AppTextStyles.small.copyWith(
-                            color: pal.subtext,
+                        Flexible(
+                          child: Text(
+                            Formatters.date(r.date),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.small.copyWith(
+                              color: pal.subtext,
+                            ),
                           ),
                         ),
                         const Spacer(),
