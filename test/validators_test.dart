@@ -36,6 +36,8 @@ void main() {
       expect(Validators.amount('abc'), isNotNull);
       expect(Validators.amount('-5'), isNotNull);
       expect(Validators.amount('1500'), isNull);
+      expect(Validators.amount('50001'), isNotNull);
+      expect(Validators.amount('50000'), isNull);
       expect(Validators.confirmPassword('a', 'b'), isNotNull);
       expect(Validators.confirmPassword('b', 'b'), isNull);
     });

@@ -411,9 +411,7 @@ class _ProductBodyState extends State<_ProductBody> {
                               ? 'Ещё одну в корзину'
                               : 'В корзину',
                           icon: Icons.shopping_cart_outlined,
-                          onPressed: product.inStock
-                              ? () => _addToCart(product)
-                              : null,
+                          onPressed: () => _addToCart(product),
                         ),
                       ),
                     ],

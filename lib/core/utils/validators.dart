@@ -24,6 +24,7 @@ class Validators {
   static String? email(String? v) {
     final text = v?.trim() ?? '';
     if (text.isEmpty) return 'Введите email';
+    if (text.length > 254) return 'Email слишком длинный (максимум 254)';
     if (!_emailRe.hasMatch(text)) {
       return 'Некорректный email, например name@mail.com';
     }
@@ -35,6 +36,7 @@ class Validators {
     final text = v ?? '';
     if (text.isEmpty) return 'Введите пароль';
     if (text.length < 8) return 'Пароль должен быть не короче 8 символов';
+    if (text.length > 64) return 'Пароль слишком длинный (максимум 64)';
     if (!RegExp(r'[A-Za-zА-Яа-я]').hasMatch(text) ||
         !RegExp(r'\d').hasMatch(text)) {
       return 'Пароль должен содержать буквы и цифры';
@@ -65,13 +67,14 @@ class Validators {
     return null;
   }
 
-  /// Optional whole number >= 0.
-  static String? amount(String? v) {
+  /// Optional whole number in 0..[max].
+  static String? amount(String? v, {int max = 50000}) {
     final text = v?.trim() ?? '';
     if (text.isEmpty) return null;
     final n = int.tryParse(text);
     if (n == null) return 'Только цифры';
     if (n < 0) return 'Не может быть отрицательным';
+    if (n > max) return 'Не больше $max';
     return null;
   }
 

@@ -45,7 +45,9 @@ class CartProvider extends ChangeNotifier {
   Future<String?> add(Product product, {int? storeId}) async {
     final userId = _userId;
     if (userId == null) return 'Сначала войдите в аккаунт';
-    if (!product.inStock) return 'Товара нет в наличии';
+    if (!product.inStock) {
+      return 'Товара нет в наличии, добавить его в корзину нельзя';
+    }
     try {
       await _repo.add(userId, product.id, storeId);
       items = await _repo.getItems(userId);

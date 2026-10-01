@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -71,6 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
         children: [
           TextField(
             controller: _controller,
+            inputFormatters: [LengthLimitingTextInputFormatter(60)],
             textInputAction: TextInputAction.search,
             onChanged: (_) => setState(() {}),
             onSubmitted: _submit,

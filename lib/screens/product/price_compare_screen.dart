@@ -73,23 +73,28 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
               label: p.inStock
                   ? 'Добавить в корзину из этого магазина'
                   : 'Нет в наличии',
-              onPressed: p.inStock
-                  ? () async {
-                      Navigator.pop(ctx);
-                      final err = await context.read<CartProvider>().add(
-                        product,
-                        storeId: p.storeId,
-                      );
-                      if (!mounted) return;
-                      showMessage(
-                        context,
-                        err ?? 'Добавлено в корзину: ${p.storeName}',
-                        type: err == null
-                            ? MessageType.success
-                            : MessageType.error,
-                      );
-                    }
-                  : null,
+              onPressed: () async {
+                if (!p.inStock) {
+                  showMessage(
+                    ctx,
+                    'В магазине «${p.storeName}» товара нет в наличии. '
+                    'Выберите другой магазин.',
+                    type: MessageType.warning,
+                  );
+                  return;
+                }
+                Navigator.pop(ctx);
+                final err = await context.read<CartProvider>().add(
+                  product,
+                  storeId: p.storeId,
+                );
+                if (!mounted) return;
+                showMessage(
+                  context,
+                  err ?? 'Добавлено в корзину: ${p.storeName}',
+                  type: err == null ? MessageType.success : MessageType.error,
+                );
+              },
             ),
           ],
         ),

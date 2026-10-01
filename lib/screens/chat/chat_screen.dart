@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -31,6 +32,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _scroll.dispose();
     super.dispose();
   }
+
+  void _wait() => showMessage(
+    context,
+    'Помощник ещё отвечает, подождите секунду',
+    type: MessageType.info,
+  );
 
   Future<void> _send([String? text]) async {
     final value = (text ?? _controller.text).trim();
@@ -137,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   backgroundColor: pal.surface,
                   side: BorderSide(color: pal.border),
-                  onPressed: chat.typing ? null : () => _send(_suggestions[i]),
+                  onPressed: chat.typing ? _wait : () => _send(_suggestions[i]),
                 ),
               ),
             ),
@@ -152,6 +159,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: (_) => _send(),
                       minLines: 1,
                       maxLines: 3,
+                      inputFormatters: [LengthLimitingTextInputFormatter(500)],
                       decoration: const InputDecoration(
                         hintText: 'Спросите про цены, состав, скидки...',
                         contentPadding: EdgeInsets.symmetric(
@@ -167,7 +175,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.primary,
                     ),
-                    onPressed: chat.typing ? null : _send,
+                    onPressed: chat.typing ? _wait : _send,
                     icon: const Icon(Icons.send_rounded, color: Colors.white),
                   ),
                 ],

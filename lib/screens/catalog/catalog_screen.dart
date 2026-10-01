@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/constants/app_constants.dart';
@@ -79,6 +80,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextField(
               controller: _search,
+              inputFormatters: [LengthLimitingTextInputFormatter(60)],
               textInputAction: TextInputAction.search,
               onChanged: (v) =>
                   setState(() => _filter = _filter.copyWith(name: v)),
