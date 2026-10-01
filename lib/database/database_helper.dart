@@ -12,7 +12,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 2;
+  static const dbVersion = 3;
 
   final String? path;
   Database? _db;
@@ -186,6 +186,7 @@ CREATE TABLE reviews (
   author TEXT NOT NULL,
   rating INTEGER NOT NULL,
   body TEXT NOT NULL,
+  photo_path TEXT,
   created_at INTEGER NOT NULL
 )''',
     '''

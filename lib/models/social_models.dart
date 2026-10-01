@@ -7,6 +7,7 @@ class Review {
     required this.rating,
     required this.body,
     required this.createdAt,
+    this.photoPath,
   });
 
   final int id;
@@ -17,6 +18,9 @@ class Review {
   final String body;
   final DateTime createdAt;
 
+  /// Photo of the product attached by the author (local file), if any.
+  final String? photoPath;
+
   factory Review.fromMap(Map<String, Object?> m) => Review(
     id: m['id'] as int,
     productId: m['product_id'] as int,
@@ -25,6 +29,7 @@ class Review {
     rating: m['rating'] as int,
     body: m['body'] as String,
     createdAt: DateTime.fromMillisecondsSinceEpoch(m['created_at'] as int),
+    photoPath: m['photo_path'] as String?,
   );
 }
 

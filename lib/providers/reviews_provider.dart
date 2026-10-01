@@ -32,6 +32,7 @@ class ReviewsProvider extends ChangeNotifier {
     required String author,
     required int rating,
     required String body,
+    String? photoPath,
   }) async {
     await _repo.add(
       productId: productId,
@@ -39,12 +40,20 @@ class ReviewsProvider extends ChangeNotifier {
       author: author,
       rating: rating,
       body: body,
+      photoPath: photoPath,
     );
     await load();
   }
 
-  Future<void> edit(Review review, int rating, String body) async {
-    await _repo.update(review.id, rating, body);
+  Future<String> savePhoto(String path) => _repo.savePhoto(path);
+
+  Future<void> edit(
+    Review review,
+    int rating,
+    String body, {
+    String? photoPath,
+  }) async {
+    await _repo.update(review.id, rating, body, photoPath: photoPath);
     await load();
   }
 

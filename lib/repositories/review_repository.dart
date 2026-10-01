@@ -1,3 +1,8 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+import 'package:sqflite/sqflite.dart';
+
 import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/models/social_models.dart';
 
@@ -23,6 +28,7 @@ class ReviewRepository {
     required String author,
     required int rating,
     required String body,
+    String? photoPath,
   }) async {
     final db = await _helper.database;
     await db.insert('reviews', {
@@ -31,15 +37,21 @@ class ReviewRepository {
       'author': author,
       'rating': rating,
       'body': body.trim(),
+      'photo_path': photoPath,
       'created_at': DateTime.now().millisecondsSinceEpoch,
     });
   }
 
-  Future<void> update(int id, int rating, String body) async {
+  Future<void> update(
+    int id,
+    int rating,
+    String body, {
+    String? photoPath,
+  }) async {
     final db = await _helper.database;
     await db.update(
       'reviews',
-      {'rating': rating, 'body': body.trim()},
+      {'rating': rating, 'body': body.trim(), 'photo_path': photoPath},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -48,5 +60,18 @@ class ReviewRepository {
   Future<void> delete(int id) async {
     final db = await _helper.database;
     await db.delete('reviews', where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// The picker returns a temporary file; keep a copy next to the database so
+  /// the photo survives app restarts.
+  Future<String> savePhoto(String sourcePath) async {
+    final dir = Directory(p.join(await getDatabasesPath(), 'review_photos'));
+    await dir.create(recursive: true);
+    final dest = p.join(
+      dir.path,
+      '${DateTime.now().microsecondsSinceEpoch}${p.extension(sourcePath)}',
+    );
+    await File(sourcePath).copy(dest);
+    return dest;
   }
 }

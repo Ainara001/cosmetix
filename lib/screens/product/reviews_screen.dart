@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -8,14 +11,12 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/core/utils/validators.dart';
 import 'package:cosmetix/models/social_models.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
-import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/reviews_provider.dart';
 import 'package:cosmetix/repositories/review_repository.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
-import 'package:cosmetix/widgets/product_art.dart';
 
 class ReviewsScreen extends StatelessWidget {
   const ReviewsScreen({super.key, required this.productId});
@@ -50,10 +51,68 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
   bool _saving = false;
   Review? _editing;
 
+  /// Photo chosen in the form (temporary picker path until the review is saved).
+  String? _photo;
+  bool _photoChanged = false;
+
   @override
   void dispose() {
     _text.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickPhoto() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Выбрать из галереи'),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Сделать снимок'),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    try {
+      final file = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 1280,
+        imageQuality: 85,
+      );
+      if (file != null && mounted) {
+        setState(() {
+          _photo = file.path;
+          _photoChanged = true;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        showMessage(
+          context,
+          'Не удалось получить фото. Проверьте доступ к камере/галерее.',
+          type: MessageType.error,
+        );
+      }
+    }
+  }
+
+  void _resetForm() {
+    _editing = null;
+    _rating = 0;
+    _photo = null;
+    _photoChanged = false;
+    _text.clear();
   }
 
   Future<void> _submit() async {
@@ -73,14 +132,19 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
     final reviews = context.read<ReviewsProvider>();
     final auth = context.read<AuthProvider>();
     try {
+      // copy a newly picked photo next to the database; keep the old one otherwise
+      final saved = _photoChanged && _photo != null
+          ? await reviews.savePhoto(_photo!)
+          : _photo;
       if (_editing != null) {
-        await reviews.edit(_editing!, _rating, _text.text);
+        await reviews.edit(_editing!, _rating, _text.text, photoPath: saved);
       } else {
         await reviews.add(
           userId: auth.userId,
           author: auth.user!.firstName,
           rating: _rating,
           body: _text.text,
+          photoPath: saved,
         );
       }
       if (!mounted) return;
@@ -89,11 +153,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
         _editing != null ? 'Отзыв обновлён' : 'Спасибо! Отзыв опубликован',
         type: MessageType.success,
       );
-      setState(() {
-        _editing = null;
-        _rating = 0;
-        _text.clear();
-      });
+      setState(_resetForm);
     } catch (_) {
       if (mounted) {
         showMessage(
@@ -104,6 +164,18 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
       }
     }
     if (mounted) setState(() => _saving = false);
+  }
+
+  void _openPhoto(Review r) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        clipBehavior: Clip.antiAlias,
+        child: InteractiveViewer(
+          child: Image.file(File(r.photoPath!), fit: BoxFit.contain),
+        ),
+      ),
+    );
   }
 
   Future<void> _delete(Review r) async {
@@ -124,12 +196,15 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ReviewsProvider>();
-    final product = context.watch<CatalogProvider>().byId(widget.productId);
     final myId = context.read<AuthProvider>().user?.id;
     final pal = context.pal;
     final list = _showAll
         ? provider.reviews
         : provider.reviews.take(3).toList();
+    final withPhoto = [
+      for (final r in provider.reviews)
+        if (r.photoPath != null && File(r.photoPath!).existsSync()) r,
+    ];
 
     return PageScaffold(
       title: 'Отзывы',
@@ -143,18 +218,23 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                   'Фото товара от покупателей',
                   padding: const EdgeInsets.only(top: 4, bottom: 8),
                   trailing: Text(
-                    '${provider.reviews.length} фото',
+                    '${withPhoto.length} фото',
                     style: AppTextStyles.small.copyWith(
                       color: AppColors.primaryDark,
                     ),
                   ),
                 ),
-                if (product != null && provider.reviews.isNotEmpty)
+                if (withPhoto.isEmpty)
+                  Text(
+                    'Пока никто не добавил фото. Будьте первым!',
+                    style: AppTextStyles.small.copyWith(color: pal.subtext),
+                  )
+                else
                   SizedBox(
                     height: 84,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: provider.reviews.length.clamp(0, 8),
+                      itemCount: withPhoto.length,
                       separatorBuilder: (_, _) => const SizedBox(width: 8),
                       itemBuilder: (_, i) => SizedBox(
                         width: 64,
@@ -162,15 +242,15 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                           children: [
                             SizedBox(
                               height: 56,
-                              child: ProductArt(
-                                art: product.art,
-                                color: product.color,
+                              child: _ReviewPhoto(
+                                path: withPhoto[i].photoPath!,
                                 radius: 12,
+                                onTap: () => _openPhoto(withPhoto[i]),
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              provider.reviews[i].author,
+                              withPhoto[i].author,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.caption,
@@ -257,6 +337,50 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                             hintText: 'Расскажите, как вам товар...',
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            if (_photo != null && File(_photo!).existsSync())
+                              Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: SizedBox(
+                                  width: 64,
+                                  height: 64,
+                                  child: _ReviewPhoto(
+                                    path: _photo!,
+                                    radius: 12,
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                              child: Wrap(
+                                spacing: 8,
+                                children: [
+                                  TextButton.icon(
+                                    onPressed: _pickPhoto,
+                                    icon: const Icon(
+                                      Icons.add_a_photo_outlined,
+                                      size: 20,
+                                    ),
+                                    label: Text(
+                                      _photo == null
+                                          ? 'Добавить фото товара'
+                                          : 'Заменить фото',
+                                    ),
+                                  ),
+                                  if (_photo != null)
+                                    TextButton(
+                                      onPressed: () => setState(() {
+                                        _photo = null;
+                                        _photoChanged = false;
+                                      }),
+                                      child: const Text('Убрать'),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
@@ -265,11 +389,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                 child: CustomButton(
                                   label: 'Отмена',
                                   outlined: true,
-                                  onPressed: () => setState(() {
-                                    _editing = null;
-                                    _rating = 0;
-                                    _text.clear();
-                                  }),
+                                  onPressed: () => setState(_resetForm),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -332,6 +452,8 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                         _editing = r;
                                         _rating = r.rating;
                                         _text.text = r.body;
+                                        _photo = r.photoPath;
+                                        _photoChanged = false;
                                       });
                                     } else {
                                       _delete(r);
@@ -353,12 +475,51 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                           StarRow(value: r.rating, size: 14),
                           const SizedBox(height: 4),
                           Text(r.body, style: AppTextStyles.small),
+                          if (r.photoPath != null &&
+                              File(r.photoPath!).existsSync())
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: SizedBox(
+                                width: 120,
+                                height: 120,
+                                child: _ReviewPhoto(
+                                  path: r.photoPath!,
+                                  radius: 12,
+                                  onTap: () => _openPhoto(r),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
                   ),
               ],
             ),
+    );
+  }
+}
+
+class _ReviewPhoto extends StatelessWidget {
+  const _ReviewPhoto({required this.path, required this.radius, this.onTap});
+
+  final String path;
+  final double radius;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: Image.file(
+          File(path),
+          fit: BoxFit.cover,
+          cacheWidth: 360,
+          errorBuilder: (_, _, _) =>
+              const ColoredBox(color: AppColors.primarySoft),
+        ),
+      ),
     );
   }
 }

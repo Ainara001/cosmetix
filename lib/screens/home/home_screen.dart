@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () => Navigator.pushNamed(context, AppRoutes.search),
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                height: 48,
+                constraints: const BoxConstraints(minHeight: 48),
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
                   color: pal.surface,
@@ -53,9 +53,13 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.search, color: pal.subtext),
                     const SizedBox(width: 10),
-                    Text(
-                      'Поиск брендов, косметики, оттенков...',
-                      style: TextStyle(color: pal.subtext, fontSize: 13),
+                    Expanded(
+                      child: Text(
+                        'Поиск брендов, косметики, оттенков...',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: pal.subtext, fontSize: 13),
+                      ),
                     ),
                   ],
                 ),
@@ -208,6 +212,7 @@ class _Banner extends StatelessWidget {
             Positioned(
               left: 12,
               top: 12,
+              right: 176, // keep clear of the two photos on the right
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -226,7 +231,14 @@ class _Banner extends StatelessWidget {
                       color: AppColors.primaryDark,
                     ),
                     SizedBox(width: 6),
-                    Text('Специальное предложение', style: AppTextStyles.small),
+                    Flexible(
+                      child: Text(
+                        'Специальное предложение',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.small,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -234,8 +246,10 @@ class _Banner extends StatelessWidget {
             const Positioned(
               left: 14,
               bottom: 14,
+              width: 170,
               child: Text(
                 'Скидки до 70%',
+                maxLines: 2,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,

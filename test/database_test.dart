@@ -34,6 +34,20 @@ void main() {
     },
   );
 
+  test('review keeps the attached photo path', () async {
+    final reviews = ReviewRepository(helper);
+    await reviews.add(
+      productId: 1,
+      userId: 1,
+      author: 'Тест',
+      rating: 5,
+      body: 'Отличный товар, рекомендую',
+      photoPath: '/tmp/x.jpg',
+    );
+    final list = await reviews.forProduct(1);
+    expect(list.any((r) => r.photoPath == '/tmp/x.jpg'), isTrue);
+  });
+
   setUp(() async {
     helper = DatabaseHelper(path: inMemoryDatabasePath);
     users = UserRepository(helper);

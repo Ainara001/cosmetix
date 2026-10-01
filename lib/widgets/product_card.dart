@@ -146,35 +146,27 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 3),
-                    Row(
+                    Wrap(
+                      spacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Flexible(
-                          child: Text(
-                            fmt(price),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: sale ? AppColors.sale : pal.text,
-                            ),
+                        Text(
+                          fmt(price),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: sale ? AppColors.sale : pal.text,
                           ),
                         ),
-                        if (sale) ...[
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              fmt(product.oldPrice!),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: pal.subtext,
-                                decoration: TextDecoration.lineThrough,
-                              ),
+                        if (sale)
+                          Text(
+                            fmt(product.oldPrice!),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: pal.subtext,
+                              decoration: TextDecoration.lineThrough,
                             ),
                           ),
-                        ],
                       ],
                     ),
                     if (footer != null) ...[const SizedBox(height: 4), footer!],
@@ -198,5 +190,5 @@ SliverGridDelegate productGridDelegate(
   crossAxisCount: 2,
   mainAxisSpacing: 12,
   crossAxisSpacing: 12,
-  mainAxisExtent: extent + MediaQuery.textScalerOf(context).scale(70) - 70,
+  mainAxisExtent: extent + MediaQuery.textScalerOf(context).scale(100) - 100,
 );

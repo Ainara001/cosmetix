@@ -84,6 +84,8 @@ class BeautyProfileScreen extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               value.isEmpty ? '—' : value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -115,7 +117,7 @@ class BeautyProfileScreen extends StatelessWidget {
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
               // grows with the system font size, so the tile never overflows
-              mainAxisExtent: MediaQuery.textScalerOf(context).scale(76),
+              mainAxisExtent: MediaQuery.textScalerOf(context).scale(100),
             ),
             children: [
               tile(
