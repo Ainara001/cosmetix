@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -63,10 +64,15 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Заказ №${order.id} оформлен', style: AppTextStyles.h2),
+                Text(
+                  trf('Заказ №{v0} оформлен', {'v0': order.id}),
+                  style: AppTextStyles.h2,
+                ),
                 const SizedBox(height: 6),
                 Text(
-                  'Спасибо за покупку! Оплата и доставка в приложении имитируются.',
+                  tr(
+                    'Спасибо за покупку! Оплата и доставка в приложении имитируются.',
+                  ),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.body.copyWith(color: pal.subtext),
                 ),
@@ -81,7 +87,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  '${l.name} × ${l.quantity}',
+                                  '${tr(l.name)} × ${l.quantity}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTextStyles.small,
@@ -97,8 +103,11 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                       const Divider(height: 20),
                       Row(
                         children: [
-                          const Expanded(
-                            child: Text('Итого', style: AppTextStyles.bodyBold),
+                          Expanded(
+                            child: Text(
+                              tr('Итого'),
+                              style: AppTextStyles.bodyBold,
+                            ),
                           ),
                           Text(
                             fmt(order.total),
@@ -112,7 +121,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Expanded(child: Text('Начислено бонусов')),
+                          Expanded(child: Text(tr('Начислено бонусов'))),
                           Text(
                             '+${order.bonus}',
                             style: const TextStyle(
@@ -127,7 +136,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                 ),
                 const Spacer(),
                 CustomButton(
-                  label: 'Мои покупки',
+                  label: tr('Мои покупки'),
                   onPressed: () {
                     context.read<NavProvider>().setTab(NavProvider.profile);
                     Navigator.of(context).popUntil((r) => r.isFirst);
@@ -136,7 +145,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                 ),
                 const SizedBox(height: 10),
                 CustomButton(
-                  label: 'На главную',
+                  label: tr('На главную'),
                   outlined: true,
                   onPressed: () => _home(context),
                 ),

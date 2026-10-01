@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -74,7 +75,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     showMessage(
       context,
-      'Вход через $provider выполнен (локальный аккаунт)',
+      trf('Вход через {provider} выполнен (локальный аккаунт)', {
+        'provider': provider,
+      }),
       type: MessageType.success,
     );
     _goHome();
@@ -86,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _error = null);
     showMessage(
       context,
-      'Подставлены данные демо-аккаунта',
+      tr('Подставлены данные демо-аккаунта'),
       type: MessageType.info,
     );
   }
@@ -107,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text('Cosmetix', style: AppTextStyles.subtitle),
                   ),
                   Tooltip(
-                    message: 'Заполнить демо-аккаунт',
+                    message: tr('Заполнить демо-аккаунт'),
                     child: InkWell(
                       onTap: _fillDemo,
                       customBorder: const CircleBorder(),
@@ -129,11 +132,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               const SizedBox(height: 28),
-              const Text('Добро пожаловать', style: AppTextStyles.h1),
+              Text(tr('Добро пожаловать'), style: AppTextStyles.h1),
               const SizedBox(height: 10),
               Text(
-                'Войдите в свой бьюти-профиль, чтобы открывать персональные '
-                'рекомендации и продолжать покупки.',
+                tr(
+                  'Войдите в свой бьюти-профиль, чтобы открывать персональные рекомендации и продолжать покупки.',
+                ),
                 style: AppTextStyles.body.copyWith(color: pal.subtext),
               ),
               const SizedBox(height: 22),
@@ -155,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 14),
                       CustomTextField(
-                        label: 'Пароль',
+                        label: tr('Пароль'),
                         hint: '••••••••',
                         controller: _password,
                         isPassword: true,
@@ -166,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: LinkText(
-                          'Забыли пароль?',
+                          tr('Забыли пароль?'),
                           bold: false,
                           onTap: () => Navigator.pushNamed(
                             context,
@@ -193,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                       CustomButton(
-                        label: 'Войти',
+                        label: tr('Войти'),
                         loading: _loading,
                         onPressed: _login,
                       ),
@@ -204,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 22),
               Center(
                 child: Text(
-                  'ИЛИ ВОЙТИ ЧЕРЕЗ',
+                  tr('ИЛИ ВОЙТИ ЧЕРЕЗ'),
                   style: AppTextStyles.label.copyWith(color: pal.subtext),
                 ),
               ),
@@ -229,15 +233,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               const SizedBox(height: 22),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
-                    'Нет аккаунта?',
+                    tr('Нет аккаунта?'),
                     style: AppTextStyles.small.copyWith(color: pal.subtext),
                   ),
                   LinkText(
-                    'Регистрация',
+                    tr('Регистрация'),
                     onTap: () =>
                         Navigator.pushNamed(context, AppRoutes.register),
                   ),

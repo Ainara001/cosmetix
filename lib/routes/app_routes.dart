@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/models/cart_models.dart';
@@ -121,13 +122,13 @@ class AppRoutes {
     return MaterialPageRoute<dynamic>(settings: s, builder: (_) => page);
   }
 
-  static Widget _bad() => const PageScaffold(
-    title: 'Ошибка',
+  static Widget _bad() => PageScaffold(
+    title: tr('Ошибка'),
     showNav: false,
     child: EmptyState(
       icon: Icons.error_outline,
-      title: 'Экран недоступен',
-      subtitle: 'Не удалось открыть этот экран. Вернитесь назад.',
+      title: tr('Экран недоступен'),
+      subtitle: tr('Не удалось открыть этот экран. Вернитесь назад.'),
     ),
   );
 }

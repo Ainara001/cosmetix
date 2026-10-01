@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,7 +48,7 @@ class AppBottomNav extends StatelessWidget {
                     },
                     child: _NavItem(
                       icon: nav.tab == i ? _items[i].$2 : _items[i].$1,
-                      label: _items[i].$3,
+                      label: tr(_items[i].$3),
                       active: nav.tab == i,
                       badge: i == NavProvider.cart ? cartCount : 0,
                     ),

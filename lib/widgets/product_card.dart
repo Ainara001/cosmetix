@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -92,7 +93,7 @@ class ProductCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            'Нет в наличии',
+                            tr('Нет в наличии'),
                             style: TextStyle(color: pal.surface, fontSize: 10),
                           ),
                         ),
@@ -136,7 +137,7 @@ class ProductCard extends StatelessWidget {
                       style: TextStyle(fontSize: 10, color: pal.subtext),
                     ),
                     Text(
-                      product.name,
+                      tr(product.name),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

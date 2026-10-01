@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -77,7 +78,7 @@ class BackTitleBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            tooltip: 'Назад',
+            tooltip: tr('Назад'),
             onPressed: onBack ?? () => Navigator.of(context).maybePop(),
             icon: const Icon(
               Icons.chevron_left,

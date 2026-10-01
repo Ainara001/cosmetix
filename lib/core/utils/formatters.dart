@@ -1,3 +1,5 @@
+import 'package:cosmetix/core/i18n/tr.dart';
+
 enum AppCurrency {
   kzt('Тенге (₸)', 'тг', 1),
   rub('Рубль (₽)', '₽', 0.19),
@@ -25,9 +27,9 @@ class Formatters {
     final value = tenge * currency.rate;
     if (currency == AppCurrency.usd) {
       return '${_group(value.toStringAsFixed(2).split('.').first)}.'
-          '${value.toStringAsFixed(2).split('.').last} ${currency.symbol}';
+          '${value.toStringAsFixed(2).split('.').last} ${tr(currency.symbol)}';
     }
-    return '${_group(value.round().toString())} ${currency.symbol}';
+    return '${_group(value.round().toString())} ${tr(currency.symbol)}';
   }
 
   static String _group(String digits) {
@@ -56,21 +58,27 @@ class Formatters {
 
   /// "12 Октября 2025"
   static String date(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
+      '${d.day.toString().padLeft(2, '0')} ${tr(_months[d.month - 1])} ${d.year}';
 
   /// "2 часа назад", "вчера", "3 дня назад"
   static String ago(DateTime d, {DateTime? now}) {
     final diff = (now ?? DateTime.now()).difference(d);
-    if (diff.inMinutes < 1) return 'только что';
-    if (diff.inHours < 1) return '${diff.inMinutes} мин назад';
+    if (diff.inMinutes < 1) return tr('только что');
+    if (diff.inHours < 1) return trf('{n} мин назад', {'n': diff.inMinutes});
     if (diff.inHours < 24) {
       final h = diff.inHours;
-      return '$h ${_plural(h, 'час', 'часа', 'часов')} назад';
+      return trf('{n} {unit} назад', {
+        'n': h,
+        'unit': plural(h, 'час', 'часа', 'часов'),
+      });
     }
-    if (diff.inDays == 1) return 'вчера';
+    if (diff.inDays == 1) return tr('вчера');
     if (diff.inDays < 30) {
       final n = diff.inDays;
-      return '$n ${_plural(n, 'день', 'дня', 'дней')} назад';
+      return trf('{n} {unit} назад', {
+        'n': n,
+        'unit': plural(n, 'день', 'дня', 'дней'),
+      });
     }
     return date(d);
   }
@@ -83,5 +91,5 @@ class Formatters {
   }
 
   static String plural(int n, String one, String few, String many) =>
-      _plural(n, one, few, many);
+      tr(_plural(n, one, few, many));
 }

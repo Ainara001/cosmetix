@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -65,8 +66,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Цвет аватара',
+            Text(
+              tr('Цвет аватара'),
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
@@ -109,7 +110,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _save() async {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) {
-      showMessage(context, 'Проверьте поля формы', type: MessageType.error);
+      showMessage(context, tr('Проверьте поля формы'), type: MessageType.error);
       return;
     }
     setState(() => _saving = true);
@@ -127,14 +128,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       showMessage(context, error, type: MessageType.error);
       return;
     }
-    showMessage(context, 'Изменения сохранены', type: MessageType.success);
+    showMessage(context, tr('Изменения сохранены'), type: MessageType.success);
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: 'Профиль',
+      title: tr('Профиль'),
       bigTitle: true,
       child: Form(
         key: _formKey,
@@ -145,24 +146,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 children: [
                   UserAvatar(size: 76, color: _avatar),
-                  LinkText('Изменить фото', bold: false, onTap: _pickAvatar),
+                  LinkText(
+                    tr('Изменить фото'),
+                    bold: false,
+                    onTap: _pickAvatar,
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
             CustomTextField(
-              label: 'Имя',
+              label: tr('Имя'),
               controller: _first,
               validator: (v) => Validators.name(v),
               textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 12),
             CustomTextField(
-              label: 'Фамилия',
+              label: tr('Фамилия'),
               controller: _last,
               validator: (v) {
                 if ((v ?? '').trim().isEmpty) return null;
-                return Validators.name(v, 'Фамилия');
+                return Validators.name(v, tr('Фамилия'));
               },
               textInputAction: TextInputAction.next,
             ),
@@ -176,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 12),
             CustomTextField(
-              label: 'Телефон',
+              label: tr('Телефон'),
               hint: '+7 707 123 45 67',
               controller: _phone,
               validator: Validators.phone,
@@ -185,14 +190,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 12),
             CustomTextField(
-              label: 'Город',
+              label: tr('Город'),
               controller: _city,
               validator: (v) =>
-                  (v ?? '').length > 40 ? 'Слишком длинное название' : null,
+                  (v ?? '').length > 40 ? tr('Слишком длинное название') : null,
             ),
             const SizedBox(height: 22),
             CustomButton(
-              label: 'Сохранить изменения',
+              label: tr('Сохранить изменения'),
               loading: _saving,
               onPressed: _save,
             ),

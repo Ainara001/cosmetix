@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -35,20 +36,20 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _wait() => showMessage(
     context,
-    'Помощник ещё отвечает, подождите секунду',
+    tr('Помощник ещё отвечает, подождите секунду'),
     type: MessageType.info,
   );
 
   Future<void> _send([String? text]) async {
     final value = (text ?? _controller.text).trim();
     if (value.isEmpty) {
-      showMessage(context, 'Введите сообщение', type: MessageType.warning);
+      showMessage(context, tr('Введите сообщение'), type: MessageType.warning);
       return;
     }
     if (value.length > 500) {
       showMessage(
         context,
-        'Сообщение слишком длинное (максимум 500 символов)',
+        tr('Сообщение слишком длинное (максимум 500 символов)'),
         type: MessageType.warning,
       );
       return;
@@ -87,12 +88,12 @@ class _ChatScreenState extends State<ChatScreen> {
             Container(
               color: pal.surface,
               child: BackTitleBar(
-                title: 'ИИ-помощник',
+                title: tr('ИИ-помощник'),
                 bigTitle: true,
                 onBack: () =>
                     context.read<NavProvider>().setTab(NavProvider.home),
                 trailing: IconButton(
-                  tooltip: 'Очистить чат',
+                  tooltip: tr('Очистить чат'),
                   icon: const Icon(
                     Icons.delete_sweep_outlined,
                     color: AppColors.primaryDark,
@@ -100,9 +101,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   onPressed: () async {
                     final ok = await confirmDialog(
                       context,
-                      title: 'Очистить переписку?',
-                      message: 'Все сообщения будут удалены.',
-                      confirmLabel: 'Очистить',
+                      title: tr('Очистить переписку?'),
+                      message: tr('Все сообщения будут удалены.'),
+                      confirmLabel: tr('Очистить'),
                       destructive: true,
                     );
                     if (ok && context.mounted) {
@@ -119,14 +120,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: chat.messages.length + (chat.typing ? 1 : 0),
                 itemBuilder: (_, i) {
                   if (i >= chat.messages.length) {
-                    return const _Bubble(
-                      text: 'Печатаю…',
+                    return _Bubble(
+                      text: tr('Печатаю…'),
                       isUser: false,
                       faded: true,
                     );
                   }
                   final m = chat.messages[i];
-                  return _Bubble(text: m.text, isUser: m.isUser);
+                  return _Bubble(
+                    text: m.isUser ? m.text : tr(m.text),
+                    isUser: m.isUser,
+                  );
                 },
               ),
             ),
@@ -139,12 +143,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (_, i) => ActionChip(
                   label: Text(
-                    _suggestions[i],
+                    tr(_suggestions[i]),
                     style: const TextStyle(fontSize: 12),
                   ),
                   backgroundColor: pal.surface,
                   side: BorderSide(color: pal.border),
-                  onPressed: chat.typing ? _wait : () => _send(_suggestions[i]),
+                  onPressed: chat.typing
+                      ? _wait
+                      : () => _send(tr(_suggestions[i])),
                 ),
               ),
             ),
@@ -160,8 +166,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       minLines: 1,
                       maxLines: 3,
                       inputFormatters: [LengthLimitingTextInputFormatter(500)],
-                      decoration: const InputDecoration(
-                        hintText: 'Спросите про цены, состав, скидки...',
+                      decoration: InputDecoration(
+                        hintText: tr('Спросите про цены, состав, скидки...'),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
@@ -171,7 +177,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
-                    tooltip: 'Отправить',
+                    tooltip: tr('Отправить'),
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.primary,
                     ),

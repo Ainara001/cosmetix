@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/models/product.dart';
@@ -24,7 +25,7 @@ class CatalogProvider extends ChangeNotifier {
       products = await _repo.getAll(userId);
       history = await _repo.getHistory(userId);
     } catch (e) {
-      error = 'Не удалось загрузить каталог';
+      error = tr('Не удалось загрузить каталог');
       debugPrint('catalog load failed: $e');
     }
     loading = false;

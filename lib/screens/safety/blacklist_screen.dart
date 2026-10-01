@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,7 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
     FocusScope.of(context).unfocus();
     showMessage(
       context,
-      'Компонент «$text» добавлен в чёрный список',
+      trf('Компонент «{text}» добавлен в чёрный список', {'text': text}),
       type: MessageType.success,
     );
   }
@@ -48,9 +49,11 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
   Future<void> _delete(BlacklistItem item) async {
     final ok = await confirmDialog(
       context,
-      title: 'Удалить из списка?',
-      message: 'Компонент «${item.name}» будет удалён из чёрного списка.',
-      confirmLabel: 'Удалить',
+      title: tr('Удалить из списка?'),
+      message: trf('Компонент «{v0}» будет удалён из чёрного списка.', {
+        'v0': tr(item.name),
+      }),
+      confirmLabel: tr('Удалить'),
       destructive: true,
     );
     if (!ok || !mounted) return;
@@ -63,14 +66,15 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
     final pal = context.pal;
 
     return PageScaffold(
-      title: 'Чёрный список',
+      title: tr('Чёрный список'),
       bigTitle: true,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           Text(
-            'Отметьте компоненты, которых не должно быть в вашей косметике. '
-            'Мы предупредим вас при анализе продукта.',
+            tr(
+              'Отметьте компоненты, которых не должно быть в вашей косметике. Мы предупредим вас при анализе продукта.',
+            ),
             style: AppTextStyles.small.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 12),
@@ -82,18 +86,18 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
               onFieldSubmitted: (_) => _add(),
               validator: (v) {
                 final t = (v ?? '').trim();
-                if (t.isEmpty) return 'Введите название компонента';
-                if (t.length < 2) return 'Слишком короткое название';
+                if (t.isEmpty) return tr('Введите название компонента');
+                if (t.length < 2) return tr('Слишком короткое название');
                 if (t.length > 40) {
-                  return 'Слишком длинное название (максимум 40)';
+                  return tr('Слишком длинное название (максимум 40)');
                 }
                 return null;
               },
               decoration: InputDecoration(
-                hintText: 'Добавить свой компонент...',
+                hintText: tr('Добавить свой компонент...'),
                 prefixIcon: const Icon(Icons.add, size: 20),
                 suffixIcon: IconButton(
-                  tooltip: 'Добавить',
+                  tooltip: tr('Добавить'),
                   icon: const Icon(
                     Icons.check_circle,
                     color: AppColors.primaryDark,
@@ -105,10 +109,10 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
           ),
           const SizedBox(height: 12),
           if (safety.blacklist.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: Icons.block,
-              title: 'Список пуст',
-              subtitle: 'Добавьте компонент, которого хотите избегать',
+              title: tr('Список пуст'),
+              subtitle: tr('Добавьте компонент, которого хотите избегать'),
             ),
           for (final b in safety.blacklist)
             Padding(
@@ -121,9 +125,9 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(b.name, style: AppTextStyles.bodyBold),
+                          Text(tr(b.name), style: AppTextStyles.bodyBold),
                           Text(
-                            b.description,
+                            tr(b.description),
                             style: AppTextStyles.caption.copyWith(
                               color: pal.subtext,
                             ),
@@ -133,7 +137,7 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
                     ),
                     if (b.isCustom)
                       IconButton(
-                        tooltip: 'Удалить',
+                        tooltip: tr('Удалить'),
                         visualDensity: VisualDensity.compact,
                         icon: const Icon(Icons.delete_outline, size: 20),
                         onPressed: () => _delete(b),

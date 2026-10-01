@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,15 +25,16 @@ class FavoritesScreen extends StatelessWidget {
     final favorites = catalog.favorites;
 
     return PageScaffold(
-      title: 'Избранное',
+      title: tr('Избранное'),
       bigTitle: true,
       child: favorites.isEmpty
           ? EmptyState(
               icon: Icons.favorite_border,
-              title: 'В избранном пока пусто',
-              subtitle:
-                  'Нажмите на сердечко у товара, чтобы сохранить его здесь',
-              actionLabel: 'Перейти в каталог',
+              title: tr('В избранном пока пусто'),
+              subtitle: tr(
+                'Нажмите на сердечко у товара, чтобы сохранить его здесь',
+              ),
+              actionLabel: tr('Перейти в каталог'),
               onAction: () => Navigator.pushNamed(
                 context,
                 AppRoutes.catalog,
@@ -76,7 +78,7 @@ class FavoritesScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  p.name,
+                                  tr(p.name),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTextStyles.bodyBold,
@@ -93,7 +95,7 @@ class FavoritesScreen extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Убрать из избранного',
+                            tooltip: tr('Убрать из избранного'),
                             onPressed: () async {
                               final catalogProvider = context
                                   .read<CatalogProvider>();
@@ -104,10 +106,12 @@ class FavoritesScreen extends StatelessWidget {
                                 ..showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      '«${p.name}» удалён из избранного',
+                                      trf('«{v0}» удалён из избранного', {
+                                        'v0': tr(p.name),
+                                      }),
                                     ),
                                     action: SnackBarAction(
-                                      label: 'Отменить',
+                                      label: tr('Отменить'),
                                       onPressed: () =>
                                           catalogProvider.toggleFavorite(p.id),
                                     ),
@@ -132,8 +136,8 @@ class FavoritesScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Уведомления о скидках',
+                      Text(
+                        tr('Уведомления о скидках'),
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryDark,
@@ -142,8 +146,12 @@ class FavoritesScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         settings.pushEnabled
-                            ? 'Мы пришлём вам уведомление, когда цены на избранные товары снизятся.'
-                            : 'Уведомления выключены. Нажмите, чтобы включить их в настройках.',
+                            ? tr(
+                                'Мы пришлём вам уведомление, когда цены на избранные товары снизятся.',
+                              )
+                            : tr(
+                                'Уведомления выключены. Нажмите, чтобы включить их в настройках.',
+                              ),
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF6E5A60),

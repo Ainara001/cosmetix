@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -122,9 +123,9 @@ class ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => EmptyState(
     icon: Icons.error_outline,
-    title: 'Что-то пошло не так',
+    title: tr('Что-то пошло не так'),
     subtitle: message,
-    actionLabel: 'Повторить',
+    actionLabel: tr('Повторить'),
     onAction: onRetry,
   );
 }

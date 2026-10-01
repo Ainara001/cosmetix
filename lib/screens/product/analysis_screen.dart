@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,15 +58,15 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     final a = _analysis;
 
     return PageScaffold(
-      title: 'Анализ состава',
+      title: tr('Анализ состава'),
       bigTitle: true,
       child: _loading
           ? const Center(child: CircularProgressIndicator())
           : a == null || product == null
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.science_outlined,
-              title: 'Состав недоступен',
-              subtitle: 'Не удалось загрузить состав этого товара',
+              title: tr('Состав недоступен'),
+              subtitle: tr('Не удалось загрузить состав этого товара'),
             )
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -92,7 +93,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                               color: AppColors.primaryDark,
                             ),
                           ),
-                          Text(product.name, style: AppTextStyles.bodyBold),
+                          Text(tr(product.name), style: AppTextStyles.bodyBold),
                         ],
                       ),
                     ),
@@ -148,8 +149,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Есть компоненты из чёрного списка',
+                        Text(
+                          tr('Есть компоненты из чёрного списка'),
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             color: AppColors.sale,
@@ -157,8 +158,10 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'В составе найдено: ${a.blacklistHits.join(', ')}. '
-                          'Нажмите, чтобы изменить чёрный список.',
+                          trf(
+                            'В составе найдено: {v0}. Нажмите, чтобы изменить чёрный список.',
+                            {'v0': a.blacklistHits.map(tr).join(', ')},
+                          ),
                           style: AppTextStyles.small,
                         ),
                       ],
@@ -173,8 +176,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Потенциальные аллергены',
+                        Text(
+                          tr('Потенциальные аллергены'),
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             color: AppColors.sale,
@@ -182,16 +185,21 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Продукт содержит: ${a.allergens.map((e) => e.name.split(' / ').first).join(', ')}. '
-                          'Людям с высокой чувствительностью рекомендуется '
-                          'тест на сгибе локтя.',
+                          trf(
+                            'Продукт содержит: {v0}. Людям с высокой чувствительностью рекомендуется тест на сгибе локтя.',
+                            {
+                              'v0': a.allergens
+                                  .map((e) => tr(e.name).split(' / ').first)
+                                  .join(', '),
+                            },
+                          ),
                           style: AppTextStyles.small,
                         ),
                       ],
                     ),
                   ),
                 ],
-                const SectionTitle('Список ингредиентов'),
+                SectionTitle(tr('Список ингредиентов')),
                 for (final i in a.ingredients)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
@@ -206,9 +214,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(i.name, style: AppTextStyles.bodyBold),
+                                Text(tr(i.name), style: AppTextStyles.bodyBold),
                                 Text(
-                                  i.description,
+                                  tr(i.description),
                                   style: AppTextStyles.caption.copyWith(
                                     color: pal.subtext,
                                   ),

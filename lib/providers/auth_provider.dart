@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/models/app_user.dart';
@@ -43,11 +44,11 @@ class AuthProvider extends ChangeNotifier {
   Future<String?> login(String email, String password) async {
     try {
       final user = await _users.login(email, password);
-      if (user == null) return 'Неверный email или пароль';
+      if (user == null) return tr('Неверный email или пароль');
       await _start(user);
       return null;
     } catch (_) {
-      return 'Не удалось выполнить вход. Попробуйте ещё раз';
+      return tr('Не удалось выполнить вход. Попробуйте ещё раз');
     }
   }
 
@@ -63,7 +64,7 @@ class AuthProvider extends ChangeNotifier {
     } on StateError catch (e) {
       return e.message;
     } catch (_) {
-      return 'Не удалось создать аккаунт. Попробуйте ещё раз';
+      return tr('Не удалось создать аккаунт. Попробуйте ещё раз');
     }
   }
 
@@ -75,14 +76,14 @@ class AuthProvider extends ChangeNotifier {
       var user = await _users.login(email, 'social-$provider');
       user ??= await _users.register(
         firstName: provider,
-        lastName: 'Пользователь',
+        lastName: tr('Пользователь'),
         email: email,
         password: 'social-$provider',
       );
       await _start(user);
       return null;
     } catch (_) {
-      return 'Не удалось войти через $provider';
+      return trf('Не удалось войти через {provider}', {'provider': provider});
     }
   }
 
@@ -112,10 +113,10 @@ class AuthProvider extends ChangeNotifier {
     required String city,
     int? avatarColor,
   }) async {
-    if (_user == null) return 'Вы не авторизованы';
+    if (_user == null) return tr('Вы не авторизованы');
     try {
       if (await _users.emailExists(email, exceptId: _user!.id)) {
-        return 'Этот email уже используется другим аккаунтом';
+        return tr('Этот email уже используется другим аккаунтом');
       }
       await _users.updateProfile(
         id: _user!.id,
@@ -129,7 +130,7 @@ class AuthProvider extends ChangeNotifier {
       await reload();
       return null;
     } catch (_) {
-      return 'Не удалось сохранить изменения';
+      return tr('Не удалось сохранить изменения');
     }
   }
 

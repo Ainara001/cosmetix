@@ -103,8 +103,12 @@ class _CosmetixAppState extends State<CosmetixApp> {
               theme: AppTheme.light(),
               darkTheme: AppTheme.dark(),
               themeMode: settings.themeMode,
-              locale: const Locale('ru'),
-              supportedLocales: const [Locale('ru')],
+              locale: Locale(settings.language.code),
+              supportedLocales: const [
+                Locale('ru'),
+                Locale('en'),
+                Locale('kk'),
+              ],
               localizationsDelegates: const [
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,

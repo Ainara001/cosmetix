@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,15 +23,15 @@ class OrdersScreen extends StatelessWidget {
   Future<void> _delete(BuildContext context, Order o) async {
     final ok = await confirmDialog(
       context,
-      title: 'Удалить заказ №${o.id}?',
-      message: 'Запись о покупке будет удалена из истории.',
-      confirmLabel: 'Удалить',
+      title: trf('Удалить заказ №{v0}?', {'v0': o.id}),
+      message: tr('Запись о покупке будет удалена из истории.'),
+      confirmLabel: tr('Удалить'),
       destructive: true,
     );
     if (!ok || !context.mounted) return;
     await context.read<CartProvider>().deleteOrder(o);
     if (context.mounted) {
-      showMessage(context, 'Заказ удалён', type: MessageType.success);
+      showMessage(context, tr('Заказ удалён'), type: MessageType.success);
     }
   }
 
@@ -41,14 +42,14 @@ class OrdersScreen extends StatelessWidget {
     final pal = context.pal;
 
     return PageScaffold(
-      title: 'Покупки',
+      title: tr('Покупки'),
       bigTitle: true,
       child: cart.orders.isEmpty
           ? EmptyState(
               icon: Icons.receipt_long_outlined,
-              title: 'Покупок пока нет',
-              subtitle: 'Оформленные заказы появятся здесь',
-              actionLabel: 'Перейти в каталог',
+              title: tr('Покупок пока нет'),
+              subtitle: tr('Оформленные заказы появятся здесь'),
+              actionLabel: tr('Перейти в каталог'),
               onAction: () => Navigator.pushNamed(
                 context,
                 AppRoutes.catalog,
@@ -69,12 +70,15 @@ class OrdersScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              'Заказ №${o.id} • ${Formatters.date(o.createdAt)}',
+                              trf('Заказ №{v0} • {v1}', {
+                                'v0': o.id,
+                                'v1': Formatters.date(o.createdAt),
+                              }),
                               style: AppTextStyles.bodyBold,
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Удалить',
+                            tooltip: tr('Удалить'),
                             visualDensity: VisualDensity.compact,
                             onPressed: () => _delete(context, o),
                             icon: const Icon(Icons.delete_outline, size: 20),
@@ -91,7 +95,7 @@ class OrdersScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          o.status,
+                          tr(o.status),
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.success,
@@ -122,7 +126,7 @@ class OrdersScreen extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    '${l.name} × ${l.quantity}',
+                                    '${tr(l.name)} × ${l.quantity}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: AppTextStyles.small,
@@ -140,7 +144,7 @@ class OrdersScreen extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '+${o.bonus} бонусов',
+                            trf('+{v0} бонусов', {'v0': o.bonus}),
                             style: TextStyle(fontSize: 12, color: pal.subtext),
                           ),
                           const Spacer(),

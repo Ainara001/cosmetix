@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +28,7 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
 
   Future<void> _finish() async {
     if (_selected == null) {
-      showMessage(context, 'Выберите цвет вен', type: MessageType.warning);
+      showMessage(context, tr('Выберите цвет вен'), type: MessageType.warning);
       return;
     }
     setState(() => _saving = true);
@@ -53,7 +54,7 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
         setState(() => _saving = false);
         showMessage(
           context,
-          'Не удалось сохранить результат',
+          tr('Не удалось сохранить результат'),
           type: MessageType.error,
         );
       }
@@ -64,7 +65,7 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
   Widget build(BuildContext context) {
     final pal = context.pal;
     return PageScaffold(
-      title: 'Тест на подтон кожи',
+      title: tr('Тест на подтон кожи'),
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
@@ -85,7 +86,9 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Посмотрите на вены на вашем запястье при естественном освещении.',
+                  tr(
+                    'Посмотрите на вены на вашем запястье при естественном освещении.',
+                  ),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.small.copyWith(color: pal.subtext),
                 ),
@@ -93,8 +96,8 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Какого цвета вены на вашем запястье?',
+          Text(
+            tr('Какого цвета вены на вашем запястье?'),
             style: AppTextStyles.title,
           ),
           const SizedBox(height: 12),
@@ -142,7 +145,7 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
             ),
           const SizedBox(height: 10),
           CustomButton(
-            label: 'Завершить и показать результат',
+            label: tr('Завершить и показать результат'),
             loading: _saving,
             onPressed: _finish,
           ),

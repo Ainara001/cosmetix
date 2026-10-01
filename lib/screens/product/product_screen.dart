@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -94,7 +95,7 @@ class _ProductBodyState extends State<_ProductBody> {
     }
     showMessage(
       context,
-      '«${product.name}» добавлен в корзину',
+      trf('«{v0}» добавлен в корзину', {'v0': tr(product.name)}),
       type: MessageType.success,
     );
   }
@@ -107,11 +108,11 @@ class _ProductBodyState extends State<_ProductBody> {
 
     if (product == null) {
       return PageScaffold(
-        title: 'О товаре',
-        child: const EmptyState(
+        title: tr('О товаре'),
+        child: EmptyState(
           icon: Icons.search_off,
-          title: 'Товар не найден',
-          subtitle: 'Возможно, он был удалён из каталога',
+          title: tr('Товар не найден'),
+          subtitle: tr('Возможно, он был удалён из каталога'),
         ),
       );
     }
@@ -122,9 +123,11 @@ class _ProductBodyState extends State<_ProductBody> {
     final price = selected?.price ?? product.price;
 
     return PageScaffold(
-      title: 'О товаре',
+      title: tr('О товаре'),
       trailing: IconButton(
-        tooltip: product.isFavorite ? 'Убрать из избранного' : 'В избранное',
+        tooltip: product.isFavorite
+            ? tr('Убрать из избранного')
+            : tr('В избранное'),
         onPressed: () async {
           final state = await context.read<CatalogProvider>().toggleFavorite(
             product.id,
@@ -132,7 +135,7 @@ class _ProductBodyState extends State<_ProductBody> {
           if (state != null && context.mounted) {
             showMessage(
               context,
-              state ? 'Добавлено в избранное' : 'Удалено из избранного',
+              state ? tr('Добавлено в избранное') : tr('Удалено из избранного'),
               type: state ? MessageType.success : MessageType.info,
             );
           }
@@ -166,8 +169,8 @@ class _ProductBodyState extends State<_ProductBody> {
                               top: 10,
                               child: _Badge(
                                 text: product.inStock
-                                    ? 'В НАЛИЧИИ'
-                                    : 'НЕТ В НАЛИЧИИ',
+                                    ? tr('В НАЛИЧИИ')
+                                    : tr('НЕТ В НАЛИЧИИ'),
                                 color: product.inStock
                                     ? AppColors.success
                                     : const Color(0xFF8E8689),
@@ -190,7 +193,7 @@ class _ProductBodyState extends State<_ProductBody> {
                         product.brand,
                         style: AppTextStyles.small.copyWith(color: pal.subtext),
                       ),
-                      Text(product.name, style: AppTextStyles.h2),
+                      Text(tr(product.name), style: AppTextStyles.h2),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
@@ -208,7 +211,9 @@ class _ProductBodyState extends State<_ProductBody> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              product.inStock ? 'В наличии' : 'Нет в наличии',
+                              product.inStock
+                                  ? tr('В наличии')
+                                  : tr('Нет в наличии'),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: product.inStock
@@ -218,8 +223,15 @@ class _ProductBodyState extends State<_ProductBody> {
                             ),
                           ),
                           Text(
-                            'Доступна в $available '
-                            '${Formatters.plural(available, 'магазине', 'магазинах', 'магазинах')}',
+                            trf('Доступна в {available} {v0}', {
+                              'available': available,
+                              'v0': Formatters.plural(
+                                available,
+                                'магазине',
+                                'магазинах',
+                                'магазинах',
+                              ),
+                            }),
                             style: AppTextStyles.small.copyWith(
                               color: pal.subtext,
                             ),
@@ -228,12 +240,15 @@ class _ProductBodyState extends State<_ProductBody> {
                       ),
                       if (product.description.isNotEmpty) ...[
                         const SizedBox(height: 10),
-                        Text(product.description, style: AppTextStyles.body),
+                        Text(
+                          tr(product.description),
+                          style: AppTextStyles.body,
+                        ),
                       ],
                       SectionTitle(
-                        'Сравнение цен в магазинах',
+                        tr('Сравнение цен в магазинах'),
                         trailing: LinkText(
-                          'Все цены',
+                          tr('Все цены'),
                           onTap: () => Navigator.pushNamed(
                             context,
                             AppRoutes.priceCompare,
@@ -250,7 +265,9 @@ class _ProductBodyState extends State<_ProductBody> {
                             if (!_prices[i].inStock) {
                               showMessage(
                                 context,
-                                'В магазине «${_prices[i].storeName}» товара нет в наличии',
+                                trf('В магазине «{v0}» товара нет в наличии', {
+                                  'v0': tr(_prices[i].storeName),
+                                }),
                                 type: MessageType.warning,
                               );
                               return;
@@ -258,7 +275,7 @@ class _ProductBodyState extends State<_ProductBody> {
                             setState(() => _storeId = _prices[i].storeId);
                           },
                         ),
-                      const SectionTitle('Анализ состава'),
+                      SectionTitle(tr('Анализ состава')),
                       if (_analysis != null)
                         AppCard(
                           onTap: () => Navigator.pushNamed(
@@ -291,24 +308,29 @@ class _ProductBodyState extends State<_ProductBody> {
                                   children: [
                                     Text(
                                       _analysis!.score >= 7.5
-                                          ? 'Безопасный состав'
-                                          : 'Состав требует внимания',
+                                          ? tr('Безопасный состав')
+                                          : tr('Состав требует внимания'),
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: _analysis!.scoreColor,
                                       ),
                                     ),
                                     Text(
-                                      '${product.naturalPercent}% натуральных и '
-                                      'немедикаментозных компонентов.',
+                                      trf(
+                                        '{v0}% натуральных и немедикаментозных компонентов.',
+                                        {'v0': product.naturalPercent},
+                                      ),
                                       style: AppTextStyles.caption.copyWith(
                                         color: pal.subtext,
                                       ),
                                     ),
                                     if (_analysis!.blacklistHits.isNotEmpty)
                                       Text(
-                                        'Из вашего чёрного списка: '
-                                        '${_analysis!.blacklistHits.join(', ')}',
+                                        trf('Из вашего чёрного списка: {v0}', {
+                                          'v0': _analysis!.blacklistHits
+                                              .map(tr)
+                                              .join(', '),
+                                        }),
                                         style: const TextStyle(
                                           fontSize: 11,
                                           color: AppColors.sale,
@@ -322,9 +344,13 @@ class _ProductBodyState extends State<_ProductBody> {
                           ),
                         ),
                       SectionTitle(
-                        'Отзывы${reviews.reviews.isEmpty ? '' : ' (${reviews.reviews.length})'}',
+                        trf('Отзывы{v0}', {
+                          'v0': reviews.reviews.isEmpty
+                              ? ''
+                              : ' (${reviews.reviews.length})',
+                        }),
                         trailing: LinkText(
-                          'Все отзывы',
+                          tr('Все отзывы'),
                           onTap: () async {
                             await Navigator.pushNamed(
                               context,
@@ -339,7 +365,7 @@ class _ProductBodyState extends State<_ProductBody> {
                       ),
                       if (reviews.reviews.isEmpty)
                         Text(
-                          'Отзывов пока нет. Станьте первым!',
+                          tr('Отзывов пока нет. Станьте первым!'),
                           style: TextStyle(color: pal.subtext),
                         )
                       else
@@ -388,7 +414,7 @@ class _ProductBodyState extends State<_ProductBody> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Цена',
+                            tr('Цена'),
                             style: AppTextStyles.caption.copyWith(
                               color: pal.subtext,
                             ),
@@ -408,8 +434,8 @@ class _ProductBodyState extends State<_ProductBody> {
                         child: CustomButton(
                           label:
                               context.watch<CartProvider>().contains(product.id)
-                              ? 'Ещё одну в корзину'
-                              : 'В корзину',
+                              ? tr('Ещё одну в корзину')
+                              : tr('В корзину'),
                           icon: Icons.shopping_cart_outlined,
                           onPressed: () => _addToCart(product),
                         ),
@@ -488,9 +514,15 @@ class _StoreRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(price.storeName, style: AppTextStyles.bodyBold),
+                  Text(tr(price.storeName), style: AppTextStyles.bodyBold),
                   Text(
-                    '${price.distanceM >= 1000 ? '${(price.distanceM / 1000).toStringAsFixed(1)} км' : '${price.distanceM} м'} от вас',
+                    trf('{v0} от вас', {
+                      'v0': price.distanceM >= 1000
+                          ? trf('{v0} км', {
+                              'v0': (price.distanceM / 1000).toStringAsFixed(1),
+                            })
+                          : trf('{v0} м', {'v0': price.distanceM}),
+                    }),
                     style: AppTextStyles.caption.copyWith(color: pal.subtext),
                   ),
                 ],
@@ -519,7 +551,7 @@ class _StoreRow extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Text(
-                    price.inStock ? 'В наличии' : 'Нет',
+                    price.inStock ? tr('В наличии') : tr('Нет'),
                     style: TextStyle(
                       fontSize: 9,
                       color: price.inStock ? AppColors.success : pal.subtext,

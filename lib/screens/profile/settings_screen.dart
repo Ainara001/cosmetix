@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +21,9 @@ class SettingsScreen extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     final ok = await confirmDialog(
       context,
-      title: 'Выйти из аккаунта?',
-      message: 'Вам нужно будет снова войти, чтобы увидеть свои данные.',
-      confirmLabel: 'Выйти',
+      title: tr('Выйти из аккаунта?'),
+      message: tr('Вам нужно будет снова войти, чтобы увидеть свои данные.'),
+      confirmLabel: tr('Выйти'),
       destructive: true,
     );
     if (ok && context.mounted) await Session.signOut(context);
@@ -31,11 +32,11 @@ class SettingsScreen extends StatelessWidget {
   Future<void> _resetDemo(BuildContext context) async {
     final ok = await confirmDialog(
       context,
-      title: 'Сбросить демо-данные?',
-      message:
-          'Все ваши данные (аккаунты, заказы, избранное, отзывы) будут '
-          'удалены, а база вернётся к исходным демо-данным.',
-      confirmLabel: 'Сбросить',
+      title: tr('Сбросить демо-данные?'),
+      message: tr(
+        'Все ваши данные (аккаунты, заказы, избранное, отзывы) будут удалены, а база вернётся к исходным демо-данным.',
+      ),
+      confirmLabel: tr('Сбросить'),
       destructive: true,
     );
     if (!ok || !context.mounted) return;
@@ -50,7 +51,7 @@ class SettingsScreen extends StatelessWidget {
       if (context.mounted) {
         showMessage(
           context,
-          'Не удалось сбросить данные',
+          tr('Не удалось сбросить данные'),
           type: MessageType.error,
         );
       }
@@ -63,19 +64,19 @@ class SettingsScreen extends StatelessWidget {
     final pal = context.pal;
 
     return PageScaffold(
-      title: 'Настройки',
+      title: tr('Настройки'),
       bigTitle: true,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
-          _Header('УВЕДОМЛЕНИЯ'),
+          _Header(tr('УВЕДОМЛЕНИЯ')),
           AppCard(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Пуш-уведомления о скидках',
+                    tr('Пуш-уведомления о скидках'),
                     style: AppTextStyles.bodyBold,
                   ),
                 ),
@@ -86,8 +87,8 @@ class SettingsScreen extends StatelessWidget {
                     showMessage(
                       context,
                       v
-                          ? 'Уведомления о скидках включены'
-                          : 'Уведомления выключены',
+                          ? tr('Уведомления о скидках включены')
+                          : tr('Уведомления выключены'),
                       type: v ? MessageType.success : MessageType.info,
                     );
                   },
@@ -95,45 +96,35 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          _Header('ПРЕДПОЧТЕНИЯ'),
-          _DropdownRow<String>(
-            title: 'Язык приложения',
-            valueLabel: s.language,
-            items: const ['Русский', 'Қазақша', 'English'],
-            labelOf: (v) => v,
-            onSelected: (v) async {
-              if (v == 'Русский') {
-                s.setLanguage(v);
-              } else {
-                await infoDialog(
-                  context,
-                  title: 'Язык в разработке',
-                  message:
-                      'Перевод интерфейса на «$v» пока недоступен. '
-                      'Приложение остаётся на русском языке.',
-                );
-              }
-            },
+          _Header(tr('ПРЕДПОЧТЕНИЯ')),
+          _DropdownRow<AppLang>(
+            title: tr('Язык приложения'),
+            valueLabel: s.language.label,
+            items: AppLang.values,
+            labelOf: (l) => l.label,
+            onSelected: s.setLanguage,
           ),
           const SizedBox(height: 8),
           _DropdownRow<ThemeMode>(
-            title: 'Тема оформления',
-            valueLabel: s.themeMode == ThemeMode.dark ? 'Тёмная' : 'Светлая',
+            title: tr('Тема оформления'),
+            valueLabel: s.themeMode == ThemeMode.dark
+                ? tr('Тёмная')
+                : tr('Светлая'),
             items: const [ThemeMode.light, ThemeMode.dark],
-            labelOf: (v) => v == ThemeMode.dark ? 'Тёмная' : 'Светлая',
+            labelOf: (v) => v == ThemeMode.dark ? tr('Тёмная') : tr('Светлая'),
             onSelected: s.setTheme,
           ),
           const SizedBox(height: 8),
           _DropdownRow<AppCurrency>(
-            title: 'Валюта',
-            valueLabel: s.currency.label,
+            title: tr('Валюта'),
+            valueLabel: tr(s.currency.label),
             items: AppCurrency.values,
-            labelOf: (v) => v.label,
+            labelOf: (v) => tr(v.label),
             onSelected: s.setCurrency,
           ),
-          _Header('ИНФОРМАЦИЯ'),
+          _Header(tr('ИНФОРМАЦИЯ')),
           _LinkRow(
-            title: 'Политика конфиденциальности',
+            title: tr('Политика конфиденциальности'),
             onTap: () => Navigator.pushNamed(
               context,
               AppRoutes.legal,
@@ -142,7 +133,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _LinkRow(
-            title: 'Условия использования',
+            title: tr('Условия использования'),
             onTap: () => Navigator.pushNamed(
               context,
               AppRoutes.legal,
@@ -151,12 +142,12 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _LinkRow(
-            title: 'Чёрный список',
+            title: tr('Чёрный список'),
             onTap: () => Navigator.pushNamed(context, AppRoutes.blacklist),
           ),
           const SizedBox(height: 8),
           _LinkRow(
-            title: 'Сбросить демо-данные',
+            title: tr('Сбросить демо-данные'),
             onTap: () => _resetDemo(context),
           ),
           const SizedBox(height: 18),
@@ -170,15 +161,15 @@ class SettingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
-              'Выйти из аккаунта',
+            child: Text(
+              tr('Выйти из аккаунта'),
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
           const SizedBox(height: 12),
           Center(
             child: Text(
-              'Версия приложения ${AppConstants.version}',
+              trf('Версия приложения {v0}', {'v0': AppConstants.version}),
               style: AppTextStyles.caption.copyWith(color: pal.subtext),
             ),
           ),

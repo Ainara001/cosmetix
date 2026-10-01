@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,14 +46,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if (!ok) {
       showMessage(
         context,
-        'Не удалось изменить пароль',
+        tr('Не удалось изменить пароль'),
         type: MessageType.error,
       );
       return;
     }
     showMessage(
       context,
-      'Пароль изменён. Войдите с новым паролем',
+      tr('Пароль изменён. Войдите с новым паролем'),
       type: MessageType.success,
     );
     Navigator.of(context).popUntil((r) => r.isFirst);
@@ -68,7 +69,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                tooltip: 'Назад',
+                tooltip: tr('Назад'),
                 onPressed: () => Navigator.of(context).maybePop(),
                 icon: const Icon(
                   Icons.chevron_left,
@@ -81,8 +82,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Новый пароль',
+                    Text(
+                      tr('Новый пароль'),
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
@@ -90,7 +91,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Придумайте новый пароль для ${widget.email}.',
+                      trf('Придумайте новый пароль для {v0}.', {
+                        'v0': widget.email,
+                      }),
                       style: AppTextStyles.body.copyWith(
                         color: context.pal.subtext,
                       ),
@@ -101,8 +104,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       child: Column(
                         children: [
                           CustomTextField(
-                            label: 'Новый пароль',
-                            hint: 'Минимум 8 символов, буквы и цифры',
+                            label: tr('Новый пароль'),
+                            hint: tr('Минимум 8 символов, буквы и цифры'),
                             controller: _password,
                             isPassword: true,
                             validator: Validators.password,
@@ -110,7 +113,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           ),
                           const SizedBox(height: 14),
                           CustomTextField(
-                            label: 'Повторите пароль',
+                            label: tr('Повторите пароль'),
                             hint: '••••••••',
                             controller: _confirm,
                             isPassword: true,
@@ -123,7 +126,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                     const SizedBox(height: 20),
                     CustomButton(
-                      label: 'Сохранить пароль',
+                      label: tr('Сохранить пароль'),
                       loading: _loading,
                       onPressed: _save,
                     ),

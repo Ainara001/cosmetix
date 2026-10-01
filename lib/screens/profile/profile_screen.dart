@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +23,7 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           BackTitleBar(
-            title: 'Профиль',
+            title: tr('Профиль'),
             centerTitle: true,
             onBack: () => context.read<NavProvider>().setTab(NavProvider.home),
           ),
@@ -60,8 +61,8 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
-                              'Редактировать профиль',
+                            Text(
+                              tr('Редактировать профиль'),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.primaryDark,
@@ -81,14 +82,14 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _Stat(
-                                label: 'БОНУСЫ',
+                                label: tr('БОНУСЫ'),
                                 value: '${user.bonusPoints}',
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _Stat(
-                                label: 'ПОСЕЩЕНИЯ',
+                                label: tr('ПОСЕЩЕНИЯ'),
                                 value: '${user.visits}',
                               ),
                             ),
@@ -98,22 +99,22 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       MenuTile(
                         icon: Icons.shopping_cart_outlined,
-                        title: 'Покупки',
+                        title: tr('Покупки'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.orders),
                       ),
                       MenuTile(
                         icon: Icons.favorite_border,
-                        title: 'Избранное',
+                        title: tr('Избранное'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.favorites),
                       ),
                       MenuTile(
                         icon: Icons.sentiment_satisfied_alt_outlined,
-                        title: 'Цветотип',
+                        title: tr('Цветотип'),
                         subtitle: user.colorType.isEmpty
-                            ? 'Пройдите тест'
-                            : user.colorType,
+                            ? tr('Пройдите тест')
+                            : tr(user.colorType),
                         onTap: () => Navigator.pushNamed(
                           context,
                           AppRoutes.beautyProfile,
@@ -121,19 +122,19 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       MenuTile(
                         icon: Icons.settings,
-                        title: 'Настройки',
+                        title: tr('Настройки'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.settings),
                       ),
                       MenuTile(
                         icon: Icons.healing_outlined,
-                        title: 'Дневник Аллергии',
+                        title: tr('Дневник Аллергии'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.reactions),
                       ),
                       MenuTile(
                         icon: Icons.block,
-                        title: 'Чёрный список',
+                        title: tr('Чёрный список'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.blacklist),
                       ),

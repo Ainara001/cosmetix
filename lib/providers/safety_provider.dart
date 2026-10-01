@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/models/safety_models.dart';
@@ -48,9 +49,9 @@ class SafetyProvider extends ChangeNotifier {
   /// Returns an error text or null.
   Future<String?> addCustom(String name) async {
     final text = name.trim();
-    if (text.length < 2) return 'Название слишком короткое';
+    if (text.length < 2) return tr('Название слишком короткое');
     if (blacklist.any((b) => b.name.toLowerCase() == text.toLowerCase())) {
-      return 'Этот компонент уже есть в списке';
+      return tr('Этот компонент уже есть в списке');
     }
     await _repo.addCustom(_userId!, text);
     blacklist = await _repo.blacklist(_userId!);

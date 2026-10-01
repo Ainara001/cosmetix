@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/constants/app_constants.dart';
@@ -66,7 +67,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
       _min.text = '0';
       _max.text = '${AppConstants.maxPrice}';
     });
-    showMessage(context, 'Фильтры сброшены');
+    showMessage(context, tr('Фильтры сброшены'));
   }
 
   void _apply() {
@@ -79,7 +80,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
     if (base != null) return base;
     final min = int.tryParse(_min.text.trim()) ?? 0;
     final max = int.tryParse(_max.text.trim()) ?? AppConstants.maxPrice;
-    if (min > max) return '«От» больше «До»';
+    if (min > max) return tr('«От» больше «До»');
     return null;
   }
 
@@ -98,7 +99,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
     );
 
     return PageScaffold(
-      title: 'Фильтры',
+      title: tr('Фильтры'),
       bigTitle: true,
       showNav: false,
       child: Form(
@@ -109,45 +110,42 @@ class _FiltersScreenState extends State<FiltersScreen> {
             Divider(color: AppColors.primary.withValues(alpha: 0.6), height: 1),
             const SizedBox(height: 10),
             Text(
-              'Уточните параметры, чтобы быстрее найти нужный товар.',
+              tr('Уточните параметры, чтобы быстрее найти нужный товар.'),
               style: AppTextStyles.small.copyWith(color: pal.subtext),
             ),
             const SizedBox(height: 14),
             CustomTextField(
-              label: 'Наименование',
-              hint: 'Поиск по названию',
+              label: tr('Наименование'),
+              hint: tr('Поиск по названию'),
               controller: _name,
               suffixIcon: Icon(Icons.search, color: pal.subtext),
               onChanged: (_) => _syncFromFields(),
               validator: (v) =>
-                  (v ?? '').length > 60 ? 'Слишком длинный запрос' : null,
+                  (v ?? '').length > 60 ? tr('Слишком длинный запрос') : null,
             ),
             const SizedBox(height: 14),
-            _label('Категория'),
+            _label(tr('Категория')),
             DropdownButtonFormField<String?>(
               initialValue: _filter.category,
               isExpanded: true,
               decoration: const InputDecoration(),
               items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text('Все категории'),
-                ),
+                DropdownMenuItem(value: null, child: Text(tr('Все категории'))),
                 for (final c in AppConstants.categories)
-                  DropdownMenuItem(value: c, child: Text(c)),
+                  DropdownMenuItem(value: c, child: Text(tr(c))),
               ],
               onChanged: (v) =>
                   setState(() => _filter = _filter.copyWith(category: v)),
             ),
             const SizedBox(height: 14),
-            _label('Статус'),
+            _label(tr('Статус')),
             DropdownButtonFormField<ProductStatus>(
               initialValue: _filter.status,
               isExpanded: true,
               decoration: const InputDecoration(),
               items: [
                 for (final s in ProductStatus.values)
-                  DropdownMenuItem(value: s, child: Text(s.label)),
+                  DropdownMenuItem(value: s, child: Text(tr(s.label))),
               ],
               onChanged: (v) => setState(
                 () =>
@@ -155,7 +153,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            _label('Диапазон цены'),
+            _label(tr('Диапазон цены')),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 activeTrackColor: AppColors.salmon,
@@ -189,12 +187,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
               children: [
                 Expanded(
                   child: CustomTextField(
-                    label: 'От',
+                    label: tr('От'),
                     controller: _min,
                     keyboardType: TextInputType.number,
-                    suffixIcon: const Padding(
+                    suffixIcon: Padding(
                       padding: EdgeInsets.only(right: 14),
-                      child: Center(widthFactor: 1, child: Text('тг')),
+                      child: Center(widthFactor: 1, child: Text(tr('тг'))),
                     ),
                     onChanged: (_) => _syncFromFields(),
                     validator: _priceValidator,
@@ -203,12 +201,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: CustomTextField(
-                    label: 'До',
+                    label: tr('До'),
                     controller: _max,
                     keyboardType: TextInputType.number,
-                    suffixIcon: const Padding(
+                    suffixIcon: Padding(
                       padding: EdgeInsets.only(right: 14),
-                      child: Center(widthFactor: 1, child: Text('тг')),
+                      child: Center(widthFactor: 1, child: Text(tr('тг'))),
                     ),
                     onChanged: (_) => _syncFromFields(),
                     validator: _priceValidator,
@@ -225,8 +223,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
               ),
               child: Text(
                 _found == 0
-                    ? 'Подходящих товаров не найдено'
-                    : 'Будет найдено примерно $_found товаров',
+                    ? tr('Подходящих товаров не найдено')
+                    : trf('Будет найдено примерно {_found} товаров', {
+                        '_found': _found,
+                      }),
                 style: TextStyle(
                   fontSize: 13,
                   color: _found == 0 ? AppColors.sale : AppColors.primaryDark,
@@ -234,9 +234,13 @@ class _FiltersScreenState extends State<FiltersScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            CustomButton(label: 'Применить', onPressed: _apply),
+            CustomButton(label: tr('Применить'), onPressed: _apply),
             const SizedBox(height: 12),
-            CustomButton(label: 'Сбросить', outlined: true, onPressed: _reset),
+            CustomButton(
+              label: tr('Сбросить'),
+              outlined: true,
+              onPressed: _reset,
+            ),
           ],
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_text_styles.dart';
@@ -84,7 +85,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 : Icon(widget.prefixIcon, color: pal.subtext, size: 20),
             suffixIcon: widget.isPassword
                 ? IconButton(
-                    tooltip: _hidden ? 'Показать пароль' : 'Скрыть пароль',
+                    tooltip: _hidden
+                        ? tr('Показать пароль')
+                        : tr('Скрыть пароль'),
                     icon: Icon(
                       _hidden
                           ? Icons.visibility_outlined

@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -14,7 +15,7 @@ void showMessage(
     MessageType.success => (AppColors.success, Icons.check_circle_outline),
     MessageType.error => (AppColors.danger, Icons.error_outline),
     MessageType.warning => (AppColors.warning, Icons.warning_amber_rounded),
-    MessageType.info => (const Color(0xFF3A3135), Icons.info_outline),
+    MessageType.info => (Color(0xFF3A3135), Icons.info_outline),
   };
   final messenger = ScaffoldMessenger.of(context);
   messenger
@@ -22,14 +23,14 @@ void showMessage(
     ..showSnackBar(
       SnackBar(
         backgroundColor: color,
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        duration: const Duration(seconds: 3),
+        margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+        duration: Duration(seconds: 3),
         content: Row(
           children: [
             Icon(icon, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
-              child: Text(text, style: const TextStyle(color: Colors.white)),
+              child: Text(text, style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -54,12 +55,15 @@ Future<bool> confirmDialog(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child: Text(cancelLabel, style: TextStyle(color: ctx.pal.subtext)),
+          child: Text(
+            tr(cancelLabel),
+            style: TextStyle(color: ctx.pal.subtext),
+          ),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
           child: Text(
-            confirmLabel,
+            tr(confirmLabel),
             style: TextStyle(
               color: destructive ? AppColors.danger : AppColors.primaryDark,
               fontWeight: FontWeight.w700,
@@ -85,8 +89,8 @@ Future<void> infoDialog(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: const Text(
-            'Понятно',
+          child: Text(
+            tr('Понятно'),
             style: TextStyle(color: AppColors.primaryDark),
           ),
         ),

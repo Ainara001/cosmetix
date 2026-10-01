@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -36,7 +37,7 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
     if (_answers[_step] == null) {
       showMessage(
         context,
-        'Выберите один из вариантов',
+        tr('Выберите один из вариантов'),
         type: MessageType.warning,
       );
       return;
@@ -69,7 +70,7 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
         if (!didPop) setState(() => _step--);
       },
       child: PageScaffold(
-        title: 'Тест цветотипа',
+        title: tr('Тест цветотипа'),
         onBack: _back,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -79,12 +80,15 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
               Row(
                 children: [
                   Text(
-                    'Шаг ${_step + 1} из ${_steps.length}',
+                    trf('Шаг {v0} из {v1}', {
+                      'v0': _step + 1,
+                      'v1': _steps.length,
+                    }),
                     style: AppTextStyles.small.copyWith(color: pal.subtext),
                   ),
                   const Spacer(),
                   Text(
-                    q.section,
+                    tr(q.section),
                     style: AppTextStyles.small.copyWith(
                       color: AppColors.primaryDark,
                     ),
@@ -102,7 +106,7 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(q.question, style: AppTextStyles.title),
+              Text(tr(q.question), style: AppTextStyles.title),
               const SizedBox(height: 14),
               Expanded(
                 child: GridView.count(
@@ -122,8 +126,8 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
               ),
               CustomButton(
                 label: _step == _steps.length - 1
-                    ? 'К тесту на подтон'
-                    : 'Далее',
+                    ? tr('К тесту на подтон')
+                    : tr('Далее'),
                 onPressed: _next,
               ),
             ],
@@ -177,7 +181,7 @@ class _OptionCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            option.title,
+            tr(option.title),
             textAlign: TextAlign.center,
             maxLines: 2,
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),

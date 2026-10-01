@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -33,7 +34,7 @@ class ColorResultScreen extends StatelessWidget {
         if (!didPop) _done(context);
       },
       child: PageScaffold(
-        title: 'Результат теста',
+        title: tr('Результат теста'),
         onBack: () => _done(context),
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -57,13 +58,13 @@ class ColorResultScreen extends StatelessWidget {
             const SizedBox(height: 14),
             Center(
               child: Text(
-                'Ваш цветотип: ${result.colorType}',
+                trf('Ваш цветотип: {v0}', {'v0': result.colorType}),
                 style: AppTextStyles.h2,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              result.description,
+              tr(result.description),
               textAlign: TextAlign.center,
               style: AppTextStyles.body.copyWith(color: pal.subtext),
             ),
@@ -71,16 +72,16 @@ class ColorResultScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _Info(label: 'ПОДТОН', value: result.undertone),
+                  child: _Info(label: tr('ПОДТОН'), value: result.undertone),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _Info(label: 'ТОН КОЖИ', value: result.skinTone),
+                  child: _Info(label: tr('ТОН КОЖИ'), value: result.skinTone),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            const Text('Ваши оттенки', style: AppTextStyles.subtitle),
+            Text(tr('Ваши оттенки'), style: AppTextStyles.subtitle),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -91,22 +92,22 @@ class ColorResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              'Результат сохранён в вашем бьюти-профиле.',
+              tr('Результат сохранён в вашем бьюти-профиле.'),
               textAlign: TextAlign.center,
               style: AppTextStyles.small.copyWith(color: pal.subtext),
             ),
             const SizedBox(height: 20),
             CustomButton(
-              label: 'Подобрать косметику',
+              label: tr('Подобрать косметику'),
               onPressed: () => Navigator.pushNamed(
                 context,
                 AppRoutes.catalog,
-                arguments: const CatalogArgs(category: 'Макияж'),
+                arguments: CatalogArgs(category: 'Макияж'),
               ),
             ),
             const SizedBox(height: 10),
             CustomButton(
-              label: 'Готово',
+              label: tr('Готово'),
               outlined: true,
               onPressed: () => _done(context),
             ),
@@ -138,7 +139,7 @@ class _Info extends StatelessWidget {
           style: AppTextStyles.label.copyWith(color: context.pal.subtext),
         ),
         const SizedBox(height: 4),
-        Text(value, style: AppTextStyles.subtitle),
+        Text(tr(value), style: AppTextStyles.subtitle),
       ],
     ),
   );

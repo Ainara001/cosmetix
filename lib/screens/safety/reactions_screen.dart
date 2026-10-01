@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,15 +21,17 @@ class ReactionsScreen extends StatelessWidget {
   Future<void> _delete(BuildContext context, Reaction r) async {
     final ok = await confirmDialog(
       context,
-      title: 'Удалить запись?',
-      message: 'Реакция на «${r.productName}» будет удалена из дневника.',
-      confirmLabel: 'Удалить',
+      title: tr('Удалить запись?'),
+      message: trf('Реакция на «{v0}» будет удалена из дневника.', {
+        'v0': tr(r.productName),
+      }),
+      confirmLabel: tr('Удалить'),
       destructive: true,
     );
     if (!ok || !context.mounted) return;
     await context.read<SafetyProvider>().deleteReaction(r);
     if (context.mounted) {
-      showMessage(context, 'Запись удалена', type: MessageType.success);
+      showMessage(context, tr('Запись удалена'), type: MessageType.success);
     }
   }
 
@@ -38,25 +41,25 @@ class ReactionsScreen extends StatelessWidget {
     final pal = context.pal;
 
     return PageScaffold(
-      title: 'Дневник реакций',
+      title: tr('Дневник реакций'),
       bigTitle: true,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           CustomButton(
-            label: 'Добавить реакцию',
+            label: tr('Добавить реакцию'),
             icon: Icons.add,
             onPressed: () =>
                 Navigator.pushNamed(context, AppRoutes.reactionForm),
           ),
-          const SectionTitle('История кожных реакций'),
+          SectionTitle(tr('История кожных реакций')),
           if (safety.reactions.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: Icons.healing_outlined,
-              title: 'Реакций не было',
-              subtitle:
-                  'Записывайте реакции кожи на косметику, чтобы избегать '
-                  'неподходящих средств',
+              title: tr('Реакций не было'),
+              subtitle: tr(
+                'Записывайте реакции кожи на косметику, чтобы избегать неподходящих средств',
+              ),
             ),
           for (final r in safety.reactions)
             Padding(
@@ -84,7 +87,7 @@ class ReactionsScreen extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'Тяжесть: ',
+                          tr('Тяжесть: '),
                           style: AppTextStyles.small.copyWith(
                             color: pal.subtext,
                           ),
@@ -101,7 +104,7 @@ class ReactionsScreen extends StatelessWidget {
                             ),
                           ),
                         PopupMenuButton<String>(
-                          tooltip: 'Действия',
+                          tooltip: tr('Действия'),
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.more_vert, size: 18),
                           onSelected: (v) {
@@ -115,14 +118,14 @@ class ReactionsScreen extends StatelessWidget {
                               _delete(context, r);
                             }
                           },
-                          itemBuilder: (_) => const [
+                          itemBuilder: (_) => [
                             PopupMenuItem(
                               value: 'edit',
-                              child: Text('Редактировать'),
+                              child: Text(tr('Редактировать')),
                             ),
                             PopupMenuItem(
                               value: 'delete',
-                              child: Text('Удалить'),
+                              child: Text(tr('Удалить')),
                             ),
                           ],
                         ),
@@ -146,7 +149,7 @@ class ReactionsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                r.productName,
+                                tr(r.productName),
                                 style: AppTextStyles.bodyBold,
                               ),
                               const SizedBox(height: 4),
@@ -160,7 +163,7 @@ class ReactionsScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  r.title,
+                                  tr(r.title),
                                   style: const TextStyle(
                                     fontSize: 11,
                                     color: AppColors.sale,

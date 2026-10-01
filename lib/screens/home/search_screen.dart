@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +66,7 @@ class _SearchScreenState extends State<SearchScreen> {
               .toList();
 
     return PageScaffold(
-      title: 'Поиск',
+      title: tr('Поиск'),
       bigTitle: true,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -77,39 +78,39 @@ class _SearchScreenState extends State<SearchScreen> {
             onChanged: (_) => setState(() {}),
             onSubmitted: _submit,
             decoration: InputDecoration(
-              hintText: 'Поиск брендов, косметики, оттенков...',
+              hintText: tr('Поиск брендов, косметики, оттенков...'),
               prefixIcon: Icon(Icons.search, color: pal.subtext),
               suffixIcon: _controller.text.isEmpty
                   ? null
                   : IconButton(
-                      tooltip: 'Очистить',
+                      tooltip: tr('Очистить'),
                       icon: const Icon(Icons.close, size: 20),
                       onPressed: () => setState(_controller.clear),
                     ),
             ),
           ),
           if (query.isNotEmpty) ...[
-            SectionTitle('Результаты (${matches.length})'),
+            SectionTitle(trf('Результаты ({v0})', {'v0': matches.length})),
             if (matches.isEmpty)
-              const EmptyState(
+              EmptyState(
                 icon: Icons.search_off,
-                title: 'Ничего не найдено',
-                subtitle: 'Попробуйте другой запрос или название бренда',
+                title: tr('Ничего не найдено'),
+                subtitle: tr('Попробуйте другой запрос или название бренда'),
               )
             else ...[
               for (final p in matches) _ProductRow(product: p),
               const SizedBox(height: 8),
               LinkText(
-                'Показать все в каталоге',
+                tr('Показать все в каталоге'),
                 onTap: () => _submit(_controller.text),
               ),
             ],
           ] else ...[
             if (catalog.history.isNotEmpty) ...[
               SectionTitle(
-                'История поиска',
+                tr('История поиска'),
                 trailing: LinkText(
-                  'Очистить',
+                  tr('Очистить'),
                   onTap: () => context.read<CatalogProvider>().clearHistory(),
                 ),
               ),
@@ -135,7 +136,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ],
-            const SectionTitle('Популярные категории'),
+            SectionTitle(tr('Популярные категории')),
             GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
@@ -158,7 +159,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         Icon(c.$2, color: AppColors.primaryDark, size: 28),
                         const SizedBox(height: 6),
                         Text(
-                          c.$1,
+                          tr(c.$1),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           style: AppTextStyles.caption,
@@ -168,10 +169,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
               ],
             ),
-            const SectionTitle('Сейчас в тренде'),
+            SectionTitle(tr('Сейчас в тренде')),
             if (catalog.trending.isEmpty)
               Text(
-                'Пока нет трендовых товаров',
+                tr('Пока нет трендовых товаров'),
                 style: TextStyle(color: pal.subtext),
               )
             else
@@ -222,7 +223,7 @@ class _ProductRow extends StatelessWidget {
                     style: TextStyle(fontSize: 10, color: pal.subtext),
                   ),
                   Text(
-                    product.name,
+                    tr(product.name),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.bodyBold,

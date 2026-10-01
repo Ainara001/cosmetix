@@ -1,0 +1,210 @@
+210|Cart
+211|Cart cleared
+212|Cart is empty
+213|The cart is already empty
+214|Beautiful packaging, colors as in the photo.
+215|I burn first, then tan
+216|SPF 50 Relief Sun Cream
+217|No critical ingredients found.
+218|Iconic lip tint that lasts up to 8 hours.
+219|Missha Magic Cushion
+220|Sodium Lauryl Sulfate / SLS
+221|Light peeling
+222|Summer
+223|Face
+224|Best price: from {v0}
+225|The best SPF I have tried, leaves no white cast.
+226|Any status
+227|Light serum with niacinamide and hyaluronic acid.
+228|Light cushion with a glowing finish and SPF.
+229|Light peeling
+230|-
+231|Makeup
+232|Maximum 10 pieces of one product
+233|Maximum 300 characters
+234|-
+235|-
+236|Mattifying filler.
+237|May
+238|Mineral oil
+239|Mineral Oil
+240|Mineral UV filter.
+241|At least 8 characters, letters and digits
+242|My purchases
+243|Wrinkles and aging
+244|We sent a recovery link to {v0}.\n\nThe app works without a server, so the email is simulated: set a new password on the next screen.
+245|We will notify you when prices of your favorite products drop.
+246|Soft shadows, blend easily.
+247|OUT OF STOCK
+248|To home
+249|A skincare set in gift packaging.
+250|Tap the heart on a product to save it here
+251|Back
+252|The name is too short
+253|Name
+254|Settings
+255|Natural wax, softens the lips.
+256|Bonuses earned
+257|No more than {max}
+258|Cannot be negative
+259|Could not sign in with {provider}
+260|Could not sign in. Please try again
+261|Could not add the product to the cart
+262|Could not load the catalog
+263|Could not load the ingredients of this product
+264|Could not change the password
+265|Could not open this screen. Go back.
+266|Could not place the order. Please try again
+267|Could not get the photo. Check camera/gallery access.
+268|Could not reset the data
+269|Could not create the account. Please try again
+270|Could not save the entry
+271|Could not save the changes
+272|Could not save the review
+273|Could not save the result
+274|Wrong email or password
+275|A gentle floral-musk fragrance for the whole day.
+276|Neutral
+277|Invalid email, for example name@mail.com
+278|You must accept the terms
+279|No
+280|No account?
+281|Out of stock
+282|No offers
+283|Niacinamide
+284|Seriously good quality - lasts long, can't be felt on the skin and doesn't emphasize pores.
+285|Seriously good quality - perfect for everyday makeup and causes no discomfort.
+286|Seriously good quality - liked the shade, but it gets slightly shiny on the second day.
+287|Nothing found
+288|New password
+289|Normal
+290|November
+291|I need help choosing - which costs less: the FlowerKnows or the Peripera palette?
+292|About the product
+293|Zinc Oxide
+294|October
+295|Olive / medium
+296|Description
+297|Describe the reaction
+298|Autumn
+299|The main solvent, completely safe.
+300|Leave the first review of this product
+301|Leave your review
+302|From
+303|Review
+304|Review updated
+305|Review deleted
+306|No reviews yet
+307|No reviews yet. Be the first!
+308|Reviews
+309|Reviews{v0}
+310|Great ingredients!
+311|Cancel
+312|Undo
+313|Mark the ingredients that should not be in your cosmetics. We will warn you when analyzing a product.
+314|Send
+315|Submit review
+316|Send link
+317|Swelling
+318|Check out
+319|Place order
+320|Place the order?
+321|Placed
+322|Placed orders will appear here
+323|Rate the product
+324|Very delicate shades, good pigment.
+325|Very fair, porcelain
+326|Very light
+327|Clear
+328|Clear cart
+329|Clear the cart?
+330|Clear the conversation?
+331|Clear chat
+332|Error
+333|UNDERTONE
+334|VISITS
+335|PREFERENCES
+336|Flower Knows Strawberry Palette
+337|The Flower Knows palette costs 2 500 KZT, and the Peripera Ink Cozy - 4 800 KZT. If budget matters more, Flower Knows wins on price right now.
+338|Peripera Ink Cozy Palette
+339|A palette of 9 delicate shades with shimmer and matte textures.
+340|Parabens
+341|Parabens
+342|Passwords do not match
+343|Password
+344|The password must be at least 8 characters
+345|The password must contain letters and digits
+346|Password changed. Sign in with the new password
+347|The password is too long (maximum 64)
+348|Peripera Mood Perfume
+349|Perfume
+350|Parfum
+351|Foaming agents, dry the skin
+352|Foaming agent, dries the skin.
+353|Go to catalog
+354|Peach
+355|Typing…
+356|Pigmentation
+357|Nourishing body cream with ceramides.
+358|No products match your query. Change the search or filters.
+359|By name
+360|Newest
+361|Repeat the password
+362|Retry
+363|Gifts
+364|"Tenderness" gift set
+365|Pick cosmetics
+366|Demo account data filled in
+367|Undertone
+368|No suitable products found
+369|Search
+370|Search brands, cosmetics, shades...
+371|Search by name
+372|No trending products yet
+373|Nobody has added a photo yet. Be the first!
+374|Show all in catalog
+375|Show password
+376|Redness and itching
+377|Purchases
+378|No purchases yet
+379|Privacy Policy
+380|User
+381|The assistant is still replying, wait a second
+382|Got it
+383|Try another query or a brand name
+384|Popular
+385|Popular categories
+386|Latest reviews
+387|Look at the veins on your wrist in natural light.
+388|Recommend a lip tint
+389|Rate the product
+390|Potential allergens
+391|I almost never burn
+392|Excellent ingredients!
+393|Adds glow and pigment.
+394|Create a new password for {v0}.
+395|Acceptable ingredients
+396|Apply
+397|Accept the terms of use
+398|Pleasant shade, but slightly sticky.
+399|Skin concerns (care focus)
+400|Check the form fields
+401|Product
+402|Petroleum product
+403|Petroleum product.
+404|The product contains: {v0}. People with high sensitivity are advised to do a patch test on the elbow.
+405|Take the test
+406|Retake the beauty test
+407|Profile
+408|Powder blush with a natural glow.
+409|Push notifications about discounts
+410|Beeswax
+411|Tell us how you like the product...
+412|No reactions
+413|Reaction added to the diary
+414|The reaction to "{v0}" will be deleted from the diary.
+415|Sign up
+416|Edit
+417|Edit review
+418|Edit profile
+419|Edit reaction

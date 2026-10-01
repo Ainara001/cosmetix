@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/routes/route_args.dart';
@@ -12,12 +13,12 @@ class LegalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: args.title,
+      title: tr(args.title),
       showNav: false,
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
         child: Text(
-          args.text,
+          tr(args.text),
           style: const TextStyle(fontSize: 14, height: 1.5),
         ),
       ),

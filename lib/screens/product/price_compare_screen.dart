@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -58,27 +59,29 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(p.storeName, style: AppTextStyles.h2),
+            Text(tr(p.storeName), style: AppTextStyles.h2),
             const SizedBox(height: 4),
-            Text('${p.address} • ${p.distanceLabel}'),
+            Text('${tr(p.address)} • ${p.distanceLabel}'),
             const SizedBox(height: 4),
-            Text('Рейтинг магазина: ★ ${p.rating}'),
+            Text(trf('Рейтинг магазина: ★ {v0}', {'v0': p.rating})),
             const SizedBox(height: 12),
             Text(
-              '${product.name} — ${fmt(p.price)}',
+              '${tr(product.name)} — ${fmt(p.price)}',
               style: AppTextStyles.bodyBold,
             ),
             const SizedBox(height: 16),
             CustomButton(
               label: p.inStock
-                  ? 'Добавить в корзину из этого магазина'
-                  : 'Нет в наличии',
+                  ? tr('Добавить в корзину из этого магазина')
+                  : tr('Нет в наличии'),
               onPressed: () async {
                 if (!p.inStock) {
                   showMessage(
                     ctx,
-                    'В магазине «${p.storeName}» товара нет в наличии. '
-                    'Выберите другой магазин.',
+                    trf(
+                      'В магазине «{v0}» товара нет в наличии. Выберите другой магазин.',
+                      {'v0': tr(p.storeName)},
+                    ),
                     type: MessageType.warning,
                   );
                   return;
@@ -91,7 +94,8 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                 if (!mounted) return;
                 showMessage(
                   context,
-                  err ?? 'Добавлено в корзину: ${p.storeName}',
+                  err ??
+                      trf('Добавлено в корзину: {v0}', {'v0': tr(p.storeName)}),
                   type: err == null ? MessageType.success : MessageType.error,
                 );
               },
@@ -110,11 +114,8 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
 
     if (product == null) {
       return PageScaffold(
-        title: 'Сравнение цен',
-        child: const EmptyState(
-          icon: Icons.search_off,
-          title: 'Товар не найден',
-        ),
+        title: tr('Сравнение цен'),
+        child: EmptyState(icon: Icons.search_off, title: tr('Товар не найден')),
       );
     }
 
@@ -129,7 +130,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
         : _prices.map((e) => e.price).reduce((a, b) => a < b ? a : b);
 
     return PageScaffold(
-      title: 'Сравнение цен',
+      title: tr('Сравнение цен'),
       bigTitle: true,
       child: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -154,13 +155,13 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              product.name,
+                              tr(product.name),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.bodyBold,
                             ),
                             Text(
-                              'Лучшая цена: от ${fmt(best)}',
+                              trf('Лучшая цена: от {v0}', {'v0': fmt(best)}),
                               style: AppTextStyles.small.copyWith(
                                 color: pal.subtext,
                               ),
@@ -177,12 +178,12 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                   runSpacing: 8,
                   children: [
                     AppChip(
-                      label: 'Сначала дешёвые',
+                      label: tr('Сначала дешёвые'),
                       selected: _cheapFirst,
                       onTap: () => setState(() => _cheapFirst = true),
                     ),
                     AppChip(
-                      label: 'Ближе ко мне',
+                      label: tr('Ближе ко мне'),
                       selected: !_cheapFirst,
                       onTap: () => setState(() => _cheapFirst = false),
                     ),
@@ -190,10 +191,10 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                 ),
                 const SizedBox(height: 12),
                 if (list.isEmpty)
-                  const EmptyState(
+                  EmptyState(
                     icon: Icons.storefront_outlined,
-                    title: 'Нет предложений',
-                    subtitle: 'Для этого товара пока нет цен в магазинах',
+                    title: tr('Нет предложений'),
+                    subtitle: tr('Для этого товара пока нет цен в магазинах'),
                   )
                 else
                   for (final p in list)
@@ -211,7 +212,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    p.storeName,
+                                    tr(p.storeName),
                                     style: AppTextStyles.subtitle,
                                   ),
                                 ),
@@ -238,7 +239,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
-                                    '${p.distanceLabel} • ${p.address}',
+                                    '${p.distanceLabel} • ${tr(p.address)}',
                                     style: AppTextStyles.caption.copyWith(
                                       color: pal.subtext,
                                     ),
@@ -267,7 +268,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  'Нет в наличии',
+                                  tr('Нет в наличии'),
                                   style: AppTextStyles.caption.copyWith(
                                     color: AppColors.sale,
                                   ),

@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Поиск брендов, косметики, оттенков...',
+                        tr('Поиск брендов, косметики, оттенков...'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(color: pal.subtext, fontSize: 13),
@@ -75,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   for (final c in _categories)
                     Tooltip(
-                      message: c.$1,
+                      message: tr(c.$1),
                       child: InkWell(
                         onTap: () => Navigator.pushNamed(
                           context,
@@ -97,9 +98,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             SectionTitle(
-              'Популярное',
+              tr('Популярное'),
               trailing: LinkText(
-                'Весь каталог',
+                tr('Весь каталог'),
                 onTap: () => Navigator.pushNamed(
                   context,
                   AppRoutes.catalog,
@@ -118,10 +119,10 @@ class HomeScreen extends StatelessWidget {
                 onRetry: () => catalog.load(_userId(context)),
               )
             else if (catalog.products.isEmpty)
-              const EmptyState(
+              EmptyState(
                 icon: Icons.inventory_2_outlined,
-                title: 'Каталог пуст',
-                subtitle: 'Товары пока не добавлены',
+                title: tr('Каталог пуст'),
+                subtitle: tr('Товары пока не добавлены'),
               )
             else
               GridView.builder(
@@ -144,8 +145,8 @@ class HomeScreen extends StatelessWidget {
                         showMessage(
                           context,
                           state
-                              ? 'Добавлено в избранное'
-                              : 'Удалено из избранного',
+                              ? tr('Добавлено в избранное')
+                              : tr('Удалено из избранного'),
                           type: state ? MessageType.success : MessageType.info,
                         );
                       }
@@ -206,7 +207,7 @@ class _Banner extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.92),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
@@ -217,7 +218,7 @@ class _Banner extends StatelessWidget {
                       SizedBox(width: 6),
                       Flexible(
                         child: Text(
-                          'Специальное предложение',
+                          tr('Специальное предложение'),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.small,

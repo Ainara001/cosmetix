@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 class Ingredient {
@@ -89,18 +90,21 @@ class IngredientAnalysis {
   }
 
   String get headline {
-    if (score >= 9) return 'Превосходный состав!';
-    if (score >= 7.5) return 'Отличный состав!';
-    if (score >= 6) return 'Приемлемый состав';
-    return 'Состав вызывает вопросы';
+    if (score >= 9) return tr('Превосходный состав!');
+    if (score >= 7.5) return tr('Отличный состав!');
+    if (score >= 6) return tr('Приемлемый состав');
+    return tr('Состав вызывает вопросы');
   }
 
   String get summary {
-    if (criticalCount == 0) return 'Критических компонентов не обнаружено.';
+    if (criticalCount == 0) return tr('Критических компонентов не обнаружено.');
     final word = criticalCount == 1
-        ? 'критический компонент'
-        : 'критических компонента';
-    return 'Большинство ингредиентов безопасны. Обнаружен $criticalCount $word.';
+        ? tr('критический компонент')
+        : tr('критических компонента');
+    return trf(
+      'Большинство ингредиентов безопасны. Обнаружен {criticalCount} {word}.',
+      {'criticalCount': criticalCount, 'word': word},
+    );
   }
 
   Color get scoreColor => score >= 7.5
@@ -136,7 +140,7 @@ class Reaction {
   factory Reaction.fromMap(Map<String, Object?> m) => Reaction(
     id: m['id'] as int,
     productId: m['product_id'] as int,
-    productName: m['product_name'] as String? ?? 'Удалённый товар',
+    productName: m['product_name'] as String? ?? tr('Удалённый товар'),
     art: m['art'] as String? ?? 'bottle',
     color: m['color'] as int? ?? 0xFFF4B6C2,
     title: m['title'] as String,

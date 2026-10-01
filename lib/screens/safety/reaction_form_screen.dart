@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,7 +55,7 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
         if (AppConstants.reactionTypes.contains(r.title)) {
           _type = r.title;
         } else {
-          _type = 'Другое';
+          _type = tr('Другое');
           _custom.text = r.title;
         }
       }
@@ -76,14 +77,14 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
       initialDate: _date.isAfter(now) ? now : _date,
       firstDate: DateTime(2020),
       lastDate: now,
-      helpText: 'Дата реакции',
+      helpText: tr('Дата реакции'),
     );
     if (picked != null) setState(() => _date = picked);
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) {
-      showMessage(context, 'Проверьте поля формы', type: MessageType.error);
+      showMessage(context, tr('Проверьте поля формы'), type: MessageType.error);
       return;
     }
     setState(() => _saving = true);
@@ -100,7 +101,7 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
       if (!mounted) return;
       showMessage(
         context,
-        _editing ? 'Запись обновлена' : 'Реакция добавлена в дневник',
+        _editing ? tr('Запись обновлена') : tr('Реакция добавлена в дневник'),
         type: MessageType.success,
       );
       Navigator.pop(context);
@@ -109,7 +110,7 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
         setState(() => _saving = false);
         showMessage(
           context,
-          'Не удалось сохранить запись',
+          tr('Не удалось сохранить запись'),
           type: MessageType.error,
         );
       }
@@ -119,9 +120,9 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
   Future<void> _delete() async {
     final ok = await confirmDialog(
       context,
-      title: 'Удалить запись?',
-      message: 'Запись будет удалена из дневника реакций.',
-      confirmLabel: 'Удалить',
+      title: tr('Удалить запись?'),
+      message: tr('Запись будет удалена из дневника реакций.'),
+      confirmLabel: tr('Удалить'),
       destructive: true,
     );
     if (!ok || !mounted) return;
@@ -129,7 +130,7 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
     final r = await safety.reactionById(widget.reactionId!);
     if (r != null) await safety.deleteReaction(r);
     if (!mounted) return;
-    showMessage(context, 'Запись удалена', type: MessageType.success);
+    showMessage(context, tr('Запись удалена'), type: MessageType.success);
     Navigator.pop(context);
   }
 
@@ -139,7 +140,7 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
     final pal = context.pal;
 
     return PageScaffold(
-      title: _editing ? 'Редактировать реакцию' : 'Добавить реакцию',
+      title: _editing ? tr('Редактировать реакцию') : tr('Добавить реакцию'),
       showNav: false,
       child: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -148,20 +149,20 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                 children: [
-                  _label('Продукт'),
+                  _label(tr('Продукт')),
                   DropdownButtonFormField<int>(
                     initialValue: products.any((p) => p.id == _productId)
                         ? _productId
                         : null,
                     isExpanded: true,
-                    hint: const Text('Выберите продукт'),
-                    validator: (v) => v == null ? 'Выберите продукт' : null,
+                    hint: Text(tr('Выберите продукт')),
+                    validator: (v) => v == null ? tr('Выберите продукт') : null,
                     items: [
                       for (final p in products)
                         DropdownMenuItem(
                           value: p.id,
                           child: Text(
-                            '${p.brand} — ${p.name}',
+                            '${p.brand} — ${tr(p.name)}',
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -169,15 +170,16 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
                     onChanged: (v) => setState(() => _productId = v),
                   ),
                   const SizedBox(height: 14),
-                  _label('Тип реакции'),
+                  _label(tr('Тип реакции')),
                   DropdownButtonFormField<String>(
                     initialValue: _type,
                     isExpanded: true,
-                    hint: const Text('Выберите реакцию'),
-                    validator: (v) => v == null ? 'Выберите тип реакции' : null,
+                    hint: Text(tr('Выберите реакцию')),
+                    validator: (v) =>
+                        v == null ? tr('Выберите тип реакции') : null,
                     items: [
                       for (final t in AppConstants.reactionTypes)
-                        DropdownMenuItem(value: t, child: Text(t)),
+                        DropdownMenuItem(value: t, child: Text(tr(t))),
                     ],
                     onChanged: (v) => setState(() => _type = v),
                   ),
@@ -189,15 +191,17 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
                         v,
                         min: 3,
                         max: 40,
-                        field: 'Описание',
+                        field: tr('Описание'),
                       ),
-                      decoration: const InputDecoration(
-                        hintText: 'Опишите реакцию',
+                      decoration: InputDecoration(
+                        hintText: tr('Опишите реакцию'),
                       ),
                     ),
                   ],
                   const SizedBox(height: 14),
-                  _label('Тяжесть: $_severity из 5'),
+                  _label(
+                    trf('Тяжесть: {_severity} из 5', {'_severity': _severity}),
+                  ),
                   Row(
                     children: [
                       for (var i = 1; i <= 5; i++)
@@ -229,7 +233,7 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  _label('Дата'),
+                  _label(tr('Дата')),
                   InkWell(
                     onTap: _pickDate,
                     borderRadius: BorderRadius.circular(16),
@@ -244,29 +248,30 @@ class _ReactionFormScreenState extends State<ReactionFormScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _label('Заметка (необязательно)'),
+                  _label(tr('Заметка (необязательно)')),
                   TextFormField(
                     controller: _notes,
                     maxLines: 3,
                     maxLength: 300,
-                    validator: (v) =>
-                        (v ?? '').length > 300 ? 'Максимум 300 символов' : null,
-                    decoration: const InputDecoration(
-                      hintText: 'Что вы почувствовали?',
+                    validator: (v) => (v ?? '').length > 300
+                        ? tr('Максимум 300 символов')
+                        : null,
+                    decoration: InputDecoration(
+                      hintText: tr('Что вы почувствовали?'),
                     ),
                   ),
                   const SizedBox(height: 12),
                   CustomButton(
                     label: _editing
-                        ? 'Сохранить изменения'
-                        : 'Добавить в дневник',
+                        ? tr('Сохранить изменения')
+                        : tr('Добавить в дневник'),
                     loading: _saving,
                     onPressed: _save,
                   ),
                   if (_editing) ...[
                     const SizedBox(height: 10),
                     CustomButton(
-                      label: 'Удалить запись',
+                      label: tr('Удалить запись'),
                       outlined: true,
                       color: AppColors.sale,
                       onPressed: _delete,

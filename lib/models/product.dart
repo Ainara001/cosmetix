@@ -1,3 +1,5 @@
+import 'package:cosmetix/core/i18n/tr.dart';
+
 class Product {
   const Product({
     required this.id,
@@ -100,8 +102,10 @@ class StorePrice {
   final bool inStock;
 
   String get distanceLabel => distanceM >= 1000
-      ? '${(distanceM / 1000).toStringAsFixed(1).replaceAll('.', ',')} км от вас'
-      : '$distanceM м от вас';
+      ? trf('{v0} км от вас', {
+          'v0': (distanceM / 1000).toStringAsFixed(1).replaceAll('.', ','),
+        })
+      : trf('{distanceM} м от вас', {'distanceM': distanceM});
 
   factory StorePrice.fromMap(Map<String, Object?> m) => StorePrice(
     storeId: m['store_id'] as int,

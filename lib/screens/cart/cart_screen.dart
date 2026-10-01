@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,20 +43,20 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _clear(CartProvider cart) async {
     if (cart.items.isEmpty) {
-      showMessage(context, 'Корзина уже пуста', type: MessageType.info);
+      showMessage(context, tr('Корзина уже пуста'), type: MessageType.info);
       return;
     }
     final ok = await confirmDialog(
       context,
-      title: 'Очистить корзину?',
-      message: 'Все товары будут удалены из корзины.',
-      confirmLabel: 'Очистить',
+      title: tr('Очистить корзину?'),
+      message: tr('Все товары будут удалены из корзины.'),
+      confirmLabel: tr('Очистить'),
       destructive: true,
     );
     if (!ok || !mounted) return;
     await cart.clear();
     if (mounted) {
-      showMessage(context, 'Корзина очищена', type: MessageType.success);
+      showMessage(context, tr('Корзина очищена'), type: MessageType.success);
     }
   }
 
@@ -63,11 +64,13 @@ class _CartScreenState extends State<CartScreen> {
     final fmt = context.read<SettingsProvider>().priceText;
     final ok = await confirmDialog(
       context,
-      title: 'Оформить заказ?',
-      message:
-          'Товаров: ${cart.count}\nИтого: ${fmt(cart.total)}\n'
-          'Бонусы за заказ: +${cart.bonus}',
-      confirmLabel: 'Оформить',
+      title: tr('Оформить заказ?'),
+      message: trf('Товаров: {v0}\nИтого: {v1}\nБонусы за заказ: +{v2}', {
+        'v0': cart.count,
+        'v1': fmt(cart.total),
+        'v2': cart.bonus,
+      }),
+      confirmLabel: tr('Оформить'),
     );
     if (!ok || !mounted) return;
     setState(() => _busy = true);
@@ -77,7 +80,7 @@ class _CartScreenState extends State<CartScreen> {
     if (order == null) {
       showMessage(
         context,
-        'Не удалось оформить заказ. Попробуйте ещё раз',
+        tr('Не удалось оформить заказ. Попробуйте ещё раз'),
         type: MessageType.error,
       );
       return;
@@ -109,11 +112,11 @@ class _CartScreenState extends State<CartScreen> {
       child: Column(
         children: [
           BackTitleBar(
-            title: 'Корзина',
+            title: tr('Корзина'),
             bigTitle: true,
             onBack: () => context.read<NavProvider>().setTab(NavProvider.home),
             trailing: IconButton(
-              tooltip: 'Очистить корзину',
+              tooltip: tr('Очистить корзину'),
               onPressed: () => _clear(cart),
               icon: const Icon(
                 Icons.delete_outline,
@@ -125,21 +128,31 @@ class _CartScreenState extends State<CartScreen> {
             padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
             child: Row(
               children: [
-                PopupMenuButton<ProductSort>(
-                  tooltip: 'Сортировка',
-                  initialValue: _sort,
-                  onSelected: (v) => setState(() => _sort = v),
-                  itemBuilder: (_) => [
-                    for (final s in ProductSort.values)
-                      PopupMenuItem(value: s, child: Text(s.label)),
-                  ],
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.arrow_drop_down, size: 20),
-                        Text(_sort.label, style: const TextStyle(fontSize: 13)),
-                      ],
+                Flexible(
+                  child: PopupMenuButton<ProductSort>(
+                    tooltip: tr('Сортировка'),
+                    initialValue: _sort,
+                    onSelected: (v) => setState(() => _sort = v),
+                    itemBuilder: (_) => [
+                      for (final s in ProductSort.values)
+                        PopupMenuItem(value: s, child: Text(tr(s.label))),
+                    ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.arrow_drop_down, size: 20),
+                          Flexible(
+                            child: Text(
+                              tr(_sort.label),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -152,7 +165,7 @@ class _CartScreenState extends State<CartScreen> {
                     backgroundColor: AppColors.sale,
                     child: Icon(Icons.filter_alt_outlined, color: pal.text),
                   ),
-                  label: Text('Фильтры', style: TextStyle(color: pal.text)),
+                  label: Text(tr('Фильтры'), style: TextStyle(color: pal.text)),
                 ),
               ],
             ),
@@ -163,10 +176,11 @@ class _CartScreenState extends State<CartScreen> {
                 : cart.items.isEmpty
                 ? EmptyState(
                     icon: Icons.shopping_cart_outlined,
-                    title: 'Корзина пуста',
-                    subtitle:
-                        'Добавьте товары из каталога, чтобы оформить заказ',
-                    actionLabel: 'Перейти в каталог',
+                    title: tr('Корзина пуста'),
+                    subtitle: tr(
+                      'Добавьте товары из каталога, чтобы оформить заказ',
+                    ),
+                    actionLabel: tr('Перейти в каталог'),
                     onAction: () => Navigator.pushNamed(
                       context,
                       AppRoutes.catalog,
@@ -176,9 +190,9 @@ class _CartScreenState extends State<CartScreen> {
                 : items.isEmpty
                 ? EmptyState(
                     icon: Icons.filter_alt_off_outlined,
-                    title: 'Ничего не найдено',
-                    subtitle: 'В корзине нет товаров по выбранным фильтрам',
-                    actionLabel: 'Сбросить фильтры',
+                    title: tr('Ничего не найдено'),
+                    subtitle: tr('В корзине нет товаров по выбранным фильтрам'),
+                    actionLabel: tr('Сбросить фильтры'),
                     onAction: () =>
                         setState(() => _filter = const ProductFilter()),
                   )
@@ -203,7 +217,7 @@ class _CartScreenState extends State<CartScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Итого (${cart.count})',
+                        trf('Итого ({v0})', {'v0': cart.count}),
                         style: AppTextStyles.caption.copyWith(
                           color: pal.subtext,
                         ),
@@ -216,7 +230,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
                       Text(
-                        '+${cart.bonus} бонусов',
+                        trf('+{v0} бонусов', {'v0': cart.bonus}),
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.primaryDark,
@@ -227,7 +241,7 @@ class _CartScreenState extends State<CartScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: CustomButton(
-                      label: 'Оформить заказ',
+                      label: tr('Оформить заказ'),
                       loading: _busy,
                       onPressed: () => _checkout(cart),
                     ),
@@ -263,7 +277,7 @@ class _CartCard extends StatelessWidget {
         children: [
           if (item.storeName.isNotEmpty)
             Text(
-              item.storeName,
+              tr(item.storeName),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 10, color: pal.subtext),
@@ -276,10 +290,11 @@ class _CartCard extends StatelessWidget {
                   if (item.quantity == 1) {
                     final ok = await confirmDialog(
                       context,
-                      title: 'Удалить товар?',
-                      message:
-                          '«${item.product.name}» будет удалён из корзины.',
-                      confirmLabel: 'Удалить',
+                      title: tr('Удалить товар?'),
+                      message: trf('«{v0}» будет удалён из корзины.', {
+                        'v0': tr(item.product.name),
+                      }),
+                      confirmLabel: tr('Удалить'),
                       destructive: true,
                     );
                     if (!ok) return;
@@ -301,7 +316,7 @@ class _CartCard extends StatelessWidget {
                   if (item.quantity >= 10) {
                     showMessage(
                       context,
-                      'Максимум 10 штук одного товара',
+                      tr('Максимум 10 штук одного товара'),
                       type: MessageType.warning,
                     );
                     return;

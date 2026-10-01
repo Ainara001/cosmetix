@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/utils/formatters.dart';
@@ -11,9 +12,7 @@ class SettingsProvider extends ChangeNotifier {
   bool pushEnabled = true;
   ThemeMode themeMode = ThemeMode.light;
   AppCurrency currency = AppCurrency.kzt;
-  String language = 'Русский';
-
-  static const languages = ['Русский'];
+  AppLang language = AppLang.ru;
 
   Future<void> load() async {
     try {
@@ -21,7 +20,8 @@ class SettingsProvider extends ChangeNotifier {
       pushEnabled = map['push'] != '0';
       themeMode = map['theme'] == 'dark' ? ThemeMode.dark : ThemeMode.light;
       currency = AppCurrency.fromName(map['currency']);
-      language = map['language'] ?? 'Русский';
+      language = AppLang.fromCode(map['language']);
+      currentLang = language; // before the first frame, no rebuild needed
     } catch (e) {
       debugPrint('settings load failed: $e');
     }
@@ -48,9 +48,17 @@ class SettingsProvider extends ChangeNotifier {
     await _repo.set('currency', value.name);
   }
 
-  Future<void> setLanguage(String value) async {
+  Future<void> setLanguage(AppLang value) async {
     language = value;
+    currentLang = value;
     notifyListeners();
-    await _repo.set('language', value);
+    // Texts come from tr() in many const-built widgets: rebuild everything
+    // (keeps the navigation stack and screen state, like a hot reload).
+    try {
+      await WidgetsBinding.instance.reassembleApplication();
+    } catch (e) {
+      debugPrint('language rebuild failed: $e');
+    }
+    await _repo.set('language', value.code);
   }
 }

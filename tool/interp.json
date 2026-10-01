@@ -1,0 +1,218 @@
+[
+[
+"lib/core/utils/formatters.dart",
+"${diff.inMinutes} мин назад"
+],
+[
+"lib/core/utils/formatters.dart",
+"$h ${_plural(h, 'час', 'часа', 'часов')} назад"
+],
+[
+"lib/core/utils/formatters.dart",
+"$n ${_plural(n, 'день', 'дня', 'дней')} назад"
+],
+[
+"lib/core/utils/validators.dart",
+"$field обязательно для заполнения"
+],
+[
+"lib/core/utils/validators.dart",
+"$field обязательно для заполнения"
+],
+[
+"lib/core/utils/validators.dart",
+"$field слишком короткое (минимум 2 буквы)"
+],
+[
+"lib/core/utils/validators.dart",
+"$field слишком длинное (максимум 40)"
+],
+[
+"lib/core/utils/validators.dart",
+"$field может содержать только буквы"
+],
+[
+"lib/core/utils/validators.dart",
+"Не больше $max"
+],
+[
+"lib/core/utils/validators.dart",
+"$field обязательно для заполнения"
+],
+[
+"lib/core/utils/validators.dart",
+"$field слишком короткое (минимум $min символов)"
+],
+[
+"lib/core/utils/validators.dart",
+"$field слишком длинное (максимум $max)"
+],
+[
+"lib/models/product.dart",
+"${(distanceM / 1000).toStringAsFixed(1).replaceAll('.', ',')} км от вас"
+],
+[
+"lib/models/product.dart",
+"$distanceM м от вас"
+],
+[
+"lib/models/safety_models.dart",
+"Большинство ингредиентов безопасны. Обнаружен $criticalCount $word."
+],
+[
+"lib/providers/auth_provider.dart",
+"Не удалось войти через $provider"
+],
+[
+"lib/screens/auth/forgot_password_screen.dart",
+"Мы отправили ссылку для восстановления на ${_email.text.trim()}.\\n\\nПриложение работает без сервера, поэтому письмо имитируется: на следующем экране задайте новый пароль."
+],
+[
+"lib/screens/auth/login_screen.dart",
+"Вход через $provider выполнен (локальный аккаунт)"
+],
+[
+"lib/screens/auth/reset_password_screen.dart",
+"Придумайте новый пароль для ${widget.email}."
+],
+[
+"lib/screens/beauty/beauty_profile_screen.dart",
+"Сохранено: $picked"
+],
+[
+"lib/screens/beauty/color_result_screen.dart",
+"Ваш цветотип: ${result.colorType}"
+],
+[
+"lib/screens/beauty/color_test_screen.dart",
+"Шаг ${_step + 1} из ${_steps.length}"
+],
+[
+"lib/screens/cart/cart_screen.dart",
+"Товаров: ${cart.count}\\nИтого: ${fmt(cart.total)}\\nБонусы за заказ: +${cart.bonus}"
+],
+[
+"lib/screens/cart/cart_screen.dart",
+"Итого (${cart.count})"
+],
+[
+"lib/screens/cart/cart_screen.dart",
+"+${cart.bonus} бонусов"
+],
+[
+"lib/screens/cart/cart_screen.dart",
+"«${item.product.name}» будет удалён из корзины."
+],
+[
+"lib/screens/cart/order_success_screen.dart",
+"Заказ №${order.id} оформлен"
+],
+[
+"lib/screens/cart/orders_screen.dart",
+"Удалить заказ №${o.id}?"
+],
+[
+"lib/screens/cart/orders_screen.dart",
+"Заказ №${o.id} • ${Formatters.date(o.createdAt)}"
+],
+[
+"lib/screens/cart/orders_screen.dart",
+"+${o.bonus} бонусов"
+],
+[
+"lib/screens/catalog/filters_screen.dart",
+"Будет найдено примерно $_found товаров"
+],
+[
+"lib/screens/home/search_screen.dart",
+"Результаты (${matches.length})"
+],
+[
+"lib/screens/product/analysis_screen.dart",
+"В составе найдено: ${a.blacklistHits.join(', ')}. Нажмите, чтобы изменить чёрный список."
+],
+[
+"lib/screens/product/analysis_screen.dart",
+"Продукт содержит: ${a.allergens.map((e) => e.name.split(' / ').first).join(', ')}. Людям с высокой чувствительностью рекомендуется тест на сгибе локтя."
+],
+[
+"lib/screens/product/price_compare_screen.dart",
+"Рейтинг магазина: ★ ${p.rating}"
+],
+[
+"lib/screens/product/price_compare_screen.dart",
+"В магазине «${p.storeName}» товара нет в наличии. Выберите другой магазин."
+],
+[
+"lib/screens/product/price_compare_screen.dart",
+"Добавлено в корзину: ${p.storeName}"
+],
+[
+"lib/screens/product/price_compare_screen.dart",
+"Лучшая цена: от ${fmt(best)}"
+],
+[
+"lib/screens/product/product_screen.dart",
+"«${product.name}» добавлен в корзину"
+],
+[
+"lib/screens/product/product_screen.dart",
+"Доступна в $available ${Formatters.plural(available, 'магазине', 'магазинах', 'магазинах')}"
+],
+[
+"lib/screens/product/product_screen.dart",
+"В магазине «${_prices[i].storeName}» товара нет в наличии"
+],
+[
+"lib/screens/product/product_screen.dart",
+"${product.naturalPercent}% натуральных и немедикаментозных компонентов."
+],
+[
+"lib/screens/product/product_screen.dart",
+"Из вашего чёрного списка: ${_analysis!.blacklistHits.join(', ')}"
+],
+[
+"lib/screens/product/product_screen.dart",
+"Отзывы${reviews.reviews.isEmpty ? '' : ' (${reviews.reviews.length})'}"
+],
+[
+"lib/screens/product/product_screen.dart",
+"${price.distanceM >= 1000 ? '${(price.distanceM / 1000).toStringAsFixed(1)} км' : '${price.distanceM} м'} от вас"
+],
+[
+"lib/screens/product/reviews_screen.dart",
+"${withPhoto.length} фото"
+],
+[
+"lib/screens/product/reviews_screen.dart",
+"${provider.reviews.length} ${Formatters.plural(provider.reviews.length, 'отзыв', 'отзыва', 'отзывов')}"
+],
+[
+"lib/screens/profile/favorites_screen.dart",
+"«${p.name}» удалён из избранного"
+],
+[
+"lib/screens/profile/settings_screen.dart",
+"Перевод интерфейса на «$v» пока недоступен. Приложение остаётся на русском языке."
+],
+[
+"lib/screens/profile/settings_screen.dart",
+"Версия приложения ${AppConstants.version}"
+],
+[
+"lib/screens/safety/blacklist_screen.dart",
+"Компонент «$text» добавлен в чёрный список"
+],
+[
+"lib/screens/safety/blacklist_screen.dart",
+"Компонент «${item.name}» будет удалён из чёрного списка."
+],
+[
+"lib/screens/safety/reaction_form_screen.dart",
+"Тяжесть: $_severity из 5"
+],
+[
+"lib/screens/safety/reactions_screen.dart",
+"Реакция на «${r.productName}» будет удалена из дневника."
+]
+]

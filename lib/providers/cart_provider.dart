@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/models/cart_models.dart';
@@ -44,9 +45,9 @@ class CartProvider extends ChangeNotifier {
   /// Returns an error message or null when the product was added.
   Future<String?> add(Product product, {int? storeId}) async {
     final userId = _userId;
-    if (userId == null) return 'Сначала войдите в аккаунт';
+    if (userId == null) return tr('Сначала войдите в аккаунт');
     if (!product.inStock) {
-      return 'Товара нет в наличии, добавить его в корзину нельзя';
+      return tr('Товара нет в наличии, добавить его в корзину нельзя');
     }
     try {
       await _repo.add(userId, product.id, storeId);
@@ -54,7 +55,7 @@ class CartProvider extends ChangeNotifier {
       notifyListeners();
       return null;
     } catch (_) {
-      return 'Не удалось добавить товар в корзину';
+      return tr('Не удалось добавить товар в корзину');
     }
   }
 

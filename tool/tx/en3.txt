@@ -1,0 +1,192 @@
+420|The result is saved in your beauty profile.
+421|Test result
+422|Results ({v0})
+423|Store rating: ★ {v0}
+424|I recommend: {v0}.
+425|Ruble (₽)
+426|Better Than Cheek Blush
+427|Blush
+428|-
+429|Red / copper
+430|Salicylic Acid
+431|Reset
+432|Reset demo data
+433|Reset demo data?
+434|Reset filters
+435|Collapse
+436|Light
+437|Fair with a blush
+438|Light brown
+439|Light
+440|Light blond / dark blond
+441|Light warm type: peach, coral and golden shades, light textures and warm nudes suit you.
+442|Light cool type: choose pink, lavender and muted shades with a cool undertone.
+443|Take a photo
+444|Trending now
+445|There are no discounts right now, but I will let you know when they appear.
+446|On sale now: {v0}.
+447|September
+448|Silicone, creates a film on the skin.
+449|Silicones
+450|Severe breakouts
+451|Blue / purple
+452|Hide password
+453|The name is too long
+454|The name is too long (maximum 40)
+455|The query is too long
+456|The name is too short
+457|Complex esters, preservatives
+458|Mica
+459|Mixed (both colors)
+460|Dark-skinned / deep
+461|Tan
+462|Sign in first
+463|Cheapest first
+464|Most expensive first
+465|On sale
+466|Create a beauty profile to pick the perfect cosmetics.
+467|Create a film, clog pores
+468|Sun
+469|Sunscreen based on rice extracts.
+470|The message is too long (maximum 500 characters)
+471|Sorting
+472|The ingredients raise questions
+473|Ingredients unavailable
+474|The ingredients need attention
+475|-
+476|Saved: {picked}
+477|Save
+478|Save changes
+479|Save password
+480|Thank you for your purchase! Payment and delivery in the app are simulated.
+481|Thank you! Review published
+482|Special offer
+483|Alcohol Denat.
+484|Ingredient list
+485|The list is empty
+486|Ask about prices, ingredients, discounts...
+487|Price comparison
+488|Price comparison across stores
+489|Compare Flower Knows and Peripera prices
+490|I burn right away
+491|Medium
+492|Link sent
+493|Status
+494|Long-lasting fragrance, but a bit pricey.
+495|Long-lasting lip tint with a juicy-lips effect.
+496|Sulfates (SLS / SLES)
+497|Dry
+498|Dryness and peeling
+499|-
+500|Dries the skin, increases permeability.
+501|Niacinamide 10% Serum
+502|Face serum
+503|Serum against enlarged pores and imperfections.
+504|SKIN TONE
+505|Dostyk Plaza Mall
+506|Talc
+507|Phone
+508|Body
+509|Body and bath
+510|Theme
+511|Tenge (₸)
+512|Skin undertone test
+513|Color type test
+514|Peripera Ink Tint
+515|Flower Knows Lip Tint
+516|Tint with a velvet finish and rich color.
+517|Skin type
+518|Reaction type
+519|Product not found
+520|The product is out of stock, it cannot be added to the cart
+521|Items: {v0}\nTotal: {v1}\nOrder bonuses: +{v2}
+522|No products have been added yet
+523|Tocopherol
+524|Toxic scent fixatives
+525|Toxic scent fixatives.
+526|Digits only
+527|Skin tone
+528|Heartleaf 77% Toner
+529|Triclosan
+530|Triclosan
+531|Severity: 
+532|Severity: {_severity} of 5
+533|Dark
+534|Dark brown / black
+535|Dark
+536|Warm
+537|NOTIFICATIONS
+538|Remove
+539|Remove from favorites
+540|Notifications are off
+541|Notifications are off. Tap to turn them on in settings.
+542|Discount notifications
+543|Discount notifications are on
+544|Moisturizing ingredient, retains moisture.
+545|Moisturizing body cream
+546|Removed from favorites
+547|Delete
+548|Delete order #{v0}?
+549|Delete entry
+550|Delete the entry?
+551|Remove from the list?
+552|Delete the review?
+553|Remove the item?
+554|Deleted product
+555|Already have an account?
+556|Indicates a neutral undertone
+557|Indicates a warm undertone
+558|Indicates a cool undertone
+559|A universal palette of nude shades for every day.
+560|Terms of Use
+561|Soothing toner with houttuynia extract.
+562|Refine the parameters to find the product you need faster.
+563|Face care
+564|A cozy palette in warm pink-brown tones.
+565|Last name
+566|February
+567|Filters
+568|Filters reset
+569|Formaldehyde
+570|Formaldehyde
+571|Customer product photos
+572|Phthalates
+573|Phthalates
+574|Cool
+575|Cool pink
+576|Avatar color
+577|Color type
+578|Price
+579|What did you feel?
+580|Something went wrong
+581|Something went wrong, try rephrasing your question.
+582|Sensitive
+583|Sensitivity and redness
+584|Black / dark brunette
+585|Blacklist
+586|Step {v0} of {v1}
+587|Perfect Serum Shampoo
+588|Brown / chestnut
+589|Screen unavailable
+590|This action cannot be undone.
+591|This email is already used by another account
+592|This ingredient is already in the list
+593|I can compare prices, check ingredients, show discounts or pick cosmetics. For example: "Recommend a lip tint" or "What is the composition of the Flower Knows palette?"
+594|I agree to the 
+595|Berry / burgundy
+596|App language
+597|January
+598|yesterday
+599|day
+600|days
+601|days
+602|critical ingredient
+603|critical ingredients
+604|12 Dostyk Ave.
+605|KZT
+606|just now
+607|45 Abay St.
+608|terms of use
+609|hour
+610|hours
+611|hours

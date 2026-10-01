@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,7 +43,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!exists) {
       setState(() {
         _loading = false;
-        _error = 'Аккаунт с таким email не найден';
+        _error = tr('Аккаунт с таким email не найден');
       });
       return;
     }
@@ -50,11 +51,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     // No server: the "e-mail" is simulated and the user continues locally.
     await infoDialog(
       context,
-      title: 'Ссылка отправлена',
-      message:
-          'Мы отправили ссылку для восстановления на ${_email.text.trim()}.\n\n'
-          'Приложение работает без сервера, поэтому письмо имитируется: '
-          'на следующем экране задайте новый пароль.',
+      title: tr('Ссылка отправлена'),
+      message: trf(
+        'Мы отправили ссылку для восстановления на {v0}.\n\nПриложение работает без сервера, поэтому письмо имитируется: на следующем экране задайте новый пароль.',
+        {'v0': _email.text.trim()},
+      ),
     );
     if (!mounted) return;
     Navigator.pushReplacementNamed(
@@ -75,7 +76,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                tooltip: 'Назад',
+                tooltip: tr('Назад'),
                 onPressed: () => Navigator.of(context).maybePop(),
                 icon: const Icon(
                   Icons.chevron_left,
@@ -101,8 +102,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      'Забыли пароль?',
+                    Text(
+                      tr('Забыли пароль?'),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
@@ -110,8 +111,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Введите email, указанный при регистрации, и мы отправим '
-                      'ссылку для восстановления доступа.',
+                      tr(
+                        'Введите email, указанный при регистрации, и мы отправим ссылку для восстановления доступа.',
+                      ),
                       textAlign: TextAlign.center,
                       style: AppTextStyles.small.copyWith(color: pal.subtext),
                     ),
@@ -141,22 +143,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     const SizedBox(height: 14),
                     CustomButton(
-                      label: 'Отправить ссылку',
+                      label: tr('Отправить ссылку'),
                       loading: _loading,
                       onPressed: _send,
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          'Вспомнили пароль?',
+                          tr('Вспомнили пароль?'),
                           style: AppTextStyles.small.copyWith(
                             color: pal.subtext,
                           ),
                         ),
                         LinkText(
-                          'Вернуться к входу',
+                          tr('Вернуться к входу'),
                           onTap: () => Navigator.of(context).maybePop(),
                         ),
                       ],

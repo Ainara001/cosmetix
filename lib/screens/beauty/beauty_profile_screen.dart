@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,7 +34,7 @@ class BeautyProfileScreen extends StatelessWidget {
             const SizedBox(height: 8),
             for (final o in options)
               ListTile(
-                title: Text(o),
+                title: Text(tr(o)),
                 trailing: o == current
                     ? const Icon(Icons.check, color: AppColors.primaryDark)
                     : null,
@@ -47,7 +48,11 @@ class BeautyProfileScreen extends StatelessWidget {
     if (picked == null || picked == current) return;
     await onSave(picked);
     if (context.mounted) {
-      showMessage(context, 'Сохранено: $picked', type: MessageType.success);
+      showMessage(
+        context,
+        trf('Сохранено: {picked}', {'picked': picked}),
+        type: MessageType.success,
+      );
     }
   }
 
@@ -56,7 +61,7 @@ class BeautyProfileScreen extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final user = auth.user;
     if (user == null) {
-      return const PageScaffold(title: 'Бьюти-профиль', child: SizedBox());
+      return PageScaffold(title: tr('Бьюти-профиль'), child: SizedBox());
     }
     final pal = context.pal;
 
@@ -83,7 +88,7 @@ class BeautyProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              value.isEmpty ? '—' : value,
+              value.isEmpty ? '—' : tr(value),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -98,14 +103,15 @@ class BeautyProfileScreen extends StatelessWidget {
     }
 
     return PageScaffold(
-      title: 'Бьюти-профиль',
+      title: tr('Бьюти-профиль'),
       bigTitle: true,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           Text(
-            'Ваши индивидуальные особенности кожи и цветотипа для более '
-            'точного подбора косметики.',
+            tr(
+              'Ваши индивидуальные особенности кожи и цветотипа для более точного подбора косметики.',
+            ),
             style: AppTextStyles.small.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 14),
@@ -121,44 +127,44 @@ class BeautyProfileScreen extends StatelessWidget {
             ),
             children: [
               tile(
-                'Тип кожи',
+                tr('Тип кожи'),
                 user.skinType,
                 () => _pick(
                   context,
-                  title: 'Тип кожи',
+                  title: tr('Тип кожи'),
                   options: AppConstants.skinTypes,
                   current: user.skinType,
                   onSave: (v) => auth.updateBeauty(skinType: v),
                 ),
               ),
               tile(
-                'Тон кожи',
+                tr('Тон кожи'),
                 user.skinTone,
                 () => _pick(
                   context,
-                  title: 'Тон кожи',
+                  title: tr('Тон кожи'),
                   options: AppConstants.skinTones,
                   current: user.skinTone,
                   onSave: (v) => auth.updateBeauty(skinTone: v),
                 ),
               ),
               tile(
-                'Подтон',
+                tr('Подтон'),
                 user.undertone,
                 () => _pick(
                   context,
-                  title: 'Подтон',
+                  title: tr('Подтон'),
                   options: AppConstants.undertones,
                   current: user.undertone,
                   onSave: (v) => auth.updateBeauty(undertone: v),
                 ),
               ),
               tile(
-                'Цветотип',
+                tr('Цветотип'),
                 user.colorType,
                 () => _pick(
                   context,
-                  title: 'Цветотип',
+                  title: tr('Цветотип'),
                   options: AppConstants.colorTypes,
                   current: user.colorType,
                   onSave: (v) => auth.updateBeauty(colorType: v),
@@ -167,7 +173,7 @@ class BeautyProfileScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SectionTitle('Проблемы кожи (фокус ухода)'),
+          SectionTitle(tr('Проблемы кожи (фокус ухода)')),
           AppCard(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Column(
@@ -176,7 +182,7 @@ class BeautyProfileScreen extends StatelessWidget {
                   CheckboxListTile(
                     dense: true,
                     controlAffinity: ListTileControlAffinity.leading,
-                    title: Text(c, style: const TextStyle(fontSize: 14)),
+                    title: Text(tr(c), style: const TextStyle(fontSize: 14)),
                     value: user.skinConcerns.contains(c),
                     onChanged: (v) {
                       final list = [...user.skinConcerns];
@@ -189,7 +195,7 @@ class BeautyProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           CustomButton(
-            label: 'Пройти бьюти-тест заново',
+            label: tr('Пройти бьюти-тест заново'),
             outlined: true,
             onPressed: () => Navigator.pushNamed(context, AppRoutes.colorTest),
           ),

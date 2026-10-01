@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -71,12 +72,12 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Выбрать из галереи'),
+              title: Text(tr('Выбрать из галереи')),
               onTap: () => Navigator.pop(ctx, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Сделать снимок'),
+              title: Text(tr('Сделать снимок')),
               onTap: () => Navigator.pop(ctx, ImageSource.camera),
             ),
           ],
@@ -100,7 +101,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
       if (mounted) {
         showMessage(
           context,
-          'Не удалось получить фото. Проверьте доступ к камере/галерее.',
+          tr('Не удалось получить фото. Проверьте доступ к камере/галерее.'),
           type: MessageType.error,
         );
       }
@@ -122,7 +123,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
       if (_rating == 0) {
         showMessage(
           context,
-          'Поставьте оценку товару',
+          tr('Поставьте оценку товару'),
           type: MessageType.warning,
         );
       }
@@ -150,7 +151,9 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
       if (!mounted) return;
       showMessage(
         context,
-        _editing != null ? 'Отзыв обновлён' : 'Спасибо! Отзыв опубликован',
+        _editing != null
+            ? tr('Отзыв обновлён')
+            : tr('Спасибо! Отзыв опубликован'),
         type: MessageType.success,
       );
       setState(_resetForm);
@@ -158,7 +161,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
       if (mounted) {
         showMessage(
           context,
-          'Не удалось сохранить отзыв',
+          tr('Не удалось сохранить отзыв'),
           type: MessageType.error,
         );
       }
@@ -181,15 +184,15 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
   Future<void> _delete(Review r) async {
     final ok = await confirmDialog(
       context,
-      title: 'Удалить отзыв?',
-      message: 'Это действие нельзя отменить.',
-      confirmLabel: 'Удалить',
+      title: tr('Удалить отзыв?'),
+      message: tr('Это действие нельзя отменить.'),
+      confirmLabel: tr('Удалить'),
       destructive: true,
     );
     if (!ok || !mounted) return;
     await context.read<ReviewsProvider>().delete(r);
     if (mounted) {
-      showMessage(context, 'Отзыв удалён', type: MessageType.success);
+      showMessage(context, tr('Отзыв удалён'), type: MessageType.success);
     }
   }
 
@@ -207,7 +210,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
     ];
 
     return PageScaffold(
-      title: 'Отзывы',
+      title: tr('Отзывы'),
       centerTitle: true,
       child: provider.loading
           ? const Center(child: CircularProgressIndicator())
@@ -215,10 +218,10 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
               children: [
                 SectionTitle(
-                  'Фото товара от покупателей',
+                  tr('Фото товара от покупателей'),
                   padding: const EdgeInsets.only(top: 4, bottom: 8),
                   trailing: Text(
-                    '${withPhoto.length} фото',
+                    trf('{v0} фото', {'v0': withPhoto.length}),
                     style: AppTextStyles.small.copyWith(
                       color: AppColors.primaryDark,
                     ),
@@ -226,7 +229,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                 ),
                 if (withPhoto.isEmpty)
                   Text(
-                    'Пока никто не добавил фото. Будьте первым!',
+                    tr('Пока никто не добавил фото. Будьте первым!'),
                     style: AppTextStyles.small.copyWith(color: pal.subtext),
                   )
                 else
@@ -250,7 +253,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              withPhoto[i].author,
+                              tr(withPhoto[i].author),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.caption,
@@ -272,8 +275,8 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                             Expanded(
                               child: Text(
                                 _editing != null
-                                    ? 'Редактировать отзыв'
-                                    : 'Оставьте свой отзыв',
+                                    ? tr('Редактировать отзыв')
+                                    : tr('Оставьте свой отзыв'),
                                 style: AppTextStyles.subtitle,
                               ),
                             ),
@@ -287,7 +290,15 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                '${provider.reviews.length} ${Formatters.plural(provider.reviews.length, 'отзыв', 'отзыва', 'отзывов')}',
+                                trf('{v0} {v1}', {
+                                  'v0': provider.reviews.length,
+                                  'v1': Formatters.plural(
+                                    provider.reviews.length,
+                                    'отзыв',
+                                    'отзыва',
+                                    'отзывов',
+                                  ),
+                                }),
                                 style: const TextStyle(
                                   fontSize: 11,
                                   color: AppColors.primaryDark,
@@ -298,7 +309,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Оцените товар',
+                          tr('Оцените товар'),
                           style: AppTextStyles.small.copyWith(
                             color: pal.subtext,
                           ),
@@ -312,10 +323,10 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                           }),
                         ),
                         if (_ratingError)
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(top: 4),
                             child: Text(
-                              'Выберите оценку',
+                              tr('Выберите оценку'),
                               style: TextStyle(
                                 color: AppColors.danger,
                                 fontSize: 12,
@@ -331,10 +342,10 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                             v,
                             min: 10,
                             max: 500,
-                            field: 'Отзыв',
+                            field: tr('Отзыв'),
                           ),
-                          decoration: const InputDecoration(
-                            hintText: 'Расскажите, как вам товар...',
+                          decoration: InputDecoration(
+                            hintText: tr('Расскажите, как вам товар...'),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -364,8 +375,8 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                     ),
                                     label: Text(
                                       _photo == null
-                                          ? 'Добавить фото товара'
-                                          : 'Заменить фото',
+                                          ? tr('Добавить фото товара')
+                                          : tr('Заменить фото'),
                                     ),
                                   ),
                                   if (_photo != null)
@@ -374,7 +385,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                         _photo = null;
                                         _photoChanged = false;
                                       }),
-                                      child: const Text('Убрать'),
+                                      child: Text(tr('Убрать')),
                                     ),
                                 ],
                               ),
@@ -387,7 +398,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                             if (_editing != null) ...[
                               Expanded(
                                 child: CustomButton(
-                                  label: 'Отмена',
+                                  label: tr('Отмена'),
                                   outlined: true,
                                   onPressed: () => setState(_resetForm),
                                 ),
@@ -397,8 +408,8 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                             Expanded(
                               child: CustomButton(
                                 label: _editing != null
-                                    ? 'Сохранить'
-                                    : 'Отправить отзыв',
+                                    ? tr('Сохранить')
+                                    : tr('Отправить отзыв'),
                                 loading: _saving,
                                 onPressed: _submit,
                               ),
@@ -410,19 +421,19 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                   ),
                 ),
                 SectionTitle(
-                  'Последние отзывы',
+                  tr('Последние отзывы'),
                   trailing: provider.reviews.length > 3
                       ? LinkText(
-                          _showAll ? 'Свернуть' : 'Все',
+                          _showAll ? tr('Свернуть') : tr('Все'),
                           onTap: () => setState(() => _showAll = !_showAll),
                         )
                       : null,
                 ),
                 if (provider.reviews.isEmpty)
-                  const EmptyState(
+                  EmptyState(
                     icon: Icons.rate_review_outlined,
-                    title: 'Отзывов пока нет',
-                    subtitle: 'Оставьте первый отзыв об этом товаре',
+                    title: tr('Отзывов пока нет'),
+                    subtitle: tr('Оставьте первый отзыв об этом товаре'),
                   ),
                 for (final r in list)
                   Padding(
@@ -433,7 +444,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                         children: [
                           Row(
                             children: [
-                              Text(r.author, style: AppTextStyles.bodyBold),
+                              Text(tr(r.author), style: AppTextStyles.bodyBold),
                               const Spacer(),
                               Text(
                                 Formatters.ago(r.createdAt),
@@ -443,7 +454,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                               ),
                               if (r.userId != null && r.userId == myId)
                                 PopupMenuButton<String>(
-                                  tooltip: 'Действия',
+                                  tooltip: tr('Действия'),
                                   padding: EdgeInsets.zero,
                                   icon: const Icon(Icons.more_vert, size: 18),
                                   onSelected: (v) {
@@ -459,14 +470,14 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                       _delete(r);
                                     }
                                   },
-                                  itemBuilder: (_) => const [
+                                  itemBuilder: (_) => [
                                     PopupMenuItem(
                                       value: 'edit',
-                                      child: Text('Редактировать'),
+                                      child: Text(tr('Редактировать')),
                                     ),
                                     PopupMenuItem(
                                       value: 'delete',
-                                      child: Text('Удалить'),
+                                      child: Text(tr('Удалить')),
                                     ),
                                   ],
                                 ),
@@ -474,7 +485,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                           ),
                           StarRow(value: r.rating, size: 14),
                           const SizedBox(height: 4),
-                          Text(r.body, style: AppTextStyles.small),
+                          Text(tr(r.body), style: AppTextStyles.small),
                           if (r.photoPath != null &&
                               File(r.photoPath!).existsSync())
                             Padding(

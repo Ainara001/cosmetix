@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -71,7 +72,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
         _filter.maxPrice < AppConstants.maxPrice;
 
     return PageScaffold(
-      title: 'Каталог',
+      title: tr('Каталог'),
       bigTitle: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,12 +87,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   setState(() => _filter = _filter.copyWith(name: v)),
               onSubmitted: (v) => context.read<CatalogProvider>().addHistory(v),
               decoration: InputDecoration(
-                hintText: 'Поиск брендов, косметики, оттенков...',
+                hintText: tr('Поиск брендов, косметики, оттенков...'),
                 prefixIcon: Icon(Icons.search, color: pal.subtext),
                 suffixIcon: _search.text.isEmpty
                     ? null
                     : IconButton(
-                        tooltip: 'Очистить',
+                        tooltip: tr('Очистить'),
                         icon: const Icon(Icons.close, size: 20),
                         onPressed: () => setState(() {
                           _search.clear();
@@ -109,7 +110,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 AppChip(
-                  label: 'Все',
+                  label: tr('Все'),
                   selected: _filter.zone == null,
                   onTap: () =>
                       setState(() => _filter = _filter.copyWith(zone: null)),
@@ -117,7 +118,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 for (final z in AppConstants.zones) ...[
                   const SizedBox(width: 8),
                   AppChip(
-                    label: z,
+                    label: tr(z),
                     selected: _filter.zone == z,
                     onTap: () =>
                         setState(() => _filter = _filter.copyWith(zone: z)),
@@ -130,21 +131,31 @@ class _CatalogScreenState extends State<CatalogScreen> {
             padding: const EdgeInsets.fromLTRB(16, 6, 8, 0),
             child: Row(
               children: [
-                PopupMenuButton<ProductSort>(
-                  tooltip: 'Сортировка',
-                  initialValue: _sort,
-                  onSelected: (v) => setState(() => _sort = v),
-                  itemBuilder: (_) => [
-                    for (final s in ProductSort.values)
-                      PopupMenuItem(value: s, child: Text(s.label)),
-                  ],
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.arrow_drop_down, size: 20),
-                        Text(_sort.label, style: const TextStyle(fontSize: 13)),
-                      ],
+                Flexible(
+                  child: PopupMenuButton<ProductSort>(
+                    tooltip: tr('Сортировка'),
+                    initialValue: _sort,
+                    onSelected: (v) => setState(() => _sort = v),
+                    itemBuilder: (_) => [
+                      for (final s in ProductSort.values)
+                        PopupMenuItem(value: s, child: Text(tr(s.label))),
+                    ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.arrow_drop_down, size: 20),
+                          Flexible(
+                            child: Text(
+                              tr(_sort.label),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -157,7 +168,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     backgroundColor: AppColors.sale,
                     child: Icon(Icons.filter_alt_outlined, color: pal.text),
                   ),
-                  label: Text('Фильтры', style: TextStyle(color: pal.text)),
+                  label: Text(tr('Фильтры'), style: TextStyle(color: pal.text)),
                 ),
               ],
             ),
@@ -181,9 +192,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
     if (items.isEmpty) {
       return EmptyState(
         icon: Icons.search_off,
-        title: 'Ничего не найдено',
-        subtitle: 'По вашему запросу товаров нет. Измените поиск или фильтры.',
-        actionLabel: 'Сбросить фильтры',
+        title: tr('Ничего не найдено'),
+        subtitle: tr(
+          'По вашему запросу товаров нет. Измените поиск или фильтры.',
+        ),
+        actionLabel: tr('Сбросить фильтры'),
         onAction: () => setState(() {
           _filter = const ProductFilter();
           _search.clear();
@@ -205,7 +218,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
             if (state != null && context.mounted) {
               showMessage(
                 context,
-                state ? 'Добавлено в избранное' : 'Удалено из избранного',
+                state
+                    ? tr('Добавлено в избранное')
+                    : tr('Удалено из избранного'),
                 type: state ? MessageType.success : MessageType.info,
               );
             }

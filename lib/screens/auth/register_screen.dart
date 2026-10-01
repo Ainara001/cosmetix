@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (valid && !_agree) {
         showMessage(
           context,
-          'Примите условия использования',
+          tr('Примите условия использования'),
           type: MessageType.warning,
         );
       }
@@ -70,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
     showMessage(
       context,
-      'Аккаунт создан. Добро пожаловать в Cosmetix!',
+      tr('Аккаунт создан. Добро пожаловать в Cosmetix!'),
       type: MessageType.success,
     );
     Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.main, (_) => false);
@@ -99,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                tooltip: 'Назад',
+                tooltip: tr('Назад'),
                 onPressed: () => Navigator.of(context).maybePop(),
                 icon: const Icon(
                   Icons.chevron_left,
@@ -112,8 +113,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Регистрация',
+                    Text(
+                      tr('Регистрация'),
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w400,
@@ -121,7 +122,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Создайте бьюти-профиль, чтобы подбирать идеальную косметику.',
+                      tr(
+                        'Создайте бьюти-профиль, чтобы подбирать идеальную косметику.',
+                      ),
                       style: AppTextStyles.body.copyWith(color: pal.subtext),
                     ),
                     const SizedBox(height: 20),
@@ -131,8 +134,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CustomTextField(
-                            label: 'Имя',
-                            hint: 'Введите ваше имя',
+                            label: tr('Имя'),
+                            hint: tr('Введите ваше имя'),
                             controller: _name,
                             validator: (v) => Validators.name(v),
                             textInputAction: TextInputAction.next,
@@ -148,8 +151,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 14),
                           CustomTextField(
-                            label: 'Пароль',
-                            hint: 'Минимум 8 символов, буквы и цифры',
+                            label: tr('Пароль'),
+                            hint: tr('Минимум 8 символов, буквы и цифры'),
                             controller: _password,
                             isPassword: true,
                             validator: Validators.password,
@@ -172,12 +175,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              const Text(
-                                'Я согласен с ',
+                              Text(
+                                tr('Я согласен с '),
                                 style: TextStyle(fontSize: 13),
                               ),
                               LinkText(
-                                'условиями использования',
+                                tr('условиями использования'),
                                 bold: false,
                                 onTap: () => Navigator.pushNamed(
                                   context,
@@ -191,10 +194,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                     ),
                     if (_agreeError)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(left: 12, bottom: 6),
                         child: Text(
-                          'Необходимо принять условия',
+                          tr('Необходимо принять условия'),
                           style: TextStyle(
                             color: AppColors.danger,
                             fontSize: 12,
@@ -219,22 +222,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     CustomButton(
-                      label: 'Зарегистрироваться',
+                      label: tr('Зарегистрироваться'),
                       loading: _loading,
                       onPressed: _register,
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          'Уже есть аккаунт?',
+                          tr('Уже есть аккаунт?'),
                           style: AppTextStyles.small.copyWith(
                             color: pal.subtext,
                           ),
                         ),
                         LinkText(
-                          'Войти',
+                          tr('Войти'),
                           onTap: () => Navigator.of(context).maybePop(),
                         ),
                       ],
@@ -242,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 10),
                     Center(
                       child: Text(
-                        'ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ ЧЕРЕЗ',
+                        tr('ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ ЧЕРЕЗ'),
                         style: AppTextStyles.label.copyWith(color: pal.subtext),
                       ),
                     ),

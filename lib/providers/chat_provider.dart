@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/models/social_models.dart';
@@ -43,7 +44,7 @@ class ChatProvider extends ChangeNotifier {
       await Future<void>.delayed(const Duration(milliseconds: 600));
       answer = await _assistant.reply(clean, userId);
     } catch (_) {
-      answer = 'Что-то пошло не так, попробуйте переформулировать вопрос.';
+      answer = tr('Что-то пошло не так, попробуйте переформулировать вопрос.');
     }
     await _repo.add(userId, answer, isUser: false);
     messages = await _repo.messages(userId);

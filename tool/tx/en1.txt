@@ -1,0 +1,210 @@
+0| Warning: the ingredients include components from your blacklist — {v0}.
+1|+{v0} bonus points
+2|BHA acid. Cleanses pores. May cause dryness.
+3|Email is too long (maximum 254)
+4|{distanceM} m from you
+5|{field} may contain letters only
+6|{field} is required
+7|{field} is too long (maximum 40)
+8|{field} is too long (maximum {max})
+9|{field} is too short (minimum 2 letters)
+10|{field} is too short (minimum {min} characters)
+11|{n} {unit} ago
+12|{n} min ago
+13|{v0} km
+14|{v0} km from you
+15|{v0} m
+16|{v0} from you
+17|{v0} costs {v1}, and {v2} — {v3}. If budget matters more, "{v4}" wins on price.
+18|{v0} photos
+19|{v0}% natural and non-medicinal ingredients.
+20|"{v0}" ({v1}) — {v2}. {v3} Ask about the ingredients or a price comparison.
+21|"{v0}" will be removed from the cart.
+22|"{v0}" added to cart
+23|"{v0}" from {v1} at {v2} ({v3}).
+24|"{v0}" costs {v1}.
+25|"{v0}" removed from favorites
+26|"{v0}": ingredient score {v1}/10 ({v2}). {v3}
+27|"From" is greater than "To"
+28|August
+29|-
+30|-
+31|No account found with this email
+32|Account created. Welcome to Cosmetix!
+33|Acne and breakouts
+34|-
+35|-
+36|Ingredient analysis
+37|-
+38|Antibacterial agent
+39|Antibacterial agent.
+40|April
+41|Fragrance. May cause irritation.
+42|Astana
+43|BONUSES
+44|A basic everyday moisturizing cream.
+45|Safe formula
+46|Buying my second one, I recommend it to everyone.
+47|Rom&nd Glasting Gloss
+48|Closest to me
+49|Most ingredients are safe. Found {criticalCount} {word}.
+50|About {_found} products will be found
+51|Beauty profile
+52|IN STOCK
+53|Add to favorites
+54|Favorites are empty for now
+55|No products in the cart match the selected filters
+56|Add to cart
+57|"{v0}" is out of stock
+58|"{v0}" is out of stock. Choose another store.
+59|In stock
+60|Found in the formula: {v0}. Tap to edit the blacklist.
+61|Currency
+62|You will need to sign in again to see your data.
+63|Your color type: {v0}
+64|Your individual skin and color-type traits for more accurate cosmetics selection.
+65|Your shades
+66|Enter your email
+67|Enter the email you registered with and we will send a link to restore access.
+68|Enter your name
+69|Enter the ingredient name
+70|Enter a number in the format +7 707 123 45 67
+71|Enter your password
+72|Enter a message
+73|Back to sign in
+74|App version {v0}
+75|Spring
+76|Full catalog
+77|Vitamin E. Antioxidant, protects the skin.
+78|Water / Aqua
+79|It may have been removed from the catalog
+80|Sign in to your beauty profile to get personal recommendations and keep shopping.
+81|Sign in
+82|Hair
+83|Repairing shampoo for damaged hair.
+84|All
+85|All your data (accounts, orders, favorites, reviews) will be deleted and the database will return to the initial demo data.
+86|All categories
+87|All reviews
+88|All messages will be deleted.
+89|All items will be removed from the cart.
+90|All prices
+91|Remembered your password?
+92|Signed in with {provider} (local account)
+93|You are not signed in
+94|Choose one of the options
+95|Choose a rating
+96|Choose a product
+97|Choose a reaction
+98|Choose a reaction type
+99|Choose your vein color
+100|Choose from gallery
+101|Sign out
+102|Sign out of account
+103|Sign out of your account?
+104|Evens out skin tone and tightens pores.
+105|Hyaluronic Acid
+106|Home
+107|Eyes
+108|Glycerin
+109|Deep warm type: terracotta, copper and warm brown shades suit you.
+110|Deeply moisturizes the skin.
+111|Glossy shine with a glass effect.
+112|Blue / gray
+113|City
+114|Done
+115|Lips
+116|Next
+117|Date
+118|Reaction date
+119|Actions
+120|December
+121|Price range
+122|Dimethicone
+123|-
+124|There are no store prices for this product yet
+125|Allergy diary
+126|Reaction diary
+127|To
+128|Add
+129|Add to diary
+130|Add to cart from this store
+131|Add reaction
+132|Add your own ingredient...
+133|Add a product photo
+134|Added to favorites
+135|Added to cart: {v0}
+136|Add an ingredient you want to avoid
+137|Add items from the catalog to place an order
+138|Welcome
+139|Dollar (\$)
+140|Available in {available} {v0}
+141|Other
+142|-
+143|Contains blacklisted ingredients
+144|Any discounts?
+145|One more to cart
+146|-
+147|Burning
+148|Oily
+149|Forgot your password?
+150|Finish and show the result
+151|I tan easily
+152|Order deleted
+153|Order #{v0} placed
+154|Order #{v0} • {v1}
+155|Replace photo
+156|Note (optional)
+157|Record your skin reactions to cosmetics to avoid unsuitable products
+158|The entry will be deleted from the reaction diary.
+159|The purchase record will be deleted from the history.
+160|Entry updated
+161|Entry deleted
+162|Fill in demo account
+163|Sign up
+164|Hello! Ask me about prices, ingredients, discounts, or ask me to pick cosmetics for you.
+165|Hello! I am the Cosmetix AI assistant. What question about cosmetics or self-care can I help you with today?
+166|Green / olive
+167|Green / hazel
+168|Winter
+169|Golden Apple
+170|AI Chat
+171|AI assistant
+172|OR SIGN IN WITH
+173|OR SIGN UP WITH
+174|INFORMATION
+175|From your blacklist: {v0}
+176|Favorites
+177|Changes saved
+178|Change photo
+179|Name
+180|Skin reaction history
+181|Search history
+182|Total
+183|Total ({v0})
+184|July
+185|June
+186|Unfortunately, no suitable products were found.
+187|To the undertone test
+188|Account
+189|How does your skin react to the sun?
+190|What color are your eyes?
+191|What color are the veins on your wrist?
+192|What is the composition of the Flower Knows palette?
+193|What is your natural lip and cheek color?
+194|What is your natural skin color?
+195|What is your natural hair color?
+196|-
+197|Carcinogenic preservative
+198|Carcinogenic preservative.
+199|Catalog
+200|The catalog is empty
+201|Category
+202|Skin
+203|My skin became noticeably smoother in two weeks.
+204|Combination
+205|Ingredient "{text}" added to the blacklist
+206|Ingredient "{v0}" will be removed from the blacklist.
+207|Preservative. Potential allergen.
+208|High-contrast cool type: bright berry, wine and pure cool shades will highlight your features.
+209|Coral
