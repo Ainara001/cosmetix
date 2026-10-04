@@ -88,21 +88,15 @@ class HomeScreen extends StatelessWidget {
                         customBorder: const CircleBorder(),
                         child: Padding(
                           padding: const EdgeInsets.all(5),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/photos/${c.$2}.jpg',
-                              width: 36,
-                              height: 36,
-                              fit: BoxFit.cover,
-                              cacheWidth: 120,
-                              errorBuilder: (_, _, _) => const SizedBox(
-                                width: 36,
-                                height: 36,
-                                child: Icon(
-                                  Icons.spa_outlined,
-                                  color: AppColors.primaryDark,
-                                ),
-                              ),
+                          child: Image.asset(
+                            'assets/icons/${c.$2}.png',
+                            width: 30,
+                            height: 30,
+                            cacheWidth: 120,
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.spa_outlined,
+                              size: 30,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                         ),

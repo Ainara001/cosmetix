@@ -1,0 +1,3 @@
+Home category icons: Material Design Icons (Pictogrammers), Apache License 2.0,
+https://pictogrammers.com/library/mdi/ — lipstick, lotion, spray, bathtub, hair-dryer, gift
+(rendered to PNG in the app's primary color).

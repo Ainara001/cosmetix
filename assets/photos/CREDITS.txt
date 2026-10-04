@@ -7,11 +7,3 @@ tube.jpg — pexels.com/photo/3373746
 perfume.jpg — pexels.com/photo/264819
 bottle.jpg — pexels.com/photo/34939732
 banner.jpg — pexels.com/photo/24602068
-
-Home category images (square crops, Pexels License):
-cat_makeup.jpg — crop of palette.jpg (pexels.com/photo/1327689)
-cat_care.jpg — crop of bottle.jpg (pexels.com/photo/34939732)
-cat_perfume.jpg — crop of perfume.jpg (pexels.com/photo/264819)
-cat_body.jpg — pexels.com/photo/7418925
-cat_hair.jpg — pexels.com/photo/13573918
-cat_gift.jpg — pexels.com/photo/4397879
