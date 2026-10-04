@@ -18,12 +18,12 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   static const _categories = [
-    ('Макияж', '💄'),
-    ('Уход за лицом', '🧴'),
-    ('Парфюмерия', '🌸'),
-    ('Тело и ванна', '🛁'),
-    ('Волосы', '💇'),
-    ('Подарки', '🎁'),
+    ('Макияж', 'cat_makeup'),
+    ('Уход за лицом', 'cat_care'),
+    ('Парфюмерия', 'cat_perfume'),
+    ('Тело и ванна', 'cat_body'),
+    ('Волосы', 'cat_hair'),
+    ('Подарки', 'cat_gift'),
   ];
 
   @override
@@ -87,11 +87,23 @@ class HomeScreen extends StatelessWidget {
                         ),
                         customBorder: const CircleBorder(),
                         child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(
-                            c.$2,
-                            textScaler: TextScaler.noScaling,
-                            style: const TextStyle(fontSize: 28),
+                          padding: const EdgeInsets.all(5),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/photos/${c.$2}.jpg',
+                              width: 36,
+                              height: 36,
+                              fit: BoxFit.cover,
+                              cacheWidth: 120,
+                              errorBuilder: (_, _, _) => const SizedBox(
+                                width: 36,
+                                height: 36,
+                                child: Icon(
+                                  Icons.spa_outlined,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
