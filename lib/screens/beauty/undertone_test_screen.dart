@@ -102,11 +102,11 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            ColorTestService.veinQuestion[i].$1,
+                            tr(ColorTestService.veinQuestion[i].$1),
                             style: AppTextStyles.bodyBold,
                           ),
                           Text(
-                            ColorTestService.veinQuestion[i].$2,
+                            tr(ColorTestService.veinQuestion[i].$2),
                             style: AppTextStyles.caption.copyWith(
                               color: pal.subtext,
                             ),

@@ -172,23 +172,6 @@ class SeedData {
       'created_at': now - 60000 * 5,
     });
     if (demo) {
-      batch.insert('chat_messages', {
-        'user_id': userId,
-        'is_user': 1,
-        'text':
-            'Нужна помощь с выбором - что меньше стоит: палетка '
-            'FlowerKnows или Peripera?',
-        'created_at': now - 60000 * 4,
-      });
-      batch.insert('chat_messages', {
-        'user_id': userId,
-        'is_user': 0,
-        'text':
-            'Палетка Flower Knows стоит 2 500 тг, а Peripera Ink Cozy - '
-            '4 800 тг. Если бюджет важнее, то Flower Knows сейчас выигрывает '
-            'по цене.',
-        'created_at': now - 60000 * 3,
-      });
       for (final productId in [1, 2]) {
         batch.insert('favorites', {
           'user_id': userId,

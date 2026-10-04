@@ -145,6 +145,11 @@ void main() {
         skinTone: 'Светлый',
       );
       await visit(
+        'undertoneTest',
+        AppRoutes.undertoneTest,
+        const UndertoneArgs(warm: 0, depth: 0),
+      );
+      await visit(
         'skinTest',
         AppRoutes.skinTest,
         const SkinTestArgs(color: color),

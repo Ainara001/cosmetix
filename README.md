@@ -264,6 +264,8 @@ test/                       validators, logic, database, widget
 
    ```bash
    curl http://192.168.1.50:11434/api/tags
+   # или готовый скрипт: проверит доступность и обе модели
+   tool/check_ollama.sh http://192.168.1.50:11434 llama3.2 llava
    ```
 
 **На ноутбуке A (Flutter):**

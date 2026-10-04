@@ -220,7 +220,7 @@ void main() {
 
   test('chat: messages are persisted and can be reset', () async {
     final chat = ChatRepository(helper);
-    expect((await chat.messages(1)).length, 3);
+    expect((await chat.messages(1)).length, 1); // only the greeting
     await chat.add(1, 'Привет', isUser: true);
     expect((await chat.messages(1)).last.isUser, isTrue);
     await chat.reset(1);
