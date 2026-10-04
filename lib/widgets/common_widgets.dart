@@ -1,4 +1,6 @@
 import 'package:cosmetix/core/i18n/tr.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
@@ -293,18 +295,38 @@ class StarPicker extends StatelessWidget {
 }
 
 class UserAvatar extends StatelessWidget {
-  const UserAvatar({super.key, this.size = 100, this.color = 0xFFD4A0AC});
+  const UserAvatar({
+    super.key,
+    this.size = 100,
+    this.color = 0xFFD4A0AC,
+    this.photoPath,
+  });
 
   final double size;
   final int color;
 
+  /// Avatar photo; without it the colored circle with an icon is shown.
+  final String? photoPath;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final fallback = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(color: Color(color), shape: BoxShape.circle),
       child: Icon(Icons.person_outline, color: Colors.white, size: size * 0.55),
+    );
+    final path = photoPath;
+    if (path == null || !File(path).existsSync()) return fallback;
+    return ClipOval(
+      child: Image.file(
+        File(path),
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        cacheWidth: (size * 3).round(),
+        errorBuilder: (_, _, _) => fallback,
+      ),
     );
   }
 }
@@ -348,4 +370,31 @@ class SocialButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Small "92% match" label under a product card.
+class MatchBadge extends StatelessWidget {
+  const MatchBadge({super.key, required this.percent});
+
+  final int percent;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      const Icon(Icons.favorite, size: 11, color: AppColors.primaryDark),
+      const SizedBox(width: 4),
+      Flexible(
+        child: Text(
+          trf('{n}% совпадение', {'n': percent}),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryDark,
+          ),
+        ),
+      ),
+    ],
+  );
 }

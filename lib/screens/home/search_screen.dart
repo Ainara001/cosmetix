@@ -56,14 +56,21 @@ class _SearchScreenState extends State<SearchScreen> {
     final catalog = context.watch<CatalogProvider>();
     final pal = context.pal;
     final query = _controller.text.trim().toLowerCase();
-    final matches = query.isEmpty
+    final found = query.isEmpty
         ? const <Product>[]
         : catalog.products
               .where(
                 (p) => '${p.brand} ${p.name}'.toLowerCase().contains(query),
               )
-              .take(8)
               .toList();
+    // with a Beauty Profile the suggestions are personal: no blacklisted
+    // products, best match first (same rule as the catalog "For you" sort)
+    final matches =
+        (catalog.hasProfile
+                ? [for (final r in catalog.recommend(found)) r.product]
+                : found)
+            .take(8)
+            .toList();
 
     return PageScaffold(
       title: tr('Поиск'),

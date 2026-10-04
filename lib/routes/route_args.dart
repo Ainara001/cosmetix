@@ -1,6 +1,9 @@
+import 'package:cosmetix/core/beauty/beauty_codes.dart';
 import 'package:cosmetix/core/constants/legal_texts.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/product_filter.dart';
+import 'package:cosmetix/services/color_test_service.dart';
 
 /// Arguments for the catalog screen.
 class CatalogArgs {
@@ -45,4 +48,39 @@ class UndertoneArgs {
 
   final int warm;
   final int depth;
+}
+
+/// Beauty Test, step "about your skin": carries the colour-test result.
+class SkinTestArgs {
+  const SkinTestArgs({required this.color});
+
+  final ColorTestResult color;
+}
+
+/// Beauty Test, optional photo step.
+class BeautyPhotoArgs {
+  const BeautyPhotoArgs({
+    required this.color,
+    required this.skinType,
+    required this.concerns,
+  });
+
+  final ColorTestResult color;
+  final SkinType skinType;
+  final Set<SkinConcern> concerns;
+}
+
+/// What the final Beauty Profile screen shows.
+class BeautyResultArgs {
+  const BeautyResultArgs({
+    required this.profile,
+    this.photoUsed = false,
+    this.observations = const [],
+  });
+
+  final BeautyProfile profile;
+
+  /// True when a valid photo analysis took part.
+  final bool photoUsed;
+  final List<String> observations;
 }

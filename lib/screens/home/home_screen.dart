@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
+import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
@@ -29,6 +30,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final catalog = context.watch<CatalogProvider>();
     final pal = context.pal;
+    final recommended = catalog.recommendedForYou();
 
     return SafeArea(
       child: RefreshIndicator(
@@ -97,6 +99,31 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
+            if (recommended.isNotEmpty) ...[
+              SectionTitle(
+                tr('Рекомендуем вам'),
+                trailing: LinkText(
+                  tr('Все'),
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.catalog,
+                    arguments: const CatalogArgs(),
+                  ),
+                ),
+              ),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: productGridDelegate(context, extent: 262),
+                itemCount: recommended.length,
+                itemBuilder: (context, i) => _card(
+                  context,
+                  catalog,
+                  recommended[i].product,
+                  match: recommended[i].matchPercent,
+                ),
+              ),
+            ],
             SectionTitle(
               tr('Популярное'),
               trailing: LinkText(
@@ -130,29 +157,8 @@ class HomeScreen extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: productGridDelegate(context, extent: 240),
                 itemCount: catalog.featured.length,
-                itemBuilder: (context, i) {
-                  final p = catalog.featured[i];
-                  return ProductCard(
-                    product: p,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      AppRoutes.product,
-                      arguments: p.id,
-                    ),
-                    onFavorite: () async {
-                      final state = await catalog.toggleFavorite(p.id);
-                      if (state != null && context.mounted) {
-                        showMessage(
-                          context,
-                          state
-                              ? tr('Добавлено в избранное')
-                              : tr('Удалено из избранного'),
-                          type: state ? MessageType.success : MessageType.info,
-                        );
-                      }
-                    },
-                  );
-                },
+                itemBuilder: (context, i) =>
+                    _card(context, catalog, catalog.featured[i]),
               ),
           ],
         ),
@@ -162,6 +168,28 @@ class HomeScreen extends StatelessWidget {
 
   static int _userId(BuildContext context) =>
       context.read<AuthProvider>().userId;
+
+  Widget _card(
+    BuildContext context,
+    CatalogProvider catalog,
+    Product p, {
+    int? match,
+  }) => ProductCard(
+    product: p,
+    footer: match == null ? null : MatchBadge(percent: match),
+    onTap: () =>
+        Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),
+    onFavorite: () async {
+      final state = await catalog.toggleFavorite(p.id);
+      if (state != null && context.mounted) {
+        showMessage(
+          context,
+          state ? tr('Добавлено в избранное') : tr('Удалено из избранного'),
+          type: state ? MessageType.success : MessageType.info,
+        );
+      }
+    },
+  );
 }
 
 class _Banner extends StatelessWidget {

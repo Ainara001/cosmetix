@@ -1,3 +1,5 @@
+import 'package:cosmetix/models/beauty_profile.dart';
+
 class AppUser {
   const AppUser({
     required this.id,
@@ -14,6 +16,10 @@ class AppUser {
     this.bonusPoints = 0,
     this.visits = 0,
     this.avatarColor = 0xFFD4A0AC,
+    this.avatarPath,
+    this.beautySource = 'questionnaire',
+    this.beautyConfidence,
+    this.beautyAnalyzedAt,
   });
 
   final int id;
@@ -31,7 +37,27 @@ class AppUser {
   final int visits;
   final int avatarColor;
 
+  /// Persistent avatar photo (application documents directory), if any.
+  final String? avatarPath;
+
+  /// 'questionnaire' or 'questionnaire_photo'.
+  final String beautySource;
+  final double? beautyConfidence;
+  final int? beautyAnalyzedAt;
+
   String get fullName => '$lastName $firstName'.trim();
+
+  BeautyProfile get beautyProfile => BeautyProfile.fromLabels(
+    skinType: skinType,
+    skinTone: skinTone,
+    undertone: undertone,
+    colorType: colorType,
+    concerns: skinConcerns,
+    source: beautySource,
+    confidence: beautyConfidence,
+  );
+
+  bool get hasBeautyProfile => colorType.isNotEmpty;
 
   factory AppUser.fromMap(Map<String, Object?> m) {
     final concerns = (m['skin_concerns'] as String? ?? '')
@@ -53,6 +79,10 @@ class AppUser {
       bonusPoints: m['bonus_points'] as int? ?? 0,
       visits: m['visits'] as int? ?? 0,
       avatarColor: m['avatar_color'] as int? ?? 0xFFD4A0AC,
+      avatarPath: m['avatar_path'] as String?,
+      beautySource: m['beauty_source'] as String? ?? 'questionnaire',
+      beautyConfidence: (m['beauty_confidence'] as num?)?.toDouble(),
+      beautyAnalyzedAt: m['beauty_analyzed_at'] as int?,
     );
   }
 }

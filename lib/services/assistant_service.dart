@@ -1,268 +1,162 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/models/product.dart';
-import 'package:cosmetix/repositories/product_repository.dart';
-import 'package:cosmetix/repositories/safety_repository.dart';
+import 'package:cosmetix/models/recommendation.dart';
+import 'package:cosmetix/models/social_models.dart';
+import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ollama_client.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
+import 'package:cosmetix/services/recommendation_service.dart';
 
-/// A small offline "AI" assistant: it understands a few kinds of questions
-/// (price comparison, composition, discounts, recommendations) and answers
-/// from the products stored in SQLite.
+/// The chat assistant: a real Ollama model that knows the user's Beauty
+/// Profile, blacklist and (when relevant) the product being discussed.
+/// Throws [AiException] when the server is not available: the caller shows a
+/// friendly message, nothing else in the app depends on the chat.
 class AssistantService {
-  AssistantService(this._products, this._safety);
+  AssistantService(this._reco, this._client, this._config);
 
-  final ProductRepository _products;
-  final SafetyRepository _safety;
+  final RecommendationService _reco;
+  final OllamaClient _client;
+  final AiConfig Function() _config;
 
-  static const _categoryWords = {
-    'Губы': ['помад', 'тинт', 'губ', 'блеск', 'lip', 'tint', 'gloss', 'ерін'],
-    'Глаза': [
-      'палет',
-      'тен',
-      'глаз',
-      'подвод',
-      'тушь',
-      'eye',
-      'palette',
-      'shadow',
-      'көз',
-      'палитр',
-    ],
-    'Лицо': [
-      'кушон',
-      'тональ',
-      'румян',
-      'лицо',
-      'лица',
-      'сыворот',
-      'тонер',
-      'face',
-      'serum',
-      'toner',
-      'бет',
-      'сарысу',
-    ],
-    'Уход за лицом': [
-      'крем',
-      'spf',
-      'уход',
-      'сыворот',
-      'тонер',
-      'cream',
-      'skincare',
-      'skin care',
-      'күтім',
-    ],
-    'Парфюмерия': ['парфюм', 'аромат', 'духи', 'perfume', 'fragrance', 'иіс'],
-    'Тело и ванна': ['тело', 'тела', 'ванн', 'body', 'bath', 'дене'],
-    'Волосы': ['волос', 'шампун', 'hair', 'shampoo', 'шаш'],
-    'Подарки': ['подар', 'набор', 'gift', 'set', 'сыйлық'],
-  };
+  /// How many previous messages are sent as conversation context.
+  static const historyLimit = 8;
 
-  Future<String> reply(String text, int userId) async {
-    final q = text.toLowerCase().trim();
-    final all = await _products.getAll(userId);
-    final mentioned = _mentioned(q, all);
+  /// Added to the answer when the user describes a serious reaction, whatever
+  /// the model says.
+  static String get safetyNote => tr(
+    'Если реакция сильная (отёк, затруднённое дыхание, сильная сыпь, боль) — прекратите использовать средство и обратитесь к врачу.',
+  );
 
-    bool has(List<String> words) => words.any(q.contains);
+  static final _serious = RegExp(
+    r'отёк|отек|задых|затрудн\w* дыхан|анафилакс|сильн\w* (сыпь|ожог|зуд|покраснен)|'
+    r'swell|breath|hives|anaphyla|severe (rash|burn|itch|reaction)|'
+    r'ісін|тыныс',
+    caseSensitive: false,
+  );
 
-    if (has(['привет', 'здравств', 'добрый', 'hello', 'hi ', 'hey', 'сәлем'])) {
-      return tr(
-        'Здравствуйте! Спросите меня о ценах, составе, скидках или попросите подобрать косметику.',
-      );
-    }
+  static bool isSeriousReaction(String text) => _serious.hasMatch(text);
 
-    if (has([
-          'состав',
-          'безопас',
-          'аллерг',
-          'ингредиент',
-          'composition',
-          'ingredient',
-          'safe',
-          'allerg',
-          'құрам',
-          'қауіпсіз',
-          'аллерг',
-        ]) &&
-        mentioned.isNotEmpty) {
-      final p = mentioned.first;
-      final blacklist = await _safety.blacklist(userId);
-      final analysis = IngredientAnalyzer.analyze(
-        await _safety.ingredientsOf(p.id),
-        blacklist,
-      );
-      final buffer = StringBuffer(
-        trf('«{v0}»: оценка состава {v1}/10 ({v2}). {v3}', {
-          'v0': tr(p.name),
-          'v1': analysis.score.toStringAsFixed(1),
-          'v2': analysis.grade,
-          'v3': analysis.summary,
-        }),
-      );
-      if (analysis.blacklistHits.isNotEmpty) {
-        buffer.write(
-          trf(
-            ' Внимание: в составе есть компоненты из вашего чёрного списка — {v0}.',
-            {'v0': analysis.blacklistHits.map(tr).join(', ')},
-          ),
-        );
-      }
-      return buffer.toString();
-    }
-
-    if (has([
-      'скидк',
-      'акци',
-      'распродаж',
-      'дешев',
-      'discount',
-      'sale',
-      'offer',
-      'cheap',
-      'жеңілдік',
-      'арзан',
-    ])) {
-      final sale = all.where((p) => p.hasDiscount && p.inStock).toList()
-        ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
-      if (sale.isEmpty) {
-        return tr('Сейчас скидок нет, но я сообщу, когда появятся.');
-      }
-      if (mentioned.length < 2) {
-        return trf('Сейчас со скидкой: {v0}.', {
-          'v0': sale.take(3).map(_line).join('; '),
-        });
-      }
-    }
-
-    if (has([
-          'цен',
-          'стоит',
-          'сколько',
-          'сравн',
-          'дешевле',
-          'выгодн',
-          'price',
-          'cost',
-          'how much',
-          'compare',
-          'cheaper',
-          'баға',
-          'қанша',
-          'салыстыр',
-        ]) &&
-        mentioned.isNotEmpty) {
-      if (mentioned.length >= 2) {
-        final a = mentioned[0], b = mentioned[1];
-        final cheaper = a.price <= b.price ? a : b;
-        return trf(
-          '{v0} стоит {v1}, а {v2} — {v3}. Если бюджет важнее, то «{v4}» выигрывает по цене.',
-          {
-            'v0': tr(a.name),
-            'v1': Formatters.price(a.price),
-            'v2': tr(b.name),
-            'v3': Formatters.price(b.price),
-            'v4': tr(cheaper.name),
-          },
-        );
-      }
-      final p = mentioned.first;
-      final prices = await _products.getStorePrices(p.id);
-      final best = prices.isEmpty ? null : prices.first;
-      return best == null
-          ? trf('«{v0}» стоит {v1}.', {
-              'v0': tr(p.name),
-              'v1': Formatters.price(p.price),
-            })
-          : trf('«{v0}» от {v1} в магазине {v2} ({v3}).', {
-              'v0': tr(p.name),
-              'v1': Formatters.price(best.price),
-              'v2': tr(best.storeName),
-              'v3': best.distanceLabel.replaceAll(' от вас', ''),
-            });
-    }
-
-    final category = _categoryFor(q);
-    if (has([
-          'посоветуй',
-          'подбер',
-          'порекомен',
-          'хочу',
-          'ищу',
-          'нужен',
-          'нужна',
-          'лучш',
-          'recommend',
-          'suggest',
-          'looking for',
-          'need',
-          'best',
-          'want',
-          'ұсын',
-          'іздеп',
-          'керек',
-        ]) ||
-        category != null) {
-      final pool = all.where((p) => p.inStock).where((p) {
-        if (category == null) return true;
-        return p.zone == category || p.category == category;
-      }).toList()..sort((a, b) => a.price.compareTo(b.price));
-      if (pool.isEmpty) {
-        return tr('К сожалению, подходящих товаров не нашлось.');
-      }
-      return trf('Рекомендую: {v0}.', {
-        'v0': pool.take(3).map(_line).join('; '),
-      });
-    }
-
-    if (mentioned.isNotEmpty) {
-      final p = mentioned.first;
-      return trf(
-        '«{v0}» ({v1}) — {v2}. {v3} Спросите про состав или сравнение цен.',
-        {
-          'v0': tr(p.name),
-          'v1': p.brand,
-          'v2': Formatters.price(p.price),
-          'v3': p.description,
-        },
-      );
-    }
-
-    return tr(
-      'Я могу сравнить цены, проверить состав, показать скидки или подобрать косметику. Например: «Посоветуй тинт для губ» или «Какой состав у палетки Flower Knows?»',
+  Future<String> reply({
+    required int userId,
+    required String text,
+    required List<ChatMessage> history,
+    int? productId,
+  }) async {
+    final ctx = await _reco.loadContext(userId);
+    final system = buildSystemPrompt(
+      ctx: ctx,
+      question: text,
+      productId: productId,
+      language: currentLang.englishName,
     );
+    final recent = history.length > historyLimit
+        ? history.sublist(history.length - historyLimit)
+        : history;
+    final answer = await _client.chat(
+      model: _config().textModel,
+      temperature: 0.4,
+      messages: [
+        OllamaMessage('system', system),
+        for (final m in recent)
+          OllamaMessage(m.isUser ? 'user' : 'assistant', m.text),
+        OllamaMessage('user', text),
+      ],
+    );
+    var out = answer.trim();
+    if (isSeriousReaction(text)) out = '$out\n\n$safetyNote';
+    return out;
   }
 
-  String _line(Product p) =>
-      '${p.name} — ${Formatters.price(p.price)}${p.hasDiscount ? ' (−${p.discountPercent}%)' : ''}';
+  /// All facts the model may use. Kept as a pure function so it can be tested.
+  static String buildSystemPrompt({
+    required PersonalizationContext ctx,
+    required String question,
+    required String language,
+    int? productId,
+  }) {
+    final p = ctx.profile;
+    String v(Object? x) => x == null ? 'unknown' : '$x';
+    final profile =
+        '''
+- skin type: ${v(p.skinType?.label)}
+- skin tone: ${v(p.skinTone?.label)}
+- undertone: ${v(p.undertone?.label)}
+- color type: ${v(p.colorType?.label)}
+- skin concerns: ${p.concerns.isEmpty ? 'none' : p.concerns.map((c) => c.label).join(', ')}''';
+    final blocked = [
+      for (final b in ctx.blacklist)
+        if (b.enabled) b.name,
+    ];
+    final catalog = [
+      for (final c in ctx.candidates)
+        '- ${c.product.brand} ${c.product.name} (${c.product.category}, '
+            '${Formatters.price(c.product.price)})'
+            '${RecommendationService.isBlacklisted(c, ctx.blacklist) ? ' [CONTAINS BLACKLISTED INGREDIENT - never recommend]' : ''}',
+    ];
+    final focus = _focusProducts(ctx, question, productId);
+    final detail = [for (final c in focus) _productFacts(c, ctx)].join('\n');
+    return '''
+You are Cosmetix Assistant, a friendly cosmetics assistant inside a shopping app.
+Rules:
+- Talk only about cosmetics, ingredients, routines, the user's Beauty Profile and whether products suit them.
+- You are NOT a doctor. Never diagnose. If the user describes a serious reaction (swelling, trouble breathing, severe rash, burning, pain), tell them to stop using the product and to see a doctor or pharmacist.
+- Recommend ONLY products from the CATALOG below. Never invent products, prices or ingredients. If you do not know, say so.
+- Never recommend a product that contains a blacklisted ingredient.
+- Base suitability answers on the Beauty Profile and the ingredient facts you are given.
+- Keep answers short (under 120 words).
+- Answer in $language.
 
-  List<Product> _mentioned(String q, List<Product> all) {
-    final scored = <(Product, int)>[];
-    for (final p in all) {
+USER BEAUTY PROFILE:
+$profile
+
+USER BLACKLIST (ingredients to avoid): ${blocked.isEmpty ? 'none' : blocked.join(', ')}
+
+CATALOG:
+${catalog.join('\n')}
+${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
+  }
+
+  static List<ProductCandidate> _focusProducts(
+    PersonalizationContext ctx,
+    String question,
+    int? productId,
+  ) {
+    if (productId != null) {
+      return ctx.candidates.where((c) => c.product.id == productId).toList();
+    }
+    final q = question.toLowerCase();
+    final found = <ProductCandidate>[];
+    for (final c in ctx.candidates) {
+      final Product p = c.product;
       final words = '${p.brand} ${p.name} ${tr(p.name)}'
           .toLowerCase()
           .split(RegExp(r'[^a-zа-яё0-9&+]+'))
-          .where((w) => w.length >= 4)
-          .toSet();
-      final nospace = q.replaceAll(' ', '');
-      var score = words.where(q.contains).length;
-      if (nospace.contains(p.brand.toLowerCase().replaceAll(' ', ''))) score++;
-      if (score > 0) scored.add((p, score));
+          .where((w) => w.length >= 4);
+      if (words.any(q.contains)) found.add(c);
     }
-    scored.sort((a, b) => b.$2.compareTo(a.$2));
-    // one product per brand, so "FlowerKnows или Peripera" compares two brands
-    final seen = <String>{};
-    final result = <Product>[];
-    for (final s in scored) {
-      if (seen.add(s.$1.brand)) result.add(s.$1);
-    }
-    return result;
+    return found.take(2).toList();
   }
 
-  String? _categoryFor(String q) {
-    for (final e in _categoryWords.entries) {
-      if (e.value.any(q.contains)) return e.key;
-    }
-    return null;
+  static String _productFacts(ProductCandidate c, PersonalizationContext ctx) {
+    final p = c.product;
+    final hits = IngredientAnalyzer.analyze(
+      c.ingredients,
+      ctx.blacklist,
+    ).blacklistHits;
+    final ranked = RecommendationService.rank(
+      candidates: [c],
+      profile: ctx.profile,
+      blacklist: ctx.blacklist,
+    );
+    final match = ranked.isEmpty ? null : ranked.first.matchPercent;
+    return '''
+- ${p.brand} ${p.name} (${p.category}), ${Formatters.price(p.price)}${p.inStock ? '' : ', out of stock'}
+  description: ${p.description}
+  ingredients: ${c.ingredients.isEmpty ? 'unknown' : c.ingredients.map((i) => '${i.name}${i.isAllergen ? ' (allergen)' : ''}').join(', ')}
+  made for skin types: ${c.skinTypes.isEmpty ? 'not specified' : c.skinTypes.map((e) => e.label).join(', ')}
+  made for color types: ${c.colorTypes.isEmpty ? 'not specified' : c.colorTypes.map((e) => e.label).join(', ')}
+  blacklisted ingredients found: ${hits.isEmpty ? 'none' : hits.join(', ')}
+  local match with the user: ${match == null ? 'excluded (blacklist)' : '$match%'}''';
   }
 }

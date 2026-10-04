@@ -7,9 +7,11 @@ import 'package:cosmetix/core/constants/app_constants.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product_filter.dart';
+import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
@@ -29,6 +31,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
   late ProductFilter _filter;
   ProductSort _sort = ProductSort.newest;
 
+  /// Set once the user picks a sorting manually: it then wins for this visit.
+  bool _sortChosen = false;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +50,33 @@ class _CatalogScreenState extends State<CatalogScreen> {
   void dispose() {
     _search.dispose();
     super.dispose();
+  }
+
+  bool _aiBusy = false;
+
+  /// Optional: asks the AI to refine the order of the personal picks. The
+  /// catalog works the same without it.
+  Future<void> _refineWithAi(CatalogProvider catalog) async {
+    final ai = context.read<AiProvider>();
+    final refiner = context.read<RecommendationRefiner>();
+    setState(() => _aiBusy = true);
+    final ok = await catalog.refineWithAi(refiner);
+    if (!mounted) return;
+    setState(() => _aiBusy = false);
+    if (ok) {
+      showMessage(
+        context,
+        tr('Подбор уточнён с помощью ИИ'),
+        type: MessageType.success,
+      );
+    } else {
+      ai.markOffline('The AI server did not answer');
+      showMessage(
+        context,
+        tr('ИИ сейчас недоступен — показан обычный персональный подбор.'),
+        type: MessageType.info,
+      );
+    }
   }
 
   Future<void> _openFilters(CatalogProvider catalog) async {
@@ -64,7 +96,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     final catalog = context.watch<CatalogProvider>();
     final pal = context.pal;
-    final items = ProductFilter.apply(catalog.products, _filter, _sort);
+    final sort = _sortChosen
+        ? _sort
+        : (catalog.hasProfile ? ProductSort.forYou : ProductSort.newest);
+    var items = ProductFilter.apply(catalog.products, _filter, sort);
+    final matches = <int, int>{};
+    if (sort == ProductSort.forYou) {
+      // search/filters first, then blacklist exclusion and personal ranking
+      final ranked = catalog.recommend(items);
+      items = [for (final r in ranked) r.product];
+      for (final r in ranked) {
+        matches[r.product.id] = r.matchPercent;
+      }
+    }
     final hasFilters =
         _filter.category != null ||
         _filter.status != ProductStatus.any ||
@@ -134,10 +178,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 Flexible(
                   child: PopupMenuButton<ProductSort>(
                     tooltip: tr('Сортировка'),
-                    initialValue: _sort,
-                    onSelected: (v) => setState(() => _sort = v),
+                    initialValue: sort,
+                    onSelected: (v) => setState(() {
+                      _sort = v;
+                      _sortChosen = true;
+                    }),
                     itemBuilder: (_) => [
-                      for (final s in ProductSort.values)
+                      for (final s in ProductSort.catalogOptions(
+                        hasProfile: catalog.hasProfile,
+                      ))
                         PopupMenuItem(value: s, child: Text(tr(s.label))),
                     ],
                     child: Padding(
@@ -148,7 +197,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           const Icon(Icons.arrow_drop_down, size: 20),
                           Flexible(
                             child: Text(
-                              tr(_sort.label),
+                              tr(sort.label),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 13),
@@ -160,6 +209,23 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   ),
                 ),
                 const Spacer(),
+                if (sort == ProductSort.forYou)
+                  IconButton(
+                    tooltip: tr('Уточнить подбор с ИИ'),
+                    icon: _aiBusy
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            catalog.hasAiOrder
+                                ? Icons.auto_awesome
+                                : Icons.auto_awesome_outlined,
+                            color: AppColors.primaryDark,
+                          ),
+                    onPressed: _aiBusy ? null : () => _refineWithAi(catalog),
+                  ),
                 TextButton.icon(
                   onPressed: () => _openFilters(catalog),
                   icon: Badge(
@@ -173,13 +239,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ],
             ),
           ),
-          Expanded(child: _body(catalog, items)),
+          Expanded(child: _body(catalog, items, matches)),
         ],
       ),
     );
   }
 
-  Widget _body(CatalogProvider catalog, List items) {
+  Widget _body(CatalogProvider catalog, List items, Map<int, int> matches) {
     if (catalog.loading && catalog.products.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -205,12 +271,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
     }
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      gridDelegate: productGridDelegate(context),
+      gridDelegate: productGridDelegate(
+        context,
+        extent: matches.isEmpty ? 250 : 270,
+      ),
       itemCount: items.length,
       itemBuilder: (context, i) {
         final p = items[i];
+        final match = matches[p.id];
         return ProductCard(
           product: p,
+          footer: match == null ? null : MatchBadge(percent: match),
           onTap: () =>
               Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),
           onFavorite: () async {

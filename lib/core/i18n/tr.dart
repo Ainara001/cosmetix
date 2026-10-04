@@ -4,14 +4,17 @@ import 'package:cosmetix/core/i18n/translations_kk.dart';
 /// UI languages. Source strings in the code are Russian; other languages are
 /// looked up by the Russian text.
 enum AppLang {
-  ru('ru', 'Русский'),
-  en('en', 'English'),
-  kk('kk', 'Қазақша');
+  ru('ru', 'Русский', 'Russian'),
+  en('en', 'English', 'English'),
+  kk('kk', 'Қазақша', 'Kazakh');
 
-  const AppLang(this.code, this.label);
+  const AppLang(this.code, this.label, this.englishName);
 
   final String code;
   final String label;
+
+  /// For prompts to the AI.
+  final String englishName;
 
   static AppLang fromCode(String? code) => AppLang.values.firstWhere(
     (l) => l.code == code,

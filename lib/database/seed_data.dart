@@ -1,5 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
+import 'package:cosmetix/database/seed_traits.dart';
+
 import 'package:cosmetix/core/utils/password_hasher.dart';
 
 /// Demo content that makes the app look alive right after the first launch.
@@ -74,6 +76,7 @@ class SeedData {
           'ingredient_id': ing,
         });
       }
+      _insertTraits(batch, id, p.brand, p.name);
     }
 
     batch.insert('users', {
@@ -98,6 +101,50 @@ class SeedData {
 
     await insertUserDefaults(db, 1, demo: true);
     await _insertReviews(db, now);
+  }
+
+  static void _insertTraits(
+    Batch batch,
+    int productId,
+    String brand,
+    String name,
+  ) {
+    final t = seedTraits['$brand|$name'];
+    if (t == null) return;
+    void rows(String table, String column, List<String> values) {
+      for (final v in values) {
+        batch.insert(table, {
+          'product_id': productId,
+          column: v,
+          'source': 'seed',
+        });
+      }
+    }
+
+    rows('product_skin_types', 'skin_type', t.skinTypes);
+    rows('product_color_types', 'color_type', t.colorTypes);
+    rows('product_undertones', 'undertone', t.undertones);
+    rows('product_concerns', 'concern', t.concerns);
+    rows('product_tags', 'tag', t.tags);
+  }
+
+  /// Migration step: gives products that already exist in a user's database
+  /// the curated traits (matched by brand + name).
+  static Future<void> backfillProductTraits(DatabaseExecutor db) async {
+    final products = await db.query(
+      'products',
+      columns: ['id', 'brand', 'name'],
+    );
+    final batch = db.batch();
+    for (final p in products) {
+      _insertTraits(
+        batch,
+        p['id']! as int,
+        p['brand']! as String,
+        p['name']! as String,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 
   /// Blacklist, welcome chat message (and demo favourites/reactions).

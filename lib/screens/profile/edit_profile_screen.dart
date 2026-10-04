@@ -6,6 +6,7 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/core/utils/validators.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
+import 'package:cosmetix/widgets/avatar_sheet.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/custom_text_field.dart';
@@ -145,11 +146,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Center(
               child: Column(
                 children: [
-                  UserAvatar(size: 76, color: _avatar),
+                  GestureDetector(
+                    onTap: () =>
+                        showAvatarSheet(context, onPickColor: _pickAvatar),
+                    child: UserAvatar(
+                      size: 76,
+                      color: _avatar,
+                      photoPath: context.watch<AuthProvider>().user?.avatarPath,
+                    ),
+                  ),
                   LinkText(
                     tr('Изменить фото'),
                     bold: false,
-                    onTap: _pickAvatar,
+                    onTap: () =>
+                        showAvatarSheet(context, onPickColor: _pickAvatar),
                   ),
                 ],
               ),

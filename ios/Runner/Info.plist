@@ -3,9 +3,18 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Фото товара для вашего отзыва</string>
+	<string>Фото для отзыва, аватара профиля и необязательного улучшения бьюти-анализа</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Снимок товара для вашего отзыва</string>
+	<string>Снимок для отзыва, аватара профиля и необязательного улучшения бьюти-анализа</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Cosmetix подключается к ИИ-серверу (Ollama) в вашей домашней сети Wi-Fi для чата и анализа фото. Это необязательно.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Minimum exception: plain HTTP only to local-network addresses
+		     (IP addresses and .local names); ATS stays on for the Internet. -->
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

@@ -140,6 +140,10 @@ class AuthProvider extends ChangeNotifier {
     String? undertone,
     String? colorType,
     List<String>? skinConcerns,
+    String? source,
+    double? confidence,
+    bool clearConfidence = false,
+    bool markCompleted = false,
   }) async {
     if (_user == null) return;
     await _users.updateBeauty(
@@ -149,7 +153,17 @@ class AuthProvider extends ChangeNotifier {
       undertone: undertone,
       colorType: colorType,
       skinConcerns: skinConcerns,
+      source: source,
+      confidence: confidence,
+      clearConfidence: clearConfidence,
+      markCompleted: markCompleted,
     );
+    await reload();
+  }
+
+  Future<void> setAvatarPath(String? path) async {
+    if (_user == null) return;
+    await _users.setAvatarPath(_user!.id, path);
     await reload();
   }
 }

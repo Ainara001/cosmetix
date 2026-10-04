@@ -1,0 +1,88 @@
+0|Could not analyze the photo.
+1|The AI server is unavailable.
+2|The AI is taking too long to answer.
+3|The AI returned an error. Check that the photo analysis model is installed.
+4|Could not read the AI answer.
+5|Photo (optional)
+6|Natural or neutral lighting
+7|Your face is clearly visible, no filters
+8|Preferably without heavy makeup
+9|Look straight at the camera
+10|Improve your result with a photo
+11|The photo is an optional step. The AI uses it only as an extra hint; your answers matter more.
+12|How to take a good photo
+13|Your photo is used only to improve your Beauty Profile analysis and is not stored.
+14|The AI server is unavailable right now — photo analysis will not work, but you can finish the test without it.
+15|Take a photo
+16|Skip
+17|Use photo
+18|Retake
+19|Analyzing the photo…
+20|This may take up to a minute.
+21|No problem: the result can be based on your test answers.
+22|Continue without a photo
+23|Try another photo
+24|Determined using: questionnaire + photo analysis
+25|Determined using: questionnaire
+26|Find products for me
+27|Questionnaire + photo analysis
+28|Questionnaire
+29|SKIN TYPE
+30|COLOR TYPE
+31|SKIN CONCERNS
+32|DETERMINED USING
+33|Photo analysis confidence: {n}%
+34|Retake the test
+35|Choose how your skin behaves
+36|Test: your skin
+37|How does your skin feel a couple of hours after washing?
+38|Skin type comes from your answers — it cannot be guessed from a photo.
+39|What concerns you? (you can pick several)
+40|The selection was refined with AI
+41|The AI is unavailable right now — the regular personal selection is shown.
+42|Refine the selection with AI
+43|The AI assistant is unavailable right now
+44|The rest of the app works.
+45|Recommended for you
+46|Is this product right for me?
+47|Ask AI: is it right for me?
+48|AI server (Ollama)
+49|Server address
+50|Text model
+51|Photo model
+52|The AI server is unavailable. Try again later.
+53|All products are already classified
+54|Products classified: {n}
+55|Connected
+56|Checking…
+57|Unavailable
+58|Address not set
+59|Not checked
+60|Server
+61|The text model is not installed on the server.
+62|The photo model is not installed on the server.
+63|The test, catalog, blacklist and recommendations work without AI. AI is needed for the chat, photo analysis and refining the selection.
+64|Test connection
+65|Change server and models
+66|Classify products (AI)
+67|Take the Beauty Test to get personal recommendations.
+68|Take the test
+69|AI ASSISTANT
+70|If the reaction is severe (swelling, trouble breathing, severe rash, pain), stop using the product and see a doctor.
+71|Remove photo
+72|Photo removed
+73|Profile photo updated
+74|{n}% match
+75|Contains ingredients from your blacklist
+76|Why it suits you
+77|Matches your color type: {v}
+78|Matches your undertone: {v}
+79|Recommended for skin type: {v}
+80|Helps with: {v}
+81|Gentle formula, no irritating ingredients
+82|No active blacklist ingredients detected
+83|Skin feels tight, flaking appears
+84|Comfortable, no shine or tightness
+85|Shiny all over the face
+86|Shiny only in the T-zone
+87|Redness or irritation appears

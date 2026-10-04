@@ -12,6 +12,7 @@ import 'package:cosmetix/providers/session.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
+import 'package:cosmetix/screens/profile/ai_settings_section.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
@@ -122,6 +123,8 @@ class SettingsScreen extends StatelessWidget {
             labelOf: (v) => tr(v.label),
             onSelected: s.setCurrency,
           ),
+          _Header(tr('ИИ-АССИСТЕНТ')),
+          const AiSettingsSection(),
           _Header(tr('ИНФОРМАЦИЯ')),
           _LinkRow(
             title: tr('Политика конфиденциальности'),

@@ -1,0 +1,67 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:cosmetix/models/ai_models.dart';
+import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ollama_client.dart';
+
+/// Optional photo step of the Beauty Test: sends one small photo to the
+/// multimodal Ollama model and expects structured JSON back.
+class VisionAnalyzer {
+  VisionAnalyzer(this._client, this._config);
+
+  final OllamaClient _client;
+  final AiConfig Function() _config;
+
+  /// Photos bigger than this are rejected before sending (the picker already
+  /// downsizes to ~1024px, so real photos are a few hundred KB).
+  static const maxBytes = 4 * 1024 * 1024;
+
+  static const prompt = '''
+You analyze a selfie ONLY to help choose cosmetics. This is not a medical assessment.
+Estimate from the photo: the person's skin tone, skin undertone and the most likely seasonal color type.
+Answer with ONE JSON object and nothing else, using exactly these keys:
+{
+  "skinTone": "very_light" | "light" | "medium" | "tan" | "deep",
+  "undertone": "warm" | "cool" | "neutral",
+  "colorType": "spring" | "summer" | "autumn" | "winter",
+  "observations": [short strings about visible cosmetic characteristics, max 4],
+  "confidence": number from 0 to 1 (use a low value for dark, blurry or filtered photos),
+  "explanation": "one or two sentences"
+}
+Do not describe diseases or skin conditions. Do not guess the person's age, ethnicity or identity.''';
+
+  /// [photoBytes] is a resized JPEG. Throws [AiException] subclasses.
+  Future<VisionAnalysis> analyze(Uint8List photoBytes) async {
+    if (photoBytes.isEmpty || photoBytes.length > maxBytes) {
+      throw const AiBadResponse('The photo is empty or too large');
+    }
+    final answer = await _client.chat(
+      model: _config().visionModel,
+      json: true,
+      temperature: 0.2,
+      timeout: OllamaClient.visionTimeout,
+      messages: [
+        OllamaMessage(
+          'user',
+          prompt,
+          images: [base64Encode(photoBytes)], // never logged
+        ),
+      ],
+    );
+    return VisionAnalysis.parse(answer);
+  }
+
+  /// Reads the picked photo, analyzes it and always deletes the temporary file
+  /// afterwards (the Beauty photo is not stored).
+  Future<VisionAnalysis> analyzeFile(File photo) async {
+    try {
+      return await analyze(await photo.readAsBytes());
+    } finally {
+      try {
+        if (await photo.exists()) await photo.delete();
+      } catch (_) {}
+    }
+  }
+}

@@ -16,6 +16,9 @@ import 'package:cosmetix/database/seed_data.dart';
 import 'package:cosmetix/models/product_filter.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
+import 'package:cosmetix/core/beauty/beauty_codes.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
+import 'package:cosmetix/services/color_test_service.dart';
 import 'widget_test.dart' show pumpUntil;
 
 final _cyr = RegExp('[А-Яа-яЁё]');
@@ -136,6 +139,38 @@ void main() {
         await visit('reviews$id', AppRoutes.reviews, id);
         await visit('analysis$id', AppRoutes.analysis, id);
       }
+      const color = ColorTestResult(
+        colorType: 'Лето',
+        undertone: 'Холодный',
+        skinTone: 'Светлый',
+      );
+      await visit(
+        'skinTest',
+        AppRoutes.skinTest,
+        const SkinTestArgs(color: color),
+      );
+      await visit(
+        'beautyPhoto',
+        AppRoutes.beautyPhoto,
+        const BeautyPhotoArgs(
+          color: color,
+          skinType: SkinType.dry,
+          concerns: {SkinConcern.dryness},
+        ),
+      );
+      await visit(
+        'colorResult',
+        AppRoutes.colorResult,
+        BeautyResultArgs(
+          profile: BeautyProfile.fromLabels(
+            skinType: 'Сухая',
+            skinTone: 'Светлый',
+            undertone: 'Холодный',
+            colorType: 'Лето',
+            concerns: const ['Сухость и шелушение'],
+          ),
+        ),
+      );
       for (final r in [
         AppRoutes.favorites,
         AppRoutes.orders,

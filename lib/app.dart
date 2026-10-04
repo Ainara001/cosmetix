@@ -21,7 +21,13 @@ import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/providers/ai_provider.dart';
+import 'package:cosmetix/services/ai/product_classifier.dart';
+import 'package:cosmetix/services/ai/recommendation_refiner.dart';
+import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/assistant_service.dart';
+import 'package:cosmetix/services/avatar_service.dart';
+import 'package:cosmetix/services/recommendation_service.dart';
 
 /// Creates repositories and providers (Screen -> Provider -> Repository ->
 /// SQLite) and starts the app after the saved session is restored.
@@ -40,6 +46,10 @@ class _CosmetixAppState extends State<CosmetixApp> {
   late final ReviewRepository _reviews;
   late final AuthProvider _auth;
   late final SettingsProvider _settings;
+  late final SafetyProvider _safetyProvider;
+  late final CatalogProvider _catalogProvider;
+  late final AiProvider _ai;
+  late final RecommendationService _reco;
   late final Future<void> _init;
 
   @override
@@ -51,7 +61,19 @@ class _CosmetixAppState extends State<CosmetixApp> {
     _reviews = ReviewRepository(h);
     _auth = AuthProvider(UserRepository(h));
     _settings = SettingsProvider(SettingsRepository(h));
-    _init = Future.wait([_auth.restoreSession(), _settings.load()]);
+    final users = UserRepository(h);
+    _safetyProvider = SafetyProvider(_safety);
+    _reco = RecommendationService(_products, _safety, users);
+    _ai = AiProvider(SettingsRepository(h));
+    _catalogProvider = CatalogProvider(_products, _reco);
+    // re-personalize when the Beauty Profile or the blacklist changes
+    _catalogProvider.watchProfile(
+      signature: () =>
+          '${_auth.user?.beautyProfile.signature}|'
+          '${_safetyProvider.blacklist.where((b) => b.enabled).map((b) => b.id).join(',')}',
+      sources: [_auth, _safetyProvider],
+    );
+    _init = Future.wait([_auth.restoreSession(), _settings.load(), _ai.load()]);
   }
 
   @override
@@ -83,16 +105,37 @@ class _CosmetixAppState extends State<CosmetixApp> {
             Provider<ReviewRepository>.value(value: _reviews),
             ChangeNotifierProvider<AuthProvider>.value(value: _auth),
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
+            ChangeNotifierProvider<AiProvider>.value(value: _ai),
+            Provider<AvatarService>(create: (_) => AvatarService()),
+            Provider<VisionAnalyzer>(
+              create: (_) => VisionAnalyzer(_ai.client, () => _ai.config),
+            ),
+            Provider<ProductClassifier>(
+              create: (_) => ProductClassifier(
+                _ai.client,
+                () => _ai.config,
+                _products,
+                _safety,
+              ),
+            ),
+            Provider<RecommendationRefiner>(
+              create: (_) =>
+                  RecommendationRefiner(_ai.client, () => _ai.config),
+            ),
             ChangeNotifierProvider(create: (_) => NavProvider()),
-            ChangeNotifierProvider(create: (_) => CatalogProvider(_products)),
+            ChangeNotifierProvider<CatalogProvider>.value(
+              value: _catalogProvider,
+            ),
             ChangeNotifierProvider(
               create: (_) => CartProvider(CartRepository(widget.helper)),
             ),
-            ChangeNotifierProvider(create: (_) => SafetyProvider(_safety)),
+            ChangeNotifierProvider<SafetyProvider>.value(
+              value: _safetyProvider,
+            ),
             ChangeNotifierProvider(
               create: (_) => ChatProvider(
                 ChatRepository(widget.helper),
-                AssistantService(_products, _safety),
+                AssistantService(_reco, _ai.client, () => _ai.config),
               ),
             ),
           ],

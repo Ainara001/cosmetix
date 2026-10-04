@@ -4,11 +4,14 @@ import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
+import 'package:cosmetix/models/app_user.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/widgets/app_card.dart';
+import 'package:cosmetix/widgets/avatar_sheet.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
+import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -40,7 +43,38 @@ class ProfileScreen extends StatelessWidget {
                             Navigator.pushNamed(context, AppRoutes.editProfile),
                         child: Column(
                           children: [
-                            UserAvatar(size: 104, color: user.avatarColor),
+                            GestureDetector(
+                              onTap: () => showAvatarSheet(context),
+                              child: Stack(
+                                children: [
+                                  UserAvatar(
+                                    size: 104,
+                                    color: user.avatarColor,
+                                    photoPath: user.avatarPath,
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: pal.surface,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.photo_camera,
+                                        size: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 12),
                             Text(
                               user.fullName.isEmpty
@@ -96,6 +130,8 @@ class ProfileScreen extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 14),
+                      _BeautySummary(user: user),
                       const SizedBox(height: 14),
                       MenuTile(
                         icon: Icons.shopping_cart_outlined,
@@ -179,6 +215,82 @@ class _Stat extends StatelessWidget {
               fontWeight: FontWeight.w700,
               color: AppColors.primaryDark,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Beauty Profile on the profile screen: color type, skin type, undertone and
+/// the two actions (edit profile / retake the Beauty Test).
+class _BeautySummary extends StatelessWidget {
+  const _BeautySummary({required this.user});
+
+  final AppUser user;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    final done = user.hasBeautyProfile;
+    Widget cell(String label, String value) => Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: AppTextStyles.label.copyWith(color: pal.subtext)),
+          const SizedBox(height: 2),
+          Text(
+            value.isEmpty ? '—' : tr(value),
+            style: AppTextStyles.bodyBold,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+    return AppCard(
+      radius: 20,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(tr('Бьюти-профиль'), style: AppTextStyles.subtitle),
+          const SizedBox(height: 10),
+          if (done)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                cell(tr('ЦВЕТОТИП'), user.colorType),
+                cell(tr('ТИП КОЖИ'), user.skinType),
+                cell(tr('ПОДТОН'), user.undertone),
+              ],
+            )
+          else
+            Text(
+              tr(
+                'Пройдите бьюти-тест, чтобы получать персональные рекомендации.',
+              ),
+              style: AppTextStyles.small.copyWith(color: pal.subtext),
+            ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: CustomButton(
+                  label: tr('Редактировать профиль'),
+                  outlined: true,
+                  onPressed: () =>
+                      Navigator.pushNamed(context, AppRoutes.editProfile),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: CustomButton(
+                  label: done ? tr('Пройти тест заново') : tr('Пройти тест'),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, AppRoutes.colorTest),
+                ),
+              ),
+            ],
           ),
         ],
       ),

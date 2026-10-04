@@ -10,11 +10,12 @@ import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
-/// Added screen: result of the colour-type test (already saved to SQLite).
+/// Final Beauty Profile: what the questionnaire (and the optional photo)
+/// found. It is already saved and now drives the recommendations.
 class ColorResultScreen extends StatelessWidget {
   const ColorResultScreen({super.key, required this.result});
 
-  final ColorTestResult result;
+  final BeautyResultArgs result;
 
   static const _palettes = {
     'Весна': [0xFFF6B8A0, 0xFFF3C969, 0xFFE9967A, 0xFFB5D99C, 0xFFFFD9B3],
@@ -26,7 +27,20 @@ class ColorResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pal = context.pal;
-    final colors = _palettes[result.colorType] ?? _palettes['Весна']!;
+    final p = result.profile;
+    final colorType = p.colorType?.label ?? '';
+    final colors = _palettes[colorType] ?? _palettes['Весна']!;
+    final description = ColorTestResult(
+      colorType: colorType,
+      undertone: p.undertone?.label ?? '',
+      skinTone: p.skinTone?.label ?? '',
+    ).description;
+    final concerns = p.concerns.isEmpty
+        ? '—'
+        : p.concerns.map((c) => tr(c.label)).join(' / ');
+    final photoLine = result.photoUsed
+        ? tr('Опросник + анализ фото')
+        : tr('Опросник');
 
     return PopScope(
       canPop: false,
@@ -34,7 +48,7 @@ class ColorResultScreen extends StatelessWidget {
         if (!didPop) _done(context);
       },
       child: PageScaffold(
-        title: tr('Результат теста'),
+        title: tr('Бьюти-профиль'),
         onBack: () => _done(context),
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -42,29 +56,29 @@ class ColorResultScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Center(
               child: Container(
-                width: 110,
-                height: 110,
+                width: 96,
+                height: 96,
                 decoration: const BoxDecoration(
                   color: AppColors.primarySoft,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.local_florist,
-                  size: 56,
+                  size: 48,
                   color: AppColors.primaryDark,
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             Center(
               child: Text(
-                trf('Ваш цветотип: {v0}', {'v0': result.colorType}),
+                trf('Ваш цветотип: {v0}', {'v0': tr(colorType)}),
                 style: AppTextStyles.h2,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              tr(result.description),
+              tr(description),
               textAlign: TextAlign.center,
               style: AppTextStyles.body.copyWith(color: pal.subtext),
             ),
@@ -72,13 +86,68 @@ class ColorResultScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _Info(label: tr('ПОДТОН'), value: result.undertone),
+                  child: _Info(
+                    label: tr('ТИП КОЖИ'),
+                    value: p.skinType?.label ?? '—',
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _Info(label: tr('ТОН КОЖИ'), value: result.skinTone),
+                  child: _Info(
+                    label: tr('ТОН КОЖИ'),
+                    value: p.skinTone?.label ?? '—',
+                  ),
                 ),
               ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _Info(
+                    label: tr('ПОДТОН'),
+                    value: p.undertone?.label ?? '—',
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _Info(label: tr('ЦВЕТОТИП'), value: colorType),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            AppCard(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tr('ПРОБЛЕМЫ КОЖИ'),
+                    style: AppTextStyles.label.copyWith(color: pal.subtext),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(concerns, style: AppTextStyles.subtitle),
+                  const SizedBox(height: 10),
+                  Text(
+                    tr('ОПРЕДЕЛЕНО ПО'),
+                    style: AppTextStyles.label.copyWith(color: pal.subtext),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(photoLine, style: AppTextStyles.subtitle),
+                  if (result.photoUsed && p.confidence != null)
+                    Text(
+                      trf('Уверенность анализа фото: {n}%', {
+                        'n': (p.confidence! * 100).round(),
+                      }),
+                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                    ),
+                  for (final o in result.observations)
+                    Text(
+                      '• $o',
+                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             Text(tr('Ваши оттенки'), style: AppTextStyles.subtitle),
@@ -98,18 +167,26 @@ class ColorResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             CustomButton(
-              label: tr('Подобрать косметику'),
+              label: tr('Подобрать косметику для меня'),
               onPressed: () => Navigator.pushNamed(
                 context,
                 AppRoutes.catalog,
-                arguments: CatalogArgs(category: 'Макияж'),
+                arguments: const CatalogArgs(),
               ),
             ),
             const SizedBox(height: 10),
             CustomButton(
-              label: tr('Готово'),
+              label: tr('Пройти тест заново'),
               outlined: true,
+              onPressed: () {
+                _done(context);
+                Navigator.pushNamed(context, AppRoutes.colorTest);
+              },
+            ),
+            const SizedBox(height: 6),
+            TextButton(
               onPressed: () => _done(context),
+              child: Text(tr('Готово')),
             ),
           ],
         ),

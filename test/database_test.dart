@@ -9,7 +9,6 @@ import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/review_repository.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
-import 'package:cosmetix/services/assistant_service.dart';
 
 void main() {
   sqfliteFfiInit();
@@ -226,27 +225,6 @@ void main() {
     expect((await chat.messages(1)).last.isUser, isTrue);
     await chat.reset(1);
     expect((await chat.messages(1)).length, 1);
-  });
-
-  group('assistant', () {
-    test('compares prices of two brands', () async {
-      final bot = AssistantService(products, safety);
-      final answer = await bot.reply(
-        'что меньше стоит: палетка FlowerKnows или Peripera?',
-        1,
-      );
-      expect(answer, contains('Flower Knows'));
-      expect(answer, contains('выигрывает по цене'));
-    });
-
-    test('answers about composition and falls back politely', () async {
-      final bot = AssistantService(products, safety);
-      expect(
-        await bot.reply('какой состав у палетки Flower Knows', 1),
-        contains('8.5/10'),
-      );
-      expect(await bot.reply('abracadabra', 1), contains('Я могу'));
-    });
   });
 
   test('resetDemoData restores the seed', () async {

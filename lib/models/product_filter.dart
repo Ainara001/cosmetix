@@ -12,6 +12,7 @@ enum ProductStatus {
 }
 
 enum ProductSort {
+  forYou('Для вас'),
   newest('По новизне'),
   priceAsc('Сначала дешёвые'),
   priceDesc('Сначала дорогие'),
@@ -19,6 +20,16 @@ enum ProductSort {
 
   const ProductSort(this.label);
   final String label;
+
+  /// Catalog options: "For you" exists only after the Beauty Test.
+  static List<ProductSort> catalogOptions({required bool hasProfile}) => [
+    if (hasProfile) forYou,
+    newest,
+    priceAsc,
+    priceDesc,
+  ];
+
+  static const cartOptions = [newest, priceAsc, priceDesc, name];
 }
 
 /// Search + filter parameters shared by Catalog, Cart and Filters screens.
@@ -98,6 +109,7 @@ class ProductFilter {
   ) {
     final list = source.where(filter.matches).toList();
     switch (sort) {
+      case ProductSort.forYou: // ranked by the personal recommendation service
       case ProductSort.newest:
         list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       case ProductSort.priceAsc:

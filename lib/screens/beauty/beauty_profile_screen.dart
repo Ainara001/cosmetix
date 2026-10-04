@@ -8,6 +8,7 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -193,7 +194,23 @@ class BeautyProfileScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
+          Text(
+            user.beautySource == 'questionnaire_photo'
+                ? tr('Определено по: опросник + анализ фото')
+                : tr('Определено по: опросник'),
+            style: AppTextStyles.caption.copyWith(color: pal.subtext),
+          ),
+          const SizedBox(height: 14),
+          CustomButton(
+            label: tr('Подобрать косметику для меня'),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              AppRoutes.catalog,
+              arguments: const CatalogArgs(),
+            ),
+          ),
+          const SizedBox(height: 10),
           CustomButton(
             label: tr('Пройти бьюти-тест заново'),
             outlined: true,

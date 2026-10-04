@@ -134,6 +134,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
+            if (chat.aiUnavailable)
+              _OfflineBanner(
+                detail: chat.aiError,
+                onRetry: () => context.read<ChatProvider>().retry(),
+              ),
             SizedBox(
               height: 40,
               child: ListView.separated(
@@ -250,6 +255,57 @@ class _Bubble extends StatelessWidget {
             const SizedBox(width: 8),
           ],
           Flexible(child: bubble),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown when the AI server did not answer: the chat itself keeps working
+/// (history, input), only the answer is missing.
+class _OfflineBanner extends StatelessWidget {
+  const _OfflineBanner({required this.onRetry, this.detail});
+
+  final VoidCallback onRetry;
+  final String? detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: const EdgeInsets.fromLTRB(12, 8, 6, 8),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.cloud_off_outlined,
+            size: 20,
+            color: AppColors.primaryDark,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tr('ИИ-помощник сейчас недоступен'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  tr('Остальные функции приложения работают.'),
+                  style: TextStyle(fontSize: 11.5, color: pal.subtext),
+                ),
+              ],
+            ),
+          ),
+          TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
         ],
       ),
     );

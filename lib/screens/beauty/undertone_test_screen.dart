@@ -1,11 +1,9 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
-import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/color_test_service.dart';
@@ -37,28 +35,13 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
       depth: widget.args.depth,
       vein: ColorTestService.veinQuestion[_selected!].$4,
     );
-    try {
-      await context.read<AuthProvider>().updateBeauty(
-        colorType: result.colorType,
-        undertone: result.undertone,
-        skinTone: result.skinTone,
-      );
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.colorResult,
-        arguments: result,
-      );
-    } catch (_) {
-      if (mounted) {
-        setState(() => _saving = false);
-        showMessage(
-          context,
-          tr('Не удалось сохранить результат'),
-          type: MessageType.error,
-        );
-      }
-    }
+    // nothing is saved yet: the skin questions and the optional photo follow
+    Navigator.pushNamed(
+      context,
+      AppRoutes.skinTest,
+      arguments: SkinTestArgs(color: result),
+    );
+    setState(() => _saving = false);
   }
 
   @override

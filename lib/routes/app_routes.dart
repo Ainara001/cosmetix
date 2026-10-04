@@ -8,7 +8,9 @@ import 'package:cosmetix/screens/auth/login_screen.dart';
 import 'package:cosmetix/screens/auth/register_screen.dart';
 import 'package:cosmetix/screens/auth/reset_password_screen.dart';
 import 'package:cosmetix/screens/beauty/beauty_profile_screen.dart';
+import 'package:cosmetix/screens/beauty/beauty_photo_screen.dart';
 import 'package:cosmetix/screens/beauty/color_result_screen.dart';
+import 'package:cosmetix/screens/beauty/skin_test_screen.dart';
 import 'package:cosmetix/screens/beauty/color_test_screen.dart';
 import 'package:cosmetix/screens/beauty/undertone_test_screen.dart';
 import 'package:cosmetix/screens/cart/order_success_screen.dart';
@@ -28,7 +30,6 @@ import 'package:cosmetix/screens/profile/settings_screen.dart';
 import 'package:cosmetix/screens/safety/blacklist_screen.dart';
 import 'package:cosmetix/screens/safety/reaction_form_screen.dart';
 import 'package:cosmetix/screens/safety/reactions_screen.dart';
-import 'package:cosmetix/services/color_test_service.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
@@ -54,6 +55,8 @@ class AppRoutes {
   static const beautyProfile = '/beauty-profile';
   static const colorTest = '/color-test';
   static const undertoneTest = '/undertone-test';
+  static const skinTest = '/skin-test';
+  static const beautyPhoto = '/beauty-photo';
   static const colorResult = '/color-result';
   static const editProfile = '/edit-profile';
   static const settings = '/settings';
@@ -102,8 +105,12 @@ class AppRoutes {
         page = const ColorTestScreen();
       case undertoneTest:
         page = a is UndertoneArgs ? UndertoneTestScreen(args: a) : _bad();
+      case skinTest:
+        page = a is SkinTestArgs ? SkinTestScreen(args: a) : _bad();
+      case beautyPhoto:
+        page = a is BeautyPhotoArgs ? BeautyPhotoScreen(args: a) : _bad();
       case colorResult:
-        page = a is ColorTestResult ? ColorResultScreen(result: a) : _bad();
+        page = a is BeautyResultArgs ? ColorResultScreen(result: a) : _bad();
       case editProfile:
         page = const EditProfileScreen();
       case AppRoutes.settings:

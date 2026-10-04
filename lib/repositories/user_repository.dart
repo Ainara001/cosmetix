@@ -125,9 +125,19 @@ class UserRepository {
     String? undertone,
     String? colorType,
     List<String>? skinConcerns,
+    String? source,
+    double? confidence,
+    bool clearConfidence = false,
+    bool markCompleted = false,
   }) async {
     final db = await _helper.database;
+    final now = DateTime.now().millisecondsSinceEpoch;
     final values = <String, Object?>{
+      'beauty_source': ?source,
+      'beauty_confidence': ?confidence,
+      if (clearConfidence) 'beauty_confidence': null,
+      if (confidence != null) 'beauty_analyzed_at': now,
+      if (markCompleted) 'beauty_completed_at': now,
       'skin_type': ?skinType,
       'skin_tone': ?skinTone,
       'undertone': ?undertone,
@@ -136,6 +146,19 @@ class UserRepository {
       'updated_at': DateTime.now().millisecondsSinceEpoch,
     };
     await db.update('users', values, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> setAvatarPath(int id, String? path) async {
+    final db = await _helper.database;
+    await db.update(
+      'users',
+      {
+        'avatar_path': path,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<bool> changePassword(String email, String newPassword) async {

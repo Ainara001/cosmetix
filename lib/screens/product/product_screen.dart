@@ -9,6 +9,8 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
+import 'package:cosmetix/providers/chat_provider.dart';
+import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/reviews_provider.dart';
 import 'package:cosmetix/providers/safety_provider.dart';
@@ -20,6 +22,7 @@ import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 import 'package:cosmetix/widgets/product_art.dart';
+import 'package:cosmetix/widgets/why_it_suits_card.dart';
 
 class ProductScreen extends StatelessWidget {
   const ProductScreen({super.key, required this.productId});
@@ -81,6 +84,15 @@ class _ProductBodyState extends State<_ProductBody> {
       if (p.storeId == _storeId) return p;
     }
     return null;
+  }
+
+  /// Opens the chat and asks about this product (the assistant gets the
+  /// product facts together with the user's Beauty Profile).
+  void _askAi(Product product) {
+    final chat = context.read<ChatProvider>();
+    Navigator.of(context).popUntil((r) => r.isFirst);
+    context.read<NavProvider>().setTab(NavProvider.chat);
+    chat.send(tr('Подойдёт ли мне этот товар?'), productId: product.id);
   }
 
   Future<void> _addToCart(Product product) async {
@@ -245,6 +257,14 @@ class _ProductBodyState extends State<_ProductBody> {
                           style: AppTextStyles.body,
                         ),
                       ],
+                      WhyItSuitsCard(productId: product.id),
+                      const SizedBox(height: 10),
+                      CustomButton(
+                        label: tr('Спросить ИИ: подойдёт ли мне?'),
+                        icon: Icons.smart_toy_outlined,
+                        outlined: true,
+                        onPressed: () => _askAi(product),
+                      ),
                       SectionTitle(
                         tr('Сравнение цен в магазинах'),
                         trailing: LinkText(

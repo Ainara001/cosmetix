@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -12,7 +13,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 3;
+  static const dbVersion = 4;
 
   final String? path;
   Database? _db;
@@ -32,20 +33,59 @@ class DatabaseHelper {
     );
   }
 
+  /// Fresh install: the original (v3) tables, then the same migrations an
+  /// existing database goes through, then the demo data.
   Future<void> _onCreate(Database db, int version) async {
-    for (final sql in _schema) {
+    for (final sql in schemaV3) {
       await db.execute(sql);
     }
+    await _migrate(db, 3, version);
     await SeedData.insertAll(db);
   }
 
-  /// Demo strategy: the catalog is seed data, so when the version changes we
-  /// rebuild all tables and seed them again.
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    for (final table in _tables.reversed) {
-      await db.execute('DROP TABLE IF EXISTS $table');
+  /// Safe upgrade: runs the migrations one by one, user data is never dropped.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) =>
+      _migrate(db, oldVersion, newVersion);
+
+  Future<void> _migrate(Database db, int from, int to) async {
+    for (var v = from + 1; v <= to; v++) {
+      await _migrations[v]!(db);
     }
-    await _onCreate(db, newVersion);
+  }
+
+  /// Version -> migration. Version 3 is the first step for databases created
+  /// by older builds (v1/v2 only differed by demo data and one column).
+  static final Map<int, Future<void> Function(Database)> _migrations = {
+    3: (db) async {
+      await _addColumn(db, 'reviews', 'photo_path', 'TEXT');
+    },
+    4: (db) async {
+      await _addColumn(db, 'users', 'avatar_path', 'TEXT');
+      await _addColumn(
+        db,
+        'users',
+        'beauty_source',
+        "TEXT NOT NULL DEFAULT 'questionnaire'",
+      );
+      await _addColumn(db, 'users', 'beauty_confidence', 'REAL');
+      await _addColumn(db, 'users', 'beauty_analyzed_at', 'INTEGER');
+      await _addColumn(db, 'users', 'beauty_completed_at', 'INTEGER');
+      for (final sql in _schemaV4) {
+        await db.execute(sql);
+      }
+      await SeedData.backfillProductTraits(db);
+    },
+  };
+
+  static Future<void> _addColumn(
+    Database db,
+    String table,
+    String column,
+    String type,
+  ) async {
+    final info = await db.rawQuery('PRAGMA table_info($table)');
+    if (info.any((r) => r['name'] == column)) return;
+    await db.execute('ALTER TABLE $table ADD COLUMN $column $type');
   }
 
   Future<void> close() async {
@@ -64,6 +104,12 @@ class DatabaseHelper {
   }
 
   static const _tables = [
+    'product_ai_classification',
+    'product_tags',
+    'product_concerns',
+    'product_undertones',
+    'product_color_types',
+    'product_skin_types',
     'users',
     'settings',
     'stores',
@@ -81,6 +127,58 @@ class DatabaseHelper {
     'reactions',
     'chat_messages',
   ];
+
+  /// Tables added in schema version 4: what each product is suitable for.
+  /// `source` is 'seed' (curated) or 'ai' (validated AI classification).
+  static const _schemaV4 = [
+    '''
+CREATE TABLE product_skin_types (
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  skin_type TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'seed',
+  PRIMARY KEY (product_id, skin_type, source)
+)''',
+    '''
+CREATE TABLE product_color_types (
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  color_type TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'seed',
+  PRIMARY KEY (product_id, color_type, source)
+)''',
+    '''
+CREATE TABLE product_undertones (
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  undertone TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'seed',
+  PRIMARY KEY (product_id, undertone, source)
+)''',
+    '''
+CREATE TABLE product_concerns (
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  concern TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'seed',
+  PRIMARY KEY (product_id, concern, source)
+)''',
+    '''
+CREATE TABLE product_tags (
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  tag TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'seed',
+  PRIMARY KEY (product_id, tag, source)
+)''',
+    '''
+CREATE TABLE product_ai_classification (
+  product_id INTEGER PRIMARY KEY REFERENCES products(id) ON DELETE CASCADE,
+  model TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  explanation TEXT NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL
+)''',
+  ];
+
+  /// The original tables (schema version 3).
+  @visibleForTesting
+  static List<String> get schemaV3 => _schema;
 
   static const _schema = [
     '''

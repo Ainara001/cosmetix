@@ -98,6 +98,7 @@ class _CartScreenState extends State<CartScreen> {
         .where((i) => _filter.matches(i.product, priceOverride: i.unitPrice))
         .toList();
     switch (_sort) {
+      case ProductSort.forYou:
       case ProductSort.newest:
         break;
       case ProductSort.priceAsc:
@@ -134,7 +135,7 @@ class _CartScreenState extends State<CartScreen> {
                     initialValue: _sort,
                     onSelected: (v) => setState(() => _sort = v),
                     itemBuilder: (_) => [
-                      for (final s in ProductSort.values)
+                      for (final s in ProductSort.cartOptions)
                         PopupMenuItem(value: s, child: Text(tr(s.label))),
                     ],
                     child: Padding(
