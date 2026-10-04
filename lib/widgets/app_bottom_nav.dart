@@ -36,7 +36,8 @@ class AppBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 62,
+          // grows with the system font size so the labels never overflow
+          height: 62 + (MediaQuery.textScalerOf(context).scale(11) - 11) * 2,
           child: Row(
             children: [
               for (var i = 0; i < _items.length; i++)

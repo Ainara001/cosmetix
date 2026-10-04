@@ -402,8 +402,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Отличный состав!': 'Great ingredients!',
   'Отмена': 'Cancel',
   'Отменить': 'Undo',
-  'Отметьте компоненты, которых не должно быть в вашей косметике. Мы предупредим вас при анализе продукта.':
-      'Mark the ingredients that should not be in your cosmetics. We will warn you when analyzing a product.',
+  'Отметьте компоненты, которых не должно быть в вашей косметике. Мы предупредим вас при анализе продукта и не будем показывать такие товары в персональных рекомендациях.':
+      'Mark the ingredients that should not be in your cosmetics. We will warn you when analyzing a product and will not show such products in your personal recommendations.',
   'Отправить': 'Send',
   'Отправить отзыв': 'Submit review',
   'Отправить ссылку': 'Send link',

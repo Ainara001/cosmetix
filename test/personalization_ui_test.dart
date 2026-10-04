@@ -105,6 +105,8 @@ void main() {
     final (helper, _) = await newUser(t);
     await t.pumpWidget(CosmetixApp(helper: helper));
     await pumpUntil(t, find.text('Кабинет'));
+    // no Beauty Profile yet: no personal block on the home screen
+    expect(find.text('Рекомендуем вам'), findsNothing);
     nav(t).pushNamed(AppRoutes.catalog);
     await _settle(t);
     expect(find.text('По новизне'), findsOneWidget);
