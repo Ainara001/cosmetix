@@ -28,15 +28,26 @@ import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/assistant_service.dart';
+import 'package:cosmetix/services/ingredient_scan/ingredient_ocr.dart';
 import 'package:cosmetix/services/avatar_service.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
 /// Creates repositories and providers (Screen -> Provider -> Repository ->
 /// SQLite) and starts the app after the saved session is restored.
 class CosmetixApp extends StatefulWidget {
-  const CosmetixApp({super.key, required this.helper});
+  const CosmetixApp({
+    super.key,
+    required this.helper,
+    this.ocr = const PlatformIngredientOcr(),
+    this.photoSource = const ImagePickerPhotoSource(),
+  });
 
   final DatabaseHelper helper;
+
+  /// Text recognition and photo picking of the ingredient scanner (replaced by
+  /// fakes in tests).
+  final IngredientOcr ocr;
+  final ScanPhotoSource photoSource;
 
   @override
   State<CosmetixApp> createState() => _CosmetixAppState();
@@ -109,6 +120,8 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
             ChangeNotifierProvider<AiProvider>.value(value: _ai),
             Provider<AvatarService>(create: (_) => AvatarService()),
+            Provider<IngredientOcr>.value(value: widget.ocr),
+            Provider<ScanPhotoSource>.value(value: widget.photoSource),
             Provider<VisionAnalyzer>(create: (_) => VisionAnalyzer(_ai.client)),
             Provider<ProductClassifier>(
               create: (_) => ProductClassifier(_ai.client, _products, _safety),

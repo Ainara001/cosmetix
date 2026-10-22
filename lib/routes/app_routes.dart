@@ -32,6 +32,7 @@ import 'package:cosmetix/screens/profile/favorites_screen.dart';
 import 'package:cosmetix/screens/profile/legal_screen.dart';
 import 'package:cosmetix/screens/profile/settings_screen.dart';
 import 'package:cosmetix/screens/safety/blacklist_screen.dart';
+import 'package:cosmetix/screens/scan/scan_screen.dart';
 import 'package:cosmetix/screens/safety/reaction_form_screen.dart';
 import 'package:cosmetix/screens/safety/reactions_screen.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
@@ -68,6 +69,7 @@ class AppRoutes {
   static const reactions = '/reactions';
   static const reactionForm = '/reaction-form';
   static const legal = '/legal';
+  static const scan = '/scan';
   static const bag = '/bag';
   static const bagForm = '/bag-form';
   static const care = '/care';
@@ -129,6 +131,8 @@ class AppRoutes {
         page = const ReactionsScreen();
       case reactionForm:
         page = ReactionFormScreen(reactionId: a is int ? a : null);
+      case scan:
+        page = const ScanScreen();
       case bag:
         page = const BagScreen();
       case bagForm:
