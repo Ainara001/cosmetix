@@ -67,11 +67,11 @@ class UserRepository {
     );
     if (rows.isEmpty) return null;
     final stored = rows.first['password_hash'] as String;
-    if (!PasswordHasher.verify(password, stored)) return null;
+    if (!await PasswordHasher.verifyAsync(password, stored)) return null;
     if (PasswordHasher.needsUpgrade(stored)) {
       await db.update(
         'users',
-        {'password_hash': PasswordHasher.hash(password)},
+        {'password_hash': await PasswordHasher.hashAsync(password)},
         where: 'id = ?',
         whereArgs: [rows.first['id']],
       );
@@ -131,7 +131,7 @@ class UserRepository {
     }
     final db = await _helper.database;
     final now = DateTime.now().millisecondsSinceEpoch;
-    final hash = passwordHash ?? PasswordHasher.hash(password!);
+    final hash = passwordHash ?? await PasswordHasher.hashAsync(password!);
     final id = await db.transaction((txn) async {
       final id = await txn.insert('users', {
         'first_name': firstName.trim(),
@@ -241,7 +241,7 @@ class UserRepository {
     final n = await db.update(
       'users',
       {
-        'password_hash': PasswordHasher.hash(newPassword),
+        'password_hash': await PasswordHasher.hashAsync(newPassword),
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: 'LOWER(email) = ?',

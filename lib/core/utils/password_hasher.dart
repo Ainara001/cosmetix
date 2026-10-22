@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -32,6 +33,16 @@ class PasswordHasher {
     final key = _pbkdf2(utf8.encode(password), salt, iterations);
     return '$_prefix\$$iterations\$${base64.encode(salt)}\$${base64.encode(key)}';
   }
+
+  /// Same as [hash] but off the UI thread (about 0.1-0.5 s of CPU).
+  static Future<String> hashAsync(String password) =>
+      Isolate.run(() => hash(password));
+
+  /// Same as [verify] but off the UI thread.
+  static Future<bool> verifyAsync(String password, String stored) =>
+      stored == unusable || !stored.startsWith('$_prefix\$')
+      ? Future.value(verify(password, stored)) // legacy / unusable: instant
+      : Isolate.run(() => verify(password, stored));
 
   static bool verify(String password, String stored) {
     if (stored == unusable) return false;
