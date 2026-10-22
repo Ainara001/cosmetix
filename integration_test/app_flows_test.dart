@@ -69,10 +69,18 @@ Future<void> _see(WidgetTester t, Finder f) async {
   }
 }
 
+/// Scrolls [f] into view and taps it. On small phones a widget can end up
+/// half hidden at the edge (behind the bottom bar), so scroll a bit more until
+/// its centre really receives the tap.
 Future<void> _tap(WidgetTester t, Finder f) async {
   await _see(t, f);
   await t.ensureVisible(f);
-  await t.tap(f);
+  await _settle(t, 1);
+  for (var i = 0; i < 4 && f.hitTestable().evaluate().isEmpty; i++) {
+    await t.drag(find.byType(Scrollable).first, const Offset(0, -140));
+    await _settle(t, 1);
+  }
+  await t.tap(f.hitTestable().first);
   await _settle(t, 3);
 }
 
@@ -114,7 +122,7 @@ Future<void> main() async {
     await _until(t, find.text('Добро пожаловать'));
     await t.enterText(find.byType(TextFormField).at(0), SeedData.demoEmail);
     await t.enterText(find.byType(TextFormField).at(1), SeedData.demoPassword);
-    await t.tap(find.text('Войти'));
+    await _tap(t, find.text('Войти'));
     await _until(t, find.text('Кабинет'));
     await _settle(t);
   }
@@ -225,16 +233,16 @@ Future<void> main() async {
     }
     // undertone test
     await _until(t, find.text('Тест на подтон кожи'));
-    await t.tap(find.byIcon(Icons.radio_button_unchecked).first);
+    await _tap(t, find.byIcon(Icons.radio_button_unchecked).first);
     await _tap(t, find.text('Завершить и показать результат'));
     // skin test: the first skin type, then Next
     await _until(t, find.text('Тест: ваша кожа'));
-    await t.tap(find.byIcon(Icons.radio_button_off).first);
+    await _tap(t, find.byIcon(Icons.radio_button_off).first);
     await _tap(t, find.text('Далее'));
     // optional photo step is skipped
     await _until(t, find.text('Пропустить'));
     await _tap(t, find.text('Пропустить'));
-    await _until(t, find.text('Подобрать косметику для меня'));
+    await _see(t, find.text('Подобрать косметику для меня'));
     expect(t.takeException(), isNull);
   });
 
@@ -247,6 +255,7 @@ Future<void> main() async {
       'Лимонен',
     );
     await _tap(t, find.byTooltip('Добавить'));
+    await _see(t, find.text('Лимонен'));
     expect(find.text('Лимонен'), findsWidgets);
     expect(t.takeException(), isNull);
   });
@@ -291,15 +300,18 @@ Future<void> main() async {
     await loginDemo(t);
     await open(t, AppRoutes.reactions);
     await _tap(t, find.text('Добавить реакцию'));
-    await _until(t, find.text('Добавить в дневник'));
+    await _until(t, find.text('Продукт'));
     final drop = find.byType(DropdownButtonFormField<int>);
     await _tap(t, drop);
-    await _tap(t, find.byType(DropdownMenuItem<int>).first);
+    // menu items live in an overlay: tap them directly
+    await t.tap(find.byType(DropdownMenuItem<int>).first);
+    await _settle(t, 3);
     final type = find.byType(DropdownButtonFormField<String>);
     await _tap(t, type);
-    await _tap(t, find.byType(DropdownMenuItem<String>).first);
+    await t.tap(find.byType(DropdownMenuItem<String>).first);
+    await _settle(t, 3);
     await _tap(t, find.text('Добавить в дневник'));
-    await _until(t, find.text('История кожных реакций'));
+    await _see(t, find.text('История кожных реакций'));
     expect(t.takeException(), isNull);
   });
 
