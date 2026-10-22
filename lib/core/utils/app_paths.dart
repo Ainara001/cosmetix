@@ -16,6 +16,9 @@ class AppPaths {
 
   static const avatarsDir = 'avatars';
   static const reviewPhotosDir = 'review_photos';
+  static const reactionPhotosDir = 'reaction_photos';
+
+  static const _photoFolders = {avatarsDir, reviewPhotosDir, reactionPhotosDir};
 
   static String? _documents;
   static String? _databases;
@@ -34,13 +37,42 @@ class AppPaths {
 
   static String? _baseOf(String folder) => switch (folder) {
     avatarsDir => _documents,
+    reactionPhotosDir => _documents,
     reviewPhotosDir => _databases,
     _ => null,
   };
 
+  /// Copies [source] into the photo folder [folder] (created on demand) and
+  /// returns the new absolute path; store it with [toStored].
+  static Future<String> storePhoto(
+    File source,
+    String folder, {
+    String prefix = 'photo',
+  }) async {
+    final base = _baseOf(folder);
+    if (base == null) {
+      throw StateError('AppPaths is not initialized');
+    }
+    final dir = Directory(p.join(base, folder));
+    await dir.create(recursive: true);
+    final ext = p.extension(source.path).isEmpty
+        ? '.jpg'
+        : p.extension(source.path);
+    final dest = p.join(
+      dir.path,
+      '${prefix}_${DateTime.now().microsecondsSinceEpoch}$ext',
+    );
+    await source.copy(dest);
+    return dest;
+  }
+
   /// Deletes every saved avatar and review photo (used by the demo reset).
   static Future<void> deletePhotos() async {
-    for (final folder in const [avatarsDir, reviewPhotosDir]) {
+    for (final folder in const [
+      avatarsDir,
+      reviewPhotosDir,
+      reactionPhotosDir,
+    ]) {
       final base = _baseOf(folder);
       if (base == null) continue;
       try {
@@ -67,7 +99,7 @@ class AppPaths {
   static String? toStored(String? path) {
     if (path == null) return null;
     final folder = p.basename(p.dirname(path));
-    if (folder != avatarsDir && folder != reviewPhotosDir) return path;
+    if (!_photoFolders.contains(folder)) return path;
     return '$folder/${p.basename(path)}';
   }
 

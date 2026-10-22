@@ -1,6 +1,7 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
+import 'package:cosmetix/models/reaction_insights.dart';
 import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
@@ -75,6 +76,18 @@ class SafetyProvider extends ChangeNotifier {
 
   Future<Reaction?> reactionById(int id) => _repo.reactionById(id);
 
+  Future<List<ReactionChange>> reactionHistory(int id) =>
+      _repo.reactionHistory(id);
+
+  /// Repeated observations in the diary (see [ReactionInsights]).
+  Future<ReactionInsights> insights() async {
+    final byProduct = <int, List<Ingredient>>{};
+    for (final id in {for (final r in reactions) r.productId}) {
+      byProduct[id] = await _repo.ingredientsOf(id);
+    }
+    return ReactionInsights.compute(reactions, byProduct);
+  }
+
   Future<void> saveReaction({
     int? id,
     required int productId,
@@ -82,6 +95,7 @@ class SafetyProvider extends ChangeNotifier {
     required int severity,
     required DateTime date,
     String notes = '',
+    String? photoPath,
   }) async {
     final userId = _userId;
     if (userId == null) return;
@@ -93,6 +107,7 @@ class SafetyProvider extends ChangeNotifier {
         severity: severity,
         date: date,
         notes: notes,
+        photoPath: photoPath,
       );
     } else {
       await _repo.updateReaction(
@@ -102,6 +117,7 @@ class SafetyProvider extends ChangeNotifier {
         severity: severity,
         date: date,
         notes: notes,
+        photoPath: photoPath,
       );
     }
     reactions = await _repo.reactions(userId);
