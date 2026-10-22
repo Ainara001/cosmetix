@@ -5,6 +5,7 @@ import 'package:cosmetix/core/utils/password_hasher.dart';
 import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/database/seed_data.dart';
 import 'package:cosmetix/models/app_user.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
 
 class UserRepository {
   UserRepository(this._helper);
@@ -200,6 +201,26 @@ class UserRepository {
       'updated_at': DateTime.now().millisecondsSinceEpoch,
     };
     await db.update('users', values, where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// Saves the personal preferences and the consent to use the history
+  /// (reactions, cosmetic bag) in recommendations.
+  Future<void> updatePreferences(
+    int id, {
+    Set<String>? preferences,
+    bool? useHistory,
+  }) async {
+    final db = await _helper.database;
+    await db.update(
+      'users',
+      {
+        if (preferences != null) 'preferences': Preferences.encode(preferences),
+        'reco_use_history': ?(useHistory == null ? null : (useHistory ? 1 : 0)),
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<void> setAvatarPath(int id, String? path) async {

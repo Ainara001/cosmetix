@@ -62,6 +62,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
   late final SafetyProvider _safetyProvider;
   late final CatalogProvider _catalogProvider;
   late final AiProvider _ai;
+  late final CareProvider _care;
   late final RecommendationService _reco;
   late final Future<void> _init;
 
@@ -76,17 +77,30 @@ class _CosmetixAppState extends State<CosmetixApp> {
     _settings = SettingsProvider(SettingsRepository(h));
     final users = UserRepository(h);
     _safetyProvider = SafetyProvider(_safety);
-    _reco = RecommendationService(_products, _safety, users);
+    _reco = RecommendationService(_products, _safety, users, CareRepository(h));
     _ai = AiProvider(SettingsRepository(h));
     _catalogProvider = CatalogProvider(_products, _reco);
     // re-personalize when the Beauty Profile or the blacklist changes
+    _care = CareProvider(CareRepository(h));
     _catalogProvider.watchProfile(
       signature: () =>
           '${_auth.user?.beautyProfile.signature}|'
-          '${_safetyProvider.blacklist.where((b) => b.enabled).map((b) => b.id).join(',')}',
-      sources: [_auth, _safetyProvider],
+          '${_safetyProvider.blacklist.where((b) => b.enabled).map((b) => b.id).join(',')}|'
+          '${_historySignature()}',
+      sources: [_auth, _safetyProvider, _care],
     );
     _init = Future.wait([_auth.restoreSession(), _settings.load(), _ai.load()]);
+  }
+
+  /// Changes when the user's reactions or cosmetic bag change AND they allowed
+  /// the recommendations to use them.
+  String _historySignature() {
+    if (!(_auth.user?.recoUseHistory ?? false)) return 'no-history';
+    final reactions = _safetyProvider.reactions
+        .map((r) => '${r.productId}:${r.severity}')
+        .join(',');
+    final owned = _care.bag.map((p) => p.productId).join(',');
+    return '$reactions|$owned';
   }
 
   @override
@@ -136,9 +150,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider(
               create: (_) => CartProvider(CartRepository(widget.helper)),
             ),
-            ChangeNotifierProvider(
-              create: (_) => CareProvider(CareRepository(widget.helper)),
-            ),
+            ChangeNotifierProvider<CareProvider>.value(value: _care),
             ChangeNotifierProvider<SafetyProvider>.value(
               value: _safetyProvider,
             ),

@@ -24,7 +24,11 @@ class BeautyProfile {
     this.concerns = const {},
     this.source = BeautySource.questionnaire,
     this.confidence,
+    this.preferences = const {},
   });
+
+  /// Personal preferences the user ticked (codes of [Preferences]).
+  final Set<String> preferences;
 
   final SkinType? skinType;
   final SkinTone? skinTone;
@@ -42,7 +46,8 @@ class BeautyProfile {
   /// Changes whenever something that affects recommendations changes.
   String get signature =>
       '${skinType?.code}|${skinTone?.code}|${undertone?.code}|'
-      '${colorType?.code}|${(concerns.map((c) => c.code).toList()..sort()).join(',')}';
+      '${colorType?.code}|${(concerns.map((c) => c.code).toList()..sort()).join(',')}|'
+      '${(preferences.toList()..sort()).join(',')}';
 
   factory BeautyProfile.fromLabels({
     String? skinType,
@@ -52,6 +57,7 @@ class BeautyProfile {
     List<String> concerns = const [],
     String? source,
     double? confidence,
+    Set<String> preferences = const {},
   }) => BeautyProfile(
     skinType: SkinType.fromLabel(skinType),
     skinTone: SkinTone.fromLabel(skinTone),
@@ -63,5 +69,32 @@ class BeautyProfile {
     },
     source: BeautySource.fromCode(source),
     confidence: confidence,
+    preferences: preferences,
   );
+}
+
+/// Personal preferences that gently shift the ranking (never a hard filter:
+/// the blacklist is the only hard rule).
+class Preferences {
+  Preferences._();
+
+  static const fragranceFree = 'fragrance_free';
+  static const natural = 'natural';
+
+  static const all = [fragranceFree, natural];
+
+  /// Russian source label (translated with `tr`).
+  static String label(String code) => switch (code) {
+    fragranceFree => 'Без отдушки',
+    natural => 'Натуральный состав',
+    _ => code,
+  };
+
+  static Set<String> parse(String? raw) => {
+    for (final c in (raw ?? '').split('|'))
+      if (all.contains(c)) c,
+  };
+
+  static String encode(Set<String> codes) =>
+      (codes.where(all.contains).toList()..sort()).join('|');
 }

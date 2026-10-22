@@ -21,6 +21,8 @@ class AppUser {
     this.beautySource = 'questionnaire',
     this.beautyConfidence,
     this.beautyAnalyzedAt,
+    this.preferences = const {},
+    this.recoUseHistory = false,
   });
 
   final int id;
@@ -46,6 +48,13 @@ class AppUser {
   final double? beautyConfidence;
   final int? beautyAnalyzedAt;
 
+  /// Personal preferences (codes of `Preferences`).
+  final Set<String> preferences;
+
+  /// The user allowed the recommendations to take their reactions and
+  /// cosmetic bag into account.
+  final bool recoUseHistory;
+
   String get fullName => '$lastName $firstName'.trim();
 
   BeautyProfile get beautyProfile => BeautyProfile.fromLabels(
@@ -56,6 +65,7 @@ class AppUser {
     concerns: skinConcerns,
     source: beautySource,
     confidence: beautyConfidence,
+    preferences: preferences,
   );
 
   bool get hasBeautyProfile => colorType.isNotEmpty;
@@ -84,6 +94,8 @@ class AppUser {
       beautySource: m['beauty_source'] as String? ?? 'questionnaire',
       beautyConfidence: (m['beauty_confidence'] as num?)?.toDouble(),
       beautyAnalyzedAt: m['beauty_analyzed_at'] as int?,
+      preferences: Preferences.parse(m['preferences'] as String?),
+      recoUseHistory: (m['reco_use_history'] as int? ?? 0) == 1,
     );
   }
 }

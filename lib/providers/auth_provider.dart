@@ -207,6 +207,19 @@ class AuthProvider extends ChangeNotifier {
     await reload();
   }
 
+  Future<void> updatePreferences({
+    Set<String>? preferences,
+    bool? useHistory,
+  }) async {
+    if (_user == null) return;
+    await _users.updatePreferences(
+      _user!.id,
+      preferences: preferences,
+      useHistory: useHistory,
+    );
+    await reload();
+  }
+
   Future<void> setAvatarPath(String? path) async {
     if (_user == null) return;
     await _users.setAvatarPath(_user!.id, path);
