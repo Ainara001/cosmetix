@@ -1,17 +1,15 @@
 import 'package:cosmetix/models/ai_models.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/recommendation.dart';
-import 'package:cosmetix/services/ai/ai_config.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 
 /// Optional AI re-ranking. It receives ONLY products that already passed the
 /// blacklist filter and the local scoring, and it can only reorder them: ids
 /// it makes up are dropped, so it can never bring back an excluded product.
 class RecommendationRefiner {
-  RecommendationRefiner(this._client, this._config);
+  RecommendationRefiner(this._client);
 
-  final OllamaClient _client;
-  final AiConfig Function() _config;
+  final AiClient _client;
 
   static const maxItems = 12;
 
@@ -27,18 +25,17 @@ class RecommendationRefiner {
         '- id ${r.product.id}: ${r.product.brand} ${r.product.name} '
             '(${r.product.category}, local match ${r.matchPercent}%)',
     ].join('\n');
-    final answer = await _client.chat(
-      model: _config().textModel,
+    final reply = await _client.chat(
       json: true,
       temperature: 0.2,
       messages: [
-        const OllamaMessage(
+        const AiMessage(
           'system',
           '''
 You re-rank cosmetics for one user. You may only reorder the listed products.
 Answer with ONE JSON object: {"order": [product ids, best first]} and nothing else.''',
         ),
-        OllamaMessage('user', '''
+        AiMessage('user', '''
 User profile: skin type ${profile.skinType?.label}, skin tone ${profile.skinTone?.label},
 undertone ${profile.undertone?.label}, color type ${profile.colorType?.label},
 concerns ${profile.concerns.map((c) => c.label).join(', ')}.
@@ -48,7 +45,7 @@ $lines'''),
     );
     return applyOrder(
       candidates.map((r) => r.product.id).toList(),
-      parseOrder(answer),
+      parseOrder(reply.text),
     );
   }
 

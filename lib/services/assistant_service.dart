@@ -3,24 +3,29 @@ import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/models/social_models.dart';
-import 'package:cosmetix/services/ai/ai_config.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
-/// The chat assistant: a real Ollama model that knows the user's Beauty
-/// Profile, blacklist and (when relevant) the product being discussed.
+/// The chat assistant: Claude (through the Cosmetix AI proxy) that knows the
+/// catalog and, only when the user agreed (`shareProfile`), their Beauty
+/// Profile and blacklist, plus the product being discussed.
 /// Throws [AiException] when the server is not available: the caller shows a
 /// friendly message, nothing else in the app depends on the chat.
 class AssistantService {
-  AssistantService(this._reco, this._client, this._config);
+  AssistantService(this._reco, this._client);
 
   final RecommendationService _reco;
-  final OllamaClient _client;
-  final AiConfig Function() _config;
+  final AiClient _client;
 
   /// How many previous messages are sent as conversation context.
   static const historyLimit = 8;
+
+  /// Longest answer we ask for (cost control; the proxy caps it as well).
+  static const maxAnswerTokens = 400;
+
+  /// At most this many catalog lines go into the prompt.
+  static const maxCatalogLines = 60;
 
   /// Added to the answer when the user describes a serious reaction, whatever
   /// the model says.
@@ -42,6 +47,7 @@ class AssistantService {
     required String text,
     required List<ChatMessage> history,
     int? productId,
+    bool shareProfile = false,
   }) async {
     final ctx = await _reco.loadContext(userId);
     final system = buildSystemPrompt(
@@ -49,68 +55,81 @@ class AssistantService {
       question: text,
       productId: productId,
       language: currentLang.englishName,
+      shareProfile: shareProfile,
     );
     final recent = history.length > historyLimit
         ? history.sublist(history.length - historyLimit)
         : history;
-    final answer = await _client.chat(
-      model: _config().textModel,
+    final reply = await _client.chat(
       temperature: 0.4,
+      maxTokens: maxAnswerTokens,
       messages: [
-        OllamaMessage('system', system),
+        AiMessage('system', system),
         for (final m in recent)
-          OllamaMessage(m.isUser ? 'user' : 'assistant', m.text),
-        OllamaMessage('user', text),
+          AiMessage(m.isUser ? 'user' : 'assistant', m.text),
+        AiMessage('user', text),
       ],
     );
-    var out = answer.trim();
+    var out = reply.text.trim();
     if (isSeriousReaction(text)) out = '$out\n\n$safetyNote';
     return out;
   }
 
   /// All facts the model may use. Kept as a pure function so it can be tested.
+  /// Without [shareProfile] the Beauty profile and the blacklist stay on the
+  /// phone: blacklisted products are simply left out of the catalog the model
+  /// sees, so they can still never be recommended.
   static String buildSystemPrompt({
     required PersonalizationContext ctx,
     required String question,
     required String language,
     int? productId,
+    bool shareProfile = true,
   }) {
     final p = ctx.profile;
     String v(Object? x) => x == null ? 'unknown' : '$x';
-    final profile =
-        '''
+    final profile = shareProfile
+        ? '''
 - skin type: ${v(p.skinType?.label)}
 - skin tone: ${v(p.skinTone?.label)}
 - undertone: ${v(p.undertone?.label)}
 - color type: ${v(p.colorType?.label)}
-- skin concerns: ${p.concerns.isEmpty ? 'none' : p.concerns.map((c) => c.label).join(', ')}''';
+- skin concerns: ${p.concerns.isEmpty ? 'none' : p.concerns.map((c) => c.label).join(', ')}'''
+        : 'not shared by the user (do not guess it; if it matters, suggest enabling "personal data for AI" in Settings)';
     final blocked = [
       for (final b in ctx.blacklist)
         if (b.enabled) b.name,
     ];
     final catalog = [
       for (final c in ctx.candidates)
-        '- ${c.product.brand} ${c.product.name} (${c.product.category}, '
-            '${Formatters.price(c.product.price)})'
-            '${RecommendationService.isBlacklisted(c, ctx.blacklist) ? ' [CONTAINS BLACKLISTED INGREDIENT - never recommend]' : ''}',
-    ];
-    final focus = _focusProducts(ctx, question, productId);
-    final detail = [for (final c in focus) _productFacts(c, ctx)].join('\n');
+        if (shareProfile ||
+            !RecommendationService.isBlacklisted(c, ctx.blacklist))
+          '- ${c.product.brand} ${c.product.name} (${c.product.category}, '
+              '${Formatters.price(c.product.price)})'
+              '${shareProfile && RecommendationService.isBlacklisted(c, ctx.blacklist) ? ' [CONTAINS BLACKLISTED INGREDIENT - never recommend]' : ''}',
+    ].take(maxCatalogLines).toList();
+    final focus = _focusProducts(ctx, question, productId, shareProfile);
+    final detail = [
+      for (final c in focus) _productFacts(c, ctx, shareProfile),
+    ].join('\n');
+    final blacklistLine = shareProfile
+        ? (blocked.isEmpty ? 'none' : blocked.join(', '))
+        : 'not shared by the user';
     return '''
 You are Cosmetix Assistant, a friendly cosmetics assistant inside a shopping app.
 Rules:
 - Talk only about cosmetics, ingredients, routines, the user's Beauty Profile and whether products suit them.
-- You are NOT a doctor. Never diagnose. If the user describes a serious reaction (swelling, trouble breathing, severe rash, burning, pain), tell them to stop using the product and to see a doctor or pharmacist.
-- Recommend ONLY products from the CATALOG below. Never invent products, prices or ingredients. If you do not know, say so.
+- You are NOT a doctor. Never diagnose and never promise that a product will not cause an allergy or a reaction. If the user describes a serious reaction (swelling, trouble breathing, severe rash, burning, pain), tell them to stop using the product and to see a doctor or pharmacist.
+- Recommend ONLY products from the CATALOG below. Never invent products, prices, stores or ingredients. If a product or fact is not in the data, say plainly that you have no data about it.
 - Never recommend a product that contains a blacklisted ingredient.
-- Base suitability answers on the Beauty Profile and the ingredient facts you are given.
+- Base suitability answers on the Beauty Profile and the ingredient facts you are given, and explain them in simple words.
 - Keep answers short (under 120 words).
 - Answer in $language.
 
 USER BEAUTY PROFILE:
 $profile
 
-USER BLACKLIST (ingredients to avoid): ${blocked.isEmpty ? 'none' : blocked.join(', ')}
+USER BLACKLIST (ingredients to avoid): $blacklistLine
 
 CATALOG:
 ${catalog.join('\n')}
@@ -121,6 +140,7 @@ ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
     PersonalizationContext ctx,
     String question,
     int? productId,
+    bool shareProfile,
   ) {
     if (productId != null) {
       return ctx.candidates.where((c) => c.product.id == productId).toList();
@@ -128,6 +148,10 @@ ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
     final q = question.toLowerCase();
     final found = <ProductCandidate>[];
     for (final c in ctx.candidates) {
+      if (!shareProfile &&
+          RecommendationService.isBlacklisted(c, ctx.blacklist)) {
+        continue;
+      }
       final Product p = c.product;
       final words = '${p.brand} ${p.name} ${tr(p.name)}'
           .toLowerCase()
@@ -138,7 +162,11 @@ ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
     return found.take(2).toList();
   }
 
-  static String _productFacts(ProductCandidate c, PersonalizationContext ctx) {
+  static String _productFacts(
+    ProductCandidate c,
+    PersonalizationContext ctx,
+    bool shareProfile,
+  ) {
     final p = c.product;
     final hits = IngredientAnalyzer.analyze(
       c.ingredients,
@@ -156,7 +184,8 @@ ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
   ingredients: ${c.ingredients.isEmpty ? 'unknown' : c.ingredients.map((i) => '${i.name}${i.isAllergen ? ' (allergen)' : ''}').join(', ')}
   made for skin types: ${c.skinTypes.isEmpty ? 'not specified' : c.skinTypes.map((e) => e.label).join(', ')}
   made for color types: ${c.colorTypes.isEmpty ? 'not specified' : c.colorTypes.map((e) => e.label).join(', ')}
+${shareProfile ? '''
   blacklisted ingredients found: ${hits.isEmpty ? 'none' : hits.join(', ')}
-  local match with the user: ${match == null ? 'excluded (blacklist)' : '$match%'}''';
+  local match with the user: ${match == null ? 'excluded (blacklist)' : '$match%'}''' : ''}''';
   }
 }

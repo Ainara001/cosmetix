@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 
 /// Pulls the JSON object out of a model answer (models like to wrap JSON in
 /// ```json fences or add a sentence around it).

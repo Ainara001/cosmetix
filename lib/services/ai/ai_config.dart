@@ -1,42 +1,30 @@
-/// Where the Ollama server lives and which models to use.
+/// Where the Cosmetix AI proxy lives (see `server/`).
 ///
-/// Ollama normally runs on ANOTHER machine (same Wi-Fi/LAN), so there is no
-/// localhost default: on a phone `localhost` is the phone itself.
+/// The proxy talks to the Claude API and owns the API key, so the app only
+/// needs an address (and, optionally, a shared token). There is no
+/// `localhost` default: on a phone `localhost` is the phone itself.
 ///
 /// Values come from `--dart-define` (build time) and can be overridden in the
 /// app (Settings -> AI assistant), the override is stored in SQLite.
 ///
 ///     flutter run \
-///       --dart-define=OLLAMA_BASE_URL=http://192.168.1.50:11434 \
-///       --dart-define=OLLAMA_TEXT_MODEL=llama3.2 \
-///       --dart-define=OLLAMA_VISION_MODEL=llava
+///       --dart-define=AI_BASE_URL=http://192.168.1.50:8787 \
+///       --dart-define=AI_APP_TOKEN=optional-shared-token
 class AiConfig {
-  const AiConfig({
-    required this.baseUrl,
-    required this.textModel,
-    required this.visionModel,
-  });
+  const AiConfig({required this.baseUrl, this.appToken = ''});
 
-  static const defaultPort = 11434;
-  static const defaultBaseUrl = String.fromEnvironment('OLLAMA_BASE_URL');
-  static const defaultTextModel = String.fromEnvironment(
-    'OLLAMA_TEXT_MODEL',
-    defaultValue: 'llama3.2',
-  );
-  static const defaultVisionModel = String.fromEnvironment(
-    'OLLAMA_VISION_MODEL',
-    defaultValue: 'llava',
-  );
+  /// Port of the proxy when only a bare LAN address is typed.
+  static const defaultPort = 8787;
+  static const defaultBaseUrl = String.fromEnvironment('AI_BASE_URL');
+  static const defaultAppToken = String.fromEnvironment('AI_APP_TOKEN');
 
-  factory AiConfig.fromEnvironment() => const AiConfig(
-    baseUrl: defaultBaseUrl,
-    textModel: defaultTextModel,
-    visionModel: defaultVisionModel,
-  );
+  factory AiConfig.fromEnvironment() =>
+      const AiConfig(baseUrl: defaultBaseUrl, appToken: defaultAppToken);
 
   final String baseUrl;
-  final String textModel;
-  final String visionModel;
+
+  /// Optional shared secret for the proxy's `APP_TOKEN` (sent as a header).
+  final String appToken;
 
   bool get isConfigured => baseUrl.trim().isNotEmpty;
 
@@ -47,7 +35,7 @@ class AiConfig {
     if (!raw.contains('://')) raw = 'http://$raw';
     var uri = Uri.tryParse(raw);
     if (uri == null || uri.host.isEmpty) return null;
-    // a bare LAN address (192.168.1.50) means Ollama's default port
+    // a bare LAN address (192.168.1.50) means the proxy's default port
     if (uri.scheme == 'http' &&
         !uri.hasPort &&
         RegExp(r'^\d{1,3}(\.\d{1,3}){3}$').hasMatch(uri.host)) {
@@ -63,13 +51,8 @@ class AiConfig {
     return u.hasPort ? '${u.host}:${u.port}' : u.host;
   }
 
-  AiConfig copyWith({
-    String? baseUrl,
-    String? textModel,
-    String? visionModel,
-  }) => AiConfig(
+  AiConfig copyWith({String? baseUrl, String? appToken}) => AiConfig(
     baseUrl: baseUrl ?? this.baseUrl,
-    textModel: textModel ?? this.textModel,
-    visionModel: visionModel ?? this.visionModel,
+    appToken: appToken ?? this.appToken,
   );
 }

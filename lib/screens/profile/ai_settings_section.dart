@@ -12,9 +12,10 @@ import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 
-/// Settings -> AI assistant: where the Ollama server is, which models are
-/// used, whether it answers, plus a one-time product classification.
-/// Everything outside the chat / photo analysis works without it.
+/// Settings -> AI assistant: where the AI proxy is, whether it answers with the
+/// real Claude or in test mode, what the user allows to send, plus a one-time
+/// product classification. Everything outside the chat / photo analysis works
+/// without it.
 class AiSettingsSection extends StatefulWidget {
   const AiSettingsSection({super.key});
 
@@ -40,12 +41,11 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
   Future<void> _edit() async {
     final ai = context.read<AiProvider>();
     final url = TextEditingController(text: ai.config.baseUrl);
-    final text = TextEditingController(text: ai.config.textModel);
-    final vision = TextEditingController(text: ai.config.visionModel);
+    final token = TextEditingController(text: ai.config.appToken);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(tr('Сервер ИИ (Ollama)')),
+        title: Text(tr('Сервер ИИ (Claude)')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -56,20 +56,17 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
                 autocorrect: false,
                 decoration: InputDecoration(
                   labelText: tr('Адрес сервера'),
-                  hintText: 'http://192.168.1.50:11434',
+                  hintText: 'http://192.168.1.50:8787',
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
-                controller: text,
+                controller: token,
                 autocorrect: false,
-                decoration: InputDecoration(labelText: tr('Текстовая модель')),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: vision,
-                autocorrect: false,
-                decoration: InputDecoration(labelText: tr('Модель для фото')),
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: tr('Токен приложения (необязательно)'),
+                ),
               ),
             ],
           ),
@@ -87,11 +84,7 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
       ),
     );
     if (ok != true || !mounted) return;
-    await ai.update(
-      baseUrl: url.text,
-      textModel: text.text,
-      visionModel: vision.text,
-    );
+    await ai.update(baseUrl: url.text, appToken: token.text);
     await ai.testConnection();
   }
 
@@ -143,6 +136,9 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
       ),
       AiStatus.unknown => (tr('Не проверено'), pal.subtext),
     };
+    final modeText = ai.mode == null
+        ? ''
+        : (ai.isMock ? tr('Тестовый режим (ключа нет)') : 'Claude');
 
     Widget row(String label, String value, {Color? color}) => Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -172,16 +168,13 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
         children: [
           row(tr('Статус'), statusText, color: statusColor),
           row(tr('Сервер'), ai.config.displayHost),
-          row(tr('Текстовая модель'), ai.config.textModel),
-          row(tr('Модель для фото'), ai.config.visionModel),
-          if (ai.status == AiStatus.online && !ai.textModelInstalled)
+          row(tr('Режим'), modeText, color: ai.isMock ? AppColors.sale : null),
+          if (ai.model != null) row(tr('Модель'), ai.model!),
+          if (ai.isMock)
             Text(
-              tr('Текстовая модель не установлена на сервере.'),
-              style: AppTextStyles.caption.copyWith(color: AppColors.sale),
-            ),
-          if (ai.status == AiStatus.online && !ai.visionModelInstalled)
-            Text(
-              tr('Модель для фото не установлена на сервере.'),
+              tr(
+                'Тестовый режим: на сервере нет ключа Claude API, ответы помечены как ненастоящие.',
+              ),
               style: AppTextStyles.caption.copyWith(color: AppColors.sale),
             ),
           if (ai.status == AiStatus.offline && ai.detail != null)
@@ -196,7 +189,30 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
             ),
             style: AppTextStyles.caption.copyWith(color: pal.subtext),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            activeThumbColor: AppColors.primaryDark,
+            title: Text(
+              tr('Отправлять ИИ Beauty-профиль и чёрный список'),
+              style: AppTextStyles.small,
+            ),
+            value: ai.shareProfile,
+            onChanged: ai.setShareProfile,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            activeThumbColor: AppColors.primaryDark,
+            title: Text(
+              tr('Разрешить отправку фото в ИИ'),
+              style: AppTextStyles.small,
+            ),
+            value: ai.sharePhotos,
+            onChanged: ai.setSharePhotos,
+          ),
+          const SizedBox(height: 6),
           CustomButton(
             label: tr('Проверить подключение'),
             icon: Icons.wifi_tethering,
@@ -205,7 +221,7 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
           ),
           const SizedBox(height: 8),
           CustomButton(
-            label: tr('Изменить сервер и модели'),
+            label: tr('Изменить адрес сервера'),
             outlined: true,
             onPressed: _edit,
           ),
@@ -214,7 +230,7 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
             label: tr('Классифицировать товары (ИИ)'),
             outlined: true,
             loading: _classifying,
-            onPressed: ai.isOnline ? _classify : null,
+            onPressed: ai.isOnline && !ai.isMock ? _classify : null,
           ),
         ],
       ),

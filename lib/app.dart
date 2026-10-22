@@ -107,20 +107,12 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
             ChangeNotifierProvider<AiProvider>.value(value: _ai),
             Provider<AvatarService>(create: (_) => AvatarService()),
-            Provider<VisionAnalyzer>(
-              create: (_) => VisionAnalyzer(_ai.client, () => _ai.config),
-            ),
+            Provider<VisionAnalyzer>(create: (_) => VisionAnalyzer(_ai.client)),
             Provider<ProductClassifier>(
-              create: (_) => ProductClassifier(
-                _ai.client,
-                () => _ai.config,
-                _products,
-                _safety,
-              ),
+              create: (_) => ProductClassifier(_ai.client, _products, _safety),
             ),
             Provider<RecommendationRefiner>(
-              create: (_) =>
-                  RecommendationRefiner(_ai.client, () => _ai.config),
+              create: (_) => RecommendationRefiner(_ai.client),
             ),
             ChangeNotifierProvider(create: (_) => NavProvider()),
             ChangeNotifierProvider<CatalogProvider>.value(
@@ -135,7 +127,8 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider(
               create: (_) => ChatProvider(
                 ChatRepository(widget.helper),
-                AssistantService(_reco, _ai.client, () => _ai.config),
+                AssistantService(_reco, _ai.client),
+                shareProfile: () => _ai.shareProfile,
               ),
             ),
           ],

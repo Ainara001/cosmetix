@@ -2,8 +2,7 @@ import 'package:cosmetix/models/ai_models.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
-import 'package:cosmetix/services/ai/ai_config.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 
 class ClassificationReport {
   const ClassificationReport({
@@ -19,16 +18,18 @@ class ClassificationReport {
   final bool stoppedOffline;
 }
 
-/// Asks the text model who a product suits and caches the answer in SQLite.
+/// Asks Claude who a product suits and caches the answer in SQLite.
 /// Runs on demand (Settings) and never when the catalog opens. The model gets
 /// only what the app knows about the product and must not invent facts.
 class ProductClassifier {
-  ProductClassifier(this._client, this._config, this._products, this._safety);
+  ProductClassifier(this._client, this._products, this._safety);
 
-  final OllamaClient _client;
-  final AiConfig Function() _config;
+  final AiClient _client;
   final ProductRepository _products;
   final SafetyRepository _safety;
+
+  /// Recorded with the cached answer (the proxy picks the real model).
+  static const _model = 'claude';
 
   static const _system = '''
 You classify cosmetics for a shopping app. Use ONLY the product data you are given.
@@ -53,16 +54,12 @@ Category: ${p.category}
 Zone: ${p.zone}
 Description: ${p.description}
 Ingredients: ${ingredients.isEmpty ? 'unknown' : ingredients.map((i) => i.name).join(', ')}''';
-    final answer = await _client.chat(
-      model: _config().textModel,
+    final reply = await _client.chat(
       json: true,
       temperature: 0.1,
-      messages: [
-        const OllamaMessage('system', _system),
-        OllamaMessage('user', user),
-      ],
+      messages: [const AiMessage('system', _system), AiMessage('user', user)],
     );
-    return sanitize(p, ProductClassification.parse(answer));
+    return sanitize(p, ProductClassification.parse(reply.text));
   }
 
   /// Skincare gets no color traits, so the model cannot "invent" shades.
@@ -90,11 +87,7 @@ Ingredients: ${ingredients.isEmpty ? 'unknown' : ingredients.map((i) => i.name).
       onProgress?.call(i, pending.length);
       try {
         final c = await classify(pending[i]);
-        await _products.saveAiClassification(
-          pending[i].id,
-          _config().textModel,
-          c,
-        );
+        await _products.saveAiClassification(pending[i].id, _model, c);
         ok++;
       } on AiBadResponse {
         failed++; // keep going, this product is retried next time

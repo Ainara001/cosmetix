@@ -1,0 +1,14 @@
+{
+  "name": "cosmetix-ai-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal secure proxy between the Cosmetix app and the Anthropic Claude API. The API key lives only here, in environment variables.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

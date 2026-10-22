@@ -54,3 +54,7 @@ key.properties
 *.mobileprovision
 google-services.json
 GoogleService-Info.plist
+
+# AI proxy secrets
+server/.env
+server/node_modules/

@@ -3,16 +3,15 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cosmetix/models/ai_models.dart';
-import 'package:cosmetix/services/ai/ai_config.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 
 /// Optional photo step of the Beauty Test: sends one small photo to the
-/// multimodal Ollama model and expects structured JSON back.
+/// AI (Claude, through the proxy) and expects structured JSON back. The caller
+/// must have the user's consent first (see `AiProvider.sharePhotos`).
 class VisionAnalyzer {
-  VisionAnalyzer(this._client, this._config);
+  VisionAnalyzer(this._client);
 
-  final OllamaClient _client;
-  final AiConfig Function() _config;
+  final AiClient _client;
 
   /// Photos bigger than this are rejected before sending (the picker already
   /// downsizes to ~1024px, so real photos are a few hundred KB).
@@ -37,20 +36,19 @@ Do not describe diseases or skin conditions. Do not guess the person's age, ethn
     if (photoBytes.isEmpty || photoBytes.length > maxBytes) {
       throw const AiBadResponse('The photo is empty or too large');
     }
-    final answer = await _client.chat(
-      model: _config().visionModel,
+    final reply = await _client.chat(
       json: true,
       temperature: 0.2,
-      timeout: OllamaClient.visionTimeout,
+      timeout: AiClient.visionTimeout,
       messages: [
-        OllamaMessage(
+        AiMessage(
           'user',
           prompt,
           images: [base64Encode(photoBytes)], // never logged
         ),
       ],
     );
-    return VisionAnalysis.parse(answer);
+    return VisionAnalysis.parse(reply.text);
   }
 
   /// Reads the picked photo, analyzes it and always deletes the temporary file

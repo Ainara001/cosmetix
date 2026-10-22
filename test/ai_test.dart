@@ -17,56 +17,70 @@ import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/ai_config.dart';
 import 'package:cosmetix/services/ai/beauty_profile_merger.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
-/// A tiny fake Ollama on the loopback interface.
-class FakeOllama {
-  FakeOllama._(this._server);
+/// A tiny fake Cosmetix AI proxy on the loopback interface.
+class FakeAiProxy {
+  FakeAiProxy._(this._server);
 
   final HttpServer _server;
   final requests = <Map<String, Object?>>[];
+  final headers = <HttpHeaders>[];
 
-  /// Answer of /api/chat (message.content). Null -> HTTP 500.
+  /// `text` of /v1/chat. Null -> the error below is returned instead.
   String? chatAnswer = '{}';
+  bool mock = false;
+  String mode = 'claude';
   Duration delay = Duration.zero;
   int chatCalls = 0;
 
+  /// Error answer used when [chatAnswer] is null.
+  int errorStatus = 500;
+  Map<String, Object?> errorBody = {'error': 'internal', 'message': 'boom'};
+  String? retryAfter;
+
   String get url => 'http://127.0.0.1:${_server.port}';
 
-  static Future<FakeOllama> start() async {
+  static Future<FakeAiProxy> start() async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-    final fake = FakeOllama._(server);
+    final fake = FakeAiProxy._(server);
     unawaited(
       server.forEach((req) async {
         final body = await utf8.decoder.bind(req).join();
         await Future<void>.delayed(fake.delay);
         final res = req.response;
-        if (req.uri.path == '/api/tags') {
+        res.headers.contentType = ContentType.json;
+        if (req.uri.path == '/health') {
           res.write(
             jsonEncode({
-              'models': [
-                {'name': 'llama3.2:latest'},
-                {'name': 'llava:latest'},
-              ],
+              'ok': true,
+              'mode': fake.mode,
+              'model': fake.mode == 'mock' ? null : 'claude-haiku-5-5',
             }),
           );
-        } else if (req.uri.path == '/api/chat') {
+        } else if (req.uri.path == '/v1/chat') {
           fake.chatCalls++;
+          fake.headers.add(req.headers);
           fake.requests.add(jsonDecode(body) as Map<String, Object?>);
           if (fake.chatAnswer == null) {
-            res.statusCode = 500;
-            res.write(jsonEncode({'error': 'model not found'}));
+            res.statusCode = fake.errorStatus;
+            if (fake.retryAfter != null) {
+              res.headers.set('retry-after', fake.retryAfter!);
+            }
+            res.write(jsonEncode(fake.errorBody));
           } else {
             res.write(
               jsonEncode({
-                'message': {'role': 'assistant', 'content': fake.chatAnswer},
+                'text': fake.chatAnswer,
+                'mock': fake.mock,
+                'usage': {'inputTokens': 1, 'outputTokens': 1},
               }),
             );
           }
@@ -90,46 +104,55 @@ void main() {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  late FakeOllama fake;
+  late FakeAiProxy fake;
   late AiConfig config;
-  late OllamaClient client;
+  late AiClient client;
 
   setUp(() async {
-    fake = await FakeOllama.start();
-    config = AiConfig(
-      baseUrl: fake.url,
-      textModel: 'llama3.2',
-      visionModel: 'llava',
-    );
-    client = OllamaClient(() => config);
+    fake = await FakeAiProxy.start();
+    config = AiConfig(baseUrl: fake.url);
+    client = AiClient(() => config);
   });
   tearDown(() => fake.stop());
 
   group('connection and offline fallback', () {
-    test('health lists installed models', () async {
-      final h = await client.health();
-      expect(h.hasModel('llama3.2'), isTrue);
-      expect(h.hasModel('llava'), isTrue);
-      expect(h.hasModel('other'), isFalse);
+    test('health tells the real Claude from test mode', () async {
+      final real = await client.health();
+      expect(real.isMock, isFalse);
+      expect(real.model, 'claude-haiku-5-5');
+      fake.mode = 'mock';
+      final test = await client.health();
+      expect(test.isMock, isTrue);
+      expect(test.model, isNull);
+    });
+
+    test('something that is not the proxy is AiBadResponse', () async {
+      final other = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => other.close(force: true));
+      unawaited(
+        other.forEach((r) {
+          r.response
+            ..write('<html>hi</html>')
+            ..close();
+        }),
+      );
+      final c = AiClient(
+        () => AiConfig(baseUrl: 'http://127.0.0.1:${other.port}'),
+      );
+      expect(c.health(), throwsA(isA<AiBadResponse>()));
     });
 
     test('an unreachable server is AiUnavailable, not a crash', () async {
-      final offline = OllamaClient(
-        () => const AiConfig(
-          baseUrl: 'http://127.0.0.1:1',
-          textModel: 't',
-          visionModel: 'v',
-        ),
+      final offline = AiClient(
+        () => const AiConfig(baseUrl: 'http://127.0.0.1:1'),
       );
       expect(offline.health(), throwsA(isA<AiUnavailable>()));
     });
 
     test('no server address configured', () {
-      final none = OllamaClient(
-        () => const AiConfig(baseUrl: '', textModel: 't', visionModel: 'v'),
-      );
+      final none = AiClient(() => const AiConfig(baseUrl: ''));
       expect(
-        none.chat(model: 't', messages: const []),
+        none.chat(messages: const [AiMessage('user', 'hi')]),
         throwsA(isA<AiUnavailable>()),
       );
     });
@@ -138,20 +161,87 @@ void main() {
       fake.delay = const Duration(milliseconds: 600);
       expect(
         client.chat(
-          model: 't',
-          messages: const [OllamaMessage('user', 'hi')],
+          messages: const [AiMessage('user', 'hi')],
           timeout: const Duration(milliseconds: 150),
         ),
         throwsA(isA<AiTimeout>()),
       );
     });
 
-    test('a server error (model missing) is AiServerError', () async {
+    test('proxy errors map to typed exceptions', () async {
       fake.chatAnswer = null;
+      Future<Object?> failWith(int status, [String? retryAfter]) async {
+        fake.errorStatus = status;
+        fake.errorBody = {'error': 'e$status', 'message': 'm$status'};
+        fake.retryAfter = retryAfter;
+        try {
+          await client.chat(messages: const [AiMessage('user', 'hi')]);
+        } catch (e) {
+          return e;
+        }
+        return null;
+      }
+
+      final limited = await failWith(429, '12');
+      expect(limited, isA<AiRateLimited>());
+      expect((limited! as AiRateLimited).retryAfter, 12);
+      expect(await failWith(504), isA<AiTimeout>());
+      expect(await failWith(503), isA<AiUnavailable>());
+      final auth = await failWith(401);
+      expect(auth, isA<AiServerError>());
+      expect((auth! as AiServerError).statusCode, 401);
+      expect(await failWith(500), isA<AiServerError>());
+    });
+
+    test('an empty answer is AiBadResponse', () async {
+      fake.chatAnswer = '  ';
       expect(
-        client.chat(model: 'x', messages: const [OllamaMessage('user', 'hi')]),
-        throwsA(isA<AiServerError>()),
+        client.chat(messages: const [AiMessage('user', 'hi')]),
+        throwsA(isA<AiBadResponse>()),
       );
+    });
+
+    test('test-mode answers are flagged', () async {
+      fake.mock = true;
+      fake.chatAnswer = '[ТЕСТОВЫЙ РЕЖИМ] hi';
+      final r = await client.chat(messages: const [AiMessage('user', 'hi')]);
+      expect(r.mock, isTrue);
+    });
+
+    test('request shape: system split out, json flag, token header', () async {
+      config = AiConfig(baseUrl: fake.url, appToken: 'tok');
+      fake.chatAnswer = 'ok';
+      await client.chat(
+        json: true,
+        temperature: 0.2,
+        maxTokens: 123,
+        messages: const [
+          AiMessage('system', 'be nice'),
+          AiMessage('user', 'hello'),
+        ],
+      );
+      final sent = fake.requests.single;
+      expect(sent['system'], 'be nice');
+      expect(sent['json'], isTrue);
+      expect(sent['maxTokens'], 123);
+      expect((sent['messages']! as List).single, {
+        'role': 'user',
+        'content': 'hello',
+      });
+      expect(fake.headers.single.value('x-app-token'), 'tok');
+      // no model and no key ever leave the app
+      expect(sent.containsKey('model'), isFalse);
+      expect(jsonEncode(sent), isNot(contains('sk-')));
+    });
+
+    test('a very long message is cut before sending (cost control)', () async {
+      fake.chatAnswer = 'ok';
+      await client.chat(messages: [AiMessage('user', 'x' * 20000)]);
+      final content =
+          ((fake.requests.single['messages']! as List).single
+                  as Map)['content']!
+              as String;
+      expect(content.length, AiClient.maxMessageChars);
     });
 
     test('AiProvider reports offline/online and never throws', () async {
@@ -159,40 +249,74 @@ void main() {
       addTearDown(h.close);
       final ai = AiProvider(
         SettingsRepository(h),
-        initial: const AiConfig(
-          baseUrl: 'http://127.0.0.1:1',
-          textModel: 'llama3.2',
-          visionModel: 'llava',
-        ),
+        initial: const AiConfig(baseUrl: 'http://127.0.0.1:1'),
       );
       await ai.testConnection();
       expect(ai.status, AiStatus.offline);
       await ai.update(baseUrl: fake.url);
       await ai.testConnection();
       expect(ai.status, AiStatus.online);
-      expect(ai.installedModels, isNotEmpty);
+      expect(ai.isMock, isFalse);
+      expect(ai.model, 'claude-haiku-5-5');
+      fake.mode = 'mock';
+      await ai.testConnection();
+      expect(ai.isMock, isTrue);
       // the address is stored in SQLite and survives a reload
       final again = AiProvider(
         SettingsRepository(h),
-        initial: const AiConfig(baseUrl: '', textModel: 't', visionModel: 'v'),
+        initial: const AiConfig(baseUrl: ''),
       );
       await again.load();
       expect(again.config.baseUrl, fake.url);
     });
 
+    test('an old Ollama address is dropped on load', () async {
+      final h = DatabaseHelper(path: inMemoryDatabasePath);
+      addTearDown(h.close);
+      await SettingsRepository(h).set('ai_base_url', 'http://10.0.0.5:11434');
+      final ai = AiProvider(
+        SettingsRepository(h),
+        initial: const AiConfig(baseUrl: ''),
+      );
+      await ai.load();
+      expect(ai.config.baseUrl, '');
+    });
+
     test('base url normalization', () {
       expect(
-        const AiConfig(
-          baseUrl: '192.168.1.50:11434',
-          textModel: '',
-          visionModel: '',
-        ).baseUri.toString(),
-        'http://192.168.1.50:11434',
+        const AiConfig(baseUrl: '192.168.1.50').baseUri.toString(),
+        'http://192.168.1.50:8787',
       );
       expect(
-        const AiConfig(baseUrl: ' ', textModel: '', visionModel: '').baseUri,
-        isNull,
+        const AiConfig(baseUrl: '192.168.1.50:9000').baseUri.toString(),
+        'http://192.168.1.50:9000',
       );
+      expect(
+        const AiConfig(baseUrl: 'https://ai.example.com/').baseUri.toString(),
+        'https://ai.example.com',
+      );
+      expect(const AiConfig(baseUrl: ' ').baseUri, isNull);
+    });
+  });
+
+  group('consent', () {
+    test('nothing is shared until the user agrees, and it persists', () async {
+      final h = DatabaseHelper(path: inMemoryDatabasePath);
+      addTearDown(h.close);
+      final ai = AiProvider(SettingsRepository(h));
+      await ai.load();
+      expect(ai.shareProfile, isFalse);
+      expect(ai.sharePhotos, isFalse);
+      expect(ai.profileAsked, isFalse);
+      await ai.setShareProfile(true);
+      await ai.setSharePhotos(true);
+      final again = AiProvider(SettingsRepository(h));
+      await again.load();
+      expect(again.shareProfile, isTrue);
+      expect(again.sharePhotos, isTrue);
+      expect(again.profileAsked, isTrue);
+      again.resetToDefaults();
+      expect(again.shareProfile, isFalse);
     });
   });
 
@@ -238,23 +362,23 @@ void main() {
 
     test('analyzer sends the photo and parses the answer', () async {
       fake.chatAnswer = _validVision;
-      final v = VisionAnalyzer(client, () => config);
+      final v = VisionAnalyzer(client);
       final a = await v.analyze(Uint8List.fromList([1, 2, 3, 4]));
       expect(a.undertone, Undertone.cool);
       final sent = fake.requests.single;
-      expect(sent['model'], 'llava');
+      expect(sent['json'], isTrue);
       final msg = (sent['messages']! as List).single as Map;
       expect((msg['images'] as List).single, base64Encode([1, 2, 3, 4]));
     });
 
     test('an invalid model answer does not crash the analyzer', () async {
       fake.chatAnswer = 'I cannot help with that';
-      final v = VisionAnalyzer(client, () => config);
+      final v = VisionAnalyzer(client);
       expect(v.analyze(Uint8List.fromList([1])), throwsA(isA<AiBadResponse>()));
     });
 
     test('huge or empty photos are rejected before any request', () async {
-      final v = VisionAnalyzer(client, () => config);
+      final v = VisionAnalyzer(client);
       expect(v.analyze(Uint8List(0)), throwsA(isA<AiBadResponse>()));
       expect(
         v.analyze(Uint8List(VisionAnalyzer.maxBytes + 1)),
@@ -267,7 +391,7 @@ void main() {
       fake.chatAnswer = _validVision;
       final f = File('${Directory.systemTemp.path}/cosmetix_test_photo.jpg')
         ..writeAsBytesSync([1, 2, 3]);
-      await VisionAnalyzer(client, () => config).analyzeFile(f);
+      await VisionAnalyzer(client).analyzeFile(f);
       expect(f.existsSync(), isFalse);
     });
   });
@@ -357,12 +481,7 @@ void main() {
     setUp(() {
       h = DatabaseHelper(path: inMemoryDatabasePath);
       products = ProductRepository(h);
-      classifier = ProductClassifier(
-        client,
-        () => config,
-        products,
-        SafetyRepository(h),
-      );
+      classifier = ProductClassifier(client, products, SafetyRepository(h));
     });
     tearDown(() => h.close());
 
@@ -429,7 +548,7 @@ void main() {
       final r = await classifier.classifyPending(1, limit: 2);
       expect(r.stoppedOffline, isTrue);
       expect(r.classified, 0);
-      fake = await FakeOllama.start(); // for tearDown
+      fake = await FakeAiProxy.start(); // for tearDown
     });
   });
 
@@ -444,25 +563,22 @@ void main() {
       bot = AssistantService(
         RecommendationService(products, safety, UserRepository(h)),
         client,
-        () => config,
       );
     });
     tearDown(() => h.close());
 
     test(
-      'the model receives the Beauty Profile, blacklist and product',
+      'with consent the model receives the Beauty Profile, blacklist and product',
       () async {
         fake.chatAnswer = 'It suits you.';
         final out = await bot.reply(
           userId: 1,
           text: 'Подходит ли мне Сыворотка Niacinamide?',
           history: const [],
+          shareProfile: true,
         );
         expect(out, 'It suits you.');
-        final system =
-            ((fake.requests.single['messages']! as List).first
-                    as Map)['content']!
-                as String;
+        final system = fake.requests.single['system']! as String;
         expect(system, contains('color type: Весна')); // demo profile
         expect(system, contains('skin concerns: Сухость и шелушение'));
         expect(system, contains('Парабены')); // enabled blacklist
@@ -470,8 +586,108 @@ void main() {
         expect(system, contains('ingredients:'));
         expect(system, contains('Never invent'));
         expect(system, contains('NOT a doctor'));
+        expect(system, contains('no data'));
+        expect(system, contains('never promise'));
+        expect(
+          fake.requests.single['maxTokens'],
+          AssistantService.maxAnswerTokens,
+        );
       },
     );
+
+    test(
+      'without consent the profile and blacklist never leave the app',
+      () async {
+        final db = await h.database;
+        // make a blacklisted product exist: enable parabens for the demo user
+        await db.update('blacklist', {
+          'enabled': 1,
+        }, where: "group_key = 'parabens'");
+        fake.chatAnswer = 'ok';
+        await bot.reply(
+          userId: 1,
+          text: 'Подходит ли мне Сыворотка Niacinamide?',
+          history: const [],
+        );
+        final system = fake.requests.single['system']! as String;
+        expect(system, contains('not shared by the user'));
+        expect(system, isNot(contains('Весна')));
+        expect(system, isNot(contains('Сухость и шелушение')));
+        expect(system, isNot(contains('Парабены')));
+        expect(system, isNot(contains('local match')));
+        // the whole request must not contain the user's email or phone either
+        final all = jsonEncode(fake.requests.single);
+        expect(all, isNot(contains('ainara')));
+        expect(all, isNot(contains('+7 707')));
+      },
+    );
+
+    test(
+      'blacklisted products are hidden from the model without consent',
+      () async {
+        final ctx = await RecommendationService(
+          ProductRepository(h),
+          SafetyRepository(h),
+          UserRepository(h),
+        ).loadContext(1);
+        final hidden = ctx.candidates.where(
+          (c) => RecommendationService.isBlacklisted(c, ctx.blacklist),
+        );
+        final system = AssistantService.buildSystemPrompt(
+          ctx: ctx,
+          question: 'привет',
+          language: 'Russian',
+          shareProfile: false,
+        );
+        for (final c in hidden) {
+          expect(system, isNot(contains(c.product.name)));
+        }
+      },
+    );
+
+    test('the catalog is capped to save tokens', () async {
+      final ctx = await RecommendationService(
+        ProductRepository(h),
+        SafetyRepository(h),
+        UserRepository(h),
+      ).loadContext(1);
+      final system = AssistantService.buildSystemPrompt(
+        ctx: ctx,
+        question: 'привет',
+        language: 'Russian',
+      );
+      final lines = system
+          .split('\n')
+          .where((l) => l.startsWith('- ') && l.contains('('));
+      expect(
+        lines.length,
+        lessThanOrEqualTo(AssistantService.maxCatalogLines + 6),
+      );
+    });
+
+    test(
+      'rate limit surfaces as a friendly state with the wait time',
+      () async {
+        fake.chatAnswer = null;
+        fake.errorStatus = 429;
+        fake.errorBody = {'error': 'rate_limited', 'message': 'slow down'};
+        fake.retryAfter = '30';
+        final chat = ChatProvider(ChatRepository(h), bot);
+        await chat.load(1);
+        await chat.send('Привет');
+        expect(chat.aiUnavailable, isTrue);
+        expect(chat.aiFailure, AiFailure.rateLimited);
+        expect(chat.retryAfter, 30);
+      },
+    );
+
+    test('an unset address is reported as not configured', () async {
+      config = const AiConfig(baseUrl: '');
+      final chat = ChatProvider(ChatRepository(h), bot);
+      await chat.load(1);
+      await chat.send('Привет');
+      expect(chat.aiFailure, AiFailure.notConfigured);
+    });
 
     test('a serious reaction always gets the safety advice', () async {
       fake.chatAnswer = 'Try a cream.';
@@ -496,7 +712,7 @@ void main() {
         expect(chat.aiUnavailable, isTrue);
         expect(chat.typing, isFalse);
         expect(chat.messages.length, before + 1); // only the user message
-        fake = await FakeOllama.start();
+        fake = await FakeAiProxy.start();
         config = config.copyWith(baseUrl: fake.url);
         fake.chatAnswer = 'Hello!';
         await chat.retry();
@@ -514,11 +730,8 @@ void main() {
         await chat.send('вопрос $i');
       }
       final msgs = (fake.requests.last['messages']! as List);
-      // system + at most 8 history + the question
-      expect(
-        msgs.length,
-        lessThanOrEqualTo(1 + AssistantService.historyLimit + 1),
-      );
+      // at most 8 history messages + the question (system is a separate field)
+      expect(msgs.length, lessThanOrEqualTo(AssistantService.historyLimit + 1));
       expect((msgs.last as Map)['content'], 'вопрос 5');
     });
   });

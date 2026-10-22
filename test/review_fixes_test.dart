@@ -367,29 +367,17 @@ void main() {
   });
 
   group('AI address', () {
-    test('a bare LAN IP gets the default Ollama port', () {
-      const c = AiConfig(
-        baseUrl: '192.168.1.50',
-        textModel: '',
-        visionModel: '',
-      );
-      expect(c.baseUri.toString(), 'http://192.168.1.50:11434');
-      expect(c.displayHost, '192.168.1.50:11434');
+    test('a bare LAN IP gets the default proxy port', () {
+      const c = AiConfig(baseUrl: '192.168.1.50');
+      expect(c.baseUri.toString(), 'http://192.168.1.50:8787');
+      expect(c.displayHost, '192.168.1.50:8787');
     });
 
     test('explicit ports and host names are left alone', () {
-      const a = AiConfig(
-        baseUrl: '10.0.0.2:8080',
-        textModel: '',
-        visionModel: '',
-      );
+      const a = AiConfig(baseUrl: '10.0.0.2:8080');
       expect(a.baseUri.toString(), 'http://10.0.0.2:8080');
-      const b = AiConfig(
-        baseUrl: 'ollama.local',
-        textModel: '',
-        visionModel: '',
-      );
-      expect(b.baseUri.toString(), 'http://ollama.local');
+      const b = AiConfig(baseUrl: 'ai.local');
+      expect(b.baseUri.toString(), 'http://ai.local');
     });
   });
 }
