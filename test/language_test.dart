@@ -187,6 +187,11 @@ void main() {
         AppRoutes.reactions,
         AppRoutes.reactionForm,
         AppRoutes.legal,
+        AppRoutes.bag,
+        AppRoutes.bagForm,
+        AppRoutes.care,
+        AppRoutes.careHistory,
+        AppRoutes.scan,
       ]) {
         await visit(r, r);
       }

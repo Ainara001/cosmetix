@@ -879,4 +879,193 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Items: {v0}\nBonus points spent: −{v3}\nTotal: {v1}\nBonus points for the order: +{v2}',
   '+{v0} бонусов, −{v1} списано': '+{v0} bonus points, −{v1} spent',
   'Списано бонусов': 'Bonus points spent',
+  '«{v0}» будет удалено из косметички и из плана ухода. История применения сохранится.':
+      '“{v0}” will be removed from your cosmetic bag and care plan. The usage history is kept.',
+  '«{v0}» относится к группе «{v1}», которую вы внесли в чёрный список.':
+      '“{v0}” belongs to the group “{v1}” that you put on your blacklist.',
+  'Адрес сервера ИИ не задан': 'The AI server address is not set',
+  'Бренд (необязательно)': 'Brand (optional)',
+  'В названии есть компонент «{v1}», который вы добавили в чёрный список.':
+      'The name contains “{v1}”, a component you added to your blacklist.',
+  'В чёрном списке нет включённых компонентов, поэтому сравнивать не с чем.':
+      'No components are switched on in your blacklist, so there is nothing to compare with.',
+  'ВЕЧЕР': 'EVENING',
+  'Введите название средства': 'Enter the product name',
+  'Введите состав или выберите фото': 'Enter the ingredients or choose a photo',
+  'Вечер': 'Evening',
+  'Вечерний уход': 'Evening care',
+  'Все ваши средства уже в этом плане':
+      'All your products are already in this plan',
+  'Все компоненты ({n})': 'All components ({n})',
+  'Вскрыто раньше, чем куплено? Проверьте даты':
+      'Opened before it was bought? Check the dates',
+  'Вскрыто: {v0}': 'Opened: {v0}',
+  'Вы отмечали реакцию на это средство (тяжесть {v} из 5), поэтому оно ниже в рекомендациях':
+      'You noted a reaction to this product (severity {v} of 5), so it is lower in the recommendations',
+  'Выберите категорию': 'Choose a category',
+  'Выберите средство из косметички': 'Choose a product from your cosmetic bag',
+  'Выбрать из каталога (необязательно)': 'Pick from the catalog (optional)',
+  'Выбрать фото из галереи': 'Choose a photo from the gallery',
+  'Выше': 'Move up',
+  'Годен до': 'Best before',
+  'Годен до (дата на упаковке)': 'Best before (date on the package)',
+  'Дата вскрытия': 'Date opened',
+  'Дата вскрытия не может быть в будущем':
+      'The opening date can not be in the future',
+  'Дата покупки': 'Purchase date',
+  'Дата покупки не может быть в будущем':
+      'The purchase date can not be in the future',
+  'Дата: {a} → {b}': 'Date: {a} → {b}',
+  'Добавить в косметичку': 'Add to my cosmetic bag',
+  'Добавить средство': 'Add a product',
+  'Добавить средство в план': 'Add a product to the plan',
+  'Добавить фото': 'Add a photo',
+  'Добавьте средства из косметички в том порядке, в котором вы ими пользуетесь.':
+      'Add products from your cosmetic bag in the order you use them.',
+  'Добавьте средства, которые у вас уже есть, чтобы составить план ухода и следить за сроками.':
+      'Add the products you already have to build a care plan and keep an eye on expiry dates.',
+  'Другое средство — ввести вручную': 'Another product: enter manually',
+  'Заметка изменена': 'Note changed',
+  'Запись создана': 'Record created',
+  'ИИ вернул ошибку. Попробуйте ещё раз позже.':
+      'The AI returned an error. Please try again later.',
+  'ИИ перегружен или лимит исчерпан. Попробуйте позже.':
+      'The AI is busy or the limit is used up. Try again later.',
+  'ИИ-помощник не успел ответить': 'The AI assistant did not answer in time',
+  'ИИ-помощник перегружен или лимит исчерпан':
+      'The AI assistant is busy or its limit is used up',
+  'Изменений пока нет.': 'No changes yet.',
+  'Изменить адрес сервера': 'Change the server address',
+  'Использовать до {v0} (осталось {v1} {v2})':
+      'Use until {v0} ({v1} {v2} left)',
+  'История изменений': 'Change history',
+  'История пока пуста': 'The history is empty so far',
+  'История ухода': 'Care history',
+  'Камера недоступна (в симуляторе камеры нет). Выберите фото из галереи или введите состав вручную.':
+      'The camera is not available (the simulator has no camera). Choose a photo from the gallery or type the ingredients.',
+  'Компонент «{v0}» есть в составе {v1} из {v2} средств с записями.':
+      'The component “{v0}” is in {v1} of {v2} products with entries.',
+  'Компоненты разделяйте запятыми.': 'Separate components with commas.',
+  'Косметичка пуста': 'Your cosmetic bag is empty',
+  'Куплено: {v0}': 'Bought: {v0}',
+  'Личные предпочтения': 'Personal preferences',
+  'Модель': 'Model',
+  'Мои средства': 'My products',
+  'Мой уход': 'My care',
+  'Моя косметичка': 'My cosmetic bag',
+  'Моё средство': 'My product',
+  'Название': 'Name',
+  'Найдено совпадений с чёрным списком: {n}': 'Blacklist matches found: {n}',
+  'Напоминание основано на данных упаковки, которые вы ввели. Это не медицинская рекомендация.':
+      'The reminder is based on the package data you entered. It is not medical advice.',
+  'Например, увлажняющий крем': 'For example, a moisturizing cream',
+  'Не вскрыто': 'Not opened',
+  'Не знаю': 'I don\'t know',
+  'Не удалось открыть галерею. Проверьте доступ к фото.':
+      'Could not open the gallery. Check the access to photos.',
+  'Не удалось прочитать состав на фото. Попробуйте сфотографировать ближе и при хорошем освещении или введите состав вручную.':
+      'Could not read the ingredients in the photo. Try a closer photo in good light, or type the ingredients.',
+  'Не удалось сохранить средство': 'Could not save the product',
+  'Не указана': 'Not set',
+  'Ниже': 'Move down',
+  'Открыть чёрный список': 'Open the blacklist',
+  'Отмечайте использованные средства в плане ухода, и они появятся здесь.':
+      'Mark the products you used in your care plan and they will appear here.',
+  'Отправить фото в ИИ?': 'Send the photo to the AI?',
+  'Отправлять ИИ Beauty-профиль и чёрный список':
+      'Send my Beauty profile and blacklist to the AI',
+  'Очистить дату': 'Clear the date',
+  'План пока пуст': 'The plan is empty so far',
+  'Повторяющиеся наблюдения': 'Repeated observations',
+  'Попробуйте через {n} с.': 'Try again in {n} s.',
+  'Попробуйте чуть позже.': 'Please try a little later.',
+  'Предпочтения слегка меняют порядок рекомендаций, но не скрывают товары.':
+      'Preferences slightly change the order of recommendations but never hide products.',
+  'Проверить по чёрному списку': 'Check against the blacklist',
+  'Проверка идёт только по вашему чёрному списку и по известным названиям компонентов, редкие названия она может пропустить. Это не гарантия отсутствия аллергии и не медицинское заключение.':
+      'The check uses only your blacklist and well-known component names, so rare names can be missed. It is not a guarantee against allergies and not a medical opinion.',
+  'Проверка состава': 'Ingredient check',
+  'Продукт: {a} → {b}': 'Product: {a} → {b}',
+  'Разрешить': 'Allow',
+  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер ИИ. Фото и контакты не отправляются. Это можно изменить в Настройках.':
+      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the AI server. Photos and contact details are not sent. You can change this in Settings.',
+  'Разрешить отправку фото в ИИ': 'Allow sending photos to the AI',
+  'Распознавание текста недоступно на этом устройстве. Введите состав вручную.':
+      'Text recognition is not available on this device. Type the ingredients by hand.',
+  'Реакция: {a} → {b}': 'Reaction: {a} → {b}',
+  'Режим': 'Mode',
+  'Результат': 'Result',
+  'Сегодня отмечено: {v0} из {v1}': 'Marked today: {v0} of {v1}',
+  'Сервер ИИ (Claude)': 'AI server (Claude)',
+  'Скоро истекает: осталось {v1} {v2} (до {v0})':
+      'Expires soon: {v1} {v2} left (until {v0})',
+  'Сначала добавьте средства в «Мою косметичку».':
+      'First add products to “My cosmetic bag”.',
+  'Совпадений с вашим чёрным списком не найдено.':
+      'No matches with your blacklist were found.',
+  'Содержит «{v}», который есть и в средствах с вашими реакциями (возможно, совпадение)':
+      'Contains “{v}”, which is also in products with your reactions (possibly a coincidence)',
+  'Соответствует вашему предпочтению: {v}': 'Matches your preference: {v}',
+  'Состав (проверьте и исправьте)': 'Ingredients (check and correct)',
+  'Состав распознан. Проверьте список: распознавание может ошибаться.':
+      'Ingredients recognized. Check the list: recognition can make mistakes.',
+  'Средства, на которые вы отмечали реакцию, будут ниже в рекомендациях. Данные остаются на телефоне.':
+      'Products you noted a reaction to will rank lower in recommendations. The data stays on your phone.',
+  'Средство «{v0}» встречается в дневнике {v1} {v2} ({v3} — {v4}), средняя тяжесть {v5} из 5.':
+      'The product “{v0}” appears in the diary {v1} {v2} ({v3} to {v4}), average severity {v5} of 5.',
+  'Средство добавлено': 'Product added',
+  'Средство удалено': 'Product deleted',
+  'Срок использования заканчивается сегодня': 'The use-by date is today',
+  'Срок использования истёк': 'The use-by date has passed',
+  'Срок использования истёк {v0}': 'The use-by date passed on {v0}',
+  'Срок использования на исходе или истёк: {n}':
+      'Products near or past their use-by date: {n}',
+  'Срок не указан: добавьте дату вскрытия и срок после вскрытия (значок банки на упаковке)':
+      'No shelf life yet: add the opening date and the period after opening (the jar symbol on the package)',
+  'Срок после вскрытия (значок банки на упаковке)':
+      'Period after opening (the jar symbol on the package)',
+  'Сфотографируйте состав на упаковке или выберите фото. Текст читается на телефоне: фото никуда не отправляется и не сохраняется.':
+      'Photograph the ingredients on the package or choose a photo. The text is read on your phone: the photo is not sent anywhere or saved.',
+  'Тестовый режим (ключа нет)': 'Test mode (no key)',
+  'Тестовый режим: ключ Claude API на сервере не задан, ответы ненастоящие.':
+      'Test mode: the Claude API key is not set on the server, the answers are not real.',
+  'Тестовый режим: на сервере нет ключа Claude API, ответы помечены как ненастоящие.':
+      'Test mode: the server has no Claude API key, answers are marked as not real.',
+  'Токен приложения (необязательно)': 'App token (optional)',
+  'Тяжесть: {a} → {b}': 'Severity: {a} → {b}',
+  'УТРО': 'MORNING',
+  'Убрать из плана': 'Remove from the plan',
+  'Убрать фото': 'Remove the photo',
+  'Удалить средство?': 'Delete the product?',
+  'Укажите дату вскрытия, чтобы считать срок после вскрытия':
+      'Enter the opening date to count the period after opening',
+  'Укажите его в Кабинет → Настройки → ИИ-ассистент.':
+      'Set it in Profile → Settings → AI assistant.',
+  'Утренний и вечерний уход': 'Morning and evening care',
+  'Утренний уход': 'Morning care',
+  'Утро': 'Morning',
+  'Учитывать ваши данные?': 'Use your data?',
+  'Учитывать мои реакции и косметичку':
+      'Take my reactions and cosmetic bag into account',
+  'Фото (необязательно)': 'Photo (optional)',
+  'Фото будет отправлено на сервер ИИ (Claude) только для анализа цветотипа и сразу удалено с телефона. Согласие можно отозвать в Настройках.':
+      'The photo will be sent to the AI server (Claude) only to analyze your color type and is deleted from the phone right after. You can withdraw your consent in Settings.',
+  'Фото добавлено': 'Photo added',
+  'Фото заменено': 'Photo replaced',
+  'Фото хранится только на этом телефоне и никуда не отправляется.':
+      'The photo is stored only on this phone and is not sent anywhere.',
+  'Читаю текст на фото…': 'Reading the text in the photo…',
+  'Это ваш личный план, а не медицинская рекомендация. Схема не обязана быть одинаковой для всех: ориентируйтесь на состояние кожи. При раздражении прекратите использование и обратитесь к специалисту.':
+      'This is your personal plan, not medical advice. A routine does not have to be the same for everyone: go by how your skin feels. If irritation appears, stop using the product and see a specialist.',
+  'Это наблюдения по вашим записям, а не вывод о причине: совпадение по времени или по составу не доказывает, что реакцию вызвало именно это средство. При сильной или затяжной реакции обратитесь к врачу.':
+      'These are observations from your own records, not a conclusion about the cause: a coincidence in time or composition does not prove that this product caused the reaction. See a doctor if a reaction is strong or lasts long.',
+  'Это средство уже в плане': 'This product is already in the plan',
+  'Это средство уже есть в вашей косметичке':
+      'You already have this product in your cosmetic bag',
+  'Косметичка': 'Cosmetic bag',
+  'Рекомендации': 'Recommendations',
+  'Без отдушки': 'Fragrance-free',
+  'Натуральный состав': 'Natural composition',
+  'раз': 'time',
+  'раза': 'times',
 };

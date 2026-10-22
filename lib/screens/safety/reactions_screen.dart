@@ -239,9 +239,11 @@ class _InsightsCard extends StatelessWidget {
                   color: AppColors.primaryDark,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  tr('Повторяющиеся наблюдения'),
-                  style: AppTextStyles.subtitle,
+                Expanded(
+                  child: Text(
+                    tr('Повторяющиеся наблюдения'),
+                    style: AppTextStyles.subtitle,
+                  ),
                 ),
               ],
             ),

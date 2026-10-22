@@ -68,6 +68,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+            const _QuickAccess(),
+            const SizedBox(height: 12),
             const _Banner(),
             const SizedBox(height: 12),
             AppCard(
@@ -266,6 +268,97 @@ class _Banner extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Six shortcuts to the main personal tools (search is the field above).
+class _QuickAccess extends StatelessWidget {
+  const _QuickAccess();
+
+  @override
+  Widget build(BuildContext context) {
+    final hasProfile = context.watch<CatalogProvider>().hasProfile;
+    final items = <(IconData, String, VoidCallback)>[
+      (
+        Icons.face_retouching_natural_outlined,
+        'Бьюти-профиль',
+        () => Navigator.pushNamed(context, AppRoutes.beautyProfile),
+      ),
+      (
+        Icons.auto_awesome_outlined,
+        'Рекомендации',
+        // without a Beauty Profile there is nothing to personalize yet
+        () => hasProfile
+            ? Navigator.pushNamed(
+                context,
+                AppRoutes.catalog,
+                arguments: const CatalogArgs(),
+              )
+            : Navigator.pushNamed(context, AppRoutes.colorTest),
+      ),
+      (
+        Icons.document_scanner_outlined,
+        'Проверка состава',
+        () => Navigator.pushNamed(context, AppRoutes.scan),
+      ),
+      (
+        Icons.healing_outlined,
+        'Дневник реакций',
+        () => Navigator.pushNamed(context, AppRoutes.reactions),
+      ),
+      (
+        Icons.wb_twilight_outlined,
+        'Мой уход',
+        () => Navigator.pushNamed(context, AppRoutes.care),
+      ),
+      (
+        Icons.shopping_bag_outlined,
+        'Косметичка',
+        () => Navigator.pushNamed(context, AppRoutes.bag),
+      ),
+    ];
+    return GridView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        // icon + padding are fixed, the two label lines grow with the system
+        // font size, so the tile never overflows
+        mainAxisExtent: 64 + MediaQuery.textScalerOf(context).scale(32),
+      ),
+      children: [
+        for (final i in items)
+          AppCard(
+            onTap: i.$3,
+            radius: 16,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primarySoft,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(i.$1, size: 20, color: AppColors.primaryDark),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  tr(i.$2),
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.caption,
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
