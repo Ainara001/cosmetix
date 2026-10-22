@@ -196,10 +196,13 @@ Future<void> main() async {
   testWidgets('6. favorites and cart', (t) async {
     await launch(t);
     await loginDemo(t);
-    await open(t, AppRoutes.product, 1);
+    // product 8 is in stock and not yet a favorite of the demo user
+    await open(t, AppRoutes.product, 8);
     await _until(t, find.text('О товаре'));
     await _tap(t, find.byTooltip('В избранное'));
     expect(find.byTooltip('Убрать из избранного'), findsOneWidget);
+    // the confirmation snack bar covers the bottom button: wait until it is gone
+    await _settle(t, 45);
     await _tap(t, find.text('В корзину').first);
     nav(t).pop();
     await _settle(t);
