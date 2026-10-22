@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
 
 class AppUser {
@@ -79,7 +80,7 @@ class AppUser {
       bonusPoints: m['bonus_points'] as int? ?? 0,
       visits: m['visits'] as int? ?? 0,
       avatarColor: m['avatar_color'] as int? ?? 0xFFD4A0AC,
-      avatarPath: m['avatar_path'] as String?,
+      avatarPath: AppPaths.resolve(m['avatar_path'] as String?),
       beautySource: m['beauty_source'] as String? ?? 'questionnaire',
       beautyConfidence: (m['beauty_confidence'] as num?)?.toDouble(),
       beautyAnalyzedAt: m['beauty_analyzed_at'] as int?,

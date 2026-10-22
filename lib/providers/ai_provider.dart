@@ -54,6 +54,15 @@ class AiProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Forgets the saved server and models (after the demo data reset).
+  void resetToDefaults() {
+    config = AiConfig.fromEnvironment();
+    status = AiStatus.unknown;
+    detail = null;
+    installedModels = const [];
+    notifyListeners();
+  }
+
   Future<void> update({
     String? baseUrl,
     String? textModel,

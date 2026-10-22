@@ -41,27 +41,33 @@ class SafetyProvider extends ChangeNotifier {
   // ---- blacklist ----
 
   Future<void> toggleBlacklist(BlacklistItem item, bool enabled) async {
+    final userId = _userId;
+    if (userId == null) return;
     await _repo.setBlacklistEnabled(item.id, enabled);
-    blacklist = await _repo.blacklist(_userId!);
+    blacklist = await _repo.blacklist(userId);
     notifyListeners();
   }
 
   /// Returns an error text or null.
   Future<String?> addCustom(String name) async {
+    final userId = _userId;
+    if (userId == null) return tr('Сначала войдите в аккаунт');
     final text = name.trim();
     if (text.length < 2) return tr('Название слишком короткое');
     if (blacklist.any((b) => b.name.toLowerCase() == text.toLowerCase())) {
       return tr('Этот компонент уже есть в списке');
     }
-    await _repo.addCustom(_userId!, text);
-    blacklist = await _repo.blacklist(_userId!);
+    await _repo.addCustom(userId, text);
+    blacklist = await _repo.blacklist(userId);
     notifyListeners();
     return null;
   }
 
   Future<void> deleteBlacklist(BlacklistItem item) async {
+    final userId = _userId;
+    if (userId == null) return;
     await _repo.deleteBlacklistItem(item.id);
-    blacklist = await _repo.blacklist(_userId!);
+    blacklist = await _repo.blacklist(userId);
     notifyListeners();
   }
 
@@ -77,9 +83,11 @@ class SafetyProvider extends ChangeNotifier {
     required DateTime date,
     String notes = '',
   }) async {
+    final userId = _userId;
+    if (userId == null) return;
     if (id == null) {
       await _repo.addReaction(
-        userId: _userId!,
+        userId: userId,
         productId: productId,
         title: title,
         severity: severity,
@@ -96,13 +104,15 @@ class SafetyProvider extends ChangeNotifier {
         notes: notes,
       );
     }
-    reactions = await _repo.reactions(_userId!);
+    reactions = await _repo.reactions(userId);
     notifyListeners();
   }
 
   Future<void> deleteReaction(Reaction r) async {
+    final userId = _userId;
+    if (userId == null) return;
     await _repo.deleteReaction(r.id);
-    reactions = await _repo.reactions(_userId!);
+    reactions = await _repo.reactions(userId);
     notifyListeners();
   }
 }

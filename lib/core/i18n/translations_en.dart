@@ -1,6 +1,6 @@
 import 'package:cosmetix/core/constants/legal_texts.dart';
 
-// Generated from tool/tx: Russian source text -> translation.
+// Russian source text -> translation (edit here; the old helper scripts are in tool/i18n_legacy).
 const Map<String, String> translationsEn = {
   LegalTexts.privacy: '''1. What data we store
 Cosmetix stores data only on your device in a local SQLite database: name, email, contact details, beauty profile, favorites, orders, reviews and reaction diary entries.
@@ -112,8 +112,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Your individual skin and color-type traits for more accurate cosmetics selection.',
   'Ваши оттенки': 'Your shades',
   'Введите email': 'Enter your email',
-  'Введите email, указанный при регистрации, и мы отправим ссылку для восстановления доступа.':
-      'Enter the email you registered with and we will send a link to restore access.',
   'Введите ваше имя': 'Enter your name',
   'Введите название компонента': 'Enter the ingredient name',
   'Введите номер в формате +7 707 123 45 67':
@@ -216,8 +214,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Record your skin reactions to cosmetics to avoid unsuitable products',
   'Запись будет удалена из дневника реакций.':
       'The entry will be deleted from the reaction diary.',
-  'Запись о покупке будет удалена из истории.':
-      'The purchase record will be deleted from the history.',
   'Запись обновлена': 'Entry updated',
   'Запись удалена': 'Entry deleted',
   'Заполнить демо-аккаунт': 'Fill in demo account',
@@ -314,8 +310,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'At least 8 characters, letters and digits',
   'Мои покупки': 'My purchases',
   'Морщины и возраст': 'Wrinkles and aging',
-  'Мы отправили ссылку для восстановления на {v0}.\n\nПриложение работает без сервера, поэтому письмо имитируется: на следующем экране задайте новый пароль.':
-      'We sent a recovery link to {v0}.\n\nThe app works without a server, so the email is simulated: set a new password on the next screen.',
   'Мы пришлём вам уведомление, когда цены на избранные товары снизятся.':
       'We will notify you when prices of your favorite products drop.',
   'Мягкие тени, легко растушевываются.': 'Soft shadows, blend easily.',
@@ -406,7 +400,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Mark the ingredients that should not be in your cosmetics. We will warn you when analyzing a product and will not show such products in your personal recommendations.',
   'Отправить': 'Send',
   'Отправить отзыв': 'Submit review',
-  'Отправить ссылку': 'Send link',
   'Отёк': 'Swelling',
   'Оформить': 'Check out',
   'Оформить заказ': 'Place order',
@@ -608,7 +601,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Compare Flower Knows and Peripera prices',
   'Сразу краснею': 'I burn right away',
   'Средний': 'Medium',
-  'Ссылка отправлена': 'Link sent',
   'Статус': 'Status',
   'Стойкий аромат, но дороговат.': 'Long-lasting fragrance, but a bit pricey.',
   'Стойкий тинт для губ с эффектом сочных губ.':
@@ -868,4 +860,23 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Блестит только Т-зона': 'Shiny only in the T-zone',
   'Появляется покраснение или раздражение': 'Redness or irritation appears',
   'Для вас': 'For you',
+  'Введите email, указанный при регистрации, и мы отправим код для восстановления доступа.':
+      'Enter the email you registered with and we will send a code to restore access.',
+  'Запись о покупке будет удалена из истории, бонусы за неё пересчитаются.':
+      'The purchase will be removed from the history and its bonus points recalculated.',
+  'Мы отправили код подтверждения на {v0}.\n\nПриложение работает без сервера, поэтому письмо имитируется. Ваш код: {v1}\n\nВведите его на следующем экране и задайте новый пароль.':
+      'We sent a confirmation code to {v0}.\n\nThe app works without a server, so the email is simulated. Your code: {v1}\n\nEnter it on the next screen and set a new password.',
+  'Отправить код': 'Send code',
+  'Код отправлен': 'Code sent',
+  'Код из письма': 'Code from the email',
+  'Введите 6-значный код': 'Enter the 6-digit code',
+  'Код устарел. Запросите новый': 'The code has expired. Request a new one',
+  'Неверный код': 'Wrong code',
+  'Пользователь с таким email уже существует':
+      'A user with this email already exists',
+  'Списать бонусы: −{v0}': 'Spend bonus points: −{v0}',
+  'Товаров: {v0}\nСписано бонусов: −{v3}\nИтого: {v1}\nБонусы за заказ: +{v2}':
+      'Items: {v0}\nBonus points spent: −{v3}\nTotal: {v1}\nBonus points for the order: +{v2}',
+  '+{v0} бонусов, −{v1} списано': '+{v0} bonus points, −{v1} spent',
+  'Списано бонусов': 'Bonus points spent',
 };

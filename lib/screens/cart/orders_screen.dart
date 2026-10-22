@@ -7,6 +7,7 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/cart_models.dart';
+import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
@@ -24,12 +25,15 @@ class OrdersScreen extends StatelessWidget {
     final ok = await confirmDialog(
       context,
       title: trf('Удалить заказ №{v0}?', {'v0': o.id}),
-      message: tr('Запись о покупке будет удалена из истории.'),
+      message: tr(
+        'Запись о покупке будет удалена из истории, бонусы за неё пересчитаются.',
+      ),
       confirmLabel: tr('Удалить'),
       destructive: true,
     );
     if (!ok || !context.mounted) return;
     await context.read<CartProvider>().deleteOrder(o);
+    if (context.mounted) await context.read<AuthProvider>().reload();
     if (context.mounted) {
       showMessage(context, tr('Заказ удалён'), type: MessageType.success);
     }
@@ -144,7 +148,12 @@ class OrdersScreen extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            trf('+{v0} бонусов', {'v0': o.bonus}),
+                            o.bonusSpent > 0
+                                ? trf('+{v0} бонусов, −{v1} списано', {
+                                    'v0': o.bonus,
+                                    'v1': o.bonusSpent,
+                                  })
+                                : trf('+{v0} бонусов', {'v0': o.bonus}),
                             style: TextStyle(fontSize: 12, color: pal.subtext),
                           ),
                           const Spacer(),

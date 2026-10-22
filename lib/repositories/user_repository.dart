@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
+import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/core/utils/password_hasher.dart';
 import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/database/seed_data.dart';
@@ -54,35 +55,88 @@ class UserRepository {
     return rows.isNotEmpty;
   }
 
-  /// Returns null if the e-mail/password pair is wrong.
+  /// Returns null if the e-mail/password pair is wrong. A password hash from
+  /// an older build is upgraded after a successful sign in.
   Future<AppUser?> login(String email, String password) async {
     final db = await _helper.database;
     final rows = await db.query(
       'users',
-      where: 'LOWER(email) = ? AND password_hash = ?',
-      whereArgs: [email.trim().toLowerCase(), PasswordHasher.hash(password)],
+      where: 'LOWER(email) = ?',
+      whereArgs: [email.trim().toLowerCase()],
     );
-    return rows.isEmpty ? null : AppUser.fromMap(rows.first);
+    if (rows.isEmpty) return null;
+    final stored = rows.first['password_hash'] as String;
+    if (!PasswordHasher.verify(password, stored)) return null;
+    if (PasswordHasher.needsUpgrade(stored)) {
+      await db.update(
+        'users',
+        {'password_hash': PasswordHasher.hash(password)},
+        where: 'id = ?',
+        whereArgs: [rows.first['id']],
+      );
+    }
+    return AppUser.fromMap(rows.first);
   }
 
-  /// Throws [StateError] when the e-mail is already used.
+  /// Local imitation of Google / Apple sign in: returns the account of this
+  /// e-mail, creating it (without any usable password) on the first use.
+  /// Returns null when the e-mail belongs to an ordinary password account.
+  Future<AppUser?> socialUser({
+    required String provider,
+    required String email,
+    required String firstName,
+    required String lastName,
+  }) async {
+    final db = await _helper.database;
+    final rows = await db.query(
+      'users',
+      where: 'LOWER(email) = ?',
+      whereArgs: [email.trim().toLowerCase()],
+    );
+    if (rows.isEmpty) {
+      return register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        passwordHash: PasswordHasher.unusable,
+      );
+    }
+    final stored = rows.first['password_hash'] as String;
+    if (stored != PasswordHasher.unusable) {
+      // accounts of older builds used a fixed, guessable password
+      if (!PasswordHasher.verify('social-$provider', stored)) return null;
+      await db.update(
+        'users',
+        {'password_hash': PasswordHasher.unusable},
+        where: 'id = ?',
+        whereArgs: [rows.first['id']],
+      );
+    }
+    return AppUser.fromMap(rows.first);
+  }
+
+  /// Throws [StateError] when the e-mail is already used. Pass either a
+  /// [password] (hashed here) or a ready [passwordHash].
   Future<AppUser> register({
     required String firstName,
     required String email,
-    required String password,
+    String? password,
+    String? passwordHash,
     String lastName = '',
   }) async {
+    assert(password != null || passwordHash != null);
     if (await emailExists(email)) {
       throw StateError('Пользователь с таким email уже существует');
     }
     final db = await _helper.database;
     final now = DateTime.now().millisecondsSinceEpoch;
+    final hash = passwordHash ?? PasswordHasher.hash(password!);
     final id = await db.transaction((txn) async {
       final id = await txn.insert('users', {
         'first_name': firstName.trim(),
         'last_name': lastName.trim(),
         'email': email.trim().toLowerCase(),
-        'password_hash': PasswordHasher.hash(password),
+        'password_hash': hash,
         'created_at': now,
         'updated_at': now,
       });
@@ -153,7 +207,7 @@ class UserRepository {
     await db.update(
       'users',
       {
-        'avatar_path': path,
+        'avatar_path': AppPaths.toStored(path),
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: 'id = ?',

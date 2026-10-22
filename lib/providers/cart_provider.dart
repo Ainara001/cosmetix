@@ -15,9 +15,32 @@ class CartProvider extends ChangeNotifier {
   bool loading = false;
   int? _userId;
 
+  /// Bonus points the user owns and whether they are spent on this cart.
+  int bonusBalance = 0;
+  bool useBonus = false;
+
   int get count => items.fold(0, (s, i) => s + i.quantity);
+
+  /// Cart value before the bonus discount.
   int get total => items.fold(0, (s, i) => s + i.total);
-  int get bonus => CartRepository.bonusFor(total);
+
+  /// Points that would be spent (0 while the switch is off).
+  int get bonusToSpend =>
+      useBonus ? CartRepository.spendable(bonusBalance, total) : 0;
+
+  /// What the user pays after the bonus discount.
+  int get payable => total - bonusToSpend;
+
+  /// Points earned by this order (2% of [payable]).
+  int get bonus => CartRepository.bonusFor(payable);
+
+  /// Points that could be spent on this cart right now.
+  int get spendableBonus => CartRepository.spendable(bonusBalance, total);
+
+  void setUseBonus(bool value) {
+    useBonus = value;
+    notifyListeners();
+  }
 
   bool contains(int productId) => items.any((i) => i.product.id == productId);
 
@@ -28,6 +51,7 @@ class CartProvider extends ChangeNotifier {
     try {
       items = await _repo.getItems(userId);
       orders = await _repo.getOrders(userId);
+      bonusBalance = await _repo.bonusBalance(userId);
     } catch (e) {
       debugPrint('cart load failed: $e');
     }
@@ -38,6 +62,8 @@ class CartProvider extends ChangeNotifier {
   void reset() {
     items = [];
     orders = [];
+    bonusBalance = 0;
+    useBonus = false;
     _userId = null;
     notifyListeners();
   }
@@ -82,9 +108,11 @@ class CartProvider extends ChangeNotifier {
     final userId = _userId;
     if (userId == null) return null;
     try {
-      final order = await _repo.checkout(userId);
+      final order = await _repo.checkout(userId, useBonus: bonusToSpend);
       items = [];
+      useBonus = false;
       orders = await _repo.getOrders(userId);
+      bonusBalance = await _repo.bonusBalance(userId);
       notifyListeners();
       return order;
     } catch (e) {
@@ -98,6 +126,7 @@ class CartProvider extends ChangeNotifier {
     if (userId == null) return;
     await _repo.deleteOrder(order.id);
     orders = await _repo.getOrders(userId);
+    bonusBalance = await _repo.bonusBalance(userId);
     notifyListeners();
   }
 }

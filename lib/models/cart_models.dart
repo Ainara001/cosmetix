@@ -67,11 +67,17 @@ class Order {
     required this.status,
     required this.createdAt,
     required this.lines,
+    this.bonusSpent = 0,
   });
 
   final int id;
+
+  /// Amount paid (after the bonus discount).
   final int total;
   final int bonus;
+
+  /// Bonus points spent on this order (1 point = 1 tenge).
+  final int bonusSpent;
   final String status;
   final DateTime createdAt;
   final List<OrderLine> lines;

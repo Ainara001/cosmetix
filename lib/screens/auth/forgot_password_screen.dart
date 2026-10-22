@@ -23,7 +23,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   bool _loading = false;
-  String? _error;
 
   @override
   void dispose() {
@@ -34,27 +33,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _send() async {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    final exists = await context.read<AuthProvider>().emailExists(_email.text);
+    setState(() => _loading = true);
+    // The code is shown for any e-mail so the screen does not reveal which
+    // addresses are registered; it only works for a real account.
+    final code = await context.read<AuthProvider>().requestResetCode(
+      _email.text,
+    );
     if (!mounted) return;
-    if (!exists) {
-      setState(() {
-        _loading = false;
-        _error = tr('Аккаунт с таким email не найден');
-      });
-      return;
-    }
     setState(() => _loading = false);
     // No server: the "e-mail" is simulated and the user continues locally.
     await infoDialog(
       context,
-      title: tr('Ссылка отправлена'),
+      title: tr('Код отправлен'),
       message: trf(
-        'Мы отправили ссылку для восстановления на {v0}.\n\nПриложение работает без сервера, поэтому письмо имитируется: на следующем экране задайте новый пароль.',
-        {'v0': _email.text.trim()},
+        'Мы отправили код подтверждения на {v0}.\n\nПриложение работает без сервера, поэтому письмо имитируется. Ваш код: {v1}\n\nВведите его на следующем экране и задайте новый пароль.',
+        {'v0': _email.text.trim(), 'v1': code},
       ),
     );
     if (!mounted) return;
@@ -112,7 +105,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     const SizedBox(height: 8),
                     Text(
                       tr(
-                        'Введите email, указанный при регистрации, и мы отправим ссылку для восстановления доступа.',
+                        'Введите email, указанный при регистрации, и мы отправим код для восстановления доступа.',
                       ),
                       textAlign: TextAlign.center,
                       style: AppTextStyles.small.copyWith(color: pal.subtext),
@@ -130,20 +123,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         onSubmitted: (_) => _send(),
                       ),
                     ),
-                    if (_error != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(
-                            color: AppColors.danger,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
                     const SizedBox(height: 14),
                     CustomButton(
-                      label: tr('Отправить ссылку'),
+                      label: tr('Отправить код'),
                       loading: _loading,
                       onPressed: _send,
                     ),

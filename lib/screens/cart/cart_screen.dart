@@ -65,11 +65,21 @@ class _CartScreenState extends State<CartScreen> {
     final ok = await confirmDialog(
       context,
       title: tr('Оформить заказ?'),
-      message: trf('Товаров: {v0}\nИтого: {v1}\nБонусы за заказ: +{v2}', {
-        'v0': cart.count,
-        'v1': fmt(cart.total),
-        'v2': cart.bonus,
-      }),
+      message: cart.bonusToSpend > 0
+          ? trf(
+              'Товаров: {v0}\nСписано бонусов: −{v3}\nИтого: {v1}\nБонусы за заказ: +{v2}',
+              {
+                'v0': cart.count,
+                'v1': fmt(cart.payable),
+                'v2': cart.bonus,
+                'v3': cart.bonusToSpend,
+              },
+            )
+          : trf('Товаров: {v0}\nИтого: {v1}\nБонусы за заказ: +{v2}', {
+              'v0': cart.count,
+              'v1': fmt(cart.payable),
+              'v2': cart.bonus,
+            }),
       confirmLabel: tr('Оформить'),
     );
     if (!ok || !mounted) return;
@@ -211,41 +221,64 @@ class _CartScreenState extends State<CartScreen> {
                 color: pal.surface,
                 border: Border(top: BorderSide(color: pal.border)),
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+                  if (cart.spendableBonus > 0)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            trf('Списать бонусы: −{v0}', {
+                              'v0': cart.spendableBonus,
+                            }),
+                            style: AppTextStyles.small,
+                          ),
+                        ),
+                        Switch(
+                          value: cart.useBonus,
+                          activeThumbColor: AppColors.primaryDark,
+                          onChanged: cart.setUseBonus,
+                        ),
+                      ],
+                    ),
+                  Row(
                     children: [
-                      Text(
-                        trf('Итого ({v0})', {'v0': cart.count}),
-                        style: AppTextStyles.caption.copyWith(
-                          color: pal.subtext,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            trf('Итого ({v0})', {'v0': cart.count}),
+                            style: AppTextStyles.caption.copyWith(
+                              color: pal.subtext,
+                            ),
+                          ),
+                          Text(
+                            fmt(cart.payable),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            trf('+{v0} бонусов', {'v0': cart.bonus}),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        fmt(cart.total),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        trf('+{v0} бонусов', {'v0': cart.bonus}),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.primaryDark,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: CustomButton(
+                          label: tr('Оформить заказ'),
+                          loading: _busy,
+                          onPressed: () => _checkout(cart),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CustomButton(
-                      label: tr('Оформить заказ'),
-                      loading: _busy,
-                      onPressed: () => _checkout(cart),
-                    ),
                   ),
                 ],
               ),

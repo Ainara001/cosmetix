@@ -17,6 +17,7 @@ class AiConfig {
     required this.visionModel,
   });
 
+  static const defaultPort = 11434;
   static const defaultBaseUrl = String.fromEnvironment('OLLAMA_BASE_URL');
   static const defaultTextModel = String.fromEnvironment(
     'OLLAMA_TEXT_MODEL',
@@ -44,8 +45,14 @@ class AiConfig {
     var raw = baseUrl.trim();
     if (raw.isEmpty) return null;
     if (!raw.contains('://')) raw = 'http://$raw';
-    final uri = Uri.tryParse(raw);
+    var uri = Uri.tryParse(raw);
     if (uri == null || uri.host.isEmpty) return null;
+    // a bare LAN address (192.168.1.50) means Ollama's default port
+    if (uri.scheme == 'http' &&
+        !uri.hasPort &&
+        RegExp(r'^\d{1,3}(\.\d{1,3}){3}$').hasMatch(uri.host)) {
+      uri = uri.replace(port: defaultPort);
+    }
     return uri.replace(path: uri.path.replaceAll(RegExp(r'/+$'), ''));
   }
 

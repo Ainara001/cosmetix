@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'package:cosmetix/core/utils/app_paths.dart';
+
 import 'seed_data.dart';
 
 /// Owns the SQLite connection: creates the schema, seeds demo data and
@@ -13,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 4;
+  static const dbVersion = 5;
 
   final String? path;
   Database? _db;
@@ -75,6 +77,14 @@ class DatabaseHelper {
       }
       await SeedData.backfillProductTraits(db);
     },
+    5: (db) async {
+      await _addColumn(
+        db,
+        'orders',
+        'bonus_spent',
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    },
   };
 
   static Future<void> _addColumn(
@@ -93,14 +103,18 @@ class DatabaseHelper {
     _db = null;
   }
 
-  /// Deletes all data and builds the demo database again.
+  /// Deletes all data (and the saved photos) and builds the demo database
+  /// again. All-or-nothing: if anything fails the old data stays.
   Future<void> resetDemoData() async {
     final db = await database;
-    for (final table in _tables.reversed) {
-      await db.execute('DELETE FROM $table');
-      await db.execute("DELETE FROM sqlite_sequence WHERE name = '$table'");
-    }
-    await SeedData.insertAll(db);
+    await db.transaction((txn) async {
+      for (final table in _tables.reversed) {
+        await txn.execute('DELETE FROM $table');
+        await txn.execute("DELETE FROM sqlite_sequence WHERE name = '$table'");
+      }
+      await SeedData.insertAll(txn);
+    });
+    await AppPaths.deletePhotos();
   }
 
   static const _tables = [

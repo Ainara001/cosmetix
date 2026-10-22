@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
@@ -62,24 +64,26 @@ class AuthProvider extends ChangeNotifier {
       await _start(user);
       return null;
     } on StateError catch (e) {
-      return e.message;
+      return tr(e.message);
     } catch (_) {
       return tr('Не удалось создать аккаунт. Попробуйте ещё раз');
     }
   }
 
-  /// Local imitation of Google / Apple sign in: a local account is created
-  /// (or reused) so the whole flow works without a server.
+  /// Local imitation of Google / Apple sign in: a local account without a
+  /// usable password is created (or reused), so the whole flow works without a
+  /// server and the account cannot be opened from the e-mail form.
   Future<String?> socialLogin(String provider) async {
     try {
-      final email = '${provider.toLowerCase()}.user@cosmetix.local';
-      var user = await _users.login(email, 'social-$provider');
-      user ??= await _users.register(
+      final user = await _users.socialUser(
+        provider: provider,
+        email: '${provider.toLowerCase()}.user@cosmetix.local',
         firstName: provider,
         lastName: tr('Пользователь'),
-        email: email,
-        password: 'social-$provider',
       );
+      if (user == null) {
+        return trf('Не удалось войти через {provider}', {'provider': provider});
+      }
       await _start(user);
       return null;
     } catch (_) {
@@ -87,10 +91,52 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> emailExists(String email) => _users.emailExists(email);
+  // ---- password reset (simulated e-mail) ----
 
-  Future<bool> resetPassword(String email, String newPassword) =>
-      _users.changePassword(email, newPassword);
+  static const _resetTtl = Duration(minutes: 10);
+  static const _resetMaxAttempts = 5;
+  final Map<String, _ResetCode> _resetCodes = {};
+
+  /// Creates the 6-digit code that the simulated "e-mail" shows. Always
+  /// returns a code, so the screen never reveals whether the e-mail is
+  /// registered; the code only works for an existing account.
+  Future<String> requestResetCode(String email) async {
+    final code = (100000 + Random.secure().nextInt(900000)).toString();
+    final key = email.trim().toLowerCase();
+    if (await _users.emailExists(key)) {
+      _resetCodes[key] = _ResetCode(code, DateTime.now().add(_resetTtl));
+    } else {
+      _resetCodes.remove(key);
+    }
+    return code;
+  }
+
+  /// Changes the password when [code] matches the one issued for [email].
+  /// Returns an error message or null on success.
+  Future<String?> resetPassword(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
+    final key = email.trim().toLowerCase();
+    final issued = _resetCodes[key];
+    if (issued == null || DateTime.now().isAfter(issued.expires)) {
+      _resetCodes.remove(key);
+      return tr('Код устарел. Запросите новый');
+    }
+    if (issued.code != code.trim()) {
+      issued.attempts++;
+      if (issued.attempts >= _resetMaxAttempts) _resetCodes.remove(key);
+      return tr('Неверный код');
+    }
+    _resetCodes.remove(key);
+    try {
+      final ok = await _users.changePassword(key, newPassword);
+      return ok ? null : tr('Не удалось изменить пароль');
+    } catch (_) {
+      return tr('Не удалось изменить пароль');
+    }
+  }
 
   Future<void> logout() async {
     await _users.setCurrentUser(null);
@@ -166,4 +212,12 @@ class AuthProvider extends ChangeNotifier {
     await _users.setAvatarPath(_user!.id, path);
     await reload();
   }
+}
+
+class _ResetCode {
+  _ResetCode(this.code, this.expires);
+
+  final String code;
+  final DateTime expires;
+  int attempts = 0;
 }

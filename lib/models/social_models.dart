@@ -1,3 +1,5 @@
+import 'package:cosmetix/core/utils/app_paths.dart';
+
 class Review {
   const Review({
     required this.id,
@@ -29,7 +31,7 @@ class Review {
     rating: m['rating'] as int,
     body: m['body'] as String,
     createdAt: DateTime.fromMillisecondsSinceEpoch(m['created_at'] as int),
-    photoPath: m['photo_path'] as String?,
+    photoPath: AppPaths.resolve(m['photo_path'] as String?),
   );
 }
 
