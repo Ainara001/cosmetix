@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cosmetix/providers/auth_provider.dart';
+import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
@@ -18,6 +19,7 @@ class Session {
     await Future.wait([
       context.read<CatalogProvider>().load(uid),
       context.read<CartProvider>().load(uid),
+      context.read<CareProvider>().load(uid),
       context.read<SafetyProvider>().load(uid),
       context.read<ChatProvider>().load(uid),
     ]);
@@ -27,6 +29,7 @@ class Session {
     final navigator = Navigator.of(context);
     context.read<CatalogProvider>().reset();
     context.read<CartProvider>().reset();
+    context.read<CareProvider>().reset();
     context.read<SafetyProvider>().reset();
     context.read<ChatProvider>().reset();
     context.read<NavProvider>().setTab(NavProvider.home);

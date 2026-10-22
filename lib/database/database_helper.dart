@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 5;
+  static const dbVersion = 6;
 
   final String? path;
   Database? _db;
@@ -85,6 +85,19 @@ class DatabaseHelper {
         'INTEGER NOT NULL DEFAULT 0',
       );
     },
+    6: (db) async {
+      for (final sql in _schemaV6) {
+        await db.execute(sql);
+      }
+      await _addColumn(db, 'reactions', 'photo_path', 'TEXT');
+      await _addColumn(db, 'users', 'preferences', "TEXT NOT NULL DEFAULT ''");
+      await _addColumn(
+        db,
+        'users',
+        'reco_use_history',
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    },
   };
 
   static Future<void> _addColumn(
@@ -140,6 +153,59 @@ class DatabaseHelper {
     'blacklist',
     'reactions',
     'chat_messages',
+    'my_products',
+    'care_steps',
+    'care_logs',
+    'reaction_history',
+  ];
+
+  /// Schema version 6: the user's cosmetic bag, the morning / evening care
+  /// plan with its history and the change history of reaction diary entries.
+  static const _schemaV6 = [
+    '''
+CREATE TABLE my_products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  brand TEXT NOT NULL DEFAULT '',
+  category TEXT NOT NULL DEFAULT '',
+  purchased_at INTEGER,
+  opened_at INTEGER,
+  pao_months INTEGER,
+  expires_at INTEGER,
+  notes TEXT NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+)''',
+    '''
+CREATE TABLE care_steps (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  period TEXT NOT NULL,
+  position INTEGER NOT NULL,
+  my_product_id INTEGER NOT NULL REFERENCES my_products(id) ON DELETE CASCADE,
+  created_at INTEGER NOT NULL,
+  UNIQUE (user_id, period, my_product_id)
+)''',
+    '''
+CREATE TABLE care_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day TEXT NOT NULL,
+  period TEXT NOT NULL,
+  my_product_id INTEGER REFERENCES my_products(id) ON DELETE SET NULL,
+  product_name TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  UNIQUE (user_id, day, period, my_product_id)
+)''',
+    '''
+CREATE TABLE reaction_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reaction_id INTEGER NOT NULL REFERENCES reactions(id) ON DELETE CASCADE,
+  changed_at INTEGER NOT NULL,
+  summary TEXT NOT NULL
+)''',
   ];
 
   /// Tables added in schema version 4: what each product is suitable for.

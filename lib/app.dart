@@ -9,10 +9,12 @@ import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/providers/safety_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
+import 'package:cosmetix/repositories/care_repository.dart';
 import 'package:cosmetix/repositories/cart_repository.dart';
 import 'package:cosmetix/repositories/chat_repository.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
@@ -120,6 +122,9 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ),
             ChangeNotifierProvider(
               create: (_) => CartProvider(CartRepository(widget.helper)),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => CareProvider(CareRepository(widget.helper)),
             ),
             ChangeNotifierProvider<SafetyProvider>.value(
               value: _safetyProvider,

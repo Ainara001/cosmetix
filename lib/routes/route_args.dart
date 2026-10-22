@@ -84,3 +84,12 @@ class BeautyResultArgs {
   final bool photoUsed;
   final List<String> observations;
 }
+
+/// Cosmetic bag form: edit an existing item ([id]) or add a new one, optionally
+/// pre-filled from a catalog product.
+class BagFormArgs {
+  const BagFormArgs({this.id, this.catalogProductId});
+
+  final int? id;
+  final int? catalogProductId;
+}
