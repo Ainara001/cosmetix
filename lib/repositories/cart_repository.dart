@@ -6,8 +6,24 @@ class CartRepository {
 
   final DatabaseHelper _helper;
 
-  /// Bonus points = 2% of the order total.
+  /// Bonus points = 2% of the amount paid.
   static int bonusFor(int total) => (total * 0.02).round();
+
+  /// Points that can be spent on a cart worth [total] when the user owns
+  /// [balance] points (1 point = 1 tenge, at least 1 tenge is always paid).
+  static int spendable(int balance, int total) =>
+      balance.clamp(0, total > 0 ? total - 1 : 0);
+
+  Future<int> bonusBalance(int userId) async {
+    final db = await _helper.database;
+    final rows = await db.query(
+      'users',
+      columns: ['bonus_points'],
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+    return rows.isEmpty ? 0 : rows.first['bonus_points'] as int;
+  }
 
   Future<List<CartItem>> getItems(int userId) async {
     final db = await _helper.database;
@@ -77,13 +93,19 @@ WHERE c.user_id = ? ORDER BY c.id DESC''',
     await db.delete('cart_items', where: 'user_id = ?', whereArgs: [userId]);
   }
 
-  /// Converts the cart into an order, clears the cart and adds bonus points.
+  /// Converts the cart into an order, clears the cart, takes [useBonus]
+  /// points off the user (never more than they own or than the cart allows)
+  /// and adds the 2% bonus for the amount paid.
   /// Returns null when the cart is empty.
-  Future<Order?> checkout(int userId) async {
+  Future<Order?> checkout(int userId, {int useBonus = 0}) async {
     final items = await getItems(userId);
     if (items.isEmpty) return null;
     final db = await _helper.database;
-    final total = items.fold<int>(0, (sum, i) => sum + i.total);
+    final subtotal = items.fold<int>(0, (sum, i) => sum + i.total);
+    final spent = useBonus <= 0
+        ? 0
+        : useBonus.clamp(0, spendable(await bonusBalance(userId), subtotal));
+    final total = subtotal - spent;
     final bonus = bonusFor(total);
     final now = DateTime.now();
     final orderId = await db.transaction((txn) async {
@@ -91,6 +113,7 @@ WHERE c.user_id = ? ORDER BY c.id DESC''',
         'user_id': userId,
         'total': total,
         'bonus': bonus,
+        'bonus_spent': spent,
         'status': 'Оформлен',
         'created_at': now.millisecondsSinceEpoch,
       });
@@ -106,7 +129,7 @@ WHERE c.user_id = ? ORDER BY c.id DESC''',
       await txn.delete('cart_items', where: 'user_id = ?', whereArgs: [userId]);
       await txn.rawUpdate(
         'UPDATE users SET bonus_points = bonus_points + ? WHERE id = ?',
-        [bonus, userId],
+        [bonus - spent, userId],
       );
       return id;
     });
@@ -114,6 +137,7 @@ WHERE c.user_id = ? ORDER BY c.id DESC''',
       id: orderId,
       total: total,
       bonus: bonus,
+      bonusSpent: spent,
       status: 'Оформлен',
       createdAt: now,
       lines: [
@@ -153,6 +177,7 @@ WHERE oi.order_id = ?''',
           id: o['id'] as int,
           total: o['total'] as int,
           bonus: o['bonus'] as int,
+          bonusSpent: o['bonus_spent'] as int? ?? 0,
           status: o['status'] as String,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
             o['created_at'] as int,
@@ -164,8 +189,24 @@ WHERE oi.order_id = ?''',
     return orders;
   }
 
+  /// Deletes an order and reverses its bonus effect: the points it earned are
+  /// taken back (never below zero) and the points it spent are returned.
   Future<void> deleteOrder(int orderId) async {
     final db = await _helper.database;
-    await db.delete('orders', where: 'id = ?', whereArgs: [orderId]);
+    await db.transaction((txn) async {
+      final rows = await txn.query(
+        'orders',
+        where: 'id = ?',
+        whereArgs: [orderId],
+      );
+      if (rows.isEmpty) return;
+      final o = rows.first;
+      await txn.rawUpdate(
+        'UPDATE users SET bonus_points = MAX(0, bonus_points - ? + ?) '
+        'WHERE id = ?',
+        [o['bonus'], o['bonus_spent'], o['user_id']],
+      );
+      await txn.delete('orders', where: 'id = ?', whereArgs: [orderId]);
+    });
   }
 }

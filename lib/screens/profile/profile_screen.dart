@@ -163,6 +163,24 @@ class ProfileScreen extends StatelessWidget {
                             Navigator.pushNamed(context, AppRoutes.settings),
                       ),
                       MenuTile(
+                        icon: Icons.shopping_bag_outlined,
+                        title: tr('Моя косметичка'),
+                        onTap: () =>
+                            Navigator.pushNamed(context, AppRoutes.bag),
+                      ),
+                      MenuTile(
+                        icon: Icons.wb_twilight_outlined,
+                        title: tr('Мой уход'),
+                        onTap: () =>
+                            Navigator.pushNamed(context, AppRoutes.care),
+                      ),
+                      MenuTile(
+                        icon: Icons.document_scanner_outlined,
+                        title: tr('Проверка состава'),
+                        onTap: () =>
+                            Navigator.pushNamed(context, AppRoutes.scan),
+                      ),
+                      MenuTile(
                         icon: Icons.healing_outlined,
                         title: tr('Дневник Аллергии'),
                         onTap: () =>

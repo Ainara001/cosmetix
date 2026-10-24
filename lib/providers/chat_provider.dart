@@ -2,14 +2,21 @@ import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/models/social_models.dart';
 import 'package:cosmetix/repositories/chat_repository.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 
+/// Why the AI could not answer (decides which message the chat shows).
+enum AiFailure { unavailable, notConfigured, timeout, rateLimited }
+
 class ChatProvider extends ChangeNotifier {
-  ChatProvider(this._repo, this._assistant);
+  ChatProvider(this._repo, this._assistant, {bool Function()? shareProfile})
+    : _shareProfile = shareProfile ?? (() => false);
 
   final ChatRepository _repo;
   final AssistantService _assistant;
+
+  /// Whether the user agreed to send the Beauty profile / blacklist to the AI.
+  final bool Function() _shareProfile;
 
   List<ChatMessage> messages = [];
   bool typing = false;
@@ -18,6 +25,12 @@ class ChatProvider extends ChangeNotifier {
   /// The conversation is kept; [retry] asks again.
   bool aiUnavailable = false;
   String? aiError;
+
+  /// Why the last answer failed (null while everything works).
+  AiFailure? aiFailure;
+
+  /// Seconds the AI asked us to wait (rate limit / budget), if known.
+  int? retryAfter;
   int? _userId;
   int? _lastProductId;
   String? _lastQuestion;
@@ -62,6 +75,8 @@ class ChatProvider extends ChangeNotifier {
     typing = true;
     aiUnavailable = false;
     aiError = null;
+    aiFailure = null;
+    retryAfter = null;
     notifyListeners();
     try {
       // history = everything before the question being answered
@@ -73,6 +88,7 @@ class ChatProvider extends ChangeNotifier {
         text: question,
         history: history,
         productId: productId,
+        shareProfile: _shareProfile(),
       );
       await _repo.add(userId, answer, isUser: false);
       messages = await _repo.messages(userId);
@@ -80,10 +96,19 @@ class ChatProvider extends ChangeNotifier {
     } on AiException catch (e) {
       aiUnavailable = true;
       aiError = e.message;
+      aiFailure = switch (e) {
+        AiRateLimited() => AiFailure.rateLimited,
+        AiTimeout() => AiFailure.timeout,
+        AiUnavailable(message: 'The AI server address is not set') =>
+          AiFailure.notConfigured,
+        _ => AiFailure.unavailable,
+      };
+      if (e is AiRateLimited) retryAfter = e.retryAfter;
     } catch (e) {
       debugPrint('chat failed: $e');
       aiUnavailable = true;
       aiError = 'Unexpected error';
+      aiFailure = AiFailure.unavailable;
     }
     typing = false;
     notifyListeners();
@@ -95,6 +120,7 @@ class ChatProvider extends ChangeNotifier {
     await _repo.reset(userId);
     messages = await _repo.messages(userId);
     aiUnavailable = false;
+    aiFailure = null;
     _lastQuestion = null;
     notifyListeners();
   }

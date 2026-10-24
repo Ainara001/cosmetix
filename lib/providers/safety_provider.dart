@@ -1,6 +1,7 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
+import 'package:cosmetix/models/reaction_insights.dart';
 import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
@@ -41,33 +42,51 @@ class SafetyProvider extends ChangeNotifier {
   // ---- blacklist ----
 
   Future<void> toggleBlacklist(BlacklistItem item, bool enabled) async {
+    final userId = _userId;
+    if (userId == null) return;
     await _repo.setBlacklistEnabled(item.id, enabled);
-    blacklist = await _repo.blacklist(_userId!);
+    blacklist = await _repo.blacklist(userId);
     notifyListeners();
   }
 
   /// Returns an error text or null.
   Future<String?> addCustom(String name) async {
+    final userId = _userId;
+    if (userId == null) return tr('Сначала войдите в аккаунт');
     final text = name.trim();
     if (text.length < 2) return tr('Название слишком короткое');
     if (blacklist.any((b) => b.name.toLowerCase() == text.toLowerCase())) {
       return tr('Этот компонент уже есть в списке');
     }
-    await _repo.addCustom(_userId!, text);
-    blacklist = await _repo.blacklist(_userId!);
+    await _repo.addCustom(userId, text);
+    blacklist = await _repo.blacklist(userId);
     notifyListeners();
     return null;
   }
 
   Future<void> deleteBlacklist(BlacklistItem item) async {
+    final userId = _userId;
+    if (userId == null) return;
     await _repo.deleteBlacklistItem(item.id);
-    blacklist = await _repo.blacklist(_userId!);
+    blacklist = await _repo.blacklist(userId);
     notifyListeners();
   }
 
   // ---- reactions ----
 
   Future<Reaction?> reactionById(int id) => _repo.reactionById(id);
+
+  Future<List<ReactionChange>> reactionHistory(int id) =>
+      _repo.reactionHistory(id);
+
+  /// Repeated observations in the diary (see [ReactionInsights]).
+  Future<ReactionInsights> insights() async {
+    final byProduct = <int, List<Ingredient>>{};
+    for (final id in {for (final r in reactions) r.productId}) {
+      byProduct[id] = await _repo.ingredientsOf(id);
+    }
+    return ReactionInsights.compute(reactions, byProduct);
+  }
 
   Future<void> saveReaction({
     int? id,
@@ -76,15 +95,19 @@ class SafetyProvider extends ChangeNotifier {
     required int severity,
     required DateTime date,
     String notes = '',
+    String? photoPath,
   }) async {
+    final userId = _userId;
+    if (userId == null) return;
     if (id == null) {
       await _repo.addReaction(
-        userId: _userId!,
+        userId: userId,
         productId: productId,
         title: title,
         severity: severity,
         date: date,
         notes: notes,
+        photoPath: photoPath,
       );
     } else {
       await _repo.updateReaction(
@@ -94,15 +117,18 @@ class SafetyProvider extends ChangeNotifier {
         severity: severity,
         date: date,
         notes: notes,
+        photoPath: photoPath,
       );
     }
-    reactions = await _repo.reactions(_userId!);
+    reactions = await _repo.reactions(userId);
     notifyListeners();
   }
 
   Future<void> deleteReaction(Reaction r) async {
+    final userId = _userId;
+    if (userId == null) return;
     await _repo.deleteReaction(r.id);
-    reactions = await _repo.reactions(_userId!);
+    reactions = await _repo.reactions(userId);
     notifyListeners();
   }
 }

@@ -22,12 +22,14 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _code = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
   bool _loading = false;
 
   @override
   void dispose() {
+    _code.dispose();
     _password.dispose();
     _confirm.dispose();
     super.dispose();
@@ -37,18 +39,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    final ok = await context.read<AuthProvider>().resetPassword(
+    final error = await context.read<AuthProvider>().resetPassword(
       widget.email,
+      _code.text,
       _password.text,
     );
     if (!mounted) return;
     setState(() => _loading = false);
-    if (!ok) {
-      showMessage(
-        context,
-        tr('Не удалось изменить пароль'),
-        type: MessageType.error,
-      );
+    if (error != null) {
+      showMessage(context, error, type: MessageType.error);
       return;
     }
     showMessage(
@@ -103,6 +102,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          CustomTextField(
+                            label: tr('Код из письма'),
+                            hint: '123456',
+                            controller: _code,
+                            validator: (v) =>
+                                RegExp(r'^\d{6}$').hasMatch(v?.trim() ?? '')
+                                ? null
+                                : tr('Введите 6-значный код'),
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.next,
+                          ),
+                          const SizedBox(height: 14),
                           CustomTextField(
                             label: tr('Новый пароль'),
                             hint: tr('Минимум 8 символов, буквы и цифры'),

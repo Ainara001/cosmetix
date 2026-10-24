@@ -58,7 +58,14 @@ void main() {
     expect(find.text('ИИ Чат'), findsWidgets);
 
     // regression: "Фильтры" used to crash on a route type cast and do nothing
-    await pumpUntil(tester, find.text('Весь каталог'));
+    // the quick-access tiles push the catalog link below the fold
+    await tester.scrollUntilVisible(
+      find.text('Весь каталог'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Весь каталог'));
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.text('Весь каталог'));
     await pumpUntil(tester, find.text('Фильтры'));
     await tester.tap(find.text('Фильтры'));

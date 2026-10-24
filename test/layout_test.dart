@@ -84,6 +84,14 @@ void main() {
         (AppRoutes.settings, null),
         (AppRoutes.beautyProfile, null),
         (AppRoutes.editProfile, null),
+        (AppRoutes.reactions, null),
+        (AppRoutes.reactionForm, 1),
+        (AppRoutes.bag, null),
+        (AppRoutes.bagForm, null),
+        (AppRoutes.care, null),
+        (AppRoutes.careHistory, null),
+        (AppRoutes.scan, null),
+        (AppRoutes.blacklist, null),
       ];
       for (final (route, args) in screens) {
         nav.pushNamed(route, arguments: args);

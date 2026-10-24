@@ -118,6 +118,21 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                           ),
                         ],
                       ),
+                      if (order.bonusSpent > 0) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Expanded(child: Text(tr('Списано бонусов'))),
+                            Text(
+                              '−${order.bonusSpent}',
+                              style: const TextStyle(
+                                color: AppColors.primaryDark,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 4),
                       Row(
                         children: [

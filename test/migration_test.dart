@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/services/avatar_service.dart';
@@ -119,6 +120,18 @@ CREATE TABLE reviews (
     expect((await db.query('products')).length, 2);
   });
 
+  test('upgrade adds orders.bonus_spent with a zero default', () async {
+    final path = await makeV3Database();
+    final helper = DatabaseHelper(path: path);
+    final db = await helper.database;
+    addTearDown(helper.close);
+
+    final cols = await db.rawQuery('PRAGMA table_info(orders)');
+    expect(cols.any((c) => c['name'] == 'bonus_spent'), isTrue);
+    await db.insert('orders', {'user_id': 7, 'total': 1000, 'created_at': 1});
+    expect((await db.query('orders')).single['bonus_spent'], 0);
+  });
+
   test('upgrade adds the new tables and backfills curated traits', () async {
     final path = await makeV3Database();
     final helper = DatabaseHelper(path: path);
@@ -196,7 +209,19 @@ CREATE TABLE reviews (
         password: 'Passw0rd1',
       )).id;
       expect((await users.getById(id))!.avatarPath, isNull);
+      AppPaths.setForTest(documents: '/data');
+      addTearDown(AppPaths.setForTest);
       await users.setAvatarPath(id, '/data/avatars/a.jpg');
+      // saved relative to the app folder, so it survives a changed container
+      final db = await helper.database;
+      expect(
+        (await db.query(
+          'users',
+          where: 'id = ?',
+          whereArgs: [id],
+        )).single['avatar_path'],
+        'avatars/a.jpg',
+      );
       await helper.close();
 
       // a new connection (app restart) still sees it

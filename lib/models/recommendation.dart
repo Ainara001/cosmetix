@@ -34,6 +34,43 @@ enum MatchReasonType {
   concern,
   gentle,
   noBlacklist,
+
+  /// Matches a personal preference (no fragrance, natural composition).
+  preference,
+
+  /// The user noted a reaction to this very product (history, with consent).
+  previousReaction,
+
+  /// Shares a cautionary ingredient with products that caused reactions.
+  sharedIngredient,
+
+  /// The user already has this product in the cosmetic bag.
+  owned,
+}
+
+/// What the user's own history says (only when they allowed it).
+class PersonalHistory {
+  const PersonalHistory({
+    this.reactedProducts = const {},
+    this.ownedProductIds = const {},
+    this.sharedRiskIngredients = const {},
+  });
+
+  const PersonalHistory.empty() : this();
+
+  /// product id -> highest severity (1..5) noted in the diary.
+  final Map<int, int> reactedProducts;
+
+  /// Catalog products in the cosmetic bag.
+  final Set<int> ownedProductIds;
+
+  /// Cautionary ingredients found in several products with reactions.
+  final Set<String> sharedRiskIngredients;
+
+  bool get isEmpty =>
+      reactedProducts.isEmpty &&
+      ownedProductIds.isEmpty &&
+      sharedRiskIngredients.isEmpty;
 }
 
 class MatchReason {

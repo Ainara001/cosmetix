@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
@@ -125,6 +126,7 @@ class Reaction {
     required this.severity,
     required this.date,
     required this.notes,
+    this.photoPath,
   });
 
   final int id;
@@ -137,6 +139,9 @@ class Reaction {
   final DateTime date;
   final String notes;
 
+  /// A photo of the skin attached by the user (stored on the phone only).
+  final String? photoPath;
+
   factory Reaction.fromMap(Map<String, Object?> m) => Reaction(
     id: m['id'] as int,
     productId: m['product_id'] as int,
@@ -147,5 +152,25 @@ class Reaction {
     severity: m['severity'] as int,
     date: DateTime.fromMillisecondsSinceEpoch(m['reaction_date'] as int),
     notes: m['notes'] as String? ?? '',
+    photoPath: AppPaths.resolve(m['photo_path'] as String?),
   );
+}
+
+/// One entry of the change history of a diary record.
+class ReactionChange {
+  const ReactionChange({
+    required this.id,
+    required this.changedAt,
+    required this.created,
+    required this.fields,
+  });
+
+  final int id;
+  final DateTime changedAt;
+
+  /// True for the first entry (the record was created).
+  final bool created;
+
+  /// What changed: field code -> (old value, new value) as display text.
+  final Map<String, (String, String)> fields;
 }

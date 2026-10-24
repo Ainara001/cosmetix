@@ -13,7 +13,7 @@ import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/widgets/app_card.dart';
@@ -97,8 +97,22 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   Future<void> _analyze() async {
     final photo = _photo;
     if (photo == null) return;
-    setState(() => _step = _Step.analyzing);
     final ai = context.read<AiProvider>();
+    if (!ai.sharePhotos) {
+      // privacy: the photo goes to the AI only with the user's agreement
+      final ok = await confirmDialog(
+        context,
+        title: tr('Отправить фото в ИИ?'),
+        message: tr(
+          'Фото будет отправлено на сервер ИИ (Claude) только для анализа цветотипа и сразу удалено с телефона. Согласие можно отозвать в Настройках.',
+        ),
+        confirmLabel: tr('Разрешить'),
+      );
+      if (!ok || !mounted) return;
+      await ai.setSharePhotos(true);
+      if (!mounted) return;
+    }
+    setState(() => _step = _Step.analyzing);
     final analyzer = context.read<VisionAnalyzer>();
     try {
       final vision = await analyzer.analyzeFile(photo);
@@ -126,9 +140,10 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   String _friendly(AiException e) => switch (e) {
     AiUnavailable() => tr('ИИ-сервер недоступен.'),
     AiTimeout() => tr('ИИ отвечает слишком долго.'),
-    AiServerError() => tr(
-      'ИИ вернул ошибку. Проверьте, что модель для анализа фото установлена.',
+    AiRateLimited() => tr(
+      'ИИ перегружен или лимит исчерпан. Попробуйте позже.',
     ),
+    AiServerError() => tr('ИИ вернул ошибку. Попробуйте ещё раз позже.'),
     AiBadResponse() => tr('Не удалось разобрать ответ ИИ.'),
   };
 

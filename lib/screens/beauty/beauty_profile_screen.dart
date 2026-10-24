@@ -6,6 +6,7 @@ import 'package:cosmetix/core/constants/app_constants.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
@@ -191,6 +192,57 @@ class BeautyProfileScreen extends StatelessWidget {
                       auth.updateBeauty(skinConcerns: list);
                     },
                   ),
+              ],
+            ),
+          ),
+          SectionTitle(tr('Личные предпочтения')),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final code in Preferences.all)
+                      AppChip(
+                        label: tr(Preferences.label(code)),
+                        selected: user.preferences.contains(code),
+                        onTap: () {
+                          final next = {...user.preferences};
+                          next.contains(code)
+                              ? next.remove(code)
+                              : next.add(code);
+                          auth.updatePreferences(preferences: next);
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  tr(
+                    'Предпочтения слегка меняют порядок рекомендаций, но не скрывают товары.',
+                  ),
+                  style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                ),
+                const Divider(height: 22),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  activeThumbColor: AppColors.primaryDark,
+                  title: Text(
+                    tr('Учитывать мои реакции и косметичку'),
+                    style: AppTextStyles.small,
+                  ),
+                  subtitle: Text(
+                    tr(
+                      'Средства, на которые вы отмечали реакцию, будут ниже в рекомендациях. Данные остаются на телефоне.',
+                    ),
+                    style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                  ),
+                  value: user.recoUseHistory,
+                  onChanged: (v) => auth.updatePreferences(useHistory: v),
+                ),
               ],
             ),
           ),

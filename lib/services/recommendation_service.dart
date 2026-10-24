@@ -1,5 +1,8 @@
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
+import 'package:cosmetix/models/care_models.dart';
+import 'package:cosmetix/models/reaction_insights.dart';
+import 'package:cosmetix/repositories/care_repository.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/models/safety_models.dart';
@@ -14,16 +17,21 @@ class PersonalizationContext {
     required this.profile,
     required this.blacklist,
     required this.candidates,
+    this.history = const PersonalHistory.empty(),
   });
 
   const PersonalizationContext.empty()
     : profile = const BeautyProfile(),
       blacklist = const [],
-      candidates = const [];
+      candidates = const [],
+      history = const PersonalHistory.empty();
 
   final BeautyProfile profile;
   final List<BlacklistItem> blacklist;
   final List<ProductCandidate> candidates;
+
+  /// Reactions and cosmetic bag, empty unless the user allowed using them.
+  final PersonalHistory history;
 }
 
 /// Deterministic personalized ranking. No AI here: AI traits stored in SQLite
@@ -32,11 +40,17 @@ class PersonalizationContext {
 ///
 /// Pipeline: blacklist exclusion (hard) -> compatibility score -> sorting.
 class RecommendationService {
-  RecommendationService(this._products, this._safety, this._users);
+  RecommendationService(
+    this._products,
+    this._safety,
+    this._users, [
+    this._care,
+  ]);
 
   final ProductRepository _products;
   final SafetyRepository _safety;
   final UserRepository _users;
+  final CareRepository? _care;
 
   Future<PersonalizationContext> loadContext(int userId) async {
     final user = await _users.getById(userId);
@@ -44,6 +58,33 @@ class RecommendationService {
       profile: user?.beautyProfile ?? const BeautyProfile(),
       blacklist: await _safety.blacklist(userId),
       candidates: await _products.candidates(userId),
+      // history is used only when the user agreed to it
+      history: (user?.recoUseHistory ?? false)
+          ? await _loadHistory(userId)
+          : const PersonalHistory.empty(),
+    );
+  }
+
+  Future<PersonalHistory> _loadHistory(int userId) async {
+    final reactions = await _safety.reactions(userId);
+    final reacted = <int, int>{};
+    for (final r in reactions) {
+      if (r.severity > (reacted[r.productId] ?? 0)) {
+        reacted[r.productId] = r.severity;
+      }
+    }
+    final ingredients = <int, List<Ingredient>>{
+      for (final id in reacted.keys) id: await _safety.ingredientsOf(id),
+    };
+    final shared = ReactionInsights.compute(reactions, ingredients);
+    final bag = _care == null ? const <MyProduct>[] : await _care.bag(userId);
+    return PersonalHistory(
+      reactedProducts: reacted,
+      ownedProductIds: {
+        for (final p in bag)
+          if (p.productId != null) p.productId!,
+      },
+      sharedRiskIngredients: {for (final i in shared.sharedIngredients) i.name},
     );
   }
 
@@ -80,6 +121,7 @@ class RecommendationService {
     required Iterable<ProductCandidate> candidates,
     required BeautyProfile profile,
     required List<BlacklistItem> blacklist,
+    PersonalHistory history = const PersonalHistory.empty(),
     DateTime? now,
   }) {
     final allowed = [
@@ -87,7 +129,9 @@ class RecommendationService {
         if (!isBlacklisted(c, blacklist)) c,
     ];
     final clock = (now ?? DateTime.now()).millisecondsSinceEpoch;
-    final result = [for (final c in allowed) _score(c, profile, clock)];
+    final result = [
+      for (final c in allowed) _score(c, profile, clock, history),
+    ];
     result.sort((a, b) {
       final byScore = b.score.compareTo(a.score);
       if (byScore != 0) return byScore;
@@ -100,6 +144,7 @@ class RecommendationService {
     ProductCandidate c,
     BeautyProfile profile,
     int nowMs,
+    PersonalHistory history,
   ) {
     final reasons = <MatchReason>[];
     final w = c.isColorCosmetic ? _colorWeights : _skincareWeights;
@@ -158,13 +203,15 @@ class RecommendationService {
     final newness = 1 / (1 + ageDays / 30);
     final stock = c.product.inStock ? 1.0 : 0.0;
 
-    final total =
+    var total =
         w.color * color +
         w.undertone * undertone +
         w.skin * skin +
         w.concern * concern +
         w.newness * newness +
         w.stock * stock;
+    total += _adjustForPreferences(c, profile, reasons);
+    total += _adjustForHistory(c, history, reasons);
     if (!reasons.any((r) => r.type == MatchReasonType.gentle)) {
       reasons.add(const MatchReason(MatchReasonType.noBlacklist));
     }
@@ -173,6 +220,82 @@ class RecommendationService {
       score: total.clamp(0.0, 1.0),
       reasons: reasons,
     );
+  }
+
+  static bool _hasFragrance(ProductCandidate c) =>
+      c.tags.contains('fragrance') ||
+      c.ingredients.any(
+        (i) => RegExp(
+          r'parfum|fragrance|отдушк|парфюм',
+          caseSensitive: false,
+        ).hasMatch(i.name),
+      );
+
+  /// Preferences nudge the score by at most about +-0.1; they never hide a
+  /// product.
+  static double _adjustForPreferences(
+    ProductCandidate c,
+    BeautyProfile profile,
+    List<MatchReason> reasons,
+  ) {
+    var adj = 0.0;
+    if (profile.preferences.contains(Preferences.fragranceFree)) {
+      if (c.tags.contains('fragrance_free') ||
+          (!_hasFragrance(c) && c.ingredients.isNotEmpty)) {
+        adj += 0.08;
+        reasons.add(
+          MatchReason(
+            MatchReasonType.preference,
+            Preferences.label(Preferences.fragranceFree),
+          ),
+        );
+      } else if (_hasFragrance(c)) {
+        adj -= 0.10;
+      }
+    }
+    if (profile.preferences.contains(Preferences.natural)) {
+      if (c.product.naturalPercent >= 80) {
+        adj += 0.06;
+        reasons.add(
+          MatchReason(
+            MatchReasonType.preference,
+            Preferences.label(Preferences.natural),
+          ),
+        );
+      } else if (c.product.naturalPercent < 50) {
+        adj -= 0.05;
+      }
+    }
+    return adj;
+  }
+
+  /// Reactions noted by the user lower the score of that product (up to
+  /// -0.32) and of products with the same cautionary ingredient (-0.08).
+  /// This is a coincidence-based hint, not a proven cause.
+  static double _adjustForHistory(
+    ProductCandidate c,
+    PersonalHistory history,
+    List<MatchReason> reasons,
+  ) {
+    if (history.isEmpty) return 0;
+    var adj = 0.0;
+    final severity = history.reactedProducts[c.product.id];
+    if (severity != null) {
+      adj -= (0.12 + 0.04 * severity).clamp(0.0, 0.32);
+      reasons.add(MatchReason(MatchReasonType.previousReaction, '$severity'));
+    } else {
+      for (final i in c.ingredients) {
+        if (history.sharedRiskIngredients.contains(i.name)) {
+          adj -= 0.08;
+          reasons.add(MatchReason(MatchReasonType.sharedIngredient, i.name));
+          break;
+        }
+      }
+    }
+    if (history.ownedProductIds.contains(c.product.id)) {
+      reasons.add(const MatchReason(MatchReasonType.owned));
+    }
+    return adj;
   }
 
   static double _adjustForSensitivity(
@@ -233,6 +356,7 @@ class RecommendationService {
       ),
       profile: context.profile,
       blacklist: context.blacklist,
+      history: context.history,
       now: now,
     );
     // use the caller's (fresh) product objects, e.g. the favourite flag

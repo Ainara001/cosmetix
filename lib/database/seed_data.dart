@@ -15,7 +15,7 @@ class SeedData {
       'Здравствуйте! Я ИИ-помощник Cosmetix. Какой вопрос по косметике или '
       'уходу за собой я могу помочь решить сегодня?';
 
-  static Future<void> insertAll(Database db) async {
+  static Future<void> insertAll(DatabaseExecutor db) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     final batch = db.batch();
 
@@ -200,7 +200,7 @@ class SeedData {
     await batch.commit(noResult: true);
   }
 
-  static Future<void> _insertReviews(Database db, int now) async {
+  static Future<void> _insertReviews(DatabaseExecutor db, int now) async {
     const text1 =
         'Нифига себе рил качественно - держится долго, не '
         'чувствуется на коже и не подчеркивает поры.';

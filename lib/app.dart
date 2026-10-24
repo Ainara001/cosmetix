@@ -9,10 +9,12 @@ import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/providers/safety_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
+import 'package:cosmetix/repositories/care_repository.dart';
 import 'package:cosmetix/repositories/cart_repository.dart';
 import 'package:cosmetix/repositories/chat_repository.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
@@ -26,15 +28,26 @@ import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/assistant_service.dart';
+import 'package:cosmetix/services/ingredient_scan/ingredient_ocr.dart';
 import 'package:cosmetix/services/avatar_service.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
 /// Creates repositories and providers (Screen -> Provider -> Repository ->
 /// SQLite) and starts the app after the saved session is restored.
 class CosmetixApp extends StatefulWidget {
-  const CosmetixApp({super.key, required this.helper});
+  const CosmetixApp({
+    super.key,
+    required this.helper,
+    this.ocr = const PlatformIngredientOcr(),
+    this.photoSource = const ImagePickerPhotoSource(),
+  });
 
   final DatabaseHelper helper;
+
+  /// Text recognition and photo picking of the ingredient scanner (replaced by
+  /// fakes in tests).
+  final IngredientOcr ocr;
+  final ScanPhotoSource photoSource;
 
   @override
   State<CosmetixApp> createState() => _CosmetixAppState();
@@ -49,6 +62,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
   late final SafetyProvider _safetyProvider;
   late final CatalogProvider _catalogProvider;
   late final AiProvider _ai;
+  late final CareProvider _care;
   late final RecommendationService _reco;
   late final Future<void> _init;
 
@@ -63,17 +77,30 @@ class _CosmetixAppState extends State<CosmetixApp> {
     _settings = SettingsProvider(SettingsRepository(h));
     final users = UserRepository(h);
     _safetyProvider = SafetyProvider(_safety);
-    _reco = RecommendationService(_products, _safety, users);
+    _reco = RecommendationService(_products, _safety, users, CareRepository(h));
     _ai = AiProvider(SettingsRepository(h));
     _catalogProvider = CatalogProvider(_products, _reco);
     // re-personalize when the Beauty Profile or the blacklist changes
+    _care = CareProvider(CareRepository(h));
     _catalogProvider.watchProfile(
       signature: () =>
           '${_auth.user?.beautyProfile.signature}|'
-          '${_safetyProvider.blacklist.where((b) => b.enabled).map((b) => b.id).join(',')}',
-      sources: [_auth, _safetyProvider],
+          '${_safetyProvider.blacklist.where((b) => b.enabled).map((b) => b.id).join(',')}|'
+          '${_historySignature()}',
+      sources: [_auth, _safetyProvider, _care],
     );
     _init = Future.wait([_auth.restoreSession(), _settings.load(), _ai.load()]);
+  }
+
+  /// Changes when the user's reactions or cosmetic bag change AND they allowed
+  /// the recommendations to use them.
+  String _historySignature() {
+    if (!(_auth.user?.recoUseHistory ?? false)) return 'no-history';
+    final reactions = _safetyProvider.reactions
+        .map((r) => '${r.productId}:${r.severity}')
+        .join(',');
+    final owned = _care.bag.map((p) => p.productId).join(',');
+    return '$reactions|$owned';
   }
 
   @override
@@ -107,20 +134,14 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
             ChangeNotifierProvider<AiProvider>.value(value: _ai),
             Provider<AvatarService>(create: (_) => AvatarService()),
-            Provider<VisionAnalyzer>(
-              create: (_) => VisionAnalyzer(_ai.client, () => _ai.config),
-            ),
+            Provider<IngredientOcr>.value(value: widget.ocr),
+            Provider<ScanPhotoSource>.value(value: widget.photoSource),
+            Provider<VisionAnalyzer>(create: (_) => VisionAnalyzer(_ai.client)),
             Provider<ProductClassifier>(
-              create: (_) => ProductClassifier(
-                _ai.client,
-                () => _ai.config,
-                _products,
-                _safety,
-              ),
+              create: (_) => ProductClassifier(_ai.client, _products, _safety),
             ),
             Provider<RecommendationRefiner>(
-              create: (_) =>
-                  RecommendationRefiner(_ai.client, () => _ai.config),
+              create: (_) => RecommendationRefiner(_ai.client),
             ),
             ChangeNotifierProvider(create: (_) => NavProvider()),
             ChangeNotifierProvider<CatalogProvider>.value(
@@ -129,13 +150,15 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider(
               create: (_) => CartProvider(CartRepository(widget.helper)),
             ),
+            ChangeNotifierProvider<CareProvider>.value(value: _care),
             ChangeNotifierProvider<SafetyProvider>.value(
               value: _safetyProvider,
             ),
             ChangeNotifierProvider(
               create: (_) => ChatProvider(
                 ChatRepository(widget.helper),
-                AssistantService(_reco, _ai.client, () => _ai.config),
+                AssistantService(_reco, _ai.client),
+                shareProfile: () => _ai.shareProfile,
               ),
             ),
           ],

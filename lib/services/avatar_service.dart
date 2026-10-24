@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
+
+import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Profile avatar photo. Unlike the Beauty Test photo (temporary), this one is
@@ -15,7 +17,9 @@ class AvatarService {
 
   /// Copies [source] to a permanent place and returns the new path.
   Future<String> store(File source, int userId) async {
-    final dir = Directory(p.join((await _documentsDir()).path, 'avatars'));
+    final dir = Directory(
+      p.join((await _documentsDir()).path, AppPaths.avatarsDir),
+    );
     await dir.create(recursive: true);
     final dest = p.join(
       dir.path,

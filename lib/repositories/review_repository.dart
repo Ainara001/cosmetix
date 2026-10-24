@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/models/social_models.dart';
 
@@ -37,7 +38,7 @@ class ReviewRepository {
       'author': author,
       'rating': rating,
       'body': body.trim(),
-      'photo_path': photoPath,
+      'photo_path': AppPaths.toStored(photoPath),
       'created_at': DateTime.now().millisecondsSinceEpoch,
     });
   }
@@ -49,23 +50,41 @@ class ReviewRepository {
     String? photoPath,
   }) async {
     final db = await _helper.database;
+    final old = await _storedPhoto(id);
+    final stored = AppPaths.toStored(photoPath);
     await db.update(
       'reviews',
-      {'rating': rating, 'body': body.trim(), 'photo_path': photoPath},
+      {'rating': rating, 'body': body.trim(), 'photo_path': stored},
       where: 'id = ?',
       whereArgs: [id],
     );
+    if (old != null && old != stored) await AppPaths.deleteFile(old);
   }
 
   Future<void> delete(int id) async {
     final db = await _helper.database;
+    final old = await _storedPhoto(id);
     await db.delete('reviews', where: 'id = ?', whereArgs: [id]);
+    await AppPaths.deleteFile(old);
+  }
+
+  Future<String?> _storedPhoto(int id) async {
+    final db = await _helper.database;
+    final rows = await db.query(
+      'reviews',
+      columns: ['photo_path'],
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return rows.isEmpty ? null : rows.first['photo_path'] as String?;
   }
 
   /// The picker returns a temporary file; keep a copy next to the database so
   /// the photo survives app restarts.
   Future<String> savePhoto(String sourcePath) async {
-    final dir = Directory(p.join(await getDatabasesPath(), 'review_photos'));
+    final dir = Directory(
+      p.join(await getDatabasesPath(), AppPaths.reviewPhotosDir),
+    );
     await dir.create(recursive: true);
     final dest = p.join(
       dir.path,

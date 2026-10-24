@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
+import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
@@ -26,6 +27,19 @@ class _ChatScreenState extends State<ChatScreen> {
     'Какой состав у палетки Flower Knows?',
     'Сравни цены Flower Knows и Peripera',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // learn whether the proxy talks to the real Claude or is in test mode
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ai = context.read<AiProvider>();
+      if (ai.status == AiStatus.unknown && ai.isConfigured) {
+        ai.testConnection();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -54,6 +68,22 @@ class _ChatScreenState extends State<ChatScreen> {
       );
       return;
     }
+    final ai = context.read<AiProvider>();
+    if (!ai.profileAsked) {
+      // privacy: the Beauty profile and blacklist leave the phone only if the
+      // user agrees (asked once, can be changed in Settings)
+      final ok = await confirmDialog(
+        context,
+        title: tr('Учитывать ваши данные?'),
+        message: tr(
+          'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер ИИ. Фото и контакты не отправляются. Это можно изменить в Настройках.',
+        ),
+        confirmLabel: tr('Разрешить'),
+      );
+      if (!mounted) return;
+      await ai.setShareProfile(ok);
+      if (!mounted) return;
+    }
     _controller.clear();
     final chat = context.read<ChatProvider>();
     final future = chat.send(value);
@@ -77,6 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final chat = context.watch<ChatProvider>();
+    final ai = context.watch<AiProvider>();
     final pal = context.pal;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -113,6 +144,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
+            if (ai.isMock)
+              _InfoBanner(
+                icon: Icons.science_outlined,
+                text: tr(
+                  'Тестовый режим: ключ Claude API на сервере не задан, ответы ненастоящие.',
+                ),
+              ),
             Expanded(
               child: ListView.builder(
                 controller: _scroll,
@@ -136,7 +174,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             if (chat.aiUnavailable)
               _OfflineBanner(
-                detail: chat.aiError,
+                failure: chat.aiFailure ?? AiFailure.unavailable,
+                retryAfter: chat.retryAfter,
                 onRetry: () => context.read<ChatProvider>().retry(),
               ),
             SizedBox(
@@ -261,13 +300,63 @@ class _Bubble extends StatelessWidget {
   }
 }
 
-/// Shown when the AI server did not answer: the chat itself keeps working
-/// (history, input), only the answer is missing.
-class _OfflineBanner extends StatelessWidget {
-  const _OfflineBanner({required this.onRetry, this.detail});
+/// A small note above the messages (for example the AI test mode).
+class _InfoBanner extends StatelessWidget {
+  const _InfoBanner({required this.icon, required this.text});
 
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.primaryDark),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 12))),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown when the AI did not answer: the chat itself keeps working (history,
+/// input), only the answer is missing.
+class _OfflineBanner extends StatelessWidget {
+  const _OfflineBanner({
+    required this.failure,
+    required this.onRetry,
+    this.retryAfter,
+  });
+
+  final AiFailure failure;
+  final int? retryAfter;
   final VoidCallback onRetry;
-  final String? detail;
+
+  String get _title => switch (failure) {
+    AiFailure.rateLimited => tr('ИИ-помощник перегружен или лимит исчерпан'),
+    AiFailure.timeout => tr('ИИ-помощник не успел ответить'),
+    AiFailure.notConfigured => tr('Адрес сервера ИИ не задан'),
+    AiFailure.unavailable => tr('ИИ-помощник сейчас недоступен'),
+  };
+
+  String get _hint => switch (failure) {
+    AiFailure.rateLimited =>
+      retryAfter == null
+          ? tr('Попробуйте чуть позже.')
+          : trf('Попробуйте через {n} с.', {'n': retryAfter}),
+    AiFailure.notConfigured => tr(
+      'Укажите его в Кабинет → Настройки → ИИ-ассистент.',
+    ),
+    _ => tr('Остальные функции приложения работают.'),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -292,20 +381,21 @@ class _OfflineBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tr('ИИ-помощник сейчас недоступен'),
+                  _title,
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  tr('Остальные функции приложения работают.'),
+                  _hint,
                   style: TextStyle(fontSize: 11.5, color: pal.subtext),
                 ),
               ],
             ),
           ),
-          TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
+          if (failure != AiFailure.notConfigured)
+            TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
         ],
       ),
     );

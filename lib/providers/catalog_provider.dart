@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
-import 'package:cosmetix/services/ai/ollama_client.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 

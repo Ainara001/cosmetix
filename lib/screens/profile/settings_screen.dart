@@ -8,6 +8,7 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/session.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
@@ -43,9 +44,11 @@ class SettingsScreen extends StatelessWidget {
     if (!ok || !context.mounted) return;
     final helper = context.read<DatabaseHelper>();
     final settings = context.read<SettingsProvider>();
+    final ai = context.read<AiProvider>();
     try {
       await helper.resetDemoData();
       await settings.load();
+      ai.resetToDefaults();
       if (!context.mounted) return;
       await Session.signOut(context);
     } catch (_) {

@@ -29,7 +29,21 @@ class WhyItSuitsCard extends StatelessWidget {
         )
       else if (rec != null)
         for (final r in _dedupe(rec.reasons))
-          (Icons.check_circle_outline, AppColors.success, _text(r)),
+          (
+            switch (r.type) {
+              MatchReasonType.previousReaction ||
+              MatchReasonType.sharedIngredient => Icons.info_outline,
+              MatchReasonType.owned => Icons.shopping_bag_outlined,
+              _ => Icons.check_circle_outline,
+            },
+            switch (r.type) {
+              MatchReasonType.previousReaction ||
+              MatchReasonType.sharedIngredient => AppColors.sale,
+              MatchReasonType.owned => AppColors.primaryDark,
+              _ => AppColors.success,
+            },
+            _text(r),
+          ),
     ];
     if (lines.isEmpty) return const SizedBox.shrink();
     return Padding(
@@ -106,6 +120,20 @@ class WhyItSuitsCard extends StatelessWidget {
         return tr('Мягкий состав, без раздражающих компонентов');
       case MatchReasonType.noBlacklist:
         return tr('Нет активных компонентов из вашего чёрного списка');
+      case MatchReasonType.preference:
+        return trf('Соответствует вашему предпочтению: {v}', {'v': detail});
+      case MatchReasonType.previousReaction:
+        return trf(
+          'Вы отмечали реакцию на это средство (тяжесть {v} из 5), поэтому оно ниже в рекомендациях',
+          {'v': r.detail},
+        );
+      case MatchReasonType.sharedIngredient:
+        return trf(
+          'Содержит «{v}», который есть и в средствах с вашими реакциями (возможно, совпадение)',
+          {'v': detail},
+        );
+      case MatchReasonType.owned:
+        return tr('Это средство уже есть в вашей косметичке');
     }
   }
 }

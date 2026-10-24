@@ -13,6 +13,10 @@ import 'package:cosmetix/screens/beauty/color_result_screen.dart';
 import 'package:cosmetix/screens/beauty/skin_test_screen.dart';
 import 'package:cosmetix/screens/beauty/color_test_screen.dart';
 import 'package:cosmetix/screens/beauty/undertone_test_screen.dart';
+import 'package:cosmetix/screens/care/bag_form_screen.dart';
+import 'package:cosmetix/screens/care/bag_screen.dart';
+import 'package:cosmetix/screens/care/care_history_screen.dart';
+import 'package:cosmetix/screens/care/care_screen.dart';
 import 'package:cosmetix/screens/cart/order_success_screen.dart';
 import 'package:cosmetix/screens/cart/orders_screen.dart';
 import 'package:cosmetix/screens/catalog/catalog_screen.dart';
@@ -28,6 +32,7 @@ import 'package:cosmetix/screens/profile/favorites_screen.dart';
 import 'package:cosmetix/screens/profile/legal_screen.dart';
 import 'package:cosmetix/screens/profile/settings_screen.dart';
 import 'package:cosmetix/screens/safety/blacklist_screen.dart';
+import 'package:cosmetix/screens/scan/scan_screen.dart';
 import 'package:cosmetix/screens/safety/reaction_form_screen.dart';
 import 'package:cosmetix/screens/safety/reactions_screen.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
@@ -64,6 +69,11 @@ class AppRoutes {
   static const reactions = '/reactions';
   static const reactionForm = '/reaction-form';
   static const legal = '/legal';
+  static const scan = '/scan';
+  static const bag = '/bag';
+  static const bagForm = '/bag-form';
+  static const care = '/care';
+  static const careHistory = '/care-history';
 
   static Route<dynamic> onGenerate(RouteSettings s) {
     final a = s.arguments;
@@ -121,6 +131,18 @@ class AppRoutes {
         page = const ReactionsScreen();
       case reactionForm:
         page = ReactionFormScreen(reactionId: a is int ? a : null);
+      case scan:
+        page = const ScanScreen();
+      case bag:
+        page = const BagScreen();
+      case bagForm:
+        page = BagFormScreen(
+          args: a is BagFormArgs ? a : BagFormArgs(id: a is int ? a : null),
+        );
+      case care:
+        page = const CareScreen();
+      case careHistory:
+        page = const CareHistoryScreen();
       case legal:
         page = LegalScreen(args: a is LegalArgs ? a : LegalArgs.terms);
       default:
