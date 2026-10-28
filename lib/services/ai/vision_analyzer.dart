@@ -6,7 +6,7 @@ import 'package:cosmetix/models/ai_models.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 
 /// Optional photo step of the Beauty Test: sends one small photo to the
-/// AI (Claude, through the proxy) and expects structured JSON back. The caller
+/// AI (through the proxy) and expects structured JSON back. The caller
 /// must have the user's consent first (see `AiProvider.sharePhotos`).
 class VisionAnalyzer {
   VisionAnalyzer(this._client);

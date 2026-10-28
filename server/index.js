@@ -18,10 +18,15 @@ const { createApp } = require('./app');
 
 const { server, config, mock } = createApp();
 const port = Number.parseInt(process.env.PORT || '8787', 10);
-server.listen(port, '0.0.0.0', () => {
+// 0.0.0.0 lets a real iPhone on the same Wi-Fi reach the proxy; use
+// HOST=127.0.0.1 when only the iOS Simulator on this Mac needs it
+const host = process.env.HOST || '0.0.0.0';
+server.listen(port, host, () => {
   console.log(
-    `Cosmetix AI proxy on :${port} — ${
-      mock ? 'MOCK mode (no ANTHROPIC_API_KEY)' : `Claude model ${config.model}`
+    `Cosmetix AI proxy on ${host}:${port} — ${
+      mock
+        ? 'MOCK mode (no GEMINI_API_KEY / ANTHROPIC_API_KEY)'
+        : `${config.provider} model ${config.model}`
     }`,
   );
 });

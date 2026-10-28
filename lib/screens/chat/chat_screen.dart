@@ -30,7 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // learn whether the proxy talks to the real Claude or is in test mode
+    // learn whether the proxy talks to a real model or is in test mode
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final ai = context.read<AiProvider>();
@@ -143,7 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
               _InfoBanner(
                 icon: Icons.science_outlined,
                 text: tr(
-                  'Тестовый режим: ключ Claude API на сервере не задан, ответы ненастоящие.',
+                  'Тестовый режим: ключ ИИ на сервере не задан, ответы ненастоящие.',
                 ),
               ),
             Expanded(

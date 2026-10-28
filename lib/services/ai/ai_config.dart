@@ -1,6 +1,6 @@
 /// Where the Cosmetix AI proxy lives (see `server/`).
 ///
-/// The proxy talks to the Claude API and owns the API key, so the app only
+/// The proxy talks to the AI provider (Gemini or Claude) and owns the API key, so the app only
 /// needs an address (and, optionally, a shared token). There is no
 /// `localhost` default: on a phone `localhost` is the phone itself.
 ///

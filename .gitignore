@@ -47,6 +47,7 @@ app.*.map.json
 # Local / secrets
 .env
 .env.*
+!.env.example
 *.keystore
 *.jks
 key.properties

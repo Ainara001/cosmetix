@@ -22,15 +22,44 @@ function intEnv(env, name, fallback) {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+/**
+ * Which AI answers: AI_PROVIDER=gemini|claude forces it; otherwise Claude when
+ * ANTHROPIC_API_KEY is set, else Gemini when GEMINI_API_KEY is set.
+ */
+function pickProvider(env) {
+  const forced = (env.AI_PROVIDER || '').trim().toLowerCase();
+  if (forced === 'gemini' || forced === 'claude') return forced;
+  if ((env.ANTHROPIC_API_KEY || '').trim()) return 'claude';
+  if ((env.GEMINI_API_KEY || '').trim()) return 'gemini';
+  return 'claude';
+}
+
+/** Like intEnv, but 0 is a valid value. */
+function msEnv(env, name, fallback) {
+  const raw = env[name];
+  if (raw === undefined || raw === '') return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
+}
+
 function readConfig(env) {
+  const provider = pickProvider(env);
+  const claudeModel = (env.CLAUDE_MODEL || 'claude-haiku-5-5').trim();
+  const geminiModel = (env.GEMINI_MODEL || 'gemini-3.1-flash-lite').trim();
   return {
-    apiKey: (env.ANTHROPIC_API_KEY || '').trim(),
-    model: (env.CLAUDE_MODEL || 'claude-haiku-5-5').trim(),
+    provider,
+    apiKey: (
+      (provider === 'gemini' ? env.GEMINI_API_KEY : env.ANTHROPIC_API_KEY) || ''
+    ).trim(),
+    model: provider === 'gemini' ? geminiModel : claudeModel,
     appToken: (env.APP_TOKEN || '').trim(),
     maxOutputTokens: intEnv(env, 'MAX_OUTPUT_TOKENS', 600),
     ratePerMinute: intEnv(env, 'RATE_LIMIT_PER_MIN', 20),
     dailyTokenBudget: intEnv(env, 'DAILY_TOKEN_BUDGET', 200000),
     upstreamTimeoutMs: intEnv(env, 'UPSTREAM_TIMEOUT_MS', 45000),
+    retryDelayMs: msEnv(env, 'UPSTREAM_RETRY_MS', 800),
     forceMock: env.MOCK === '1',
   };
 }
@@ -147,6 +176,33 @@ function toAnthropicBody(req, config) {
   const body = { model: config.model, max_tokens: req.maxTokens, messages };
   if (system.trim()) body.system = system.trim();
   if (req.temperature !== undefined) body.temperature = req.temperature;
+  return body;
+}
+
+/** The same validated request, in the shape of Gemini's generateContent. */
+function toGeminiBody(req, config) {
+  let system = req.system || '';
+  if (req.json) {
+    system +=
+      '\n\nReply with ONE valid JSON object only: no markdown fences, no text before or after it.';
+  }
+  const contents = req.messages.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [
+      ...m.images.map((i) => ({ inlineData: { mimeType: i.type, data: i.data } })),
+      { text: m.content },
+    ],
+  }));
+  const generationConfig = { maxOutputTokens: req.maxTokens };
+  if (req.temperature !== undefined) generationConfig.temperature = req.temperature;
+  if (req.json) generationConfig.responseMimeType = 'application/json';
+  // 2.5 Flash "thinks" first and the thoughts eat the output budget: the
+  // consultant needs short direct answers, so thinking is switched off
+  if (/2\.5-flash/.test(config.model)) {
+    generationConfig.thinkingConfig = { thinkingBudget: 0 };
+  }
+  const body = { contents, generationConfig };
+  if (system.trim()) body.systemInstruction = { parts: [{ text: system.trim() }] };
   return body;
 }
 
@@ -270,6 +326,77 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
     return { text, usage };
   }
 
+  async function callGemini(clean) {
+    let res;
+    // Gemini answers "high demand" (503) in spikes that pass in a second or
+    // two: retry a couple of times before giving up
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        res = await fetchImpl(`${GEMINI_URL}/${encodeURIComponent(config.model)}:generateContent`, {
+          method: 'POST',
+          // the key goes in a header, never in the URL (URLs end up in logs)
+          headers: { 'content-type': 'application/json', 'x-goog-api-key': config.apiKey },
+          body: JSON.stringify(toGeminiBody(clean, config)),
+          signal: AbortSignal.timeout(config.upstreamTimeoutMs),
+        });
+      } catch (e) {
+        if (e && (e.name === 'TimeoutError' || e.name === 'AbortError')) {
+          throw new HttpError(504, 'upstream_timeout', 'Gemini did not answer in time');
+        }
+        throw new HttpError(503, 'upstream_unavailable', 'Gemini API is not reachable');
+      }
+      if ((res.status === 503 || res.status === 500) && attempt < 2) {
+        await new Promise((r) => setTimeout(r, config.retryDelayMs * (attempt + 1)));
+        continue;
+      }
+      break;
+    }
+    if (res.status === 429) {
+      throw new HttpError(429, 'upstream_rate_limited', 'Gemini API is busy, try again later', {
+        retryAfter: Number(res.headers.get('retry-after')) || 30,
+      });
+    }
+    if (res.status === 401 || res.status === 403) {
+      throw new HttpError(502, 'upstream_auth', 'The server is not configured correctly');
+    }
+    if (!res.ok) {
+      // Gemini answers 400 for a wrong key too: tell it apart from a bad request
+      let msg = '';
+      try {
+        msg = String((await res.json())?.error?.message || '');
+      } catch {
+        // no details: treated as unavailable below
+      }
+      if (res.status === 400 && /api key/i.test(msg)) {
+        throw new HttpError(502, 'upstream_auth', 'The server is not configured correctly');
+      }
+      throw new HttpError(503, 'upstream_unavailable', 'Gemini API is unavailable');
+    }
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new HttpError(502, 'upstream_bad_response', 'Unreadable answer from Gemini');
+    }
+    const parts = data?.candidates?.[0]?.content?.parts;
+    const text = Array.isArray(parts)
+      ? parts
+          .filter((p) => p && typeof p.text === 'string' && !p.thought)
+          .map((p) => p.text)
+          .join('')
+      : '';
+    if (!text.trim()) {
+      // blocked by a safety filter, or cut before any text
+      throw new HttpError(502, 'upstream_bad_response', 'Empty answer from Gemini');
+    }
+    const u = data.usageMetadata || {};
+    const usage = {
+      inputTokens: u.promptTokenCount ?? 0,
+      outputTokens: (u.candidatesTokenCount ?? 0) + (u.thoughtsTokenCount ?? 0),
+    };
+    return { text, usage };
+  }
+
   function mockAnswer(clean) {
     if (clean.json) {
       throw new HttpError(
@@ -302,14 +429,22 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
     try {
       const url = new URL(req.url, 'http://localhost');
       if (req.method === 'GET' && url.pathname === '/health') {
-        return send(200, { ok: true, mode: mock ? 'mock' : 'claude', model: mock ? null : config.model });
+        return send(200, {
+          ok: true,
+          mode: mock ? 'mock' : config.provider,
+          model: mock ? null : config.model,
+        });
       }
       if (req.method === 'POST' && url.pathname === '/v1/chat') {
         authorize(req);
         checkRate(req.socket.remoteAddress || 'unknown');
         checkBudget();
         const clean = validateChatBody(await readBody(req), config);
-        const result = mock ? mockAnswer(clean) : await callClaude(clean);
+        const result = mock
+          ? mockAnswer(clean)
+          : config.provider === 'gemini'
+            ? await callGemini(clean)
+            : await callClaude(clean);
         rollBudget();
         budget.used += result.usage.inputTokens + result.usage.outputTokens;
         return send(200, { text: result.text, mock, usage: result.usage });
@@ -329,4 +464,12 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
   return { server, config, mock, budget };
 }
 
-module.exports = { createApp, validateChatBody, toAnthropicBody, readConfig, MOCK_PREFIX, LIMITS };
+module.exports = {
+  createApp,
+  validateChatBody,
+  toAnthropicBody,
+  toGeminiBody,
+  readConfig,
+  MOCK_PREFIX,
+  LIMITS,
+};
