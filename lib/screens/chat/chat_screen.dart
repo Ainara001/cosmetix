@@ -6,8 +6,14 @@ import 'package:provider/provider.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
+import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
+import 'package:cosmetix/providers/settings_provider.dart';
+import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/product_art.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -160,9 +166,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     );
                   }
                   final m = chat.messages[i];
+                  if (m.isUser) return _Bubble(text: m.text, isUser: true);
+                  // the assistant marks catalog products as [#id]: show the
+                  // text without markers and a tappable card per product
+                  final parsed = AssistantService.parseReply(m.text);
                   return _Bubble(
-                    text: m.isUser ? m.text : tr(m.text),
-                    isUser: m.isUser,
+                    text: tr(parsed.text),
+                    isUser: false,
+                    productIds: parsed.productIds,
                   );
                 },
               ),
@@ -234,11 +245,19 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.text, required this.isUser, this.faded = false});
+  const _Bubble({
+    required this.text,
+    required this.isUser,
+    this.faded = false,
+    this.productIds = const [],
+  });
 
   final String text;
   final bool isUser;
   final bool faded;
+
+  /// Catalog products the answer mentions (shown as cards under the text).
+  final List<int> productIds;
 
   @override
   Widget build(BuildContext context) {
@@ -253,15 +272,22 @@ class _Bubble extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: isUser ? null : Border.all(color: pal.border),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 13.5,
-          height: 1.35,
-          color: faded
-              ? pal.subtext
-              : (isUser ? const Color(0xFF1E1A1C) : pal.text),
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 13.5,
+              height: 1.35,
+              color: faded
+                  ? pal.subtext
+                  : (isUser ? const Color(0xFF1E1A1C) : pal.text),
+            ),
+          ),
+          for (final id in productIds) _ProductMiniCard(productId: id),
+        ],
       ),
     );
     return Padding(
@@ -392,6 +418,83 @@ class _OfflineBanner extends StatelessWidget {
           if (failure != AiFailure.notConfigured)
             TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
         ],
+      ),
+    );
+  }
+}
+
+/// A small tappable product card inside an assistant answer.
+class _ProductMiniCard extends StatelessWidget {
+  const _ProductMiniCard({required this.productId});
+
+  final int productId;
+
+  @override
+  Widget build(BuildContext context) {
+    final Product? p = context.watch<CatalogProvider>().byId(productId);
+    // an id the model made up (or a product that is gone) shows nothing
+    if (p == null) return const SizedBox.shrink();
+    final pal = context.pal;
+    final price = context.watch<SettingsProvider>().priceText(p.price);
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Material(
+        color: AppColors.blush,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () =>
+              Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: ProductArt(art: p.art, color: p.color, radius: 8),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        p.brand,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 10, color: pal.subtext),
+                      ),
+                      Text(
+                        tr(p.name),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                        ),
+                      ),
+                      Text(
+                        price,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: p.hasDiscount ? AppColors.sale : pal.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.primaryDark,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
