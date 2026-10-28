@@ -735,4 +735,19 @@ void main() {
       expect((msgs.last as Map)['content'], 'вопрос 5');
     });
   });
+
+  test('plainText removes markdown emphasis but keeps the words', () {
+    expect(
+      AssistantService.plainText(
+        'Вот:\n\n1. **Flower Knows Тинт** (3 200 тг) — бархат.\n'
+        '* первый пункт\n- второй\n## Итог\n*Важно: стоп*',
+      ),
+      'Вот:\n\n1. Flower Knows Тинт (3 200 тг) — бархат.\n'
+      '• первый пункт\n• второй\nИтог\nВажно: стоп',
+    );
+    expect(
+      AssistantService.plainText('2 * 3 = 6, цена 5*'),
+      '2 * 3 = 6, цена 5*',
+    );
+  });
 }

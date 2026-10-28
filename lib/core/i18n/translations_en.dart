@@ -999,7 +999,7 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Режим': 'Mode',
   'Результат': 'Result',
   'Сегодня отмечено: {v0} из {v1}': 'Marked today: {v0} of {v1}',
-  'Сервер ИИ (Claude)': 'AI server (Claude)',
+  'Сервер ИИ': 'AI server',
   'Скоро истекает: осталось {v1} {v2} (до {v0})':
       'Expires soon: {v1} {v2} left (until {v0})',
   'Сначала добавьте средства в «Мою косметичку».':
@@ -1030,10 +1030,10 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Сфотографируйте состав на упаковке или выберите фото. Текст читается на телефоне: фото никуда не отправляется и не сохраняется.':
       'Photograph the ingredients on the package or choose a photo. The text is read on your phone: the photo is not sent anywhere or saved.',
   'Тестовый режим (ключа нет)': 'Test mode (no key)',
-  'Тестовый режим: ключ Claude API на сервере не задан, ответы ненастоящие.':
-      'Test mode: the Claude API key is not set on the server, the answers are not real.',
-  'Тестовый режим: на сервере нет ключа Claude API, ответы помечены как ненастоящие.':
-      'Test mode: the server has no Claude API key, answers are marked as not real.',
+  'Тестовый режим: ключ ИИ на сервере не задан, ответы ненастоящие.':
+      'Test mode: the AI key is not set on the server, the answers are not real.',
+  'Тестовый режим: на сервере нет ключа ИИ, ответы помечены как ненастоящие.':
+      'Test mode: the server has no AI key, answers are marked as not real.',
   'Токен приложения (необязательно)': 'App token (optional)',
   'Тяжесть: {a} → {b}': 'Severity: {a} → {b}',
   'УТРО': 'MORNING',
@@ -1051,8 +1051,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Учитывать мои реакции и косметичку':
       'Take my reactions and cosmetic bag into account',
   'Фото (необязательно)': 'Photo (optional)',
-  'Фото будет отправлено на сервер ИИ (Claude) только для анализа цветотипа и сразу удалено с телефона. Согласие можно отозвать в Настройках.':
-      'The photo will be sent to the AI server (Claude) only to analyze your color type and is deleted from the phone right after. You can withdraw your consent in Settings.',
+  'Фото будет отправлено на сервер ИИ только для анализа цветотипа и сразу удалено с телефона. Согласие можно отозвать в Настройках.':
+      'The photo will be sent to the AI server only to analyze your color type and is deleted from the phone right after. You can withdraw your consent in Settings.',
   'Фото добавлено': 'Photo added',
   'Фото заменено': 'Photo replaced',
   'Фото хранится только на этом телефоне и никуда не отправляется.':

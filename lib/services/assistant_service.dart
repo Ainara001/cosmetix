@@ -7,7 +7,7 @@ import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
-/// The chat assistant: Claude (through the Cosmetix AI proxy) that knows the
+/// The chat assistant: an AI model (through the Cosmetix AI proxy) that knows the
 /// catalog and, only when the user agreed (`shareProfile`), their Beauty
 /// Profile and blacklist, plus the product being discussed.
 /// Throws [AiException] when the server is not available: the caller shows a
@@ -70,9 +70,29 @@ class AssistantService {
         AiMessage('user', text),
       ],
     );
-    var out = reply.text.trim();
+    var out = plainText(reply.text);
     if (isSeriousReaction(text)) out = '$out\n\n$safetyNote';
     return out;
+  }
+
+  /// The chat bubble shows plain text, but models (Gemini especially) like
+  /// markdown: drop the emphasis markers and turn list stars into bullets.
+  static String plainText(String s) {
+    var t = s.trim();
+    t = t.replaceAllMapped(
+      RegExp(r'(\*\*|__)(.+?)\1', dotAll: true),
+      (m) => m[2]!,
+    );
+    t = t.replaceAllMapped(
+      RegExp(r'(?<![\w*])\*(?!\s)([^*\n]+?)\*(?![\w*])'),
+      (m) => m[1]!,
+    );
+    t = t.replaceAll(RegExp(r'^\s{0,3}#{1,6}\s*', multiLine: true), '');
+    t = t.replaceAllMapped(
+      RegExp(r'^(\s*)[*-]\s+', multiLine: true),
+      (m) => '${m[1]}• ',
+    );
+    return t.replaceAll('`', '');
   }
 
   /// All facts the model may use. Kept as a pure function so it can be tested.
@@ -124,6 +144,7 @@ Rules:
 - Never recommend a product that contains a blacklisted ingredient.
 - Base suitability answers on the Beauty Profile and the ingredient facts you are given, and explain them in simple words.
 - Keep answers short (under 120 words).
+- Write plain text: no markdown (no **bold**, no # headings, no tables).
 - Answer in $language.
 
 USER BEAUTY PROFILE:

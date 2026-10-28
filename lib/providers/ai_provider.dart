@@ -26,7 +26,7 @@ class AiProvider extends ChangeNotifier {
   /// Human-readable reason when offline (not localized: shown as a detail).
   String? detail;
 
-  /// `claude` or `mock` once the proxy answered the health check.
+  /// `gemini`, `claude` or `mock` once the proxy answered the health check.
   String? mode;
   String? model;
 
@@ -50,7 +50,7 @@ class AiProvider extends ChangeNotifier {
   bool get isConfigured => config.isConfigured;
   bool get isOnline => status == AiStatus.online;
 
-  /// True when the proxy has no Claude key and answers are test data.
+  /// True when the proxy has no AI key and answers are test data.
   bool get isMock => mode == 'mock';
 
   /// Applies values saved in Settings on top of the build-time defaults.

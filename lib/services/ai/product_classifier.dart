@@ -18,7 +18,7 @@ class ClassificationReport {
   final bool stoppedOffline;
 }
 
-/// Asks Claude who a product suits and caches the answer in SQLite.
+/// Asks the AI who a product suits and caches the answer in SQLite.
 /// Runs on demand (Settings) and never when the catalog opens. The model gets
 /// only what the app knows about the product and must not invent facts.
 class ProductClassifier {

@@ -3,7 +3,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { createApp, validateChatBody, toAnthropicBody, readConfig, MOCK_PREFIX } = require('../app');
+const {
+  createApp,
+  validateChatBody,
+  toAnthropicBody,
+  toGeminiBody,
+  readConfig,
+  MOCK_PREFIX,
+} = require('../app');
 
 async function start(env, fetchImpl, now) {
   const { server, ...rest } = createApp({ env, fetchImpl, now });
@@ -224,4 +231,141 @@ test('unknown routes are 404', async () => {
   const s = await start({}, claudeReply());
   assert.equal((await s.call('/nope')).status, 404);
   await s.close();
+});
+
+// ---------------------------------------------------------------- Gemini
+
+function geminiReply(text = 'Здравствуйте!', usage = { promptTokenCount: 10, candidatesTokenCount: 5 }) {
+  return async () => ({
+    ok: true,
+    status: 200,
+    headers: new Headers(),
+    json: async () => ({ candidates: [{ content: { parts: [{ text }] } }], usageMetadata: usage }),
+  });
+}
+
+const geminiEnv = {
+  GEMINI_API_KEY: 'AQ.test-key',
+  GEMINI_MODEL: 'gemini-2.5-flash',
+  UPSTREAM_RETRY_MS: '0',
+};
+
+test('provider: Gemini key alone selects Gemini, Claude wins when both are set unless forced', () => {
+  assert.equal(readConfig(geminiEnv).provider, 'gemini');
+  assert.equal(readConfig({ ...geminiEnv, ANTHROPIC_API_KEY: 'sk' }).provider, 'claude');
+  assert.equal(
+    readConfig({ ...geminiEnv, ANTHROPIC_API_KEY: 'sk', AI_PROVIDER: 'gemini' }).provider,
+    'gemini',
+  );
+  assert.equal(readConfig({}).provider, 'claude'); // no key: mock anyway
+});
+
+test('health reports the Gemini provider and model', async () => {
+  const s = await start(geminiEnv, geminiReply());
+  const r = await (await s.call('/health')).json();
+  assert.deepEqual(r, { ok: true, mode: 'gemini', model: 'gemini-2.5-flash' });
+  await s.close();
+});
+
+test('with a Gemini key the request goes to Gemini, the key only in a header', async () => {
+  let seen;
+  const s = await start(geminiEnv, async (url, init) => {
+    seen = { url, init, body: JSON.parse(init.body) };
+    return geminiReply('Ответ')();
+  });
+  const res = await s.chat({ system: 'Ты помощник', ...ask('Вопрос') });
+  const body = await res.json();
+  assert.equal(body.text, 'Ответ');
+  assert.equal(body.mock, false);
+  assert.deepEqual(body.usage, { inputTokens: 10, outputTokens: 5 });
+  assert.match(seen.url, /generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-2\.5-flash:generateContent$/);
+  assert.equal(seen.init.headers['x-goog-api-key'], 'AQ.test-key');
+  assert.ok(!seen.url.includes('AQ.test-key'));
+  assert.equal(seen.body.systemInstruction.parts[0].text, 'Ты помощник');
+  assert.ok(!JSON.stringify(body).includes('AQ.test-key'));
+  await s.close();
+});
+
+test('toGeminiBody: roles, images, JSON mode and thinking switched off for 2.5 Flash', () => {
+  const config = readConfig(geminiEnv);
+  const clean = validateChatBody(
+    {
+      system: 'S',
+      json: true,
+      temperature: 0.2,
+      messages: [
+        { role: 'user', content: 'Первый' },
+        { role: 'assistant', content: 'Ответ' },
+        { role: 'user', content: 'Фото', images: ['/9j/AAAA'] },
+      ],
+    },
+    config,
+  );
+  const b = toGeminiBody(clean, config);
+  assert.deepEqual(
+    b.contents.map((c) => c.role),
+    ['user', 'model', 'user'],
+  );
+  assert.deepEqual(b.contents[2].parts[0], { inlineData: { mimeType: 'image/jpeg', data: '/9j/AAAA' } });
+  assert.deepEqual(b.contents[2].parts[1], { text: 'Фото' });
+  assert.equal(b.generationConfig.responseMimeType, 'application/json');
+  assert.equal(b.generationConfig.temperature, 0.2);
+  assert.equal(b.generationConfig.maxOutputTokens, config.maxOutputTokens);
+  assert.deepEqual(b.generationConfig.thinkingConfig, { thinkingBudget: 0 });
+  assert.match(b.systemInstruction.parts[0].text, /ONE valid JSON object/);
+
+  const pro = readConfig({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-2.5-pro' });
+  assert.equal(toGeminiBody(validateChatBody(ask(), pro), pro).generationConfig.thinkingConfig, undefined);
+});
+
+test('Gemini failures map to clean errors', async () => {
+  const fail = (status, json = {}) => async () => ({
+    ok: false,
+    status,
+    headers: new Headers(),
+    json: async () => json,
+  });
+  const cases = [
+    [fail(429), 429, 'upstream_rate_limited'],
+    [fail(403), 502, 'upstream_auth'],
+    [fail(400, { error: { message: 'API key not valid. Please pass a valid API key.' } }), 502, 'upstream_auth'],
+    [fail(400, { error: { message: 'Bad field' } }), 503, 'upstream_unavailable'],
+    [fail(500), 503, 'upstream_unavailable'],
+    // blocked by a safety filter: no candidates at all
+    [async () => ({ ok: true, status: 200, headers: new Headers(), json: async () => ({ promptFeedback: { blockReason: 'SAFETY' } }) }), 502, 'upstream_bad_response'],
+  ];
+  for (const [impl, status, code] of cases) {
+    const s = await start(geminiEnv, impl);
+    const res = await s.chat(ask());
+    const body = await res.json();
+    assert.equal(res.status, status);
+    assert.equal(body.error, code);
+    assert.ok(!JSON.stringify(body).includes('AQ.test-key'));
+    await s.close();
+  }
+});
+
+test('Gemini "high demand" (503) is retried twice, then reported', async () => {
+  const busy = { ok: false, status: 503, headers: new Headers(), json: async () => ({}) };
+  let calls = 0;
+  const s = await start(geminiEnv, async () => {
+    calls += 1;
+    return calls < 3 ? busy : geminiReply('Получилось')();
+  });
+  const res = await s.chat(ask());
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).text, 'Получилось');
+  assert.equal(calls, 3);
+  await s.close();
+
+  let always = 0;
+  const s2 = await start(geminiEnv, async () => {
+    always += 1;
+    return busy;
+  });
+  const res2 = await s2.chat(ask());
+  assert.equal(res2.status, 503);
+  assert.equal((await res2.json()).error, 'upstream_unavailable');
+  assert.equal(always, 3);
+  await s2.close();
 });

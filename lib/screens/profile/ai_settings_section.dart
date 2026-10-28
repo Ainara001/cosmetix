@@ -13,7 +13,7 @@ import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 
 /// Settings -> AI assistant: where the AI proxy is, whether it answers with the
-/// real Claude or in test mode, what the user allows to send, plus a one-time
+/// a real model or in test mode, what the user allows to send, plus a one-time
 /// product classification. Everything outside the chat / photo analysis works
 /// without it.
 class AiSettingsSection extends StatefulWidget {
@@ -45,7 +45,7 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(tr('Сервер ИИ (Claude)')),
+        title: Text(tr('Сервер ИИ')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -138,7 +138,9 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
     };
     final modeText = ai.mode == null
         ? ''
-        : (ai.isMock ? tr('Тестовый режим (ключа нет)') : 'Claude');
+        : (ai.isMock
+              ? tr('Тестовый режим (ключа нет)')
+              : _providerName(ai.mode));
 
     Widget row(String label, String value, {Color? color}) => Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -173,7 +175,7 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
           if (ai.isMock)
             Text(
               tr(
-                'Тестовый режим: на сервере нет ключа Claude API, ответы помечены как ненастоящие.',
+                'Тестовый режим: на сервере нет ключа ИИ, ответы помечены как ненастоящие.',
               ),
               style: AppTextStyles.caption.copyWith(color: AppColors.sale),
             ),
@@ -237,3 +239,10 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
     );
   }
 }
+
+/// Display name of the model provider behind the proxy (`/health` mode).
+String _providerName(String? mode) => switch (mode) {
+  'gemini' => 'Gemini',
+  'claude' => 'Claude',
+  _ => mode ?? '',
+};

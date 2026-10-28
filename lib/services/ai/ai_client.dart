@@ -58,21 +58,21 @@ class AiReply {
 
   final String text;
 
-  /// True when the proxy has no Claude key and answered in test mode.
+  /// True when the proxy has no AI key and answered in test mode.
   final bool mock;
 }
 
 class AiHealth {
   const AiHealth({required this.mode, this.model});
 
-  /// `claude` (real answers) or `mock` (test mode, answers are marked).
+  /// `gemini` or `claude` (real answers) or `mock` (test mode, answers are marked).
   final String mode;
   final String? model;
 
   bool get isMock => mode == 'mock';
 }
 
-/// Client of the Cosmetix AI proxy (see `server/`). The proxy owns the Claude
+/// Client of the Cosmetix AI proxy (see `server/`). The proxy owns the AI
 /// API key; this app never sees one. Plain `dart:io`, no extra packages.
 class AiClient {
   AiClient(this._config);
@@ -88,7 +88,7 @@ class AiClient {
   /// proxy enforces its own, stricter-than-needed limits as well).
   static const maxMessageChars = 6000;
 
-  /// GET /health: is the proxy reachable and is it talking to the real Claude.
+  /// GET /health: is the proxy reachable and is it talking to a real model.
   Future<AiHealth> health({Duration timeout = healthTimeout}) async {
     final res = await _request('GET', '/health', null, timeout);
     final data = _decode(res.body);
