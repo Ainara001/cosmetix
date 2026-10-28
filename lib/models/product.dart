@@ -15,6 +15,8 @@ class Product {
     required this.description,
     required this.naturalPercent,
     required this.createdAt,
+    this.inci = '',
+    this.sourceUrl = '',
     this.isFavorite = false,
     this.featured = false,
     this.trending = false,
@@ -33,6 +35,10 @@ class Product {
   final String description;
   final int naturalPercent;
   final int createdAt;
+
+  /// Full ingredient list (INCI) as published, and the page it comes from.
+  final String inci;
+  final String sourceUrl;
   final bool isFavorite;
   final bool featured;
   final bool trending;
@@ -56,6 +62,8 @@ class Product {
     description: description,
     naturalPercent: naturalPercent,
     createdAt: createdAt,
+    inci: inci,
+    sourceUrl: sourceUrl,
     isFavorite: isFavorite ?? this.isFavorite,
     featured: featured,
     trending: trending,
@@ -75,6 +83,8 @@ class Product {
     description: m['description'] as String? ?? '',
     naturalPercent: m['natural_percent'] as int? ?? 80,
     createdAt: m['created_at'] as int? ?? 0,
+    inci: m['inci'] as String? ?? '',
+    sourceUrl: m['source_url'] as String? ?? '',
     isFavorite: (m['is_fav'] as int? ?? 0) == 1,
     featured: (m['featured'] as int? ?? 0) == 1,
     trending: (m['trending'] as int? ?? 0) == 1,

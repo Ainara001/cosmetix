@@ -61,7 +61,7 @@ void main() {
     final all = await products.getAll(1);
     expect(all.length, greaterThanOrEqualTo(15));
     expect((await products.getStorePrices(1)).length, 3);
-    expect((await safety.ingredientsOf(1)).length, 5);
+    expect((await safety.ingredientsOf(2)).length, 4);
     expect((await safety.reactions(1)).length, 3);
   });
 

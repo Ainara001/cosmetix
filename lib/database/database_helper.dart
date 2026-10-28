@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 6;
+  static const dbVersion = 7;
 
   final String? path;
   Database? _db;
@@ -97,6 +97,16 @@ class DatabaseHelper {
         'reco_use_history',
         'INTEGER NOT NULL DEFAULT 0',
       );
+    },
+    7: (db) async {
+      await _addColumn(db, 'products', 'inci', "TEXT NOT NULL DEFAULT ''");
+      await _addColumn(
+        db,
+        'products',
+        'source_url',
+        "TEXT NOT NULL DEFAULT ''",
+      );
+      await SeedData.applyRealCatalog(db);
     },
   };
 

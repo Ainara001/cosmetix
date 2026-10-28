@@ -259,7 +259,7 @@ ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
 - ${p.brand} ${p.name} (${p.category}), ${Formatters.price(p.price)}${p.inStock ? '' : ', out of stock'}
   description: ${p.description}
   ingredients: ${c.ingredients.isEmpty ? 'unknown' : c.ingredients.map((i) => '${i.name}${i.isAllergen ? ' (allergen)' : ''}').join(', ')}
-  made for skin types: ${c.skinTypes.isEmpty ? 'not specified' : c.skinTypes.map((e) => e.label).join(', ')}
+${p.inci.isEmpty ? '' : '  full INCI list (published by ${Uri.tryParse(p.sourceUrl)?.host ?? 'the source'}): ${p.inci.length > 700 ? '${p.inci.substring(0, 700)}...' : p.inci}\n'}  made for skin types: ${c.skinTypes.isEmpty ? 'not specified' : c.skinTypes.map((e) => e.label).join(', ')}
   made for color types: ${c.colorTypes.isEmpty ? 'not specified' : c.colorTypes.map((e) => e.label).join(', ')}
 ${shareProfile ? '''
   blacklisted ingredients found: ${hits.isEmpty ? 'none' : hits.join(', ')}

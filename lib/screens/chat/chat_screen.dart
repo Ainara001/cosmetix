@@ -29,8 +29,8 @@ class _ChatScreenState extends State<ChatScreen> {
   static const _suggestions = [
     'Есть скидки?',
     'Посоветуй тинт для губ',
-    'Какой состав у палетки Flower Knows?',
-    'Сравни цены Flower Knows и Peripera',
+    'Какой состав у крема CeraVe?',
+    'Сравни цены Rom&nd и Peripera',
   ];
 
   @override

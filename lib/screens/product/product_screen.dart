@@ -365,6 +365,39 @@ class _ProductBodyState extends State<_ProductBody> {
                             ],
                           ),
                         ),
+                      if (product.inci.isNotEmpty) ...[
+                        SectionTitle(tr('Полный состав (INCI)')),
+                        AppCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SelectableText(
+                                product.inci,
+                                style: AppTextStyles.small,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                trf('Источник: {v0}', {
+                                  'v0':
+                                      Uri.tryParse(product.sourceUrl)?.host ??
+                                      product.sourceUrl,
+                                }),
+                                style: AppTextStyles.caption.copyWith(
+                                  color: pal.subtext,
+                                ),
+                              ),
+                              Text(
+                                tr(
+                                  'Состав может отличаться по оттенкам и сериям: сверяйтесь с упаковкой.',
+                                ),
+                                style: AppTextStyles.caption.copyWith(
+                                  color: pal.subtext,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       SectionTitle(
                         trf('Отзывы{v0}', {
                           'v0': reviews.reviews.isEmpty

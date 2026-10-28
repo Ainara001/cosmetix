@@ -162,8 +162,11 @@ void main() {
           profile: ctx.profile,
           blacklist: ctx.blacklist,
         );
-        // product 1 (Flower Knows palette) contains parabens in the seed data
-        expect(ranked.any((r) => r.product.id == 1), isFalse);
+        // CeraVe (14) and Nivea Soft (15) contain parabens in the seed data
+        expect(
+          ranked.any((r) => r.product.id == 14 || r.product.id == 15),
+          isFalse,
+        );
         expect(ranked, isNotEmpty);
         // and the exclusion holds for every product that is returned
         for (final r in ranked) {

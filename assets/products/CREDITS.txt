@@ -1,0 +1,29 @@
+Product photos and ingredient lists (INCI) of the demo catalog.
+
+Photos: product pack shots taken from the public product pages named below
+(INCIDecoder, https://incidecoder.com, and one retailer page). The images belong
+to their brands / photographers; they are used here only to illustrate a demo
+catalog. Ask the brands for permission before publishing the app in a store.
+
+Ingredient lists: as published on the same pages (the source URL of every
+product is stored with it and shown in the app). Formulas change and differ by
+shade and market: the package is always the authoritative source.
+
+ 1.jpg  3CE Super Slim Waterproof Mascara            incidecoder.com/products/3ce-super-slim-waterproof-mascara
+ 2.jpg  rom&nd Better Than Palette 05 Shade & Shadow Garden   .../rom-nd-better-than-palette-05-shade-shadow-garden
+ 3.jpg  Peripera Heart Jam Glow Lip                   .../peripera-heart-jam-glow-lip
+ 4.jpg  rom&nd Better Than Eyes (low resolution)      .../romand-better-than-eyes
+ 5.jpg  COSRX Advanced Snail 96 Mucin Power Essence   .../cosrx-advanced-snail-96-mucin-power-essence-3
+ 6.jpg  Maison Margiela Replica Lazy Sunday Morning   costco.com/maison-margiela-replica-lazy-sunday-morning-eau-de-toilette-34-fl-oz.product.100984918.html
+ 7.jpg  Peripera Ink The Velvet 31 Wine Nude           .../peripera-ink-the-velvet-31-wine-nude
+ 8.jpg  Peripera Ink Mood Glowy Tint 30 Happy Berry    .../peripera-ink-mood-glowy-tint-30-happy-berry
+ 9.jpg  rom&nd Glasting Color Gloss                    .../rom-nd-glasting-color-gloss-2
+10.jpg  Missha Magic Cushion Moist Up                  .../missha-magic-cushion-moist-up
+11.jpg  Beauty of Joseon Rice Probiotics Sunscreen     .../beauty-of-joseon-rice-probiotics-sunscreen
+12.jpg  The Ordinary Niacinamide 10% + Zinc 1%         .../the-ordinary-niacinamide-10-zinc-1-8
+13.jpg  rom&nd Better Than Cheek                       .../romand-better-than-cheek
+14.jpg  CeraVe Moisturizing Cream                      .../cerave-moisturizing-cream-6
+15.jpg  Nivea Soft Moisturizing Creme                  .../nivea-soft
+16.jpg  Mise-en-scene Perfect Serum Shampoo            .../mise-en-scene-perfect-serum-shampoo
+18.jpg  Anua Heartleaf 77 Soothing Toner               .../anua-heartleaf-77-soothing-toner-4
+(17: the Cosmetix gift set keeps the generic illustration.)
