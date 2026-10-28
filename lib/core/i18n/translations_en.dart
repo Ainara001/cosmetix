@@ -805,6 +805,9 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'ИИ сейчас недоступен — показан обычный персональный подбор.':
       'The AI is unavailable right now — the regular personal selection is shown.',
   'Уточнить подбор с ИИ': 'Refine the selection with AI',
+  'ИИ': 'AI',
+  'Парфюм': 'Perfume',
+  'Уход': 'Skincare',
   'ИИ-помощник сейчас недоступен': 'The AI assistant is unavailable right now',
   'Остальные функции приложения работают.': 'The rest of the app works.',
   'Рекомендуем вам': 'Recommended for you',

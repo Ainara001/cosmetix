@@ -17,13 +17,14 @@ import 'package:cosmetix/widgets/product_card.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  /// (catalog category, icon, short caption under the icon)
   static const _categories = [
-    ('Макияж', 'cat_makeup'),
-    ('Уход за лицом', 'cat_care'),
-    ('Парфюмерия', 'cat_perfume'),
-    ('Тело и ванна', 'cat_body'),
-    ('Волосы', 'cat_hair'),
-    ('Подарки', 'cat_gift'),
+    ('Макияж', 'cat_makeup', 'Макияж'),
+    ('Уход за лицом', 'cat_care', 'Уход'),
+    ('Парфюмерия', 'cat_perfume', 'Парфюм'),
+    ('Тело и ванна', 'cat_body', 'Тело'),
+    ('Волосы', 'cat_hair', 'Волосы'),
+    ('Подарки', 'cat_gift', 'Подарки'),
   ];
 
   @override
@@ -70,35 +71,47 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             const _QuickAccess(),
             const SizedBox(height: 12),
-            const _Banner(),
-            const SizedBox(height: 12),
             AppCard(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
               radius: 20,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   for (final c in _categories)
-                    Tooltip(
-                      message: tr(c.$1),
-                      child: InkWell(
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          AppRoutes.catalog,
-                          arguments: CatalogArgs(category: c.$1),
-                        ),
-                        customBorder: const CircleBorder(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Image.asset(
-                            'assets/icons/${c.$2}.png',
-                            width: 30,
-                            height: 30,
-                            cacheWidth: 120,
-                            errorBuilder: (_, _, _) => const Icon(
-                              Icons.spa_outlined,
-                              size: 30,
-                              color: AppColors.primaryDark,
+                    Expanded(
+                      child: Tooltip(
+                        message: tr(c.$1),
+                        child: InkWell(
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.catalog,
+                            arguments: CatalogArgs(category: c.$1),
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/icons/${c.$2}.png',
+                                  width: 30,
+                                  height: 30,
+                                  cacheWidth: 120,
+                                  errorBuilder: (_, _, _) => const Icon(
+                                    Icons.spa_outlined,
+                                    size: 30,
+                                    color: AppColors.primaryDark,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  tr(c.$3),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyles.caption,
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -107,6 +120,8 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 12),
+            const _Banner(),
             if (recommended.isNotEmpty) ...[
               SectionTitle(
                 tr('Рекомендуем вам'),
@@ -213,7 +228,7 @@ class _Banner extends StatelessWidget {
       ),
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        height: 175,
+        height: 140,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: const Color(0xFFBFE0E6),
@@ -259,6 +274,11 @@ class _Banner extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.small,
                         ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 18,
+                        color: AppColors.primaryDark,
                       ),
                     ],
                   ),
@@ -327,7 +347,7 @@ class _QuickAccess extends StatelessWidget {
         crossAxisSpacing: 8,
         // icon + padding are fixed, the two label lines grow with the system
         // font size, so the tile never overflows
-        mainAxisExtent: 64 + MediaQuery.textScalerOf(context).scale(32),
+        mainAxisExtent: 60 + MediaQuery.textScalerOf(context).scale(32),
       ),
       children: [
         for (final i in items)

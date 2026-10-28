@@ -136,6 +136,8 @@ class _ProductBodyState extends State<_ProductBody> {
 
     return PageScaffold(
       title: tr('О товаре'),
+      // the price/cart bar sits at the bottom: no second bar under it
+      showNav: false,
       trailing: IconButton(
         tooltip: product.isFavorite
             ? tr('Убрать из избранного')

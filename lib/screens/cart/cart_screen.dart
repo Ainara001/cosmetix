@@ -8,7 +8,6 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/cart_models.dart';
 import 'package:cosmetix/models/product_filter.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
-import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
@@ -125,62 +124,69 @@ class _CartScreenState extends State<CartScreen> {
           BackTitleBar(
             title: tr('Корзина'),
             bigTitle: true,
-            onBack: () => context.read<NavProvider>().setTab(NavProvider.home),
-            trailing: IconButton(
-              tooltip: tr('Очистить корзину'),
-              onPressed: () => _clear(cart),
-              icon: const Icon(
-                Icons.delete_outline,
-                color: AppColors.primaryDark,
-              ),
-            ),
+            showBack: false,
+            trailing: cart.items.isEmpty
+                ? null
+                : IconButton(
+                    tooltip: tr('Очистить корзину'),
+                    onPressed: () => _clear(cart),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-            child: Row(
-              children: [
-                Flexible(
-                  child: PopupMenuButton<ProductSort>(
-                    tooltip: tr('Сортировка'),
-                    initialValue: _sort,
-                    onSelected: (v) => setState(() => _sort = v),
-                    itemBuilder: (_) => [
-                      for (final s in ProductSort.cartOptions)
-                        PopupMenuItem(value: s, child: Text(tr(s.label))),
-                    ],
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.arrow_drop_down, size: 20),
-                          Flexible(
-                            child: Text(
-                              tr(_sort.label),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 13),
+          // sorting and filters mean nothing for an empty cart
+          if (cart.items.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+              child: Row(
+                children: [
+                  Flexible(
+                    child: PopupMenuButton<ProductSort>(
+                      tooltip: tr('Сортировка'),
+                      initialValue: _sort,
+                      onSelected: (v) => setState(() => _sort = v),
+                      itemBuilder: (_) => [
+                        for (final s in ProductSort.cartOptions)
+                          PopupMenuItem(value: s, child: Text(tr(s.label))),
+                      ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.arrow_drop_down, size: 20),
+                            Flexible(
+                              child: Text(
+                                tr(_sort.label),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 13),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: () => _openFilters(cart),
-                  icon: Badge(
-                    isLabelVisible: !_filter.isDefault,
-                    smallSize: 8,
-                    backgroundColor: AppColors.sale,
-                    child: Icon(Icons.filter_alt_outlined, color: pal.text),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: () => _openFilters(cart),
+                    icon: Badge(
+                      isLabelVisible: !_filter.isDefault,
+                      smallSize: 8,
+                      backgroundColor: AppColors.sale,
+                      child: Icon(Icons.filter_alt_outlined, color: pal.text),
+                    ),
+                    label: Text(
+                      tr('Фильтры'),
+                      style: TextStyle(color: pal.text),
+                    ),
                   ),
-                  label: Text(tr('Фильтры'), style: TextStyle(color: pal.text)),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           Expanded(
             child: cart.loading && cart.items.isEmpty
                 ? const Center(child: CircularProgressIndicator())

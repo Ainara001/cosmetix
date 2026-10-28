@@ -6,7 +6,6 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/models/app_user.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
-import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/avatar_sheet.dart';
@@ -25,11 +24,7 @@ class ProfileScreen extends StatelessWidget {
     return SafeArea(
       child: Column(
         children: [
-          BackTitleBar(
-            title: tr('Профиль'),
-            centerTitle: true,
-            onBack: () => context.read<NavProvider>().setTab(NavProvider.home),
-          ),
+          BackTitleBar(title: tr('Профиль'), bigTitle: true, showBack: false),
           Expanded(
             child: user == null
                 ? const Center(child: CircularProgressIndicator())
@@ -106,29 +101,22 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 14),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.salmon,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _Stat(
-                                label: tr('БОНУСЫ'),
-                                value: '${user.bonusPoints}',
-                              ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _Stat(
+                              label: tr('БОНУСЫ'),
+                              value: '${user.bonusPoints}',
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _Stat(
-                                label: tr('ПОСЕЩЕНИЯ'),
-                                value: '${user.visits}',
-                              ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _Stat(
+                              label: tr('ПОСЕЩЕНИЯ'),
+                              value: '${user.visits}',
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 14),
                       _BeautySummary(user: user),
@@ -144,23 +132,6 @@ class ProfileScreen extends StatelessWidget {
                         title: tr('Избранное'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.favorites),
-                      ),
-                      MenuTile(
-                        icon: Icons.sentiment_satisfied_alt_outlined,
-                        title: tr('Цветотип'),
-                        subtitle: user.colorType.isEmpty
-                            ? tr('Пройдите тест')
-                            : tr(user.colorType),
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          AppRoutes.beautyProfile,
-                        ),
-                      ),
-                      MenuTile(
-                        icon: Icons.settings,
-                        title: tr('Настройки'),
-                        onTap: () =>
-                            Navigator.pushNamed(context, AppRoutes.settings),
                       ),
                       MenuTile(
                         icon: Icons.shopping_bag_outlined,
@@ -182,7 +153,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       MenuTile(
                         icon: Icons.healing_outlined,
-                        title: tr('Дневник Аллергии'),
+                        title: tr('Дневник реакций'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.reactions),
                       ),
@@ -191,6 +162,12 @@ class ProfileScreen extends StatelessWidget {
                         title: tr('Чёрный список'),
                         onTap: () =>
                             Navigator.pushNamed(context, AppRoutes.blacklist),
+                      ),
+                      MenuTile(
+                        icon: Icons.settings,
+                        title: tr('Настройки'),
+                        onTap: () =>
+                            Navigator.pushNamed(context, AppRoutes.settings),
                       ),
                     ],
                   ),
@@ -209,19 +186,21 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pal = context.pal;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: pal.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: pal.border),
       ),
       child: Column(
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
-              color: Color(0xFF8E8689),
+              color: pal.subtext,
               letterSpacing: 0.4,
             ),
           ),
@@ -290,25 +269,12 @@ class _BeautySummary extends StatelessWidget {
               style: AppTextStyles.small.copyWith(color: pal.subtext),
             ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: CustomButton(
-                  label: tr('Редактировать профиль'),
-                  outlined: true,
-                  onPressed: () =>
-                      Navigator.pushNamed(context, AppRoutes.editProfile),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: CustomButton(
-                  label: done ? tr('Пройти тест заново') : tr('Пройти тест'),
-                  onPressed: () =>
-                      Navigator.pushNamed(context, AppRoutes.colorTest),
-                ),
-              ),
-            ],
+          // editing the profile is the card at the top: one full-width button
+          // here, so the label is never cut off
+          CustomButton(
+            label: done ? tr('Пройти тест заново') : tr('Пройти тест'),
+            outlined: done,
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.colorTest),
           ),
         ],
       ),

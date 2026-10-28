@@ -210,21 +210,27 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 ),
                 const Spacer(),
                 if (sort == ProductSort.forYou)
-                  IconButton(
-                    tooltip: tr('Уточнить подбор с ИИ'),
-                    icon: _aiBusy
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Icon(
-                            catalog.hasAiOrder
-                                ? Icons.auto_awesome
-                                : Icons.auto_awesome_outlined,
-                            color: AppColors.primaryDark,
-                          ),
-                    onPressed: _aiBusy ? null : () => _refineWithAi(catalog),
+                  Tooltip(
+                    message: tr('Уточнить подбор с ИИ'),
+                    child: TextButton.icon(
+                      icon: _aiBusy
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              catalog.hasAiOrder
+                                  ? Icons.auto_awesome
+                                  : Icons.auto_awesome_outlined,
+                              color: AppColors.primaryDark,
+                            ),
+                      label: Text(
+                        tr('ИИ'),
+                        style: const TextStyle(color: AppColors.primaryDark),
+                      ),
+                      onPressed: _aiBusy ? null : () => _refineWithAi(catalog),
+                    ),
                   ),
                 TextButton.icon(
                   onPressed: () => _openFilters(catalog),
