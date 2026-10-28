@@ -69,8 +69,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const _QuickAccess(),
-            const SizedBox(height: 12),
+            // shopping first: categories, then the offer, then the personal tools
             AppCard(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
               radius: 20,
@@ -94,12 +93,12 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 Image.asset(
                                   'assets/icons/${c.$2}.png',
-                                  width: 30,
-                                  height: 30,
-                                  cacheWidth: 120,
+                                  width: 34,
+                                  height: 34,
+                                  cacheWidth: 136,
                                   errorBuilder: (_, _, _) => const Icon(
                                     Icons.spa_outlined,
-                                    size: 30,
+                                    size: 34,
                                     color: AppColors.primaryDark,
                                   ),
                                 ),
@@ -122,6 +121,8 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const _Banner(),
+            const SizedBox(height: 12),
+            const _QuickAccess(),
             if (recommended.isNotEmpty) ...[
               SectionTitle(
                 tr('Рекомендуем вам'),
