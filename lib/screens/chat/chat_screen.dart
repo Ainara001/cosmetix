@@ -7,7 +7,6 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
-import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -116,32 +115,28 @@ class _ChatScreenState extends State<ChatScreen> {
         color: isDark ? pal.background : const Color(0xFFF9EEF1),
         child: Column(
           children: [
-            Container(
-              color: pal.surface,
-              child: BackTitleBar(
-                title: tr('ИИ-помощник'),
-                bigTitle: true,
-                onBack: () =>
-                    context.read<NavProvider>().setTab(NavProvider.home),
-                trailing: IconButton(
-                  tooltip: tr('Очистить чат'),
-                  icon: const Icon(
-                    Icons.delete_sweep_outlined,
-                    color: AppColors.primaryDark,
-                  ),
-                  onPressed: () async {
-                    final ok = await confirmDialog(
-                      context,
-                      title: tr('Очистить переписку?'),
-                      message: tr('Все сообщения будут удалены.'),
-                      confirmLabel: tr('Очистить'),
-                      destructive: true,
-                    );
-                    if (ok && context.mounted) {
-                      await context.read<ChatProvider>().clear();
-                    }
-                  },
+            BackTitleBar(
+              title: tr('ИИ-помощник'),
+              bigTitle: true,
+              showBack: false,
+              trailing: IconButton(
+                tooltip: tr('Очистить чат'),
+                icon: const Icon(
+                  Icons.delete_sweep_outlined,
+                  color: AppColors.primaryDark,
                 ),
+                onPressed: () async {
+                  final ok = await confirmDialog(
+                    context,
+                    title: tr('Очистить переписку?'),
+                    message: tr('Все сообщения будут удалены.'),
+                    confirmLabel: tr('Очистить'),
+                    destructive: true,
+                  );
+                  if (ok && context.mounted) {
+                    await context.read<ChatProvider>().clear();
+                  }
+                },
               ),
             ),
             if (ai.isMock)

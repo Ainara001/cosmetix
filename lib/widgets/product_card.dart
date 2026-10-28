@@ -136,14 +136,20 @@ class ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 10, color: pal.subtext),
                     ),
-                    Text(
-                      tr(product.name),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
+                    // always two lines tall, so the photos in a row match
+                    SizedBox(
+                      height: MediaQuery.textScalerOf(
+                        context,
+                      ).scale(12.5 * 1.2 * 2),
+                      child: Text(
+                        tr(product.name),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 3),

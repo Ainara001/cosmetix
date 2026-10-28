@@ -57,6 +57,7 @@ class BackTitleBar extends StatelessWidget {
     this.onBack,
     this.centerTitle = false,
     this.bigTitle = false,
+    this.showBack = true,
   });
 
   final String title;
@@ -64,6 +65,9 @@ class BackTitleBar extends StatelessWidget {
   final VoidCallback? onBack;
   final bool centerTitle;
   final bool bigTitle;
+
+  /// Main tabs are roots of the app: no back arrow there.
+  final bool showBack;
 
   @override
   Widget build(BuildContext context) {
@@ -74,18 +78,19 @@ class BackTitleBar extends StatelessWidget {
       style: (bigTitle ? AppTextStyles.h2 : AppTextStyles.title),
     );
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 12, 8),
+      padding: EdgeInsets.fromLTRB(showBack ? 4 : 16, 8, 12, 8),
       child: Row(
         children: [
-          IconButton(
-            tooltip: tr('Назад'),
-            onPressed: onBack ?? () => Navigator.of(context).maybePop(),
-            icon: const Icon(
-              Icons.chevron_left,
-              color: AppColors.primaryDark,
-              size: 30,
+          if (showBack)
+            IconButton(
+              tooltip: tr('Назад'),
+              onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+              icon: const Icon(
+                Icons.chevron_left,
+                color: AppColors.primaryDark,
+                size: 30,
+              ),
             ),
-          ),
           Expanded(
             child: centerTitle ? Center(child: titleWidget) : titleWidget,
           ),
