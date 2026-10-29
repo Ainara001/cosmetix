@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Product picture: a real photo from assets/photos (see CREDITS.txt) when one
-/// exists for this kind of product, otherwise a locally drawn illustration.
+/// Product picture. [art] is the drawing kind (`bottle`, `tube`...), optionally
+/// followed by `|assets/products/N.jpg`: the real product photo. Without a
+/// photo (or when it fails to load) a generic photo from assets/photos (see
+/// CREDITS.txt) or a locally drawn illustration is shown.
 class ProductArt extends StatelessWidget {
   const ProductArt({
     super.key,
@@ -14,7 +16,8 @@ class ProductArt extends StatelessWidget {
   final int color;
   final double radius;
 
-  /// Art kinds that have a photo; 'box' has none and keeps the illustration.
+  /// Art kinds that have a generic photo; 'box' has none and keeps the
+  /// illustration.
   static const photos = {
     'palette',
     'tube',
@@ -26,27 +29,48 @@ class ProductArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parts = art.split('|');
+    final kind = parts.first;
+    final photo = parts.length > 1 ? parts[1] : null;
     final base = Color(color);
     final drawn = SizedBox.expand(
-      child: CustomPaint(painter: _ArtPainter(art, base)),
+      child: CustomPaint(painter: _ArtPainter(kind, base)),
     );
+    final generic = photos.contains(kind)
+        ? SizedBox.expand(
+            child: Image.asset(
+              'assets/photos/$kind.jpg',
+              fit: BoxFit.cover,
+              cacheWidth:
+                  720, // reduced decode: smooth lists, still sharp on 3x phones
+              gaplessPlayback: true,
+              errorBuilder: (_, _, _) => drawn,
+            ),
+          )
+        : drawn;
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
-      child: ColoredBox(
-        color: Color.lerp(base, Colors.white, 0.8)!,
-        child: photos.contains(art)
-            ? SizedBox.expand(
-                child: Image.asset(
-                  'assets/photos/$art.jpg',
-                  fit: BoxFit.cover,
-                  cacheWidth:
-                      720, // reduced decode: smooth lists, still sharp on 3x phones
-                  gaplessPlayback: true,
-                  errorBuilder: (_, _, _) => drawn,
+      child: photo == null
+          ? ColoredBox(
+              color: Color.lerp(base, Colors.white, 0.8)!,
+              child: generic,
+            )
+          // a pack shot on white: show it whole, never cropped
+          : ColoredBox(
+              color: Colors.white,
+              child: SizedBox.expand(
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Image.asset(
+                    photo,
+                    fit: BoxFit.contain,
+                    cacheWidth: 720,
+                    gaplessPlayback: true,
+                    errorBuilder: (_, _, _) => generic,
+                  ),
                 ),
-              )
-            : drawn,
-      ),
+              ),
+            ),
     );
   }
 }

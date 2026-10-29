@@ -188,10 +188,10 @@ Future<void> main() async {
     await launch(t);
     await loginDemo(t);
     await open(t, AppRoutes.search);
-    await t.enterText(find.byType(TextField).first, 'Flower');
+    await t.enterText(find.byType(TextField).first, 'Rom');
     await t.testTextInput.receiveAction(TextInputAction.search);
     await _settle(t, 8);
-    expect(find.textContaining('Flower'), findsWidgets);
+    expect(find.textContaining('Better Than'), findsWidgets);
     nav(t).pop();
     await _settle(t);
     await open(t, AppRoutes.catalog);
@@ -333,7 +333,7 @@ Future<void> main() async {
     expect(ai.requests.single['system'], contains('USER BEAUTY PROFILE'));
     // the marker is not shown; the product is a card that opens its page
     expect(find.textContaining('[#1]'), findsNothing);
-    await _tap(t, find.text('Палетка Flower Knows Strawberry'));
+    await _tap(t, find.text('Super Slim Waterproof Mascara'));
     await _until(t, find.text('О товаре'));
     expect(t.takeException(), isNull);
   });

@@ -17,75 +17,73 @@ class ProductTraits {
 }
 
 const Map<String, ProductTraits> seedTraits = {
-  'Flower Knows|Палетка Flower Knows Strawberry': ProductTraits(
-    colorTypes: ['spring', 'summer'],
-    undertones: ['cool', 'neutral'],
-    tags: ['long_wearing'],
-  ),
-  'Peripera|Палетка Peripera Ink Cozy': ProductTraits(
-    colorTypes: ['autumn', 'spring'],
-    undertones: ['warm', 'neutral'],
-  ),
-  'Flower Knows|Strawberry Lip Tint': ProductTraits(
-    colorTypes: ['summer', 'winter'],
-    undertones: ['cool', 'neutral'],
-    tags: ['long_wearing'],
-  ),
-  'Rom&nd|Better Than Eyes': ProductTraits(
+  '3CE|Super Slim Waterproof Mascara': ProductTraits(tags: ['long_wearing']),
+  'Rom&nd|Better Than Palette 05 Shade & Shadow Garden': ProductTraits(
     colorTypes: ['autumn', 'spring', 'summer'],
     undertones: ['neutral', 'warm'],
   ),
-  'Rom&nd|Сыворотка для лица': ProductTraits(
-    skinTypes: ['dry', 'normal', 'combination'],
+  'Peripera|Heart Jam Glow Lip': ProductTraits(
+    colorTypes: ['spring', 'summer'],
+    undertones: ['warm', 'neutral'],
+  ),
+  'Rom&nd|Better Than Eyes': ProductTraits(
+    colorTypes: ['summer', 'winter'],
+    undertones: ['cool', 'neutral'],
+  ),
+  'COSRX|Advanced Snail 96 Mucin Power Essence': ProductTraits(
+    skinTypes: ['dry', 'normal', 'combination', 'sensitive'],
     concerns: ['dryness', 'aging'],
-    tags: ['hydrating'],
+    tags: ['hydrating', 'soothing', 'fragrance_free'],
   ),
-  'Peripera|Парфюм Peripera Mood': ProductTraits(tags: ['fragrance']),
-  'Flower Knows|Тинт для губ Flower Knows': ProductTraits(
-    colorTypes: ['winter', 'summer'],
-    undertones: ['cool'],
+  'Maison Margiela|Replica Lazy Sunday Morning': ProductTraits(
+    tags: ['fragrance'],
+  ),
+  'Peripera|Ink The Velvet 31 Wine Nude': ProductTraits(
+    colorTypes: ['autumn', 'winter'],
+    undertones: ['cool', 'neutral'],
     tags: ['long_wearing'],
   ),
-  'Peripera|Тинт Peripera Ink': ProductTraits(
-    colorTypes: ['spring', 'autumn'],
-    undertones: ['warm'],
+  'Peripera|Ink Mood Glowy Tint 30 Happy Berry': ProductTraits(
+    colorTypes: ['spring', 'summer'],
+    undertones: ['warm', 'neutral'],
     tags: ['long_wearing'],
   ),
-  'Rom&nd|Блеск Rom&nd Glasting': ProductTraits(
+  'Rom&nd|Glasting Color Gloss': ProductTraits(
     colorTypes: ['summer', 'spring'],
     undertones: ['neutral', 'cool'],
   ),
-  'Missha|Кушон Missha Magic': ProductTraits(
+  'Missha|Magic Cushion Moist Up': ProductTraits(
     skinTypes: ['normal', 'combination', 'dry'],
     colorTypes: ['spring', 'summer'],
     undertones: ['neutral', 'warm'],
     tags: ['spf'],
   ),
-  'Beauty of Joseon|Крем SPF 50 Relief Sun': ProductTraits(
+  'Beauty of Joseon|Relief Sun: Rice + Probiotics SPF50+': ProductTraits(
     skinTypes: ['normal', 'combination', 'oily'],
     concerns: ['pigmentation', 'aging'],
     tags: ['spf', 'fragrance_free'],
   ),
-  'The Ordinary|Сыворотка Niacinamide 10%': ProductTraits(
+  'The Ordinary|Niacinamide 10% + Zinc 1%': ProductTraits(
     skinTypes: ['oily', 'combination', 'normal'],
     concerns: ['acne', 'pigmentation'],
-    tags: ['oil_control', 'brightening'],
+    tags: ['oil_control', 'brightening', 'fragrance_free'],
   ),
-  'Rom&nd|Румяна Better Than Cheek': ProductTraits(
+  'Rom&nd|Better Than Cheek': ProductTraits(
     colorTypes: ['spring', 'summer', 'autumn'],
     undertones: ['neutral', 'warm'],
   ),
-  'Dr.Jart+|Увлажняющий крем для тела': ProductTraits(
-    skinTypes: ['dry', 'normal'],
+  'CeraVe|Moisturizing Cream': ProductTraits(
+    skinTypes: ['dry', 'normal', 'sensitive'],
     concerns: ['dryness'],
-    tags: ['hydrating', 'soothing'],
+    tags: ['hydrating', 'soothing', 'fragrance_free'],
   ),
-  'Cosmetics Mockup|Cosmetics Mockup Cream': ProductTraits(
+  'Nivea|Soft Moisturizing Creme': ProductTraits(
     skinTypes: ['normal', 'dry'],
     concerns: ['dryness'],
     tags: ['hydrating'],
   ),
-  'Anua|Тонер Heartleaf 77%': ProductTraits(
+  'Mise-en-scène|Perfect Serum Shampoo': ProductTraits(tags: ['fragrance']),
+  'Anua|Heartleaf 77% Soothing Toner': ProductTraits(
     skinTypes: ['oily', 'sensitive', 'combination', 'normal'],
     concerns: ['acne', 'sensitivity'],
     tags: ['soothing', 'fragrance_free'],

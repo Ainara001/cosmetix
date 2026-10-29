@@ -806,6 +806,46 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'The AI is unavailable right now — the regular personal selection is shown.',
   'Уточнить подбор с ИИ': 'Refine the selection with AI',
   'ИИ': 'AI',
+  'Тонкая водостойкая тушь для аккуратного прокрашивания каждой ресницы.':
+      'A slim waterproof mascara that coats every lash neatly.',
+  'Палетка из десяти матовых и сияющих оттенков для повседневного макияжа глаз.':
+      'A palette of ten matte and shimmering shades for everyday eye makeup.',
+  'Сияющая помада-бальзам для губ с лёгким цветом и блеском.':
+      'A glowy lip balm-stick with a light tint and shine.',
+  'Компактная палетка из четырёх оттенков теней: матовые и мерцающие.':
+      'A compact palette of four eyeshadow shades: matte and shimmering.',
+  'Лёгкая эссенция с 96% муцина улитки для увлажнения и восстановления кожи.':
+      'A light essence with 96% snail mucin to hydrate and repair the skin.',
+  'Мягкий пудровый аромат: груша, ирис, роза и белый мускус.':
+      'A soft powdery scent: pear, iris, rose and white musk.',
+  'Бархатный тинт для губ с матовым финишем и стойким цветом.':
+      'A velvety lip tint with a matte finish and long-lasting colour.',
+  'Глянцевый тинт для губ с эффектом сочных увлажнённых губ.':
+      'A glossy lip tint for juicy, hydrated-looking lips.',
+  'Блеск для губ с цветом и зеркальным эффектом.':
+      'A tinted lip gloss with a mirror-like shine.',
+  'Увлажняющий кушон с SPF и лёгким покрытием.':
+      'A hydrating cushion with SPF and light coverage.',
+  'Лёгкий солнцезащитный крем SPF50+ с рисовым экстрактом и пробиотиками.':
+      'A light SPF50+ sunscreen with rice extract and probiotics.',
+  'Сыворотка с 10% ниацинамида и 1% цинка для кожи с несовершенствами и расширенными порами.':
+      'A serum with 10% niacinamide and 1% zinc for blemish-prone skin and enlarged pores.',
+  'Пудровые румяна с естественным оттенком для нежного румянца.':
+      'Powder blush with a natural shade for a soft glow.',
+  'Увлажняющий крем с тремя церамидами и гиалуроновой кислотой для сухой кожи.':
+      'A moisturizing cream with three ceramides and hyaluronic acid for dry skin.',
+  'Лёгкий увлажняющий крем для лица, тела и рук.':
+      'A light moisturizing cream for face, body and hands.',
+  'Шампунь с маслами арганы и жожоба для гладких и блестящих волос.':
+      'A shampoo with argan and jojoba oils for smooth, shiny hair.',
+  'Успокаивающий тонер с 77% экстракта хауттюйнии для чувствительной кожи.':
+      'A soothing toner with 77% houttuynia extract for sensitive skin.',
+  'Полный состав (INCI)': 'Full ingredients (INCI)',
+  'Источник: {v0}': 'Source: {v0}',
+  'Состав может отличаться по оттенкам и сериям: сверяйтесь с упаковкой.':
+      'The formula can differ by shade and batch: check the packaging.',
+  'Какой состав у крема CeraVe?': 'What is in the CeraVe cream?',
+  'Сравни цены Rom&nd и Peripera': 'Compare Rom&nd and Peripera prices',
   'Парфюм': 'Perfume',
   'Уход': 'Skincare',
   'ИИ-помощник сейчас недоступен': 'The AI assistant is unavailable right now',

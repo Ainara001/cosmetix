@@ -189,8 +189,8 @@ void main() {
       addTearDown(t.view.reset);
       final helper = DatabaseHelper(path: inMemoryDatabasePath);
       addTearDown(() => t.runAsync(helper.close));
-      // demo user: color type + parabens on the blacklist; the newest seeded
-      // product (Flower Knows palette) contains parabens
+      // demo user: color type + parabens on the blacklist; CeraVe Moisturizing
+      // Cream (seed product 14) contains parabens
       await t.runAsync(() => UserRepository(helper).setCurrentUser(1));
       await t.pumpWidget(CosmetixApp(helper: helper));
       await pumpUntil(t, find.text('Кабинет'));
@@ -198,7 +198,9 @@ void main() {
       await _settle(t);
 
       expect(find.text('Для вас'), findsOneWidget);
-      expect(find.text('Палетка Flower Knows Strawberry'), findsNothing);
+      await t.enterText(find.byType(TextField).first, 'Moisturizing');
+      await _settle(t);
+      expect(find.text('Moisturizing Cream'), findsNothing);
 
       // the user picks "Newest": respected, and the product appears
       await t.tap(find.byTooltip('Сортировка'));
@@ -207,7 +209,7 @@ void main() {
       await _settle(t);
       expect(find.text('Для вас'), findsNothing);
       expect(find.text('По новизне'), findsOneWidget);
-      expect(find.text('Палетка Flower Knows Strawberry'), findsOneWidget);
+      expect(find.text('Moisturizing Cream'), findsOneWidget);
 
       // still respected after other state changes (typing a search query)
       await t.enterText(find.byType(TextField).first, 'тинт');

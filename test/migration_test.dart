@@ -5,6 +5,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/database/seed_data.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/services/avatar_service.dart';
 
@@ -247,5 +248,72 @@ CREATE TABLE reviews (
       await service.delete(stored);
       expect(File(stored).existsSync(), isFalse);
     });
+  });
+
+  group('real catalog (DB v7)', () {
+    test('old demo products become real ones, other products stay', () async {
+      final helper = DatabaseHelper(path: inMemoryDatabasePath);
+      addTearDown(helper.close);
+      final db = await helper.database;
+      // what an install of the previous release looks like
+      await db.update('products', {
+        'brand': 'Flower Knows',
+        'name': 'Палетка Flower Knows Strawberry',
+        'art': 'palette',
+        'inci': '',
+        'source_url': '',
+      }, where: 'id = 1');
+      await db.insert('products', {
+        'id': 99,
+        'brand': 'My shop',
+        'name': 'Мой товар',
+        'category': 'Макияж',
+        'price': 1000,
+        'color': 0xFFFFFFFF,
+        'created_at': 0,
+      });
+      await SeedData.applyRealCatalog(db);
+
+      final p1 = (await db.query('products', where: 'id = 1')).single;
+      expect(p1['brand'], '3CE');
+      expect(p1['name'], 'Super Slim Waterproof Mascara');
+      expect(p1['art'], 'tube|assets/products/1.jpg');
+      expect(p1['inci'] as String, contains('Isododecane'));
+      expect(
+        p1['source_url'] as String,
+        startsWith('https://incidecoder.com/'),
+      );
+      final p99 = (await db.query('products', where: 'id = 99')).single;
+      expect(p99['name'], 'Мой товар');
+      // the demo user's favourites still point at the same ids
+      expect(await db.query('favorites', where: 'product_id = 1'), isNotEmpty);
+      // running it again changes nothing
+      await SeedData.applyRealCatalog(db);
+      expect(
+        (await db.query('products', where: 'id = 1')).single['name'],
+        'Super Slim Waterproof Mascara',
+      );
+    });
+
+    test(
+      'every catalog product has a photo file and a published INCI list',
+      () async {
+        final helper = DatabaseHelper(path: inMemoryDatabasePath);
+        addTearDown(helper.close);
+        final db = await helper.database;
+        final rows = await db.query('products');
+        var real = 0;
+        for (final r in rows) {
+          final inci = r['inci'] as String;
+          if (inci.isEmpty) continue; // the Cosmetix gift set
+          real++;
+          final art = (r['art'] as String).split('|');
+          expect(art.length, 2, reason: r['name'] as String);
+          expect(File(art[1]).existsSync(), isTrue, reason: art[1]);
+          expect(r['source_url'] as String, startsWith('https://'));
+        }
+        expect(real, 17);
+      },
+    );
   });
 }
