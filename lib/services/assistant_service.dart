@@ -70,7 +70,12 @@ class AssistantService {
         AiMessage('user', text),
       ],
     );
-    var out = plainText(reply.text);
+    var out = withProductMarkers(plainText(reply.text), [
+      for (final c in ctx.candidates)
+        if (shareProfile ||
+            !RecommendationService.isBlacklisted(c, ctx.blacklist))
+          c.product,
+    ]);
     if (isSeriousReaction(text)) out = '$out\n\n$safetyNote';
     return out;
   }
@@ -93,6 +98,56 @@ class AssistantService {
       (m) => '${m[1]}• ',
     );
     return t.replaceAll('`', '');
+  }
+
+  /// `[#12]`: the model puts the id of a catalog product right after its name;
+  /// the chat turns it into a tappable mini card (see [parseReply]).
+  static final _marker = RegExp(r'[ \t]*\[#(\d+)\]');
+
+  /// Splits an answer into the text to show and the product ids it mentions
+  /// (in order, without repeats, at most [maxCards]).
+  static ({String text, List<int> productIds}) parseReply(String s) {
+    final ids = <int>[];
+    for (final m in _marker.allMatches(s)) {
+      final id = int.parse(m[1]!);
+      if (!ids.contains(id)) ids.add(id);
+    }
+    final text = s
+        .replaceAll(_marker, '')
+        .replaceAll(RegExp(r'[ \t]+\n'), '\n')
+        .trim();
+    return (text: text, productIds: ids.take(maxCards).toList());
+  }
+
+  /// At most this many product cards under one answer.
+  static const maxCards = 3;
+
+  /// Keeps the markers the model wrote (only for products it was allowed to
+  /// see) and, when it wrote none, adds them for catalog products whose full
+  /// name appears in the answer. Unknown ids are dropped.
+  static String withProductMarkers(String answer, List<Product> allowed) {
+    final known = {for (final p in allowed) p.id};
+    final given = _marker.allMatches(answer).map((m) => int.parse(m[1]!));
+    var out = answer.replaceAllMapped(
+      _marker,
+      (m) => known.contains(int.parse(m[1]!)) ? m[0]! : '',
+    );
+    if (given.any(known.contains)) return out;
+    final lower = answer.toLowerCase();
+    final found = <int>[
+      for (final p in allowed)
+        if (_mentions(lower, p)) p.id,
+    ];
+    if (found.isEmpty) return out;
+    return '$out ${found.take(maxCards).map((id) => '[#$id]').join(' ')}';
+  }
+
+  static bool _mentions(String lowerAnswer, Product p) {
+    for (final name in {p.name, tr(p.name)}) {
+      final n = name.toLowerCase().trim();
+      if (n.length >= 6 && lowerAnswer.contains(n)) return true;
+    }
+    return false;
   }
 
   /// All facts the model may use. Kept as a pure function so it can be tested.
@@ -124,7 +179,7 @@ class AssistantService {
       for (final c in ctx.candidates)
         if (shareProfile ||
             !RecommendationService.isBlacklisted(c, ctx.blacklist))
-          '- ${c.product.brand} ${c.product.name} (${c.product.category}, '
+          '- [#${c.product.id}] ${c.product.brand} ${c.product.name} (${c.product.category}, '
               '${Formatters.price(c.product.price)})'
               '${shareProfile && RecommendationService.isBlacklisted(c, ctx.blacklist) ? ' [CONTAINS BLACKLISTED INGREDIENT - never recommend]' : ''}',
     ].take(maxCatalogLines).toList();
@@ -145,6 +200,7 @@ Rules:
 - Base suitability answers on the Beauty Profile and the ingredient facts you are given, and explain them in simple words.
 - Keep answers short (under 120 words).
 - Write plain text: no markdown (no **bold**, no # headings, no tables).
+- Every time you recommend or mention a CATALOG product, write its name as in the catalog and put its marker, for example [#12], right after the name. Never invent a marker.
 - Answer in $language.
 
 USER BEAUTY PROFILE:

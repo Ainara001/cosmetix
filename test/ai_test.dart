@@ -23,6 +23,7 @@ import 'package:cosmetix/services/ai/beauty_profile_merger.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
+import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
@@ -749,5 +750,68 @@ void main() {
       AssistantService.plainText('2 * 3 = 6, цена 5*'),
       '2 * 3 = 6, цена 5*',
     );
+  });
+
+  group('product cards in answers', () {
+    Product prod(int id, String brand, String name) => Product(
+      id: id,
+      brand: brand,
+      name: name,
+      category: 'Макияж',
+      zone: 'Губы',
+      price: 3200,
+      inStock: true,
+      art: 'tube',
+      color: 0xFFE06A7C,
+      description: '',
+      naturalPercent: 80,
+      createdAt: 0,
+    );
+    final tint = prod(12, 'Flower Knows', 'Strawberry Lip Tint');
+    final ink = prod(7, 'Peripera', 'Тинт Ink');
+
+    test('parseReply strips markers and keeps the ids in order', () {
+      final r = AssistantService.parseReply(
+        'Возьмите Strawberry Lip Tint [#12] или Тинт Ink [#7] [#12].',
+      );
+      expect(r.text, 'Возьмите Strawberry Lip Tint или Тинт Ink.');
+      expect(r.productIds, [12, 7]);
+      expect(AssistantService.parseReply('Без товаров').productIds, isEmpty);
+    });
+
+    test('at most three cards per answer', () {
+      final r = AssistantService.parseReply('[#1] [#2] [#3] [#4] [#5]');
+      expect(r.productIds, [1, 2, 3]);
+    });
+
+    test('markers for products the model may not mention are dropped', () {
+      final out = AssistantService.withProductMarkers(
+        'Хорош Strawberry Lip Tint [#12] и выдуманный [#99].',
+        [tint, ink],
+      );
+      expect(AssistantService.parseReply(out).productIds, [12]);
+      expect(out.contains('[#99]'), isFalse);
+    });
+
+    test('no markers: products named in the text get a marker', () {
+      final out = AssistantService.withProductMarkers(
+        'Подойдёт Strawberry Lip Tint за 3 200 тг.',
+        [tint, ink],
+      );
+      expect(AssistantService.parseReply(out).productIds, [12]);
+      // nothing named, nothing added
+      expect(
+        AssistantService.withProductMarkers('Привет!', [tint, ink]),
+        'Привет!',
+      );
+    });
+
+    test('a very short product name is not matched by accident', () {
+      final short = prod(3, 'X', 'Крем');
+      expect(
+        AssistantService.withProductMarkers('Нужен крем на ночь', [short]),
+        'Нужен крем на ночь',
+      );
+    });
   });
 }

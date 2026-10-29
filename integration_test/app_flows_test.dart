@@ -316,7 +316,8 @@ Future<void> main() async {
   });
 
   testWidgets('14. a question to the AI consultant (fake proxy)', (t) async {
-    ai.chatAnswer = 'Это крем подойдёт для сухой кожи.';
+    // [#1] is how the assistant marks a catalog product (shown as a card)
+    ai.chatAnswer = 'Это крем подойдёт для сухой кожи. [#1]';
     await launch(t);
     await loginDemo(t);
     final ctx = t.element(find.byType(Scaffold).first);
@@ -330,6 +331,10 @@ Future<void> main() async {
     await _tap(t, find.byTooltip('Отправить'));
     await _until(t, find.text('Это крем подойдёт для сухой кожи.'));
     expect(ai.requests.single['system'], contains('USER BEAUTY PROFILE'));
+    // the marker is not shown; the product is a card that opens its page
+    expect(find.textContaining('[#1]'), findsNothing);
+    await _tap(t, find.text('Палетка Flower Knows Strawberry'));
+    await _until(t, find.text('О товаре'));
     expect(t.takeException(), isNull);
   });
 
