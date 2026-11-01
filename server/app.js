@@ -54,6 +54,8 @@ function readConfig(env) {
       (provider === 'gemini' ? env.GEMINI_API_KEY : env.ANTHROPIC_API_KEY) || ''
     ).trim(),
     model: provider === 'gemini' ? geminiModel : claudeModel,
+    // tried when the main Gemini model keeps answering "high demand" (503)
+    fallbackModel: (env.GEMINI_FALLBACK_MODEL ?? 'gemini-flash-lite-latest').trim(),
     appToken: (env.APP_TOKEN || '').trim(),
     maxOutputTokens: intEnv(env, 'MAX_OUTPUT_TOKENS', 600),
     ratePerMinute: intEnv(env, 'RATE_LIMIT_PER_MIN', 20),
@@ -328,28 +330,44 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
 
   async function callGemini(clean) {
     let res;
-    // Gemini answers "high demand" (503) in spikes that pass in a second or
-    // two: retry a couple of times before giving up
-    for (let attempt = 0; ; attempt += 1) {
-      try {
-        res = await fetchImpl(`${GEMINI_URL}/${encodeURIComponent(config.model)}:generateContent`, {
-          method: 'POST',
-          // the key goes in a header, never in the URL (URLs end up in logs)
-          headers: { 'content-type': 'application/json', 'x-goog-api-key': config.apiKey },
-          body: JSON.stringify(toGeminiBody(clean, config)),
-          signal: AbortSignal.timeout(config.upstreamTimeoutMs),
-        });
-      } catch (e) {
-        if (e && (e.name === 'TimeoutError' || e.name === 'AbortError')) {
-          throw new HttpError(504, 'upstream_timeout', 'Gemini did not answer in time');
+    const models = [config.model, config.fallbackModel].filter(
+      (m, i, all) => m && all.indexOf(m) === i,
+    );
+    // Gemini answers "high demand" (503) in spikes: the main model gets a
+    // couple of quick retries, then the next model in the list takes over
+    for (const [i, model] of models.entries()) {
+      const last = i === models.length - 1;
+      for (let attempt = 0; ; attempt += 1) {
+        try {
+          res = await fetchImpl(`${GEMINI_URL}/${encodeURIComponent(model)}:generateContent`, {
+            method: 'POST',
+            // the key goes in a header, never in the URL (URLs end up in logs)
+            headers: { 'content-type': 'application/json', 'x-goog-api-key': config.apiKey },
+            body: JSON.stringify(toGeminiBody(clean, config)),
+            // a slow main model must leave time for the fallback (the app waits 60 s)
+            signal: AbortSignal.timeout(
+              last ? config.upstreamTimeoutMs : Math.min(config.upstreamTimeoutMs, 15000),
+            ),
+          });
+        } catch (e) {
+          if (!last) {
+            res = null;
+            break;
+          }
+          if (e && (e.name === 'TimeoutError' || e.name === 'AbortError')) {
+            throw new HttpError(504, 'upstream_timeout', 'Gemini did not answer in time');
+          }
+          throw new HttpError(503, 'upstream_unavailable', 'Gemini API is not reachable');
         }
-        throw new HttpError(503, 'upstream_unavailable', 'Gemini API is not reachable');
+        if (res.status === 503 || res.status === 500) {
+          if (attempt < (last ? 2 : 1)) {
+            await new Promise((r) => setTimeout(r, config.retryDelayMs * (attempt + 1)));
+            continue;
+          }
+        }
+        break;
       }
-      if ((res.status === 503 || res.status === 500) && attempt < 2) {
-        await new Promise((r) => setTimeout(r, config.retryDelayMs * (attempt + 1)));
-        continue;
-      }
-      break;
+      if (res && res.status !== 503 && res.status !== 500) break;
     }
     if (res.status === 429) {
       throw new HttpError(429, 'upstream_rate_limited', 'Gemini API is busy, try again later', {
