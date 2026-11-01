@@ -1,5 +1,6 @@
 import 'package:cosmetix/core/constants/app_constants.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
 
 enum ProductStatus {
   any('Любой статус'),
@@ -41,6 +42,9 @@ class ProductFilter {
     this.status = ProductStatus.any,
     this.minPrice = 0,
     this.maxPrice = AppConstants.maxPrice,
+    this.withIngredients = const {},
+    this.withoutIngredients = const {},
+    this.anyIngredient = false,
   });
 
   final String name;
@@ -50,13 +54,24 @@ class ProductFilter {
   final int minPrice;
   final int maxPrice;
 
+  /// [IngredientGroup] codes the composition must contain / must not contain.
+  final Set<String> withIngredients;
+  final Set<String> withoutIngredients;
+
+  /// With several wanted ingredients: any of them (true) or all (false).
+  final bool anyIngredient;
+
+  bool get hasIngredientFilter =>
+      withIngredients.isNotEmpty || withoutIngredients.isNotEmpty;
+
   bool get isDefault =>
       name.isEmpty &&
       category == null &&
       zone == null &&
       status == ProductStatus.any &&
       minPrice == 0 &&
-      maxPrice == AppConstants.maxPrice;
+      maxPrice == AppConstants.maxPrice &&
+      !hasIngredientFilter;
 
   ProductFilter copyWith({
     String? name,
@@ -65,6 +80,9 @@ class ProductFilter {
     ProductStatus? status,
     int? minPrice,
     int? maxPrice,
+    Set<String>? withIngredients,
+    Set<String>? withoutIngredients,
+    bool? anyIngredient,
   }) {
     return ProductFilter(
       name: name ?? this.name,
@@ -75,6 +93,9 @@ class ProductFilter {
       status: status ?? this.status,
       minPrice: minPrice ?? this.minPrice,
       maxPrice: maxPrice ?? this.maxPrice,
+      withIngredients: withIngredients ?? this.withIngredients,
+      withoutIngredients: withoutIngredients ?? this.withoutIngredients,
+      anyIngredient: anyIngredient ?? this.anyIngredient,
     );
   }
 
@@ -82,10 +103,8 @@ class ProductFilter {
 
   bool matches(Product p, {int? priceOverride}) {
     final q = name.trim().toLowerCase();
-    if (q.isNotEmpty &&
-        !('${p.brand} ${p.name} ${p.category}'.toLowerCase().contains(q))) {
-      return false;
-    }
+    if (q.isNotEmpty && !_matchesText(p, q)) return false;
+    if (!_matchesIngredients(p)) return false;
     if (category != null && p.category != category) return false;
     if (zone != null && p.zone != zone) return false;
     switch (status) {
@@ -100,6 +119,33 @@ class ProductFilter {
     }
     final price = priceOverride ?? p.price;
     return price >= minPrice && price <= maxPrice;
+  }
+
+  /// The search text hits the name, or the composition: an ingredient word
+  /// ("ниацинамид", "bha") or a longer piece of the INCI list.
+  static bool _matchesText(Product p, String q) {
+    if ('${p.brand} ${p.name} ${p.category}'.toLowerCase().contains(q)) {
+      return true;
+    }
+    if (q.length >= 4 && p.inci.toLowerCase().contains(q)) return true;
+    final found = IngredientCatalog.of(p);
+    return IngredientCatalog.forQuery(q).any((g) => found.contains(g.code));
+  }
+
+  bool _matchesIngredients(Product p) {
+    if (!hasIngredientFilter) return true;
+    final found = IngredientCatalog.of(p);
+    if (withIngredients.isNotEmpty) {
+      final ok = anyIngredient
+          ? withIngredients.any(found.contains)
+          : withIngredients.every(found.contains);
+      if (!ok) return false;
+    }
+    for (final code in withoutIngredients) {
+      // a product without a published composition cannot be confirmed "free of"
+      if (p.inci.trim().isEmpty || found.contains(code)) return false;
+    }
+    return true;
   }
 
   static List<Product> apply(

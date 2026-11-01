@@ -32,17 +32,21 @@ class WhyItSuitsCard extends StatelessWidget {
           (
             switch (r.type) {
               MatchReasonType.previousReaction ||
-              MatchReasonType.sharedIngredient => Icons.info_outline,
+              MatchReasonType.sharedIngredient ||
+              MatchReasonType.shadeOff ||
+              MatchReasonType.skinShadeOff => Icons.info_outline,
               MatchReasonType.owned => Icons.shopping_bag_outlined,
               _ => Icons.check_circle_outline,
             },
             switch (r.type) {
               MatchReasonType.previousReaction ||
-              MatchReasonType.sharedIngredient => AppColors.sale,
+              MatchReasonType.sharedIngredient ||
+              MatchReasonType.shadeOff ||
+              MatchReasonType.skinShadeOff => AppColors.sale,
               MatchReasonType.owned => AppColors.primaryDark,
               _ => AppColors.success,
             },
-            _text(r),
+            reasonText(r),
           ),
     ];
     if (lines.isEmpty) return const SizedBox.shrink();
@@ -105,7 +109,7 @@ class WhyItSuitsCard extends StatelessWidget {
     ];
   }
 
-  static String _text(MatchReason r) {
+  static String reasonText(MatchReason r) {
     final detail = r.detail == null ? '' : tr(r.detail!);
     switch (r.type) {
       case MatchReasonType.colorType:
@@ -134,6 +138,18 @@ class WhyItSuitsCard extends StatelessWidget {
         );
       case MatchReasonType.owned:
         return tr('Это средство уже есть в вашей косметичке');
+      case MatchReasonType.shadeFit:
+        return trf('Оттенок близок к вашей палитре: {v}', {'v': detail});
+      case MatchReasonType.shadeOff:
+        return trf('Оттенок ближе к палитре «{v}»: вам могут подойти другие', {
+          'v': detail,
+        });
+      case MatchReasonType.skinShade:
+        return trf('Оттенок близок к вашему тону кожи: {v}', {'v': detail});
+      case MatchReasonType.skinShadeOff:
+        return trf('Оттенок может не совпасть с вашим тоном кожи: {v}', {
+          'v': detail,
+        });
     }
   }
 }

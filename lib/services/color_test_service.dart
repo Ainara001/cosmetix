@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ColorOption {
-  const ColorOption(this.title, this.color, {this.warm = 0, this.depth = 0});
+  const ColorOption(
+    this.title,
+    this.color, {
+    this.warm = 0,
+    this.depth = 0,
+    this.contrast = 0,
+  });
 
   final String title;
   final Color color;
@@ -11,6 +17,10 @@ class ColorOption {
 
   /// Positive = deep (dark) coloring, negative = light.
   final int depth;
+
+  /// Positive = sharp contrast between hair/eyes and skin (clear, bright
+  /// colouring), negative = soft, blended colouring.
+  final int contrast;
 }
 
 class ColorQuestion {
@@ -113,6 +123,56 @@ class ColorTestService {
         ),
       ],
     ),
+    ColorQuestion('Украшения', 'Какой металл смотрится на вас лучше?', [
+      ColorOption('Серебро', Color(0xFFC0C5CE), warm: -2, depth: 0),
+      ColorOption('Золото', Color(0xFFD4AF37), warm: 2, depth: 0),
+      ColorOption('Розовое золото', Color(0xFFB76E79), warm: 0, depth: 0),
+      ColorOption('Одинаково хорошо', Color(0xFFB8B2A7), warm: 0, depth: 0),
+    ]),
+    ColorQuestion(
+      'Контраст',
+      'Насколько заметна разница между цветом волос, глаз и кожи?',
+      [
+        ColorOption(
+          'Очень контрастно',
+          Color(0xFF3B2F2F),
+          warm: 0,
+          depth: 0,
+          contrast: 2,
+        ),
+        ColorOption(
+          'Средне',
+          Color(0xFF8A6F63),
+          warm: 0,
+          depth: 0,
+          contrast: 0,
+        ),
+        ColorOption(
+          'Мягко, всё сливается',
+          Color(0xFFCDB8A6),
+          warm: 0,
+          depth: 0,
+          contrast: -2,
+        ),
+      ],
+    ),
+    ColorQuestion('Белое', 'Что вам больше идёт: чисто-белое или кремовое?', [
+      ColorOption(
+        'Чисто-белое',
+        Color(0xFFFFFFFF),
+        warm: -1,
+        depth: 0,
+        contrast: 1,
+      ),
+      ColorOption(
+        'Кремовое, слоновая кость',
+        Color(0xFFF3E7CF),
+        warm: 1,
+        depth: 0,
+        contrast: -1,
+      ),
+      ColorOption('Без разницы', Color(0xFFEDEDED), warm: 0, depth: 0),
+    ]),
   ];
 
   static const veinQuestion = [
@@ -131,12 +191,18 @@ class ColorTestService {
     ),
   ];
 
-  /// [warm] and [depth] are the sums of the chosen options; [vein] is the
-  /// score of the veins test (-3 cool, 0 neutral, 3 warm).
+  /// [warm], [depth] and [contrast] are the sums of the chosen options; [vein]
+  /// is the score of the veins test (-3 cool, 0 neutral, 3 warm).
+  ///
+  /// Warm vs cool comes from the undertone score. Inside each half the
+  /// "deep" type (Осень, Зима) needs deep colouring; a soft, blended look
+  /// pushes a warm person to Осень and a sharp contrast pushes a cool person
+  /// to Зима even when the hair and skin are not very dark.
   static ColorTestResult compute({
     required int warm,
     required int depth,
     required int vein,
+    int contrast = 0,
   }) {
     final totalWarm = warm + vein;
     final undertone = totalWarm >= 2
@@ -145,7 +211,8 @@ class ColorTestService {
         ? 'Холодный'
         : 'Нейтральный';
     final isWarm = totalWarm > 0 || (totalWarm == 0 && vein >= 0 && warm >= 0);
-    final isDeep = depth >= 2;
+    final isDeep =
+        depth >= 2 || (depth >= 1 && (isWarm ? contrast <= -2 : contrast >= 2));
     final String type;
     if (isWarm) {
       type = isDeep ? 'Осень' : 'Весна';

@@ -33,6 +33,7 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
     final result = ColorTestService.compute(
       warm: widget.args.warm,
       depth: widget.args.depth,
+      contrast: widget.args.contrast,
       vein: ColorTestService.veinQuestion[_selected!].$4,
     );
     // nothing is saved yet: the skin questions and the optional photo follow

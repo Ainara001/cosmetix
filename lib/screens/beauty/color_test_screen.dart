@@ -11,7 +11,8 @@ import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
-/// 5-step colour-type questionnaire.
+/// Colour-type questionnaire (eyes, hair, skin, sun, blush, jewellery,
+/// contrast, white vs cream).
 class ColorTestScreen extends StatefulWidget {
   const ColorTestScreen({super.key});
 
@@ -46,16 +47,17 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
       setState(() => _step++);
       return;
     }
-    var warm = 0, depth = 0;
+    var warm = 0, depth = 0, contrast = 0;
     for (var i = 0; i < _steps.length; i++) {
       final o = _steps[i].options[_answers[i]!];
       warm += o.warm;
       depth += o.depth;
+      contrast += o.contrast;
     }
     Navigator.pushNamed(
       context,
       AppRoutes.undertoneTest,
-      arguments: UndertoneArgs(warm: warm, depth: depth),
+      arguments: UndertoneArgs(warm: warm, depth: depth, contrast: contrast),
     );
   }
 

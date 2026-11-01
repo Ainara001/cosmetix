@@ -46,6 +46,19 @@ enum MatchReasonType {
 
   /// The user already has this product in the cosmetic bag.
   owned,
+
+  /// The product's shade is close to the palette of the user's colour type
+  /// (detail: the colour type).
+  shadeFit,
+
+  /// The shade is closer to another colour type (detail: that type).
+  shadeOff,
+
+  /// A foundation shade is close to the user's skin tone (detail: the tone).
+  skinShade,
+
+  /// A foundation shade differs from the user's skin tone (detail: the tone).
+  skinShadeOff,
 }
 
 /// What the user's own history says (only when they allowed it).

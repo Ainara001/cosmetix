@@ -1,4 +1,5 @@
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
+import 'package:cosmetix/core/beauty/color_palettes.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/care_models.dart';
 import 'package:cosmetix/models/reaction_insights.dart';
@@ -151,25 +152,34 @@ class RecommendationService {
 
     // color type / undertone: unknown or unspecified -> neutral 0.5
     var color = 0.5;
-    if (profile.colorType != null && c.colorTypes.isNotEmpty) {
-      if (c.colorTypes.contains(profile.colorType)) {
-        color = 1;
-        reasons.add(
-          MatchReason(MatchReasonType.colorType, profile.colorType!.label),
-        );
-      } else {
-        color = 0;
-      }
-    }
     var undertone = 0.5;
-    if (profile.undertone != null && c.undertones.isNotEmpty) {
-      if (c.undertones.contains(profile.undertone)) {
-        undertone = 1;
-        reasons.add(
-          MatchReason(MatchReasonType.undertone, profile.undertone!.label),
-        );
-      } else {
-        undertone = 0;
+    final shade = c.isColorCosmetic ? c.product.shade : null;
+    final byShade = shade == null
+        ? null
+        : _scoreShade(c, shade, profile, reasons);
+    if (byShade != null) {
+      // the shade's real colour was compared with the person (see below)
+      (color, undertone) = byShade;
+    } else {
+      if (profile.colorType != null && c.colorTypes.isNotEmpty) {
+        if (c.colorTypes.contains(profile.colorType)) {
+          color = 1;
+          reasons.add(
+            MatchReason(MatchReasonType.colorType, profile.colorType!.label),
+          );
+        } else {
+          color = 0;
+        }
+      }
+      if (profile.undertone != null && c.undertones.isNotEmpty) {
+        if (c.undertones.contains(profile.undertone)) {
+          undertone = 1;
+          reasons.add(
+            MatchReason(MatchReasonType.undertone, profile.undertone!.label),
+          );
+        } else {
+          undertone = 0;
+        }
       }
     }
 
@@ -220,6 +230,54 @@ class RecommendationService {
       score: total.clamp(0.0, 1.0),
       reasons: reasons,
     );
+  }
+
+  /// Compares the real colour of a makeup shade with the person: the palette
+  /// of their colour type (lips, cheeks, eyes) or, for a foundation or
+  /// cushion, their skin tone. Returns (color, undertone) scores, or null when
+  /// the profile has nothing to compare with, so the saved traits are used.
+  static (double, double)? _scoreShade(
+    ProductCandidate c,
+    int shade,
+    BeautyProfile profile,
+    List<MatchReason> reasons,
+  ) {
+    if (c.product.isBaseMakeup) {
+      final tone = profile.skinTone;
+      if (tone == null) return null;
+      final sim = ShadeMatcher.skinSimilarity(shade, tone, profile.undertone);
+      reasons.add(
+        MatchReason(
+          sim >= 0.55
+              ? MatchReasonType.skinShade
+              : MatchReasonType.skinShadeOff,
+          tone.label,
+        ),
+      );
+      return (sim, sim);
+    }
+    final type = profile.colorType;
+    if (type == null) return null;
+    final sim = ShadeMatcher.similarity(shade, type);
+    final nearest = ShadeMatcher.closestSeason(shade);
+    final ownD = ShadeMatcher.paletteDistance(shade, type);
+    final bestD = ShadeMatcher.paletteDistance(shade, nearest);
+    final fits = nearest == type || (sim >= 0.5 && ownD <= bestD + 6);
+    reasons.add(
+      fits
+          ? MatchReason(MatchReasonType.shadeFit, type.label)
+          : MatchReason(MatchReasonType.shadeOff, nearest.label),
+    );
+    var undertone = 0.5;
+    final want = profile.undertone;
+    if (want != null) {
+      final has = ShadeMatcher.undertoneOf(shade);
+      undertone = want == Undertone.neutral ? 0.7 : (want == has ? 1.0 : 0.0);
+      if (undertone == 1) {
+        reasons.add(MatchReason(MatchReasonType.undertone, want.label));
+      }
+    }
+    return (sim, undertone);
   }
 
   static bool _hasFragrance(ProductCandidate c) =>

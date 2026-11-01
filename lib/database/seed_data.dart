@@ -55,6 +55,7 @@ class SeedData {
         'description': p.description,
         'inci': p.inci,
         'source_url': p.source,
+        'shade': shades['${p.brand}|${p.name}'],
         'natural_percent': p.natural,
         'featured': p.featured ? 1 : 0,
         'trending': p.trending ? 1 : 0,
@@ -128,6 +129,35 @@ class SeedData {
     rows('product_undertones', 'undertone', t.undertones);
     rows('product_concerns', 'concern', t.concerns);
     rows('product_tags', 'tag', t.tags);
+  }
+
+  /// Representative colour of each makeup product (ARGB), sampled from its
+  /// photo. It is one shade of the line, so the match is approximate; it lets
+  /// the app compare the product with the colours of the user's colour type.
+  static const shades = {
+    'Rom&nd|Better Than Palette 05 Shade & Shadow Garden': 0xFFCCA186,
+    'Peripera|Heart Jam Glow Lip': 0xFFD24E5E,
+    'Rom&nd|Better Than Eyes': 0xFFC78A88,
+    'Peripera|Ink The Velvet 31 Wine Nude': 0xFF753E44,
+    'Peripera|Ink Mood Glowy Tint 30 Happy Berry': 0xFFF48C93,
+    'Rom&nd|Glasting Color Gloss': 0xFFAF8488,
+    'Missha|Magic Cushion Moist Up': 0xFFE3C1A6,
+    'Rom&nd|Better Than Cheek': 0xFFDDB1B6,
+  };
+
+  /// Migration step (DB v8): stores the shade colours above.
+  static Future<void> applyShades(DatabaseExecutor db) async {
+    final batch = db.batch();
+    shades.forEach((key, argb) {
+      final i = key.indexOf('|');
+      batch.update(
+        'products',
+        {'shade': argb},
+        where: 'brand = ? AND name = ?',
+        whereArgs: [key.substring(0, i), key.substring(i + 1)],
+      );
+    });
+    await batch.commit(noResult: true);
   }
 
   /// Migration step (DB v7): the first demo catalog had invented products. The

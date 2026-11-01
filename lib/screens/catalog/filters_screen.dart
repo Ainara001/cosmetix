@@ -8,6 +8,8 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/core/utils/validators.dart';
 import 'package:cosmetix/models/product_filter.dart';
 import 'package:cosmetix/routes/route_args.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
+import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/custom_text_field.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
@@ -29,10 +31,22 @@ class _FiltersScreenState extends State<FiltersScreen> {
   late final TextEditingController _max;
   late ProductFilter _filter;
 
+  /// How many catalog products each ingredient group would match.
+  late final Map<String, int> _counts;
+
   @override
   void initState() {
     super.initState();
     _filter = widget.args.initial;
+    _counts = {
+      for (final g in IngredientCatalog.groups)
+        g.code: widget.args.products.where((p) {
+          final has = IngredientCatalog.of(p).contains(g.code);
+          return g.kind == IngredientKind.avoid
+              ? p.inci.trim().isNotEmpty && !has
+              : has;
+        }).length,
+    };
     _name = TextEditingController(text: _filter.name);
     _min = TextEditingController(text: '${_filter.minPrice}');
     _max = TextEditingController(text: '${_filter.maxPrice}');
@@ -153,6 +167,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               ),
             ),
             const SizedBox(height: 14),
+            ..._composition(),
             _label(tr('Диапазон цены')),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
@@ -245,6 +260,96 @@ class _FiltersScreenState extends State<FiltersScreen> {
         ),
       ),
     );
+  }
+
+  void _toggleIngredient(IngredientGroup g) {
+    final avoid = g.kind == IngredientKind.avoid;
+    final set = {
+      ...(avoid ? _filter.withoutIngredients : _filter.withIngredients),
+    };
+    if (!set.add(g.code)) set.remove(g.code);
+    setState(
+      () => _filter = avoid
+          ? _filter.copyWith(withoutIngredients: set)
+          : _filter.copyWith(withIngredients: set),
+    );
+  }
+
+  /// "Composition" block: acids, actives and "free of" choices, matched
+  /// against the published INCI list of every product.
+  List<Widget> _composition() {
+    final pal = context.pal;
+    Widget group(IngredientKind kind) => Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr(kind.label),
+            style: AppTextStyles.caption.copyWith(color: pal.subtext),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final g in IngredientCatalog.ofKind(kind))
+                Opacity(
+                  opacity: (_counts[g.code] ?? 0) == 0 ? 0.5 : 1,
+                  child: AppChip(
+                    label: '${tr(g.label)} · ${_counts[g.code] ?? 0}',
+                    selected: kind == IngredientKind.avoid
+                        ? _filter.withoutIngredients.contains(g.code)
+                        : _filter.withIngredients.contains(g.code),
+                    onTap: () => _toggleIngredient(g),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+    return [
+      _label(tr('Состав')),
+      Text(
+        tr(
+          'Ищем по опубликованному списку INCI. Число рядом: сколько товаров подходит.',
+        ),
+        style: AppTextStyles.caption.copyWith(color: pal.subtext),
+      ),
+      const SizedBox(height: 8),
+      group(IngredientKind.acid),
+      group(IngredientKind.active),
+      if (_filter.withIngredients.length > 1)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: AppChip(
+                  label: tr('Все выбранные'),
+                  selected: !_filter.anyIngredient,
+                  onTap: () => setState(
+                    () => _filter = _filter.copyWith(anyIngredient: false),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: AppChip(
+                  label: tr('Любой из выбранных'),
+                  selected: _filter.anyIngredient,
+                  onTap: () => setState(
+                    () => _filter = _filter.copyWith(anyIngredient: true),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      group(IngredientKind.avoid),
+      const SizedBox(height: 4),
+    ];
   }
 
   Widget _label(String text) => Padding(

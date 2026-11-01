@@ -17,6 +17,7 @@ class Product {
     required this.createdAt,
     this.inci = '',
     this.sourceUrl = '',
+    this.shade,
     this.isFavorite = false,
     this.featured = false,
     this.trending = false,
@@ -39,9 +40,20 @@ class Product {
   /// Full ingredient list (INCI) as published, and the page it comes from.
   final String inci;
   final String sourceUrl;
+
+  /// Representative colour (ARGB) of a makeup product, if known.
+  final int? shade;
   final bool isFavorite;
   final bool featured;
   final bool trending;
+
+  /// Foundation / cushion: matched with the skin tone, not with the palette.
+  bool get isBaseMakeup =>
+      category == 'Макияж' &&
+      RegExp(
+        r'cushion|foundation|кушон|тональн',
+        caseSensitive: false,
+      ).hasMatch('$name $description');
 
   bool get hasDiscount => oldPrice != null && oldPrice! > price;
 
@@ -64,6 +76,7 @@ class Product {
     createdAt: createdAt,
     inci: inci,
     sourceUrl: sourceUrl,
+    shade: shade,
     isFavorite: isFavorite ?? this.isFavorite,
     featured: featured,
     trending: trending,
@@ -85,6 +98,7 @@ class Product {
     createdAt: m['created_at'] as int? ?? 0,
     inci: m['inci'] as String? ?? '',
     sourceUrl: m['source_url'] as String? ?? '',
+    shade: m['shade'] as int?,
     isFavorite: (m['is_fav'] as int? ?? 0) == 1,
     featured: (m['featured'] as int? ?? 0) == 1,
     trending: (m['trending'] as int? ?? 0) == 1,
