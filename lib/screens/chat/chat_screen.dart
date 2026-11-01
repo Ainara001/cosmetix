@@ -6,14 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
-import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
-import 'package:cosmetix/providers/settings_provider.dart';
-import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
-import 'package:cosmetix/widgets/product_art.dart';
+import 'package:cosmetix/widgets/product_mini_card.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -29,6 +26,8 @@ class _ChatScreenState extends State<ChatScreen> {
   static const _suggestions = [
     'Есть скидки?',
     'Посоветуй тинт для губ',
+    'Что подойдёт моему цветотипу?',
+    'Где есть ниацинамид?',
     'Какой состав у крема CeraVe?',
     'Сравни цены Rom&nd и Peripera',
   ];
@@ -184,6 +183,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 retryAfter: chat.retryAfter,
                 onRetry: () => context.read<ChatProvider>().retry(),
               ),
+            if (context.watch<CatalogProvider>().hasProfile && !ai.shareProfile)
+              _ShareProfileBanner(onAllow: () => ai.setShareProfile(true)),
             SizedBox(
               height: 40,
               child: ListView.separated(
@@ -286,7 +287,7 @@ class _Bubble extends StatelessWidget {
                   : (isUser ? const Color(0xFF1E1A1C) : pal.text),
             ),
           ),
-          for (final id in productIds) _ProductMiniCard(productId: id),
+          for (final id in productIds) ProductMiniCard(productId: id),
         ],
       ),
     );
@@ -315,6 +316,44 @@ class _Bubble extends StatelessWidget {
             const SizedBox(width: 8),
           ],
           Flexible(child: bubble),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Beauty Test is done but the AI may not use it: one tap to allow.
+class _ShareProfileBanner extends StatelessWidget {
+  const _ShareProfileBanner({required this.onAllow});
+
+  final VoidCallback onAllow;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.lock_outline,
+            size: 18,
+            color: AppColors.primaryDark,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              tr(
+                'ИИ не видит результаты вашего теста, поэтому советы по цветотипу и коже будут общими.',
+              ),
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+          TextButton(onPressed: onAllow, child: Text(tr('Разрешить'))),
         ],
       ),
     );
@@ -418,83 +457,6 @@ class _OfflineBanner extends StatelessWidget {
           if (failure != AiFailure.notConfigured)
             TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
         ],
-      ),
-    );
-  }
-}
-
-/// A small tappable product card inside an assistant answer.
-class _ProductMiniCard extends StatelessWidget {
-  const _ProductMiniCard({required this.productId});
-
-  final int productId;
-
-  @override
-  Widget build(BuildContext context) {
-    final Product? p = context.watch<CatalogProvider>().byId(productId);
-    // an id the model made up (or a product that is gone) shows nothing
-    if (p == null) return const SizedBox.shrink();
-    final pal = context.pal;
-    final price = context.watch<SettingsProvider>().priceText(p.price);
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Material(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () =>
-              Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: ProductArt(art: p.art, color: p.color, radius: 8),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        p.brand,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 10, color: pal.subtext),
-                      ),
-                      Text(
-                        tr(p.name),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ),
-                      ),
-                      Text(
-                        price,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: p.hasDiscount ? AppColors.sale : pal.text,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.primaryDark,
-                  size: 20,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

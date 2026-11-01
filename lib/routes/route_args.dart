@@ -12,12 +12,16 @@ class CatalogArgs {
     this.category,
     this.zone,
     this.onlySale = false,
+    this.ingredients = const {},
   });
 
   final String query;
   final String? category;
   final String? zone;
   final bool onlySale;
+
+  /// Composition filter to start with (codes of `IngredientGroup`).
+  final Set<String> ingredients;
 }
 
 class FiltersArgs {
@@ -44,10 +48,17 @@ class LegalArgs {
 
 /// Partial results of the colour-type test, passed to the undertone test.
 class UndertoneArgs {
-  const UndertoneArgs({required this.warm, required this.depth});
+  const UndertoneArgs({
+    required this.warm,
+    required this.depth,
+    this.contrast = 0,
+  });
 
   final int warm;
   final int depth;
+
+  /// Positive = high contrast between hair/eyes and skin, negative = soft.
+  final int contrast;
 }
 
 /// Beauty Test, step "about your skin": carries the colour-test result.

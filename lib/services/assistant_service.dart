@@ -1,10 +1,13 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
+import 'package:cosmetix/core/beauty/color_palettes.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/models/social_models.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
 /// The chat assistant: an AI model (through the Cosmetix AI proxy) that knows the
@@ -169,18 +172,32 @@ class AssistantService {
 - skin tone: ${v(p.skinTone?.label)}
 - undertone: ${v(p.undertone?.label)}
 - color type: ${v(p.colorType?.label)}
-- skin concerns: ${p.concerns.isEmpty ? 'none' : p.concerns.map((c) => c.label).join(', ')}'''
+- skin concerns: ${p.concerns.isEmpty ? 'none' : p.concerns.map((c) => c.label).join(', ')}${_paletteLines(p)}'''
         : 'not shared by the user (do not guess it; if it matters, suggest enabling "personal data for AI" in Settings)';
     final blocked = [
       for (final b in ctx.blacklist)
         if (b.enabled) b.name,
     ];
+    // the app's own match for every product (color type, undertone, skin...):
+    // the model quotes these facts instead of guessing
+    final fits = shareProfile
+        ? {
+            for (final r in RecommendationService.rank(
+              candidates: ctx.candidates,
+              profile: ctx.profile,
+              blacklist: ctx.blacklist,
+            ))
+              r.product.id: r,
+          }
+        : const <int, Recommendation>{};
     final catalog = [
       for (final c in ctx.candidates)
         if (shareProfile ||
             !RecommendationService.isBlacklisted(c, ctx.blacklist))
           '- [#${c.product.id}] ${c.product.brand} ${c.product.name} (${c.product.category}, '
               '${Formatters.price(c.product.price)})'
+              '${_actives(c.product)}'
+              '${fits[c.product.id] == null ? '' : _fits(fits[c.product.id]!)}'
               '${shareProfile && RecommendationService.isBlacklisted(c, ctx.blacklist) ? ' [CONTAINS BLACKLISTED INGREDIENT - never recommend]' : ''}',
     ].take(maxCatalogLines).toList();
     final focus = _focusProducts(ctx, question, productId, shareProfile);
@@ -198,9 +215,13 @@ Rules:
 - Recommend ONLY products from the CATALOG below. Never invent products, prices, stores or ingredients. If a product or fact is not in the data, say plainly that you have no data about it.
 - Never recommend a product that contains a blacklisted ingredient.
 - Base suitability answers on the Beauty Profile and the ingredient facts you are given, and explain them in simple words.
+- When the profile is shared, each catalog line has "fits:" facts computed by the app from the user's Beauty Test. For every product you recommend, say in a few words why it suits THIS person, using only those facts (for example "suits your color type" or "the shade is close to your palette", said in the answer language). Prefer products with a higher match; for makeup choose shades that fit the user's color type, undertone or skin tone.
+- Never claim a product fits the color type when its fits say the shade is closer to another palette: offer a better product from the catalog instead.
+- For questions about acids or active ingredients (hyaluronic, salicylic, niacinamide, retinol, ...) use the "actives:" part of the catalog lines and the INCI lists; if a product has no ingredient data, say so.
 - Keep answers short (under 120 words).
 - Write plain text: no markdown (no **bold**, no # headings, no tables).
-- Every time you recommend or mention a CATALOG product, write its name as in the catalog and put its marker, for example [#12], right after the name. Never invent a marker.
+- Every time you recommend a CATALOG product, write its full name as in the catalog and put its marker, for example [#12], right after the name. A marker never stands alone and never follows a word like "or"/"such as". Never invent a marker.
+- Mention only products that DO suit the user. Do not list products that do not fit, not even to say you do not recommend them: just say in a few words that the other shades belong to another palette.
 - Answer in $language.
 
 USER BEAUTY PROFILE:
@@ -211,6 +232,44 @@ USER BLACKLIST (ingredients to avoid): $blacklistLine
 CATALOG:
 ${catalog.join('\n')}
 ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
+  }
+
+  /// " | actives: Niacinamide (B3), ..." for the acids and actives in the INCI.
+  static String _actives(Product p) {
+    final a = IngredientCatalog.activesOf(p);
+    return a.isEmpty ? '' : ' | actives: ${a.map((g) => g.label).join(', ')}';
+  }
+
+  /// " | match 84%; fits: ..." from the app's own recommendation score.
+  static String _fits(Recommendation r) {
+    final facts = <String>{for (final x in r.reasons) ?_reasonFact(x)};
+    return ' | match ${r.matchPercent}%${facts.isEmpty ? '' : '; fits: ${facts.join('; ')}'}';
+  }
+
+  static String? _reasonFact(MatchReason r) => switch (r.type) {
+    MatchReasonType.colorType => 'suits color type ${r.detail}',
+    MatchReasonType.undertone => 'suits undertone ${r.detail}',
+    MatchReasonType.skinType => 'made for skin type ${r.detail}',
+    MatchReasonType.concern => 'helps with ${r.detail}',
+    MatchReasonType.gentle => 'gentle formula',
+    MatchReasonType.preference => 'matches preference: ${r.detail}',
+    MatchReasonType.shadeFit =>
+      'shade is close to the palette of color type ${r.detail}',
+    MatchReasonType.shadeOff =>
+      'shade is closer to the palette of ${r.detail}, NOT the user\'s color type',
+    MatchReasonType.skinShade => 'shade matches skin tone ${r.detail}',
+    MatchReasonType.skinShadeOff => 'shade may not match skin tone ${r.detail}',
+    _ => null,
+  };
+
+  /// Extra profile lines: the colours that flatter / do not flatter the type.
+  static String _paletteLines(BeautyProfile p) {
+    final type = p.colorType;
+    if (type == null) return '';
+    final pal = ColorPalettes.seasons[type]!;
+    String names(List<PaletteColor> l) => l.map((c) => c.name).join(', ');
+    return '\n- flattering makeup colors for ${type.label}: ${names(pal.flattering)}'
+        '\n- colors to avoid for ${type.label}: ${names(pal.avoid)}';
   }
 
   static List<ProductCandidate> _focusProducts(
@@ -263,6 +322,6 @@ ${p.inci.isEmpty ? '' : '  full INCI list (published by ${Uri.tryParse(p.sourceU
   made for color types: ${c.colorTypes.isEmpty ? 'not specified' : c.colorTypes.map((e) => e.label).join(', ')}
 ${shareProfile ? '''
   blacklisted ingredients found: ${hits.isEmpty ? 'none' : hits.join(', ')}
-  local match with the user: ${match == null ? 'excluded (blacklist)' : '$match%'}''' : ''}''';
+  local match with the user: ${match == null ? 'excluded (blacklist)' : '$match%'}${ranked.isEmpty ? '' : _fits(ranked.first)}''' : ''}''';
   }
 }

@@ -11,7 +11,9 @@ import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
@@ -43,6 +45,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       category: widget.args.category,
       zone: widget.args.zone,
       status: widget.args.onlySale ? ProductStatus.sale : ProductStatus.any,
+      withIngredients: widget.args.ingredients,
     );
   }
 
@@ -92,6 +95,99 @@ class _CatalogScreenState extends State<CatalogScreen> {
     });
   }
 
+  void _toggleIngredient(String code) {
+    final avoid = IngredientCatalog.byCode(code)?.kind == IngredientKind.avoid;
+    final set = {
+      ...(avoid ? _filter.withoutIngredients : _filter.withIngredients),
+    };
+    if (!set.add(code)) set.remove(code);
+    setState(
+      () => _filter = avoid
+          ? _filter.copyWith(withoutIngredients: set)
+          : _filter.copyWith(withIngredients: set),
+    );
+  }
+
+  /// One-tap composition filters: what is chosen, then the actives that the
+  /// catalog has the most of. The full list is in "Фильтры".
+  Widget _ingredientRow(CatalogProvider catalog) {
+    final counts = <String, int>{};
+    for (final p in catalog.products) {
+      for (final c in IngredientCatalog.of(p)) {
+        counts[c] = (counts[c] ?? 0) + 1;
+      }
+    }
+    final chosen = {..._filter.withIngredients, ..._filter.withoutIngredients};
+    final popular =
+        counts.entries
+            .where(
+              (e) =>
+                  !chosen.contains(e.key) &&
+                  IngredientCatalog.byCode(e.key)?.kind != IngredientKind.avoid,
+            )
+            .toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+    final codes = [...chosen, ...popular.take(7).map((e) => e.key)];
+    if (codes.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: SizedBox(
+        height: 38,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Text(
+                  tr('Состав:'),
+                  style: TextStyle(fontSize: 12, color: context.pal.subtext),
+                ),
+              ),
+            ),
+            for (final code in codes) ...[
+              AppChip(
+                label: tr(IngredientCatalog.byCode(code)!.label),
+                selected: chosen.contains(code),
+                onTap: () => _toggleIngredient(code),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Under a card: the personal match and, while composition filters are
+  /// on, which of the wanted ingredients the product really has.
+  Widget? _cardFooter(Product p, int? match) {
+    final found = [
+      for (final g in IngredientCatalog.activesOf(p))
+        if (_filter.withIngredients.contains(g.code)) tr(g.label),
+    ];
+    if (match == null && found.isEmpty) return null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (match != null) MatchBadge(percent: match),
+        if (found.isNotEmpty)
+          Text(
+            found.join(', '),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryDark,
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final catalog = context.watch<CatalogProvider>();
@@ -113,7 +209,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
         _filter.category != null ||
         _filter.status != ProductStatus.any ||
         _filter.minPrice > 0 ||
-        _filter.maxPrice < AppConstants.maxPrice;
+        _filter.maxPrice < AppConstants.maxPrice ||
+        _filter.hasIngredientFilter;
 
     return PageScaffold(
       title: tr('Каталог'),
@@ -171,6 +268,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ],
             ),
           ),
+          _ingredientRow(catalog),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 6, 8, 0),
             child: Row(
@@ -279,7 +377,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       gridDelegate: productGridDelegate(
         context,
-        extent: matches.isEmpty ? 250 : 270,
+        extent:
+            (matches.isEmpty ? 250 : 270) +
+            (_filter.withIngredients.isEmpty ? 0 : 22),
       ),
       itemCount: items.length,
       itemBuilder: (context, i) {
@@ -287,7 +387,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
         final match = matches[p.id];
         return ProductCard(
           product: p,
-          footer: match == null ? null : MatchBadge(percent: match),
+          footer: _cardFooter(p, match),
           onTap: () =>
               Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),
           onFavorite: () async {

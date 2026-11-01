@@ -17,6 +17,8 @@ import 'package:cosmetix/providers/safety_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/repositories/review_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/routes/route_args.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -110,6 +112,39 @@ class _ProductBodyState extends State<_ProductBody> {
       trf('«{v0}» добавлен в корзину', {'v0': tr(product.name)}),
       type: MessageType.success,
     );
+  }
+
+  /// Acids and actives found in the INCI list; a tap shows every product
+  /// with the same ingredient.
+  List<Widget> _activeChips(BuildContext context, Product product) {
+    final actives = IngredientCatalog.activesOf(product);
+    if (actives.isEmpty) return const [];
+    return [
+      Text(
+        tr('Ключевые компоненты'),
+        style: AppTextStyles.caption.copyWith(color: context.pal.subtext),
+      ),
+      const SizedBox(height: 6),
+      Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          for (final g in actives)
+            ActionChip(
+              visualDensity: VisualDensity.compact,
+              label: Text(tr(g.label), style: const TextStyle(fontSize: 12)),
+              backgroundColor: AppColors.primarySoft,
+              side: BorderSide.none,
+              onPressed: () => Navigator.pushNamed(
+                context,
+                AppRoutes.catalog,
+                arguments: CatalogArgs(ingredients: {g.code}),
+              ),
+            ),
+        ],
+      ),
+      const SizedBox(height: 10),
+    ];
   }
 
   @override
@@ -371,6 +406,7 @@ class _ProductBodyState extends State<_ProductBody> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              ..._activeChips(context, product),
                               SelectableText(
                                 product.inci,
                                 style: AppTextStyles.small,

@@ -1,6 +1,10 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
+import 'package:cosmetix/core/beauty/beauty_codes.dart';
+import 'package:cosmetix/core/beauty/color_palettes.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/routes/app_routes.dart';
@@ -8,7 +12,11 @@ import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/color_test_service.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/models/recommendation.dart';
+import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/product_mini_card.dart';
+import 'package:cosmetix/widgets/why_it_suits_card.dart';
 
 /// Final Beauty Profile: what the questionnaire (and the optional photo)
 /// found. It is already saved and now drives the recommendations.
@@ -17,19 +25,12 @@ class ColorResultScreen extends StatelessWidget {
 
   final BeautyResultArgs result;
 
-  static const _palettes = {
-    'Весна': [0xFFF6B8A0, 0xFFF3C969, 0xFFE9967A, 0xFFB5D99C, 0xFFFFD9B3],
-    'Лето': [0xFFE5A1B5, 0xFFB9A3D6, 0xFF9FB8D6, 0xFFD7B5C8, 0xFFC9D6EA],
-    'Осень': [0xFFB5532F, 0xFFC98B2F, 0xFF7A8450, 0xFF8A5A3C, 0xFFD9A066],
-    'Зима': [0xFF8E1E4A, 0xFF1F3C88, 0xFF5B2A86, 0xFFD6336C, 0xFF222222],
-  };
-
   @override
   Widget build(BuildContext context) {
     final pal = context.pal;
     final p = result.profile;
     final colorType = p.colorType?.label ?? '';
-    final colors = _palettes[colorType] ?? _palettes['Весна']!;
+    final palette = ColorPalettes.seasons[p.colorType ?? ColorType.spring]!;
     final description = ColorTestResult(
       colorType: colorType,
       undertone: p.undertone?.label ?? '',
@@ -152,13 +153,12 @@ class ColorResultScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(tr('Ваши оттенки'), style: AppTextStyles.subtitle),
             const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                for (final c in colors)
-                  CircleAvatar(radius: 24, backgroundColor: Color(c)),
-              ],
-            ),
+            _Swatches(colors: palette.flattering),
+            const SizedBox(height: 14),
+            Text(tr('Лучше избегать'), style: AppTextStyles.subtitle),
+            const SizedBox(height: 10),
+            _Swatches(colors: palette.avoid, muted: true),
+            const _ShadePicks(),
             const SizedBox(height: 14),
             Text(
               tr('Результат сохранён в вашем бьюти-профиле.'),
@@ -220,4 +220,88 @@ class _Info extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// Named colour dots (the palette of the colour type).
+class _Swatches extends StatelessWidget {
+  const _Swatches({required this.colors, this.muted = false});
+
+  final List<PaletteColor> colors;
+  final bool muted;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: 10,
+    runSpacing: 10,
+    children: [
+      for (final c in colors)
+        SizedBox(
+          width: 70,
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircleAvatar(radius: 24, backgroundColor: Color(c.argb)),
+                  if (muted)
+                    const Icon(Icons.close, color: Colors.white, size: 22),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                tr(c.name),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                style: AppTextStyles.caption.copyWith(
+                  color: context.pal.subtext,
+                ),
+              ),
+            ],
+          ),
+        ),
+    ],
+  );
+}
+
+/// Makeup from the catalog whose real shade is closest to the person's
+/// palette (or skin tone for a base), with the reason.
+class _ShadePicks extends StatelessWidget {
+  const _ShadePicks();
+
+  @override
+  Widget build(BuildContext context) {
+    final catalog = context.watch<CatalogProvider>();
+    if (!catalog.hasProfile) return const SizedBox.shrink();
+    final ranked = catalog
+        .recommend([
+          for (final p in catalog.products)
+            if (p.category == 'Макияж' && p.shade != null) p,
+        ])
+        .take(3)
+        .toList();
+    if (ranked.isEmpty) return const SizedBox.shrink();
+    const shadeTypes = {
+      MatchReasonType.shadeFit,
+      MatchReasonType.shadeOff,
+      MatchReasonType.skinShade,
+      MatchReasonType.skinShadeOff,
+    };
+    String note(Recommendation r) {
+      final why = r.reasons.where((x) => shadeTypes.contains(x.type));
+      final text = why.isEmpty
+          ? ''
+          : ' · ${WhyItSuitsCard.reasonText(why.first)}';
+      return '${r.matchPercent}%$text';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 18),
+        Text(tr('Из каталога вам идут'), style: AppTextStyles.subtitle),
+        for (final r in ranked)
+          ProductMiniCard(productId: r.product.id, note: note(r)),
+      ],
+    );
+  }
 }
