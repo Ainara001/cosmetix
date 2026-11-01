@@ -345,17 +345,20 @@ test('Gemini failures map to clean errors', async () => {
   }
 });
 
-test('Gemini "high demand" (503) is retried twice, then reported', async () => {
+test('Gemini "high demand" (503): retry, then the fallback model, then report', async () => {
   const busy = { ok: false, status: 503, headers: new Headers(), json: async () => ({}) };
-  let calls = 0;
-  const s = await start(geminiEnv, async () => {
-    calls += 1;
-    return calls < 3 ? busy : geminiReply('Получилось')();
+  const urls = [];
+  const s = await start(geminiEnv, async (url) => {
+    urls.push(String(url));
+    return urls.length < 3 ? busy : geminiReply('Получилось')();
   });
   const res = await s.chat(ask());
   assert.equal(res.status, 200);
   assert.equal((await res.json()).text, 'Получилось');
-  assert.equal(calls, 3);
+  // main model twice, the third try goes to the fallback model
+  assert.equal(urls.length, 3);
+  assert.ok(urls[0].includes('gemini-2.5-flash:') && urls[1].includes('gemini-2.5-flash:'));
+  assert.ok(urls[2].includes('gemini-flash-lite-latest:'));
   await s.close();
 
   let always = 0;
@@ -366,6 +369,16 @@ test('Gemini "high demand" (503) is retried twice, then reported', async () => {
   const res2 = await s2.chat(ask());
   assert.equal(res2.status, 503);
   assert.equal((await res2.json()).error, 'upstream_unavailable');
-  assert.equal(always, 3);
+  assert.equal(always, 5); // 2 on the main model + 3 on the fallback
   await s2.close();
+
+  // without a fallback the old behaviour stays: 3 tries on the main model
+  let single = 0;
+  const s3 = await start({ ...geminiEnv, GEMINI_FALLBACK_MODEL: '' }, async () => {
+    single += 1;
+    return busy;
+  });
+  assert.equal((await s3.chat(ask())).status, 503);
+  assert.equal(single, 3);
+  await s3.close();
 });

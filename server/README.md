@@ -50,6 +50,7 @@ upstream_bad_response`, `503 upstream_unavailable | mock_no_structured`,
 | `UPSTREAM_RETRY_MS` | 800 | pause before retrying Gemini's "high demand" (503), up to 2 retries |
 | `APP_TOKEN` | empty | if set, the app must send it as `x-app-token` |
 | `GEMINI_MODEL` | `gemini-3.1-flash-lite` | cheap and fast; model names change often, list yours with `GET /v1beta/models` |
+| `GEMINI_FALLBACK_MODEL` | `gemini-flash-lite-latest` | used when `GEMINI_MODEL` keeps answering 503; empty disables the fallback |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | cheap and good enough; change freely |
 
 Input limits: 20 messages, 6 000 characters per message, 24 000 in total, 2 JPEG /
