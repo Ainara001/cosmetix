@@ -1374,4 +1374,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'ул. Сыганак, 17Б': 'Syganak St., 17B',
   'пр. Кабанбай батыра, 58Б': 'Kabanbay Batyr Ave., 58B',
   'Тёмный бордо': 'Dark burgundy',
+  'Есть альтернативы подешевле рядом?':
+      'Are there cheaper alternatives nearby?',
 };

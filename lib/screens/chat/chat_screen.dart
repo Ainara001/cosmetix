@@ -29,6 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
     'Что подойдёт моему цветотипу?',
     'Где есть ниацинамид?',
     'Где купить Niacinamide рядом со мной?',
+    'Есть альтернативы подешевле рядом?',
     'Какой состав у крема CeraVe?',
     'Сравни цены Rom&nd и Peripera',
   ];
