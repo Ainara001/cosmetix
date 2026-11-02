@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
+import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/app_user.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
@@ -94,7 +95,7 @@ class ProfileScreen extends StatelessWidget {
                               tr('Редактировать профиль'),
                               style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.primaryDark,
+                                color: context.pal.accent,
                               ),
                             ),
                           ],
@@ -214,10 +215,10 @@ class _Stat extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
-              color: AppColors.primaryDark,
+              color: context.pal.accent,
             ),
           ),
         ],
@@ -237,25 +238,63 @@ class _BeautySummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.pal;
     final done = user.hasBeautyProfile;
-    Widget cell(String label, String value) => Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTextStyles.label.copyWith(color: pal.subtext)),
-          const SizedBox(height: 2),
-          // one line, scaled down: a long word is never cut in the middle
-          FittedBox(
-            alignment: Alignment.centerLeft,
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value.isEmpty ? '—' : tr(value),
-              style: AppTextStyles.bodyBold,
-              maxLines: 1,
+    // [short]: skin type and undertone are long words ("Комбинированная"),
+    // so the card shows their first letter big; a tap tells the full word.
+    // The colour type is short ("Лето") and stays whole.
+    Widget cell(String label, String value, {bool short = false}) {
+      final full = value.isEmpty ? '' : tr(value);
+      final shown = full.isEmpty
+          ? '—'
+          : short
+          ? full.characters.first.toUpperCase()
+          : full;
+      return Expanded(
+        child: Semantics(
+          label: '$label: ${full.isEmpty ? '—' : full}',
+          button: short && full.isNotEmpty,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: short && full.isNotEmpty
+                ? () => showMessage(
+                    context,
+                    '${label[0]}${label.substring(1).toLowerCase()}: $full',
+                    type: MessageType.info,
+                  )
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTextStyles.label.copyWith(color: pal.subtext),
+                  ),
+                  const SizedBox(height: 2),
+                  // one line, scaled down: a long word is never cut in the middle
+                  FittedBox(
+                    alignment: Alignment.centerLeft,
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      shown,
+                      style: short
+                          ? AppTextStyles.bodyBold.copyWith(
+                              fontSize: 22,
+                              height: 1.1,
+                              color: context.pal.accent,
+                            )
+                          : AppTextStyles.bodyBold,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    }
+
     return AppCard(
       radius: 20,
       child: Column(
@@ -268,8 +307,8 @@ class _BeautySummary extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 cell(tr('ЦВЕТОТИП'), user.colorType),
-                cell(tr('ТИП КОЖИ'), user.skinType),
-                cell(tr('ПОДТОН'), user.undertone),
+                cell(tr('ТИП КОЖИ'), user.skinType, short: true),
+                cell(tr('ПОДТОН'), user.undertone, short: true),
               ],
             )
           else

@@ -26,6 +26,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.subtext,
     required this.border,
     required this.field,
+    required this.accent,
   });
 
   final Color background;
@@ -35,13 +36,18 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color border;
   final Color field;
 
+  /// Pink for text and icons on pink or white surfaces: dark enough to read
+  /// on [AppColors.primarySoft] in the light theme (4.5:1), lighter in dark.
+  final Color accent;
+
   static const light = AppPalette(
     background: Color(0xFFF8F4F5),
     surface: Colors.white,
     text: Color(0xFF1E1A1C),
-    subtext: Color(0xFF8E8689),
+    subtext: Color(0xFF6A6265),
     border: Color(0xFFEBDCE0),
     field: Color(0xFFF1EDEE),
+    accent: Color(0xFF94455D),
   );
 
   static const dark = AppPalette(
@@ -51,6 +57,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     subtext: Color(0xFFA89EA2),
     border: Color(0xFF3A3135),
     field: Color(0xFF2C2528),
+    accent: Color(0xFFE0A3B5),
   );
 
   @override
@@ -61,6 +68,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? subtext,
     Color? border,
     Color? field,
+    Color? accent,
   }) {
     return AppPalette(
       background: background ?? this.background,
@@ -69,6 +77,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       subtext: subtext ?? this.subtext,
       border: border ?? this.border,
       field: field ?? this.field,
+      accent: accent ?? this.accent,
     );
   }
 
@@ -82,6 +91,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       subtext: Color.lerp(subtext, other.subtext, t)!,
       border: Color.lerp(border, other.border, t)!,
       field: Color.lerp(field, other.field, t)!,
+      accent: Color.lerp(accent, other.accent, t)!,
     );
   }
 }

@@ -223,7 +223,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                   trailing: Text(
                     trf('{v0} фото', {'v0': withPhoto.length}),
                     style: AppTextStyles.small.copyWith(
-                      color: AppColors.primaryDark,
+                      color: context.pal.accent,
                     ),
                   ),
                 ),
@@ -299,9 +299,9 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                     'отзывов',
                                   ),
                                 }),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
-                                  color: AppColors.primaryDark,
+                                  color: context.pal.accent,
                                 ),
                               ),
                             ),

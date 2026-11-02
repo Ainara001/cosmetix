@@ -88,7 +88,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                               Expanded(
                                 child: Text(
                                   '${tr(l.name)} × ${l.quantity}',
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTextStyles.small,
                                 ),
@@ -125,8 +125,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             Expanded(child: Text(tr('Списано бонусов'))),
                             Text(
                               '−${order.bonusSpent}',
-                              style: const TextStyle(
-                                color: AppColors.primaryDark,
+                              style: TextStyle(
+                                color: context.pal.accent,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -139,8 +139,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                           Expanded(child: Text(tr('Начислено бонусов'))),
                           Text(
                             '+${order.bonus}',
-                            style: const TextStyle(
-                              color: AppColors.primaryDark,
+                            style: TextStyle(
+                              color: context.pal.accent,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

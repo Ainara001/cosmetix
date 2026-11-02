@@ -112,11 +112,8 @@ class _ProductBodyState extends State<_ProductBody> {
       showMessage(context, error, type: MessageType.warning);
       return;
     }
-    showMessage(
-      context,
-      trf('«{v0}» добавлен в корзину', {'v0': tr(product.name)}),
-      type: MessageType.success,
-    );
+    // no pop-up on success: it would cover the counter that now shows the
+    // result ("1 в корзине") and the minus/plus buttons
   }
 
   /// "How it goes with your care": conflicts with the cosmetic bag, layering
@@ -167,6 +164,16 @@ class _ProductBodyState extends State<_ProductBody> {
             }),
           ),
       ],
+    ];
+  }
+
+  /// Other shades of the line: palettes 00-07, tints 01, 03, 30...
+  List<Widget> _variants(BuildContext context, Product product) {
+    final others = context.read<CatalogProvider>().variantsOf(product);
+    if (others.isEmpty) return const [];
+    return [
+      SectionTitle(tr('Другие оттенки')),
+      for (final p in others) _ShadeTile(product: p),
     ];
   }
 
@@ -274,7 +281,7 @@ class _ProductBodyState extends State<_ProductBody> {
         },
         icon: Icon(
           product.isFavorite ? Icons.favorite : Icons.favorite_border,
-          color: AppColors.primaryDark,
+          color: context.pal.accent,
         ),
       ),
       child: _loading
@@ -379,6 +386,7 @@ class _ProductBodyState extends State<_ProductBody> {
                       ],
                       WhyItSuitsCard(productId: product.id),
                       ..._compat(context, product),
+                      ..._variants(context, product),
                       const SizedBox(height: 10),
                       CustomButton(
                         label: tr('Спросить ИИ: подойдёт ли мне?'),
@@ -629,13 +637,26 @@ class _ProductBodyState extends State<_ProductBody> {
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: CustomButton(
-                          label:
-                              context.watch<CartProvider>().contains(product.id)
-                              ? tr('Ещё одну в корзину')
-                              : tr('В корзину'),
-                          icon: Icons.shopping_cart_outlined,
-                          onPressed: () => _addToCart(product),
+                        child: Builder(
+                          builder: (context) {
+                            final qty = context
+                                .watch<CartProvider>()
+                                .quantityOf(product.id);
+                            if (qty == 0) {
+                              return CustomButton(
+                                label: tr('В корзину'),
+                                icon: Icons.shopping_cart_outlined,
+                                onPressed: () => _addToCart(product),
+                              );
+                            }
+                            return _CartStepper(
+                              quantity: qty,
+                              onMinus: () => context
+                                  .read<CartProvider>()
+                                  .decrease(product.id),
+                              onPlus: () => _addToCart(product),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -643,6 +664,141 @@ class _ProductBodyState extends State<_ProductBody> {
                 ),
               ],
             ),
+    );
+  }
+}
+
+/// Replaces the big "Add to cart" button once the product is in the cart:
+/// a compact counter, so the bar stays calm and the count is visible.
+class _CartStepper extends StatelessWidget {
+  const _CartStepper({
+    required this.quantity,
+    required this.onMinus,
+    required this.onPlus,
+  });
+
+  final int quantity;
+  final VoidCallback onMinus;
+  final VoidCallback onPlus;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    Widget round(IconData icon, String tip, VoidCallback onTap) => IconButton(
+      tooltip: tip,
+      onPressed: onTap,
+      icon: Icon(icon, color: context.pal.accent),
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.primarySoft,
+        minimumSize: const Size(44, 44),
+      ),
+    );
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: pal.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppColors.primary),
+      ),
+      child: Row(
+        children: [
+          round(Icons.remove, tr('Убрать одну'), onMinus),
+          Expanded(
+            // scales down on a narrow screen instead of overflowing
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 18,
+                    color: context.pal.accent,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    trf('{v0} в корзине', {'v0': quantity}),
+                    maxLines: 1,
+                    style: AppTextStyles.bodyBold.copyWith(
+                      color: context.pal.accent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          round(Icons.add, tr('Добавить ещё'), onPlus),
+        ],
+      ),
+    );
+  }
+}
+
+/// One other shade of the line: photo, the shade ("01 Pampas Garden") and the
+/// price. The brand and the line are not repeated, the page is that line.
+class _ShadeTile extends StatelessWidget {
+  const _ShadeTile({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    final price = context.watch<SettingsProvider>().priceText(product.price);
+    final shade = product.name
+        .split(' ')
+        .skipWhile((w) => !RegExp(r'^\d').hasMatch(w))
+        .join(' ');
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: AppColors.blush,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.product,
+            arguments: product.id,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: ProductArt(
+                    art: product.art,
+                    color: product.color,
+                    radius: 8,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr(shade), style: AppTextStyles.bodyBold),
+                      Text(
+                        price,
+                        style: AppTextStyles.small.copyWith(
+                          color: product.hasDiscount
+                              ? AppColors.sale
+                              : pal.subtext,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: pal.accent, size: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -704,10 +860,7 @@ class _StoreRow extends StatelessWidget {
               backgroundColor: AppColors.primarySoft,
               child: Text(
                 '0$index',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.primaryDark,
-                ),
+                style: TextStyle(fontSize: 12, color: context.pal.accent),
               ),
             ),
             const SizedBox(width: 10),

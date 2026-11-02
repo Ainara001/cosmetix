@@ -135,9 +135,7 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
                       _selected == i
                           ? Icons.radio_button_checked
                           : Icons.radio_button_unchecked,
-                      color: _selected == i
-                          ? AppColors.primaryDark
-                          : pal.border,
+                      color: _selected == i ? context.pal.accent : pal.border,
                     ),
                   ],
                 ),

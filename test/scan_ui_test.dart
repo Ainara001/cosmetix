@@ -56,6 +56,14 @@ Future<void> _tapCheck(WidgetTester t) async {
   await _settle(t, 2);
 }
 
+/// Closes the pop-up with the outcome of a check.
+Future<void> _closeOutcome(WidgetTester t) async {
+  await t.pumpAndSettle(); // the sheet slides in
+  await t.tap(find.text('Понятно'));
+  await t.pumpAndSettle(); // the sheet slides away
+  expect(find.byType(BottomSheet), findsNothing);
+}
+
 /// Scrolls the list (down, then up) until [finder] is built and on screen.
 Future<void> _see(WidgetTester t, Finder finder) async {
   if (finder.hitTestable().evaluate().isNotEmpty) return;
@@ -113,6 +121,17 @@ void main() {
     expect(find.textContaining('Состав распознан'), findsOneWidget);
 
     await _tapCheck(t);
+    // the outcome pops up: what was found and what was checked and not found
+    expect(
+      find.text('Найдено совпадений с чёрным списком: 2'),
+      findsNWidgets(1),
+    );
+    expect(
+      find.textContaining('Парабены: найдено (Methylparaben)'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Формальдегид: не найдено'), findsOneWidget);
+    await _closeOutcome(t);
     await _see(t, find.text('Результат'));
     // demo user: parabens, sulfates and formaldehyde are on; silicones are off
     await _see(t, find.text('Найдено совпадений с чёрным списком: 2'));
@@ -125,6 +144,9 @@ void main() {
     await _see(t, field);
     await t.enterText(field, 'Aqua, Glycerin, Tocopherol');
     await _tapCheck(t);
+    expect(find.text('Из чёрного списка ничего не найдено'), findsOneWidget);
+    expect(find.textContaining('Парабены: не найдено'), findsOneWidget);
+    await _closeOutcome(t);
     await _see(t, find.text('Совпадений с вашим чёрным списком не найдено.'));
     await _see(t, find.textContaining('не гарантия'));
     expect(t.takeException(), isNull);
@@ -151,6 +173,7 @@ void main() {
     expect(find.textContaining('Введите состав вручную'), findsOneWidget);
     await t.enterText(find.byType(TextField), 'Aqua, Propylparaben');
     await _tapCheck(t);
+    await _closeOutcome(t);
     await _see(t, find.text('Найдено совпадений с чёрным списком: 1'));
   });
 

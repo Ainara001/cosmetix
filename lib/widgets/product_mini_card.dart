@@ -77,18 +77,18 @@ class ProductMiniCard extends StatelessWidget {
                           note!,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primaryDark,
+                            color: context.pal.accent,
                           ),
                         ),
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right,
-                  color: AppColors.primaryDark,
+                  color: context.pal.accent,
                   size: 20,
                 ),
               ],

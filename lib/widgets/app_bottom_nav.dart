@@ -78,7 +78,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? AppColors.primaryDark : context.pal.subtext;
+    final color = active ? context.pal.accent : context.pal.subtext;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

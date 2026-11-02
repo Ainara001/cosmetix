@@ -17,12 +17,12 @@ import 'package:cosmetix/widgets/product_card.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  /// (catalog category, icon, short caption under the icon)
+  /// (catalog category, icon, label of the pill: always the whole word)
   static const _categories = [
     ('Макияж', 'cat_makeup', 'Макияж'),
-    ('Уход за лицом', 'cat_care', 'Уход'),
-    ('Парфюмерия', 'cat_perfume', 'Парфюм'),
-    ('Тело и ванна', 'cat_body', 'Тело'),
+    ('Уход за лицом', 'cat_care', 'Уход за лицом'),
+    ('Парфюмерия', 'cat_perfume', 'Парфюмерия'),
+    ('Тело и ванна', 'cat_body', 'Тело и ванна'),
     ('Волосы', 'cat_hair', 'Волосы'),
     ('Подарки', 'cat_gift', 'Подарки'),
   ];
@@ -70,53 +70,54 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             // shopping first: categories, then the offer, then the personal tools
-            AppCard(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-              radius: 20,
-              child: Row(
-                children: [
-                  for (final c in _categories)
-                    Expanded(
-                      child: Tooltip(
-                        message: tr(c.$1),
-                        child: InkWell(
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            AppRoutes.catalog,
-                            arguments: CatalogArgs(category: c.$1),
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/${c.$2}.png',
-                                  width: 34,
-                                  height: 34,
-                                  cacheWidth: 136,
-                                  errorBuilder: (_, _, _) => const Icon(
-                                    Icons.spa_outlined,
-                                    size: 34,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  tr(c.$3),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.caption,
-                                ),
-                              ],
+            SizedBox(
+              height: 46,
+              // runs to the screen edge, so the last pill is visibly cut off:
+              // the row obviously scrolls
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                itemCount: _categories.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                itemBuilder: (context, i) {
+                  final c = _categories[i];
+                  return Material(
+                    color: pal.surface,
+                    shape: StadiumBorder(side: BorderSide(color: pal.border)),
+                    child: InkWell(
+                      customBorder: const StadiumBorder(),
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        AppRoutes.catalog,
+                        arguments: CatalogArgs(category: c.$1),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 16, 0),
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'assets/icons/${c.$2}.png',
+                              width: 28,
+                              height: 28,
+                              cacheWidth: 112,
+                              errorBuilder: (_, _, _) => Icon(
+                                Icons.spa_outlined,
+                                size: 28,
+                                color: context.pal.accent,
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            Text(
+                              tr(c.$3),
+                              maxLines: 1,
+                              style: AppTextStyles.bodyBold,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 12),
@@ -265,7 +266,7 @@ class _Banner extends StatelessWidget {
                       Icon(
                         Icons.local_florist_outlined,
                         size: 16,
-                        color: AppColors.primaryDark,
+                        color: context.pal.accent,
                       ),
                       SizedBox(width: 6),
                       Flexible(
@@ -279,7 +280,7 @@ class _Banner extends StatelessWidget {
                       Icon(
                         Icons.chevron_right,
                         size: 18,
-                        color: AppColors.primaryDark,
+                        color: context.pal.accent,
                       ),
                     ],
                   ),
@@ -343,21 +344,19 @@ class _QuickAccess extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
-        // icon + padding are fixed, the two label lines grow with the system
-        // font size, so the tile never overflows
-        mainAxisExtent: 60 + MediaQuery.textScalerOf(context).scale(32),
+        // a label of two lines grows with the system font size
+        mainAxisExtent: 36 + MediaQuery.textScalerOf(context).scale(40),
       ),
       children: [
         for (final i in items)
           AppCard(
             onTap: i.$3,
             radius: 16,
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: Row(
               children: [
                 Container(
                   width: 36,
@@ -366,15 +365,19 @@ class _QuickAccess extends StatelessWidget {
                     color: AppColors.primarySoft,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(i.$1, size: 20, color: AppColors.primaryDark),
+                  child: Icon(i.$1, size: 20, color: context.pal.accent),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  tr(i.$2),
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.caption,
+                const SizedBox(width: 10),
+                // whole words wrap onto the second line, nothing is cut inside
+                Expanded(
+                  child: Text(
+                    tr(i.$2),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.small.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),

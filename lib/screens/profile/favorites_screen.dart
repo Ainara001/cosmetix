@@ -79,15 +79,16 @@ class FavoritesScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   tr(p.name),
-                                  maxLines: 1,
+                                  maxLines:
+                                      3, // whole words, no cut in the middle
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTextStyles.bodyBold,
                                 ),
                                 Text(
                                   fmt(p.price),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.primaryDark,
+                                    color: context.pal.accent,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -118,9 +119,9 @@ class FavoritesScreen extends StatelessWidget {
                                   ),
                                 );
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.favorite,
-                              color: AppColors.primaryDark,
+                              color: context.pal.accent,
                             ),
                           ),
                         ],
@@ -140,7 +141,7 @@ class FavoritesScreen extends StatelessWidget {
                         tr('Уведомления о скидках'),
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primaryDark,
+                          color: context.pal.accent,
                         ),
                       ),
                       const SizedBox(height: 4),

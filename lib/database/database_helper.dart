@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 10;
+  static const dbVersion = 11;
 
   final String? path;
   Database? _db;
@@ -129,6 +129,10 @@ class DatabaseHelper {
       await SeedData.applyRealStores(db);
     },
     10: (db) async {
+      await SeedData.applyNewProducts(db);
+    },
+    // palettes by number, more tints, serums, toners (same idempotent step)
+    11: (db) async {
       await SeedData.applyNewProducts(db);
     },
   };

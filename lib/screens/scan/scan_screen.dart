@@ -7,6 +7,7 @@ import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
+import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/providers/safety_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/services/ingredient_scan/ingredient_matcher.dart';
@@ -34,9 +35,12 @@ class _ScanScreenState extends State<ScanScreen> {
   String? _notice;
   List<String>? _checked;
   List<ScanMatch> _matches = const [];
+  final _scroll = ScrollController();
+  final _resultKey = GlobalKey();
 
   @override
   void dispose() {
+    _scroll.dispose();
     _text.dispose();
     super.dispose();
   }
@@ -105,11 +109,128 @@ class _ScanScreenState extends State<ScanScreen> {
       );
       return;
     }
+    FocusManager.instance.primaryFocus?.unfocus();
     final blacklist = context.read<SafetyProvider>().blacklist;
     setState(() {
       _checked = items;
       _matches = IngredientMatcher.match(items, blacklist);
     });
+    // the result is far below the text field: bring it up and say it aloud,
+    // otherwise "nothing found" looks like "nothing happened"
+    final active = blacklist.where((b) => b.enabled).toList();
+    if (active.isNotEmpty) _showOutcome(active, items.length);
+  }
+
+  void _showOutcome(List<BlacklistItem> active, int total) {
+    final hits = {for (final m in _matches) m.item.id: m};
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _resultKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 300),
+          alignment: 0.05,
+        );
+      }
+    });
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheet) {
+        final pal = sheet.pal;
+        final clean = hits.isEmpty;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheet).height * 0.7,
+            ),
+            // the list scrolls, the button stays in sight
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            clean
+                                ? Icons.check_circle_outline
+                                : Icons.warning_amber_rounded,
+                            color: clean ? AppColors.success : AppColors.sale,
+                            size: 30,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              clean
+                                  ? tr('Из чёрного списка ничего не найдено')
+                                  : trf(
+                                      'Найдено совпадений с чёрным списком: {n}',
+                                      {'n': hits.length},
+                                    ),
+                              style: AppTextStyles.subtitle,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        trf('Проверено компонентов: {n}', {'n': total}),
+                        style: AppTextStyles.small.copyWith(color: pal.subtext),
+                      ),
+                      const SizedBox(height: 12),
+                      for (final b in active)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                hits.containsKey(b.id)
+                                    ? Icons.close_rounded
+                                    : Icons.check_rounded,
+                                size: 20,
+                                color: hits.containsKey(b.id)
+                                    ? AppColors.sale
+                                    : AppColors.success,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  hits.containsKey(b.id)
+                                      ? trf('{v0}: найдено ({v1})', {
+                                          'v0': tr(b.name),
+                                          'v1': hits[b.id]!.ingredient,
+                                        })
+                                      : trf('{v0}: не найдено', {
+                                          'v0': tr(b.name),
+                                        }),
+                                  style: AppTextStyles.body,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+                  child: CustomButton(
+                    label: tr('Понятно'),
+                    onPressed: () => Navigator.pop(sheet),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -122,6 +243,9 @@ class _ScanScreenState extends State<ScanScreen> {
       title: tr('Проверка состава'),
       bigTitle: true,
       child: ListView(
+        controller: _scroll,
+        // dragging the page puts the keyboard away
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           AppCard(
@@ -130,11 +254,7 @@ class _ScanScreenState extends State<ScanScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.lock_outline,
-                  size: 18,
-                  color: AppColors.primaryDark,
-                ),
+                Icon(Icons.lock_outline, size: 18, color: context.pal.accent),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -222,7 +342,7 @@ class _ScanScreenState extends State<ScanScreen> {
     final items = _checked!;
     final hitNames = {for (final m in _matches) m.ingredient};
     return [
-      SectionTitle(tr('Результат')),
+      SectionTitle(tr('Результат'), key: _resultKey),
       if (!hasActive)
         AppCard(
           child: Column(

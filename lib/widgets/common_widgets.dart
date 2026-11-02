@@ -45,7 +45,7 @@ class LinkText extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            color: AppColors.primaryDark,
+            color: context.pal.accent,
             fontSize: 13,
             fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -86,7 +86,7 @@ class EmptyState extends StatelessWidget {
                 color: AppColors.primarySoft,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 38, color: AppColors.primaryDark),
+              child: Icon(icon, size: 38, color: context.pal.accent),
             ),
             const SizedBox(height: 16),
             Text(
@@ -211,7 +211,7 @@ class MenuTile extends StatelessWidget {
                     color: AppColors.primarySoft,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: AppColors.primaryDark, size: 22),
+                  child: Icon(icon, color: context.pal.accent, size: 22),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -285,7 +285,7 @@ class StarPicker extends StatelessWidget {
               child: Icon(
                 i <= value ? Icons.star_rounded : Icons.star_outline_rounded,
                 size: 20,
-                color: i <= value ? Colors.white : AppColors.primaryDark,
+                color: i <= value ? Colors.white : context.pal.accent,
               ),
             ),
           ),
@@ -381,17 +381,17 @@ class MatchBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      const Icon(Icons.favorite, size: 11, color: AppColors.primaryDark),
+      Icon(Icons.favorite, size: 11, color: context.pal.accent),
       const SizedBox(width: 4),
       Flexible(
         child: Text(
           trf('{n}% совпадение', {'n': percent}),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: AppColors.primaryDark,
+            color: context.pal.accent,
           ),
         ),
       ),

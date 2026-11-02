@@ -38,7 +38,7 @@ class BeautyProfileScreen extends StatelessWidget {
               ListTile(
                 title: Text(tr(o)),
                 trailing: o == current
-                    ? const Icon(Icons.check, color: AppColors.primaryDark)
+                    ? Icon(Icons.check, color: context.pal.accent)
                     : null,
                 onTap: () => Navigator.pop(ctx, o),
               ),
@@ -85,7 +85,7 @@ class BeautyProfileScreen extends StatelessWidget {
             Text(
               label.toUpperCase(),
               style: AppTextStyles.label.copyWith(
-                color: accent ? AppColors.primaryDark : pal.subtext,
+                color: accent ? context.pal.accent : pal.subtext,
               ),
             ),
             const SizedBox(height: 4),
@@ -96,7 +96,7 @@ class BeautyProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: accent ? AppColors.primaryDark : pal.text,
+                color: accent ? context.pal.accent : pal.text,
               ),
             ),
           ],

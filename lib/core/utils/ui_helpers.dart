@@ -65,7 +65,7 @@ Future<bool> confirmDialog(
           child: Text(
             tr(confirmLabel),
             style: TextStyle(
-              color: destructive ? AppColors.danger : AppColors.primaryDark,
+              color: destructive ? AppColors.danger : context.pal.accent,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -91,7 +91,7 @@ Future<void> infoDialog(
           onPressed: () => Navigator.pop(ctx),
           child: Text(
             tr('Понятно'),
-            style: TextStyle(color: AppColors.primaryDark),
+            style: TextStyle(color: context.pal.accent),
           ),
         ),
       ],

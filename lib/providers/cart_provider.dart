@@ -44,6 +44,18 @@ class CartProvider extends ChangeNotifier {
 
   bool contains(int productId) => items.any((i) => i.product.id == productId);
 
+  /// How many pieces of a product are in the cart (all shops together).
+  int quantityOf(int productId) => items
+      .where((i) => i.product.id == productId)
+      .fold(0, (s, i) => s + i.quantity);
+
+  /// Takes one piece of a product out of the cart; the line disappears at 0.
+  Future<void> decrease(int productId) async {
+    final lines = items.where((i) => i.product.id == productId);
+    if (lines.isEmpty) return;
+    await setQuantity(lines.last, lines.last.quantity - 1);
+  }
+
   Future<void> load(int userId) async {
     _userId = userId;
     loading = true;

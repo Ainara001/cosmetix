@@ -43,7 +43,7 @@ class WhyItSuitsCard extends StatelessWidget {
               MatchReasonType.sharedIngredient ||
               MatchReasonType.shadeOff ||
               MatchReasonType.skinShadeOff => AppColors.sale,
-              MatchReasonType.owned => AppColors.primaryDark,
+              MatchReasonType.owned => context.pal.accent,
               _ => AppColors.success,
             },
             reasonText(r),
@@ -60,23 +60,26 @@ class WhyItSuitsCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.favorite,
-                  size: 18,
-                  color: AppColors.primaryDark,
-                ),
+                Icon(Icons.favorite, size: 18, color: context.pal.accent),
                 const SizedBox(width: 8),
+                // one line: shrinks a little instead of leaving "вам" alone
                 Expanded(
-                  child: Text(
-                    tr('Почему это подходит вам'),
-                    style: AppTextStyles.subtitle,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      tr('Почему это подходит вам'),
+                      maxLines: 1,
+                      style: AppTextStyles.subtitle,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 if (rec != null && !blacklisted)
                   Text(
                     trf('{n}% совпадение', {'n': rec.matchPercent}),
                     style: AppTextStyles.small.copyWith(
-                      color: AppColors.primaryDark,
+                      color: context.pal.accent,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

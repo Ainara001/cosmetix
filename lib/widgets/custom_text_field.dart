@@ -92,7 +92,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       _hidden
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
-                      color: AppColors.primaryDark,
+                      color: context.pal.accent,
                       size: 20,
                     ),
                     onPressed: () => setState(() => _hidden = !_hidden),

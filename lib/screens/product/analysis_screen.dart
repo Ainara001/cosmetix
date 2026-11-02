@@ -90,7 +90,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                           Text(
                             product.brand,
                             style: AppTextStyles.caption.copyWith(
-                              color: AppColors.primaryDark,
+                              color: context.pal.accent,
                             ),
                           ),
                           Text(tr(product.name), style: AppTextStyles.bodyBold),

@@ -130,7 +130,7 @@ void main() {
         'in_stock': 0,
       }, where: 'product_id = 3 AND store_id = 2');
       final old = await db.query('product_prices', where: 'store_id <= 3');
-      expect(old.length, 22 * 3);
+      expect(old.length, 38 * 3);
 
       await SeedData.applyRealStores(db);
 
@@ -154,7 +154,7 @@ void main() {
         Sqflite.firstIntValue(
           await db.rawQuery('SELECT COUNT(*) FROM product_prices'),
         ),
-        22 * 13,
+        38 * 13,
       );
       // running it again changes nothing
       await SeedData.applyRealStores(db);
@@ -163,7 +163,7 @@ void main() {
         Sqflite.firstIntValue(
           await db.rawQuery('SELECT COUNT(*) FROM product_prices'),
         ),
-        22 * 13,
+        38 * 13,
       );
     });
 

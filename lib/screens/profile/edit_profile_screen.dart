@@ -88,7 +88,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: c == _avatar
-                              ? AppColors.primaryDark
+                              ? context.pal.accent
                               : Colors.transparent,
                           width: 3,
                         ),

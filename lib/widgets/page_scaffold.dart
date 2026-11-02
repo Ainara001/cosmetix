@@ -85,9 +85,9 @@ class BackTitleBar extends StatelessWidget {
             IconButton(
               tooltip: tr('Назад'),
               onPressed: onBack ?? () => Navigator.of(context).maybePop(),
-              icon: const Icon(
+              icon: Icon(
                 Icons.chevron_left,
-                color: AppColors.primaryDark,
+                color: context.pal.accent,
                 size: 30,
               ),
             ),

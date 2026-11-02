@@ -1422,4 +1422,48 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Light lotion with betaine salicylate (BHA) to clear pores and care for blackheads.',
   'Сыворотка с витамином C (аскорбиновая кислота) и центеллой для сияния кожи.':
       'Serum with vitamin C (ascorbic acid) and centella for glowing skin.',
+  'Убрать одну': 'Remove one',
+  'Добавить ещё': 'Add one more',
+  '{v0} в корзине': '{v0} in cart',
+  'Карта на весь экран': 'Full-screen map',
+  'Свернуть карту': 'Collapse the map',
+  'Моё положение': 'My location',
+  'Из чёрного списка ничего не найдено':
+      'Nothing from your blacklist was found',
+  'Проверено компонентов: {n}': 'Ingredients checked: {n}',
+  '{v0}: найдено ({v1})': '{v0}: found ({v1})',
+  '{v0}: не найдено': '{v0}: not found',
+  'Десять чистых глиттеров без матовых оттенков: прозрачный опал, шампань, розовое золото и ледяная сирень.':
+      'Ten pure glitters and no mattes: clear opal, champagne, rose gold and iced lilac.',
+  'Персиковые, коралловые и золотисто-шампанские оттенки на тёплой слоновой кости: яркие тона поздней весны.':
+      'Peach, coral and champagne gold over warm ivory: bright shades that bloom like late spring.',
+  'Карамель, корица и жидкое золото, переходящие в шоколад: сияние золотого часа.':
+      'Caramel, cinnamon and molten gold deepening into chocolate for a golden hour glow.',
+  'Пыльная роза, мальва и мягкий розово-бежевый: прохладное спокойствие и романтичный финиш.':
+      'Dusty rose, mauve and soft pink beige: cool-toned calm with a quietly romantic finish.',
+  'Фуксия, слива и ледяная лаванда на холодных розовых: самая смелая палетка для вечера.':
+      'Fuchsia, plum and iced lavender against cool pinks: the boldest garden, made for evening.',
+  'Глянцевый тинт для губ нежно-розового оттенка с эффектом сочных увлажнённых губ.':
+      'Glossy lip tint in a soft rose shade with a juicy, moisturised look.',
+  'Стойкий глянцевый тинт персиково-нюдового оттенка: блеск, как глазурь на фруктах.':
+      'Long-wearing glossy tint in a peachy nude shade, with a glaze-like shine.',
+  'Нежные румяна в компактной коробочке тёплого персикового оттенка для естественного румянца.':
+      'Soft blush in a compact case, a warm peach shade for a natural flush.',
+  'Лёгкая сыворотка с низкомолекулярной гиалуроновой кислотой для глубокого увлажнения.':
+      'Light serum with low-molecular hyaluronic acid for deep hydration.',
+  'Успокаивающая ампула с экстрактом центеллы азиатской для чувствительной и раздражённой кожи.':
+      'Soothing ampoule with Centella asiatica extract for sensitive and irritated skin.',
+  'Сыворотка с прополисом и ниацинамидом для сияния кожи и баланса себума.':
+      'Serum with propolis and niacinamide for glowing skin and balanced sebum.',
+  'Лёгкий тонер с гиалуроновой кислотой для мгновенного увлажнения.':
+      'Light toner with hyaluronic acid for instant hydration.',
+  'Мягкий тонер с глубинной морской водой для ежедневного ухода без раздражения.':
+      'Gentle toner with deep sea water for everyday care without irritation.',
+  'Ночная маска для губ: увлажняет, смягчает и восстанавливает кожу губ за ночь.':
+      'Overnight lip mask that moisturises, softens and restores the lips.',
+  'Мягкий гель для умывания с pH около 5,5 для ежедневного очищения кожи.':
+      'Gentle gel cleanser with a pH of about 5.5 for everyday cleansing.',
+  'Питательный крем с керамидами восстанавливает барьер и смягчает сухую кожу.':
+      'Nourishing cream with ceramides that restores the barrier and softens dry skin.',
+  'Другие оттенки': 'Other shades',
 };
