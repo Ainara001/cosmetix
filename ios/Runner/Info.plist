@@ -6,8 +6,10 @@
 	<string>Фото для отзыва, аватара профиля и необязательного улучшения бьюти-анализа</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Снимок для отзыва, аватара профиля и необязательного улучшения бьюти-анализа</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Чтобы показать ближайшие магазины и расстояние до них. Положение остаётся на телефоне.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Cosmetix подключается к ИИ-серверу (Ollama) в вашей домашней сети Wi-Fi для чата и анализа фото. Это необязательно.</string>
+	<string>Cosmetix подключается к ИИ-серверу в вашей домашней сети Wi-Fi для чата и анализа фото. Это необязательно.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<!-- Minimum exception: plain HTTP only to local-network addresses

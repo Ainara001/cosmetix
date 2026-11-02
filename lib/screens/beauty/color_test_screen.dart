@@ -24,7 +24,13 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
   static final _steps = ColorTestService.questions;
 
   int _step = 0;
+
+  /// null = not answered yet, -1 = "I don't know" (skipped), else the option.
   final List<int?> _answers = List.filled(_steps.length, null);
+
+  static const _skipped = -1;
+
+  int get _answeredCount => _answers.where((a) => a != null && a >= 0).length;
 
   void _back() {
     if (_step == 0) {
@@ -34,11 +40,24 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
     }
   }
 
+  /// "I don't know": the question is skipped and the AI / other answers decide.
+  void _skip() {
+    setState(() => _answers[_step] = _skipped);
+    _next();
+  }
+
+  /// No answers at all: the colour type is determined from a photo by the AI.
+  void _byPhoto() => Navigator.pushNamed(
+    context,
+    AppRoutes.skinTest,
+    arguments: const SkinTestArgs(color: ColorTestResult.unknown()),
+  );
+
   void _next() {
     if (_answers[_step] == null) {
       showMessage(
         context,
-        tr('Выберите один из вариантов'),
+        tr('Выберите вариант или нажмите «Не знаю»'),
         type: MessageType.warning,
       );
       return;
@@ -49,6 +68,7 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
     }
     var warm = 0, depth = 0, contrast = 0;
     for (var i = 0; i < _steps.length; i++) {
+      if (_answers[i]! < 0) continue; // skipped: adds nothing
       final o = _steps[i].options[_answers[i]!];
       warm += o.warm;
       depth += o.depth;
@@ -57,7 +77,12 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
     Navigator.pushNamed(
       context,
       AppRoutes.undertoneTest,
-      arguments: UndertoneArgs(warm: warm, depth: depth, contrast: contrast),
+      arguments: UndertoneArgs(
+        warm: warm,
+        depth: depth,
+        contrast: contrast,
+        answered: _answeredCount,
+      ),
     );
   }
 
@@ -79,52 +104,89 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Text(
-                    trf('Шаг {v0} из {v1}', {
-                      'v0': _step + 1,
-                      'v1': _steps.length,
-                    }),
-                    style: AppTextStyles.small.copyWith(color: pal.subtext),
-                  ),
-                  const Spacer(),
-                  Text(
-                    tr(q.section),
-                    style: AppTextStyles.small.copyWith(
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: (_step + 1) / _steps.length,
-                  minHeight: 6,
-                  color: AppColors.primary,
-                  backgroundColor: AppColors.primarySoft,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(tr(q.question), style: AppTextStyles.title),
-              const SizedBox(height: 14),
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 0.95,
+                child: ListView(
                   children: [
-                    for (var i = 0; i < q.options.length; i++)
-                      _OptionCard(
-                        option: q.options[i],
-                        selected: _answers[_step] == i,
-                        onTap: () => setState(() => _answers[_step] = i),
+                    Row(
+                      children: [
+                        Text(
+                          trf('Шаг {v0} из {v1}', {
+                            'v0': _step + 1,
+                            'v1': _steps.length,
+                          }),
+                          style: AppTextStyles.small.copyWith(
+                            color: pal.subtext,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          tr(q.section),
+                          style: AppTextStyles.small.copyWith(
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: (_step + 1) / _steps.length,
+                        minHeight: 6,
+                        color: AppColors.primary,
+                        backgroundColor: AppColors.primarySoft,
                       ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (_step == 0)
+                      AppCard(
+                        color: AppColors.primarySoft,
+                        borderColor: Colors.transparent,
+                        onTap: _byPhoto,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.auto_awesome,
+                              color: AppColors.primaryDark,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                tr(
+                                  'Не знаете ответов? ИИ определит цветотип по фото за вас',
+                                ),
+                                style: AppTextStyles.small,
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    Text(tr(q.question), style: AppTextStyles.title),
+                    const SizedBox(height: 14),
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 0.95,
+                      children: [
+                        for (var i = 0; i < q.options.length; i++)
+                          _OptionCard(
+                            option: q.options[i],
+                            selected: _answers[_step] == i,
+                            onTap: () => setState(() => _answers[_step] = i),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
+              ),
+              TextButton(
+                onPressed: _skip,
+                child: Text(tr('Не знаю — пропустить')),
               ),
               CustomButton(
                 label: _step == _steps.length - 1

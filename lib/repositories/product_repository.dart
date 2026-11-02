@@ -40,12 +40,25 @@ SELECT p.*, EXISTS(
     final db = await _helper.database;
     final rows = await db.rawQuery(
       '''
-SELECT pp.store_id, pp.price, pp.in_stock, s.name, s.distance_m, s.address, s.rating
+SELECT pp.store_id, pp.price, pp.in_stock, pp.qty, pp.source AS offer_source,
+  pp.updated_at, s.name, s.distance_m, s.address, s.rating, s.lat, s.lng,
+  s.chain, s.hours, s.source AS loc_source
 FROM product_prices pp JOIN stores s ON s.id = pp.store_id
 WHERE pp.product_id = ? ORDER BY pp.price''',
       [productId],
     );
     return rows.map(StorePrice.fromMap).toList();
+  }
+
+  /// Every shop that has a position (for the map).
+  Future<List<StoreInfo>> getStores() async {
+    final db = await _helper.database;
+    final rows = await db.query(
+      'stores',
+      where: 'lat IS NOT NULL AND lng IS NOT NULL',
+      orderBy: 'id',
+    );
+    return rows.map(StoreInfo.fromMap).toList();
   }
 
   /// Products with their suitability traits and ingredients, for the

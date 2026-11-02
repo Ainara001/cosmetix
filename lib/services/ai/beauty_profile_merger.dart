@@ -18,9 +18,9 @@ class MergedBeauty {
 
 /// questionnaire + optional photo analysis = final Beauty Profile.
 ///
-/// The questionnaire always wins. The photo can only fill a gap: when the
-/// questionnaire could not decide the undertone ("neutral") and the photo
-/// analysis is confident, its undertone is used.
+/// The questionnaire wins. The photo fills the gaps: a skipped question
+/// leaves a value empty and a confident photo analysis provides it; a
+/// "neutral" undertone is replaced by the photo's warm/cool.
 class BeautyProfileMerger {
   BeautyProfileMerger._();
 
@@ -34,7 +34,10 @@ class BeautyProfileMerger {
       return MergedBeauty(profile: questionnaire, vision: vision);
     }
     var undertone = questionnaire.undertone;
-    if ((undertone == null || undertone == Undertone.neutral) &&
+    if (undertone == null) {
+      // the questionnaire did not decide (skipped): the photo decides
+      undertone = vision.undertone;
+    } else if (undertone == Undertone.neutral &&
         vision.undertone != null &&
         vision.undertone != Undertone.neutral) {
       undertone = vision.undertone;

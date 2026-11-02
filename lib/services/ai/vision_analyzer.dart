@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/models/ai_models.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 
@@ -29,7 +30,8 @@ Answer with ONE JSON object and nothing else, using exactly these keys:
   "confidence": number from 0 to 1 (use a low value for dark, blurry or filtered photos),
   "explanation": "one or two sentences"
 }
-Do not describe diseases or skin conditions. Do not guess the person's age, ethnicity or identity.''';
+Do not describe diseases or skin conditions. Do not guess the person's age, ethnicity or identity.
+Write "observations" and "explanation" in the requested language (the JSON keys and values of skinTone, undertone and colorType stay exactly as listed above).''';
 
   /// [photoBytes] is a resized JPEG. Throws [AiException] subclasses.
   Future<VisionAnalysis> analyze(Uint8List photoBytes) async {
@@ -43,7 +45,7 @@ Do not describe diseases or skin conditions. Do not guess the person's age, ethn
       messages: [
         AiMessage(
           'user',
-          prompt,
+          '$prompt\nRequested language: ${currentLang.englishName}.',
           images: [base64Encode(photoBytes)], // never logged
         ),
       ],

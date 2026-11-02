@@ -60,7 +60,7 @@ void main() {
   test('seed data is created on first open', () async {
     final all = await products.getAll(1);
     expect(all.length, greaterThanOrEqualTo(15));
-    expect((await products.getStorePrices(1)).length, 3);
+    expect((await products.getStorePrices(1)).length, 13); // every real shop
     expect((await safety.ingredientsOf(2)).length, 4);
     expect((await safety.reactions(1)).length, 3);
   });

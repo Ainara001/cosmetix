@@ -9,7 +9,9 @@ import 'package:cosmetix/screens/auth/register_screen.dart';
 import 'package:cosmetix/screens/auth/reset_password_screen.dart';
 import 'package:cosmetix/screens/beauty/beauty_profile_screen.dart';
 import 'package:cosmetix/screens/beauty/beauty_photo_screen.dart';
+import 'package:cosmetix/core/beauty/beauty_codes.dart';
 import 'package:cosmetix/screens/beauty/color_result_screen.dart';
+import 'package:cosmetix/screens/beauty/palettes_screen.dart';
 import 'package:cosmetix/screens/beauty/skin_test_screen.dart';
 import 'package:cosmetix/screens/beauty/color_test_screen.dart';
 import 'package:cosmetix/screens/beauty/undertone_test_screen.dart';
@@ -32,6 +34,7 @@ import 'package:cosmetix/screens/profile/favorites_screen.dart';
 import 'package:cosmetix/screens/profile/legal_screen.dart';
 import 'package:cosmetix/screens/profile/settings_screen.dart';
 import 'package:cosmetix/screens/safety/blacklist_screen.dart';
+import 'package:cosmetix/screens/stores/stores_map_screen.dart';
 import 'package:cosmetix/screens/scan/scan_screen.dart';
 import 'package:cosmetix/screens/safety/reaction_form_screen.dart';
 import 'package:cosmetix/screens/safety/reactions_screen.dart';
@@ -63,6 +66,8 @@ class AppRoutes {
   static const skinTest = '/skin-test';
   static const beautyPhoto = '/beauty-photo';
   static const colorResult = '/color-result';
+  static const palettes = '/palettes';
+  static const stores = '/stores';
   static const editProfile = '/edit-profile';
   static const settings = '/settings';
   static const blacklist = '/blacklist';
@@ -121,6 +126,10 @@ class AppRoutes {
         page = a is BeautyPhotoArgs ? BeautyPhotoScreen(args: a) : _bad();
       case colorResult:
         page = a is BeautyResultArgs ? ColorResultScreen(result: a) : _bad();
+      case stores:
+        page = StoresMapScreen(productId: a is StoresArgs ? a.productId : null);
+      case palettes:
+        page = PalettesScreen(highlight: a is ColorType ? a : null);
       case editProfile:
         page = const EditProfileScreen();
       case AppRoutes.settings:

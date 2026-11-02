@@ -8,6 +8,9 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/providers/location_provider.dart';
+import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
@@ -63,7 +66,13 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
             const SizedBox(height: 4),
             Text('${tr(p.address)} • ${p.distanceLabel}'),
             const SizedBox(height: 4),
-            Text(trf('Рейтинг магазина: ★ {v0}', {'v0': p.rating})),
+            if (p.rating > 0)
+              Text(trf('Рейтинг магазина: ★ {v0}', {'v0': p.rating})),
+            if (p.hours.isNotEmpty)
+              Text(
+                '${p.hours} • ${p.openStatus(DateTime.now())}',
+                style: AppTextStyles.small,
+              ),
             const SizedBox(height: 12),
             Text(
               '${tr(product.name)} — ${fmt(p.price)}',
@@ -119,15 +128,23 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
       );
     }
 
-    final list = [..._prices]
+    final loc = context.watch<LocationProvider>();
+    final prices = [
+      for (final p in _prices)
+        p.hasPosition ? p.withDistance(loc.distanceTo(p.lat!, p.lng!)) : p,
+    ];
+    final list = [...prices]
       ..sort(
         (a, b) => _cheapFirst
             ? a.price.compareTo(b.price)
             : a.distanceM.compareTo(b.distanceM),
       );
-    final best = _prices.isEmpty
+    final best = prices.where((e) => e.inStock).isEmpty
         ? product.price
-        : _prices.map((e) => e.price).reduce((a, b) => a < b ? a : b);
+        : prices
+              .where((e) => e.inStock)
+              .map((e) => e.price)
+              .reduce((a, b) => a < b ? a : b);
 
     return PageScaffold(
       title: tr('Сравнение цен'),
@@ -170,6 +187,17 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                CustomButton(
+                  label: tr('Показать на карте'),
+                  icon: Icons.map_outlined,
+                  outlined: true,
+                  onPressed: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.stores,
+                    arguments: StoresArgs(productId: product.id),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -245,33 +273,55 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 7,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.successSoft,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Text(
-                                    '★ ${p.rating}',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.success,
+                                if (p.rating > 0)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.successSoft,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Text(
+                                      '★ ${p.rating}',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.success,
+                                      ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
-                            if (!p.inStock)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  tr('Нет в наличии'),
-                                  style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.sale,
-                                  ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                switch (p.level) {
+                                  StockLevel.out => tr('Нет в наличии'),
+                                  StockLevel.low => trf('Мало · {v0} шт.', {
+                                    'v0': p.qty,
+                                  }),
+                                  StockLevel.inStock =>
+                                    p.qty == null
+                                        ? tr('В наличии')
+                                        : trf('В наличии · {v0} шт.', {
+                                            'v0': p.qty,
+                                          }),
+                                },
+                                style: AppTextStyles.caption.copyWith(
+                                  color: switch (p.level) {
+                                    StockLevel.out => AppColors.sale,
+                                    StockLevel.low => const Color(0xFF9A6A12),
+                                    StockLevel.inStock => AppColors.success,
+                                  },
+                                ),
+                              ),
+                            ),
+                            if (p.demo)
+                              Text(
+                                tr('демо-данные'),
+                                style: AppTextStyles.caption.copyWith(
+                                  color: pal.subtext,
                                 ),
                               ),
                           ],

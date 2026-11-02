@@ -17,6 +17,7 @@ import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/repositories/care_repository.dart';
 import 'package:cosmetix/repositories/cart_repository.dart';
 import 'package:cosmetix/repositories/chat_repository.dart';
+import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/review_repository.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
@@ -24,6 +25,7 @@ import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
+import 'package:cosmetix/providers/location_provider.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
@@ -40,6 +42,7 @@ class CosmetixApp extends StatefulWidget {
     required this.helper,
     this.ocr = const PlatformIngredientOcr(),
     this.photoSource = const ImagePickerPhotoSource(),
+    this.locationFetcher,
   });
 
   final DatabaseHelper helper;
@@ -48,6 +51,9 @@ class CosmetixApp extends StatefulWidget {
   /// fakes in tests).
   final IngredientOcr ocr;
   final ScanPhotoSource photoSource;
+
+  /// Reads the device position (a fake in tests).
+  final LocationFetcher? locationFetcher;
 
   @override
   State<CosmetixApp> createState() => _CosmetixAppState();
@@ -62,6 +68,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
   late final SafetyProvider _safetyProvider;
   late final CatalogProvider _catalogProvider;
   late final AiProvider _ai;
+  late final LocationProvider _location;
   late final CareProvider _care;
   late final RecommendationService _reco;
   late final Future<void> _init;
@@ -79,6 +86,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
     _safetyProvider = SafetyProvider(_safety);
     _reco = RecommendationService(_products, _safety, users, CareRepository(h));
     _ai = AiProvider(SettingsRepository(h));
+    _location = LocationProvider(fetcher: widget.locationFetcher);
     _catalogProvider = CatalogProvider(_products, _reco);
     // re-personalize when the Beauty Profile or the blacklist changes
     _care = CareProvider(CareRepository(h));
@@ -90,6 +98,30 @@ class _CosmetixAppState extends State<CosmetixApp> {
       sources: [_auth, _safetyProvider, _care],
     );
     _init = Future.wait([_auth.restoreSession(), _settings.load(), _ai.load()]);
+  }
+
+  /// Shops, distances and offers for the AI (distances only when the position
+  /// is real; the position itself is never sent).
+  Future<StoreContext> _storeContext(List<int> productIds) async {
+    final stores = await _products.getStores();
+    final located = _location.isReal;
+    final nearest = [
+      for (final s in stores)
+        s.withDistance(_location.distanceTo(s.lat, s.lng)),
+    ]..sort((a, b) => a.distanceM.compareTo(b.distanceM));
+    final offers = <int, List<StorePrice>>{};
+    for (final id in productIds) {
+      offers[id] = [
+        for (final o in await _products.getStorePrices(id))
+          if (o.hasPosition)
+            o.withDistance(_location.distanceTo(o.lat!, o.lng!)),
+      ]..sort((a, b) => a.distanceM.compareTo(b.distanceM));
+    }
+    return StoreContext(
+      located: located,
+      nearest: nearest.take(5).toList(),
+      offers: offers,
+    );
   }
 
   /// Changes when the user's reactions or cosmetic bag change AND they allowed
@@ -133,6 +165,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider<AuthProvider>.value(value: _auth),
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
             ChangeNotifierProvider<AiProvider>.value(value: _ai),
+            ChangeNotifierProvider<LocationProvider>.value(value: _location),
             Provider<AvatarService>(create: (_) => AvatarService()),
             Provider<IngredientOcr>.value(value: widget.ocr),
             Provider<ScanPhotoSource>.value(value: widget.photoSource),
@@ -157,7 +190,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider(
               create: (_) => ChatProvider(
                 ChatRepository(widget.helper),
-                AssistantService(_reco, _ai.client),
+                AssistantService(_reco, _ai.client, stores: _storeContext),
                 shareProfile: () => _ai.shareProfile,
               ),
             ),

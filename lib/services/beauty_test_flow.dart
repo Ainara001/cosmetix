@@ -33,11 +33,13 @@ class BeautyTestFlow {
     required Set<SkinConcern> concerns,
     VisionAnalysis? vision,
   }) {
+    // too many skipped questions: nothing is guessed, the photo fills it in
+    final weak = color.isWeak;
     final questionnaire = BeautyProfile.fromLabels(
       skinType: skinType.label,
-      skinTone: color.skinTone,
-      undertone: color.undertone,
-      colorType: color.colorType,
+      skinTone: weak ? null : color.skinTone,
+      undertone: weak ? null : color.undertone,
+      colorType: weak ? null : color.colorType,
       concerns: [for (final c in concerns) c.label],
     );
     return BeautyProfileMerger.merge(questionnaire, vision);

@@ -267,10 +267,10 @@ void main() {
             blacklist: const [],
           ).firstWhere((r) => r.product.name.contains(name));
 
-      test('the catalog really stores the shades (DB v8)', () {
+      test('the catalog really stores the shades (DB v8+)', () {
         final withShade = candidates.where((c) => c.product.shade != null);
         expect(withShade.length, 8);
-        expect(DatabaseHelper.dbVersion, 8);
+        expect(DatabaseHelper.dbVersion, 9);
       });
 
       test('a Spring person: coral tint fits, wine tint is flagged', () {
@@ -448,24 +448,21 @@ void main() {
 
     test('with consent every product carries the app\'s own "fits" facts', () {
       final text = prompt(share: true);
-      expect(text, contains('fits:'));
-      expect(text, contains('suits undertone Тёплый'));
+      expect(text, contains('fits '));
+      expect(text, contains('undertone Тёплый'));
       expect(text, contains('shade matches skin tone Светлый'));
-      expect(
-        text,
-        contains('shade is close to the palette of color type Весна'),
-      );
+      expect(text, contains('shade matches palette Весна'));
       // a shade of another palette is marked so the model does not praise it
-      expect(text, contains('NOT the user\'s color type'));
-      expect(text, contains('flattering makeup colors for Весна'));
-      expect(text, contains('colors to avoid for Весна'));
+      expect(text, contains('NOT the user\'s'));
+      expect(text, contains('good makeup colors (Весна)'));
+      expect(text, contains('avoid:'));
     });
 
     test(
       'acids and actives are listed per product for ingredient questions',
       () {
         final text = prompt(share: false, q: 'Где ниацинамид?');
-        expect(text, contains('actives:'));
+        expect(text, contains('has:'));
         expect(text, contains('Ниацинамид (B3)'));
         expect(text, contains('Гиалуроновая кислота'));
       },
@@ -475,9 +472,9 @@ void main() {
       final text = prompt(share: false);
       final data = text.split('USER BEAUTY PROFILE:').last; // after the rules
       expect(text, isNot(contains('Весна')));
-      expect(data, isNot(contains('fits:')));
-      expect(data, isNot(contains('flattering')));
-      expect(data, isNot(contains('| match')));
+      expect(data, isNot(contains('fits ')));
+      expect(data, isNot(contains('good makeup colors')));
+      expect(data, isNot(contains('match:')));
     });
   });
 }
