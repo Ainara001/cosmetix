@@ -1466,4 +1466,5 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Питательный крем с керамидами восстанавливает барьер и смягчает сухую кожу.':
       'Nourishing cream with ceramides that restores the barrier and softens dry skin.',
   'Другие оттенки': 'Other shades',
+  'Оттенок: {v0}': 'Shade: {v0}',
 };

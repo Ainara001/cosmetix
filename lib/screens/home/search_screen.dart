@@ -65,12 +65,14 @@ class _SearchScreenState extends State<SearchScreen> {
               .toList();
     // with a Beauty Profile the suggestions are personal: no blacklisted
     // products, best match first (same rule as the catalog "For you" sort)
-    final matches =
-        (catalog.hasProfile
-                ? [for (final r in catalog.recommend(found)) r.product]
-                : found)
-            .take(8)
-            .toList();
+    final matches = catalog
+        .collapseLines(
+          catalog.hasProfile
+              ? [for (final r in catalog.recommend(found)) r.product]
+              : found,
+        )
+        .take(8)
+        .toList();
 
     return PageScaffold(
       title: tr('Поиск'),
@@ -200,6 +202,7 @@ class _ProductRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.pal;
     final fmt = context.watch<SettingsProvider>().priceText;
+    final catalog = context.watch<CatalogProvider>();
     return InkWell(
       onTap: () => Navigator.pushNamed(
         context,
@@ -230,7 +233,7 @@ class _ProductRow extends StatelessWidget {
                     style: TextStyle(fontSize: 10, color: pal.subtext),
                   ),
                   Text(
-                    tr(product.name),
+                    tr(catalog.listName(product)),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.bodyBold,

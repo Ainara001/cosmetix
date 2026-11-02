@@ -32,6 +32,7 @@ class HomeScreen extends StatelessWidget {
     final catalog = context.watch<CatalogProvider>();
     final pal = context.pal;
     final recommended = catalog.recommendedForYou();
+    final featured = catalog.collapseLines(catalog.featured);
 
     return SafeArea(
       child: RefreshIndicator(
@@ -181,9 +182,9 @@ class HomeScreen extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: productGridDelegate(context, extent: 240),
-                itemCount: catalog.featured.length,
+                itemCount: featured.length,
                 itemBuilder: (context, i) =>
-                    _card(context, catalog, catalog.featured[i]),
+                    _card(context, catalog, featured[i]),
               ),
           ],
         ),
@@ -199,8 +200,9 @@ class HomeScreen extends StatelessWidget {
     CatalogProvider catalog,
     Product p, {
     int? match,
-  }) => ProductCard(
-    product: p,
+  }) => lineCard(
+    catalog,
+    p,
     footer: match == null ? null : MatchBadge(percent: match),
     onTap: () =>
         Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),

@@ -167,13 +167,40 @@ class _ProductBodyState extends State<_ProductBody> {
     ];
   }
 
-  /// Other shades of the line: palettes 00-07, tints 01, 03, 30...
-  List<Widget> _variants(BuildContext context, Product product) {
-    final others = context.read<CatalogProvider>().variantsOf(product);
-    if (others.isEmpty) return const [];
+  /// One palette, one choice: a circle with the number for every shade of the
+  /// line (00, 01, 02...). A tap opens the same page for that shade.
+  List<Widget> _shadePicker(BuildContext context, Product product) {
+    final catalog = context.read<CatalogProvider>();
+    final shades = catalog.shadesOf(product);
+    if (shades.isEmpty) return const [];
     return [
-      SectionTitle(tr('Другие оттенки')),
-      for (final p in others) _ShadeTile(product: p),
+      const SizedBox(height: 10),
+      Text(
+        trf('Оттенок: {v0}', {'v0': tr(CatalogProvider.shadeName(product))}),
+        style: AppTextStyles.bodyBold,
+      ),
+      const SizedBox(height: 8),
+      Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          for (final s in shades)
+            _ShadeCircle(
+              shade: s,
+              label: CatalogProvider.shadeNumber(s)!,
+              selected: s.id == product.id,
+              onTap: () {
+                if (s.id == product.id) return;
+                // the same page for another shade, not one more page on top
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.product,
+                  arguments: s.id,
+                );
+              },
+            ),
+        ],
+      ),
     ];
   }
 
@@ -332,7 +359,11 @@ class _ProductBodyState extends State<_ProductBody> {
                         product.brand,
                         style: AppTextStyles.small.copyWith(color: pal.subtext),
                       ),
-                      Text(tr(product.name), style: AppTextStyles.h2),
+                      Text(
+                        tr(context.read<CatalogProvider>().listName(product)),
+                        style: AppTextStyles.h2,
+                      ),
+                      ..._shadePicker(context, product),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
@@ -386,7 +417,6 @@ class _ProductBodyState extends State<_ProductBody> {
                       ],
                       WhyItSuitsCard(productId: product.id),
                       ..._compat(context, product),
-                      ..._variants(context, product),
                       const SizedBox(height: 10),
                       CustomButton(
                         label: tr('Спросить ИИ: подойдёт ли мне?'),
@@ -735,66 +765,65 @@ class _CartStepper extends StatelessWidget {
   }
 }
 
-/// One other shade of the line: photo, the shade ("01 Pampas Garden") and the
-/// price. The brand and the line are not repeated, the page is that line.
-class _ShadeTile extends StatelessWidget {
-  const _ShadeTile({required this.product});
+/// One shade in the picker: a colour circle with its number; the chosen one
+/// has a ring. The whole name of the shade is a tooltip / screen-reader label.
+class _ShadeCircle extends StatelessWidget {
+  const _ShadeCircle({
+    required this.shade,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
-  final Product product;
+  final Product shade;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final pal = context.pal;
-    final price = context.watch<SettingsProvider>().priceText(product.price);
-    final shade = product.name
-        .split(' ')
-        .skipWhile((w) => !RegExp(r'^\d').hasMatch(w))
-        .join(' ');
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(12),
+    // the colour of the shade itself (from its photo), else the pack colour
+    final color = Color(shade.shade ?? shade.color);
+    // the number stays readable on light and on dark colours
+    final onColor = color.computeLuminance() > 0.55
+        ? const Color(0xFF3A3135)
+        : Colors.white;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: tr(CatalogProvider.shadeName(shade)),
+      child: Tooltip(
+        message: tr(CatalogProvider.shadeName(shade)),
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () => Navigator.pushNamed(
-            context,
-            AppRoutes.product,
-            arguments: product.id,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: ProductArt(
-                    art: product.art,
-                    color: product.color,
-                    radius: 8,
-                  ),
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 48,
+            height: 48,
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: selected ? pal.accent : Colors.transparent,
+                width: 2,
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(color: pal.border),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: onColor,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(tr(shade), style: AppTextStyles.bodyBold),
-                      Text(
-                        price,
-                        style: AppTextStyles.small.copyWith(
-                          color: product.hasDiscount
-                              ? AppColors.sale
-                              : pal.subtext,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(Icons.chevron_right, color: pal.accent, size: 20),
-              ],
+              ),
             ),
           ),
         ),

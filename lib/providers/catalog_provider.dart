@@ -171,9 +171,13 @@ class CatalogProvider extends ChangeNotifier {
   /// Top personal picks for the Home screen.
   List<Recommendation> recommendedForYou({int limit = 4}) {
     if (!hasProfile) return const [];
+    final seen = <String>{};
     return [
       for (final r in recommend(products))
-        if (r.product.inStock) r,
+        // one pick per line: the best-matching shade of a palette
+        if (r.product.inStock &&
+            (shadesOf(r.product).isEmpty || seen.add(lineOf(r.product)!)))
+          r,
     ].take(limit).toList();
   }
 
@@ -187,28 +191,64 @@ class CatalogProvider extends ChangeNotifier {
     return false;
   }
 
+  static final _number = RegExp(r'^\d{1,3}$');
+
   /// The words of a name before its shade number: "Better Than Palette 05
   /// Shade & Shadow Garden" -> "better than palette". Null when the name has
   /// no number (or it is the first word), so such a product has no line.
   static String? lineOf(Product p) {
     final words = p.name.split(' ');
-    final at = words.indexWhere((w) => RegExp(r'^\d{1,3}$').hasMatch(w));
+    final at = words.indexWhere(_number.hasMatch);
     if (at < 2) return null;
     return '${p.brand}|${words.sublist(0, at).join(' ').toLowerCase()}';
   }
 
-  /// Other shades of the same line (same brand, same name before the number),
-  /// by shade number: the palettes 00, 01, 02... of one series.
-  List<Product> variantsOf(Product p) {
+  /// "05" of "Better Than Palette 05 Shade & Shadow Garden" (null: no number).
+  static String? shadeNumber(Product p) {
+    for (final w in p.name.split(' ')) {
+      if (_number.hasMatch(w)) return w;
+    }
+    return null;
+  }
+
+  /// All shades of the line the product belongs to (itself included), by
+  /// shade number: the palettes 00, 01, 02... of one series. Empty when the
+  /// product is alone in its line (a tint with one shade is just a product).
+  List<Product> shadesOf(Product p) {
     final line = lineOf(p);
     if (line == null) return const [];
-    int number(Product x) => int.parse(
-      x.name.split(' ').firstWhere((w) => RegExp(r'^\d{1,3}$').hasMatch(w)),
-    );
-    return [
+    final all = [
       for (final x in products)
-        if (x.id != p.id && lineOf(x) == line) x,
-    ]..sort((a, b) => number(a).compareTo(number(b)));
+        if (lineOf(x) == line) x,
+    ];
+    if (all.length < 2) return const [];
+    return all..sort((a, b) => shadeNumber(a)!.compareTo(shadeNumber(b)!));
+  }
+
+  /// What a list shows as the name: the line ("Better Than Palette") when the
+  /// product has several shades, the full name otherwise.
+  String listName(Product p) {
+    if (shadesOf(p).isEmpty) return p.name;
+    final words = p.name.split(' ');
+    return words.sublist(0, words.indexWhere(_number.hasMatch)).join(' ');
+  }
+
+  /// The shade part of a name: "05 Shade & Shadow Garden".
+  static String shadeName(Product p) {
+    final words = p.name.split(' ');
+    final at = words.indexWhere(_number.hasMatch);
+    return at < 0 ? p.name : words.sublist(at).join(' ');
+  }
+
+  /// Lists show one tile per line, not one per shade: the first shade of every
+  /// line stays (in a personal ranking that is the best-matching one), the
+  /// others are picked on the product page.
+  List<Product> collapseLines(List<Product> list) {
+    final seen = <String>{};
+    return [
+      for (final p in list)
+        if (shadesOf(p).isEmpty || seen.add(lineOf(p)!)) p,
+    ];
   }
 
   List<Product> get featured {

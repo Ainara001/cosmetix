@@ -190,6 +190,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
         matches[r.product.id] = r.matchPercent;
       }
     }
+    // one tile per line (palette 00, 01, 02... is one palette with a choice)
+    items = catalog.collapseLines(items);
     final hasFilters =
         _filter.category != null ||
         _filter.status != ProductStatus.any ||
@@ -370,8 +372,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
       itemBuilder: (context, i) {
         final p = items[i];
         final match = matches[p.id];
-        return ProductCard(
-          product: p,
+        return lineCard(
+          catalog,
+          p,
           footer: _cardFooter(p, match),
           onTap: () =>
               Navigator.pushNamed(context, AppRoutes.product, arguments: p.id),
