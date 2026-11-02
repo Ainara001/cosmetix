@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/models/care_models.dart';
+import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/repositories/care_repository.dart';
+import 'package:cosmetix/services/routine_checks.dart';
 
 /// The cosmetic bag, the morning / evening plan and today's marks.
 class CareProvider extends ChangeNotifier {
@@ -128,6 +130,45 @@ class CareProvider extends ChangeNotifier {
     if (userId == null) return;
     await _repo.removeFromBag(p.id);
     await load(userId);
+  }
+
+  // ---- compatibility ----
+
+  /// The bag as the checks see it. [catalog] finds the catalog product of an
+  /// entry that was picked from the catalog (its INCI list tells everything);
+  /// other entries are read from their typed name.
+  List<RoutineItem> bagItems(Product? Function(int id) catalog) => [
+    for (final m in bag)
+      RoutineItem.fromBag(
+        m,
+        m.productId == null ? null : catalog(m.productId!),
+      ),
+  ];
+
+  /// The steps of a period, in order.
+  List<RoutineItem> stepItems(
+    CarePeriod period,
+    Product? Function(int id) catalog,
+  ) => [
+    for (final s in _steps[period]!)
+      RoutineItem.fromBag(
+        s.product,
+        s.product.productId == null ? null : catalog(s.product.productId!),
+      ),
+  ];
+
+  /// Conflicts inside one period's plan: actives and the layering of a
+  /// foundation (only products BEFORE the foundation sit under it).
+  List<RoutineIssue> planIssues(
+    CarePeriod period,
+    Product? Function(int id) catalog, {
+    RoutineItem? extra,
+  }) {
+    final items = [...stepItems(period, catalog), ?extra];
+    return [
+      ...ActiveRules.check(items),
+      ...MakeupCompatibility.checkAll(items, ordered: true),
+    ];
   }
 
   // ---- plan ----

@@ -88,4 +88,24 @@ const Map<String, ProductTraits> seedTraits = {
     concerns: ['acne', 'sensitivity'],
     tags: ['soothing', 'fragrance_free'],
   ),
+  'The Ordinary|Glycolic Acid 7% Toning Solution': ProductTraits(
+    skinTypes: ['normal', 'combination', 'oily'],
+    concerns: ['pigmentation', 'aging'],
+    tags: ['brightening', 'fragrance_free'],
+  ),
+  'The Ordinary|Retinol 0.5% in Squalane': ProductTraits(
+    skinTypes: ['normal', 'dry', 'combination'],
+    concerns: ['aging', 'pigmentation'],
+    tags: ['fragrance_free'],
+  ),
+  'COSRX|BHA Blackhead Power Liquid': ProductTraits(
+    skinTypes: ['oily', 'combination'],
+    concerns: ['acne'],
+    tags: ['oil_control', 'fragrance_free'],
+  ),
+  'Klairs|Freshly Juiced Vitamin Drop': ProductTraits(
+    skinTypes: ['normal', 'dry', 'combination'],
+    concerns: ['pigmentation', 'aging'],
+    tags: ['brightening'],
+  ),
 };

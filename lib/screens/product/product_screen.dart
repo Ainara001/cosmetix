@@ -11,6 +11,7 @@ import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
+import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/location_provider.dart';
 import 'package:cosmetix/providers/reviews_provider.dart';
@@ -20,10 +21,13 @@ import 'package:cosmetix/repositories/review_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
+import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/product_mini_card.dart';
+import 'package:cosmetix/widgets/routine_issues_card.dart';
 import 'package:cosmetix/widgets/product_art.dart';
 import 'package:cosmetix/widgets/why_it_suits_card.dart';
 
@@ -115,12 +119,76 @@ class _ProductBodyState extends State<_ProductBody> {
     );
   }
 
+  /// "How it goes with your care": conflicts with the cosmetic bag, layering
+  /// under or over a foundation, a patch test for a sensitive skin, and for a
+  /// foundation the care products of the catalog that sit well under it.
+  List<Widget> _compat(BuildContext context, Product product) {
+    final catalog = context.watch<CatalogProvider>();
+    final care = context.watch<CareProvider>();
+    final me = RoutineItem.fromProduct(product);
+    final all = [
+      me,
+      for (final b in care.bagItems(catalog.byId))
+        if (b.productId != product.id) b,
+    ];
+    bool mine(RoutineIssue i) => i.args.values.contains(me.title);
+    final issues = [
+      ...ActiveRules.check(all).where(mine),
+      ...MakeupCompatibility.checkAll(all).where(mine),
+      ...PatchTestAdvice.forItems([me], sensitive: catalog.sensitiveSkin),
+    ];
+    final mates = <Product>[];
+    if (me.isFoundation && me.base != FormulaBase.unknown) {
+      for (final p in catalog.products) {
+        if (p.category != 'Уход за лицом' || p.id == product.id) continue;
+        final other = RoutineItem.fromProduct(p);
+        if (other.base != FormulaBase.unknown &&
+            MakeupCompatibility.check(other, me) == null) {
+          mates.add(p);
+        }
+      }
+    }
+    return [
+      RoutineIssuesCard(title: tr('Сочетание с вашим уходом'), issues: issues),
+      if (mates.isNotEmpty) ...[
+        SectionTitle(tr('С чем сочетать')),
+        Text(
+          trf(
+            'Основа {v0}: эти средства из каталога ложатся под неё ровно, без скольжения и катышков.',
+            {'v0': tr(me.base.label)},
+          ),
+          style: AppTextStyles.small.copyWith(color: context.pal.subtext),
+        ),
+        for (final p in mates.take(3))
+          ProductMiniCard(
+            productId: p.id,
+            note: trf('Формула: {v0}', {
+              'v0': tr(RoutineItem.fromProduct(p).base.label),
+            }),
+          ),
+      ],
+    ];
+  }
+
   /// Acids and actives found in the INCI list; a tap shows every product
   /// with the same ingredient.
   List<Widget> _activeChips(BuildContext context, Product product) {
     final actives = IngredientCatalog.activesOf(product);
-    if (actives.isEmpty) return const [];
+    final item = RoutineItem.fromProduct(product);
+    final formula =
+        item.base != FormulaBase.unknown &&
+            (item.isSkincare || item.isFoundation)
+        ? [
+            Text(
+              trf('Формула: {v0}', {'v0': tr(item.base.label)}),
+              style: AppTextStyles.small.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+          ]
+        : const <Widget>[];
+    if (actives.isEmpty) return formula;
     return [
+      ...formula,
       Text(
         tr('Ключевые компоненты'),
         style: AppTextStyles.caption.copyWith(color: context.pal.subtext),
@@ -310,6 +378,7 @@ class _ProductBodyState extends State<_ProductBody> {
                         ),
                       ],
                       WhyItSuitsCard(productId: product.id),
+                      ..._compat(context, product),
                       const SizedBox(height: 10),
                       CustomButton(
                         label: tr('Спросить ИИ: подойдёт ли мне?'),

@@ -1,6 +1,8 @@
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:flutter/foundation.dart';
 
+import 'package:cosmetix/core/beauty/beauty_codes.dart';
+
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
@@ -58,6 +60,12 @@ class CatalogProvider extends ChangeNotifier {
 
   /// True once the Beauty Test is completed: the catalog defaults to "For you".
   bool get hasProfile => _ctx.profile.isComplete;
+
+  /// Sensitive skin: the type or a concern about redness (a patch test is
+  /// worth the time).
+  bool get sensitiveSkin =>
+      _ctx.profile.skinType == SkinType.sensitive ||
+      _ctx.profile.concerns.contains(SkinConcern.sensitivity);
 
   PersonalizationContext get personalization => _ctx;
 

@@ -8,6 +8,7 @@ import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/social_models.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
@@ -148,7 +149,10 @@ void main() {
         prompt,
         contains('EXCEPTION: when the user asks for alternatives'),
       );
-      expect(prompt.length, lessThan(6500)); // fits the 6000-char limit
+      expect(
+        prompt.length,
+        lessThan(AiClient.maxMessageChars),
+      ); // fits the limit
     });
   });
 }

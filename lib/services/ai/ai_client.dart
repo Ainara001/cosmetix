@@ -86,7 +86,7 @@ class AiClient {
 
   /// Messages longer than this are cut before sending (cost control; the
   /// proxy enforces its own, stricter-than-needed limits as well).
-  static const maxMessageChars = 6000;
+  static const maxMessageChars = 9000;
 
   /// GET /health: is the proxy reachable and is it talking to a real model.
   Future<AiHealth> health({Duration timeout = healthTimeout}) async {

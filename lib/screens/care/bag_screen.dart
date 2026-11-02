@@ -8,11 +8,14 @@ import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/care_models.dart';
 import 'package:cosmetix/providers/care_provider.dart';
+import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/routine_issues_card.dart';
 
 /// "Моя косметичка": the products the user already has, with dates and a
 /// reminder when the package data says the shelf life is ending.
@@ -87,6 +90,21 @@ class BagScreen extends StatelessWidget {
               ),
             ),
           ],
+          // what in the bag should not meet on the skin / under makeup
+          Builder(
+            builder: (context) {
+              final items = care.bagItems(
+                context.watch<CatalogProvider>().byId,
+              );
+              return RoutineIssuesCard(
+                title: tr('Не используйте эти средства вместе'),
+                issues: [
+                  ...ActiveRules.check(items),
+                  ...MakeupCompatibility.checkAll(items),
+                ],
+              );
+            },
+          ),
           SectionTitle(tr('Мои средства')),
           if (care.loading && care.bag.isEmpty)
             const Padding(
