@@ -9,6 +9,7 @@ import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
+import 'package:cosmetix/screens/stores/stores_map_screen.dart';
 import 'package:cosmetix/services/color_test_service.dart';
 import 'widget_test.dart' show pumpUntil;
 
@@ -37,6 +38,8 @@ void main() {
       addTearDown(t.view.reset);
       addTearDown(t.platformDispatcher.clearTextScaleFactorTestValue);
       final helper = DatabaseHelper(path: inMemoryDatabasePath);
+      StoresMapScreen.defaultShowTiles = false; // no Internet in tests
+      addTearDown(() => StoresMapScreen.defaultShowTiles = true);
       addTearDown(() => t.runAsync(helper.close));
       await t.runAsync(() => UserRepository(helper).setCurrentUser(1));
       await t.pumpWidget(CosmetixApp(helper: helper));
@@ -81,6 +84,18 @@ void main() {
           ),
         ),
         (AppRoutes.product, 3),
+        (AppRoutes.palettes, ColorType.winter),
+        (AppRoutes.stores, null),
+        (AppRoutes.stores, const StoresArgs(productId: 12)),
+        (AppRoutes.colorTest, null),
+        (
+          AppRoutes.beautyPhoto,
+          const BeautyPhotoArgs(
+            color: ColorTestResult.unknown(),
+            skinType: SkinType.dry,
+            concerns: {},
+          ),
+        ),
         (AppRoutes.settings, null),
         (AppRoutes.beautyProfile, null),
         (AppRoutes.editProfile, null),

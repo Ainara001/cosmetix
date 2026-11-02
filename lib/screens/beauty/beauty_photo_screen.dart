@@ -35,6 +35,9 @@ class BeautyPhotoScreen extends StatefulWidget {
 
 class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   _Step _step = _Step.intro;
+
+  /// Too many skipped questions: the AI must determine the colour type.
+  bool get _needsPhoto => widget.args.color.isWeak;
   File? _photo;
   String? _error;
   bool _saving = false;
@@ -147,6 +150,11 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     AiBadResponse() => tr('Не удалось разобрать ответ ИИ.'),
   };
 
+  void _backToQuestions() {
+    _discardPhoto();
+    Navigator.of(context).popUntil(ModalRoute.withName(AppRoutes.colorTest));
+  }
+
   Future<void> _skip() async {
     _discardPhoto();
     await _finish(null);
@@ -163,6 +171,16 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       vision: vision,
     );
     final p = merged.profile;
+    if (p.colorType == null) {
+      // skipped questions and no usable photo: there is nothing to save
+      _saving = false;
+      if (!mounted) return;
+      setState(() {
+        _error = tr('ИИ не смог уверенно определить цветотип по этому фото.');
+        _step = _Step.failed;
+      });
+      return;
+    }
     try {
       await context.read<AuthProvider>().updateBeauty(
         skinType: p.skinType!.label,
@@ -200,7 +218,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: tr('Фото (по желанию)'),
+      title: _needsPhoto ? tr('Фото для ИИ') : tr('Фото (по желанию)'),
       child: switch (_step) {
         _Step.intro => _intro(context),
         _Step.preview => _preview(context),
@@ -222,12 +240,21 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       children: [
-        Text(tr('Улучшите результат с помощью фото'), style: AppTextStyles.h2),
+        Text(
+          _needsPhoto
+              ? tr('ИИ определит цветотип по фото')
+              : tr('Улучшите результат с помощью фото'),
+          style: AppTextStyles.h2,
+        ),
         const SizedBox(height: 6),
         Text(
-          tr(
-            'Фото — необязательный шаг. ИИ использует его только как дополнительную подсказку; ваши ответы важнее.',
-          ),
+          _needsPhoto
+              ? tr(
+                  'Вы пропустили много вопросов, поэтому ИИ посмотрит на фото и сам определит цветотип, подтон и тон кожи.',
+                )
+              : tr(
+                  'Фото — необязательный шаг. ИИ использует его только как дополнительную подсказку; ваши ответы важнее.',
+                ),
           style: AppTextStyles.body.copyWith(color: pal.subtext),
         ),
         const SizedBox(height: 14),
@@ -299,7 +326,13 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           onPressed: () => _pick(ImageSource.gallery),
         ),
         const SizedBox(height: 6),
-        TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
+        if (_needsPhoto)
+          TextButton(
+            onPressed: _backToQuestions,
+            child: Text(tr('Вернуться к вопросам')),
+          )
+        else
+          TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
       ],
     );
   }
@@ -329,7 +362,8 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           },
         ),
         const SizedBox(height: 6),
-        TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
+        if (!_needsPhoto)
+          TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
       ],
     );
   }
@@ -378,21 +412,37 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
         ),
         const SizedBox(height: 6),
         Text(
-          tr('Ничего страшного: результат можно получить по ответам теста.'),
+          _needsPhoto
+              ? tr(
+                  'Попробуйте другое фото при дневном свете или ответьте на вопросы теста.',
+                )
+              : tr(
+                  'Ничего страшного: результат можно получить по ответам теста.',
+                ),
           textAlign: TextAlign.center,
           style: AppTextStyles.small.copyWith(color: pal.subtext),
         ),
         const SizedBox(height: 20),
-        CustomButton(
-          label: tr('Продолжить без фото'),
-          onPressed: () => _finish(null),
-        ),
-        const SizedBox(height: 10),
+        if (!_needsPhoto) ...[
+          CustomButton(
+            label: tr('Продолжить без фото'),
+            onPressed: () => _finish(null),
+          ),
+          const SizedBox(height: 10),
+        ],
         CustomButton(
           label: tr('Попробовать другое фото'),
-          outlined: true,
+          outlined: !_needsPhoto,
           onPressed: () => setState(() => _step = _Step.intro),
         ),
+        if (_needsPhoto) ...[
+          const SizedBox(height: 10),
+          CustomButton(
+            label: tr('Вернуться к вопросам'),
+            outlined: true,
+            onPressed: _backToQuestions,
+          ),
+        ],
       ],
     );
   }

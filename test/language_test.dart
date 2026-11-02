@@ -18,6 +18,7 @@ import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
+import 'package:cosmetix/screens/stores/stores_map_screen.dart';
 import 'package:cosmetix/services/color_test_service.dart';
 import 'widget_test.dart' show pumpUntil;
 
@@ -101,6 +102,8 @@ void main() {
       final offenders = <String, Set<String>>{};
       // user data (name, city) legitimately stays as typed
       const userData = {'Айнара', 'Рустемкызы', 'Астана', 'Рустемкызы Айнара'};
+      StoresMapScreen.defaultShowTiles = false; // no Internet in tests
+      addTearDown(() => StoresMapScreen.defaultShowTiles = true);
       final dict = lang == AppLang.en ? translationsEn : translationsKk;
       bool untranslated(String s) {
         if (userData.contains(s) || s == 'Русский') return false;
@@ -133,6 +136,13 @@ void main() {
         AppRoutes.filters,
         const FiltersArgs(initial: ProductFilter(), products: []),
       );
+      await visit('stores', AppRoutes.stores);
+      await visit(
+        'storesProduct',
+        AppRoutes.stores,
+        const StoresArgs(productId: 12),
+      );
+      await visit('palettes', AppRoutes.palettes, ColorType.winter);
       for (final id in [1, 5]) {
         await visit('product$id', AppRoutes.product, id);
         await visit('compare$id', AppRoutes.priceCompare, id);

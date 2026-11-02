@@ -12,6 +12,7 @@ import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/providers/location_provider.dart';
 import 'package:cosmetix/providers/reviews_provider.dart';
 import 'package:cosmetix/providers/safety_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
@@ -152,6 +153,17 @@ class _ProductBodyState extends State<_ProductBody> {
     final product = context.watch<CatalogProvider>().byId(widget.productId);
     final pal = context.pal;
     final fmt = context.watch<SettingsProvider>().priceText;
+    final loc = context.watch<LocationProvider>();
+    // distances from the user's position (or the city centre)
+    // nearest first, shops that have it before shops that do not
+    final prices =
+        [
+          for (final p in _prices)
+            p.hasPosition ? p.withDistance(loc.distanceTo(p.lat!, p.lng!)) : p,
+        ]..sort((a, b) {
+          if (a.inStock != b.inStock) return a.inStock ? -1 : 1;
+          return a.distanceM.compareTo(b.distanceM);
+        });
 
     if (product == null) {
       return PageScaffold(
@@ -165,7 +177,10 @@ class _ProductBodyState extends State<_ProductBody> {
     }
 
     final reviews = context.watch<ReviewsProvider>();
-    final available = _prices.where((p) => p.inStock).length;
+    final available = prices.where((p) => p.inStock).length;
+    final best = prices
+        .where((p) => p.inStock)
+        .fold<int?>(null, (m, p) => m == null || p.price < m ? p.price : m);
     final selected = _selected;
     final price = selected?.price ?? product.price;
 
@@ -313,25 +328,48 @@ class _ProductBodyState extends State<_ProductBody> {
                           ),
                         ),
                       ),
-                      for (var i = 0; i < _prices.length; i++)
+                      for (var i = 0; i < prices.length && i < 4; i++)
                         _StoreRow(
                           index: i + 1,
-                          price: _prices[i],
-                          selected: _prices[i].storeId == _storeId,
+                          price: prices[i],
+                          isBest: prices[i].inStock && prices[i].price == best,
+                          selected: prices[i].storeId == _storeId,
                           onTap: () {
-                            if (!_prices[i].inStock) {
+                            if (!prices[i].inStock) {
                               showMessage(
                                 context,
                                 trf('В магазине «{v0}» товара нет в наличии', {
-                                  'v0': tr(_prices[i].storeName),
+                                  'v0': tr(prices[i].storeName),
                                 }),
                                 type: MessageType.warning,
                               );
                               return;
                             }
-                            setState(() => _storeId = _prices[i].storeId);
+                            setState(() => _storeId = prices[i].storeId);
                           },
                         ),
+                      if (prices.length > 4)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            trf('и ещё {v0} магазинов', {
+                              'v0': prices.length - 4,
+                            }),
+                            style: AppTextStyles.caption.copyWith(
+                              color: pal.subtext,
+                            ),
+                          ),
+                        ),
+                      CustomButton(
+                        label: tr('Где купить рядом: карта'),
+                        icon: Icons.map_outlined,
+                        outlined: true,
+                        onPressed: () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.stores,
+                          arguments: StoresArgs(productId: product.id),
+                        ),
+                      ),
                       SectionTitle(tr('Анализ состава')),
                       if (_analysis != null)
                         AppCard(
@@ -570,8 +608,11 @@ class _StoreRow extends StatelessWidget {
     required this.price,
     required this.selected,
     required this.onTap,
+    this.isBest = false,
   });
 
+  /// The lowest price among the shops that have the product.
+  final bool isBest;
   final int index;
   final StorePrice price;
   final bool selected;
@@ -607,6 +648,12 @@ class _StoreRow extends StatelessWidget {
                 children: [
                   Text(tr(price.storeName), style: AppTextStyles.bodyBold),
                   Text(
+                    tr(price.address),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                  ),
+                  Text(
                     trf('{v0} от вас', {
                       'v0': price.distanceM >= 1000
                           ? trf('{v0} км', {
@@ -627,9 +674,7 @@ class _StoreRow extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
-                    color: index == 1 && price.inStock
-                        ? AppColors.sale
-                        : pal.text,
+                    color: isBest && price.inStock ? AppColors.sale : pal.text,
                   ),
                 ),
                 Container(
@@ -638,14 +683,26 @@ class _StoreRow extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: price.inStock ? AppColors.successSoft : pal.field,
+                    color: switch (price.level) {
+                      StockLevel.inStock => AppColors.successSoft,
+                      StockLevel.low => const Color(0xFFFBF0D9),
+                      StockLevel.out => pal.field,
+                    },
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Text(
-                    price.inStock ? tr('В наличии') : tr('Нет'),
+                    switch (price.level) {
+                      StockLevel.inStock => tr('В наличии'),
+                      StockLevel.low => tr('Мало'),
+                      StockLevel.out => tr('Нет'),
+                    },
                     style: TextStyle(
                       fontSize: 9,
-                      color: price.inStock ? AppColors.success : pal.subtext,
+                      color: switch (price.level) {
+                        StockLevel.inStock => AppColors.success,
+                        StockLevel.low => const Color(0xFF9A6A12),
+                        StockLevel.out => pal.subtext,
+                      },
                     ),
                   ),
                 ),

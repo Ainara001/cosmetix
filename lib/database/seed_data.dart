@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 import 'package:cosmetix/database/seed_traits.dart';
+import 'package:cosmetix/database/store_data.dart';
 
 import 'package:cosmetix/core/utils/password_hasher.dart';
 
@@ -19,13 +20,8 @@ class SeedData {
     final now = DateTime.now().millisecondsSinceEpoch;
     final batch = db.batch();
 
-    for (final s in _stores) {
-      batch.insert('stores', {
-        'name': s.$1,
-        'distance_m': s.$2,
-        'address': s.$3,
-        'rating': s.$4,
-      });
+    for (final s in StoreData.stores) {
+      batch.insert('stores', _storeRow(s));
     }
 
     for (final i in _ingredients) {
@@ -62,16 +58,9 @@ class SeedData {
         // newer products have a later date (used by "По новизне")
         'created_at': now - i * 86400000,
       });
-      // The same product in 3 stores. Nearest store is the priciest, the middle
-      // one is cheapest, so "cheap first" and "closest" give different order.
-      final extras = [1200, 0, 600];
-      for (var s = 0; s < 3; s++) {
-        batch.insert('product_prices', {
-          'product_id': id,
-          'store_id': s + 1,
-          'price': p.price + extras[s],
-          'in_stock': p.inStock && !(p.art == 'perfume' && s == 1) ? 1 : 0,
-        });
+      // The same product in every shop (DEMO prices and stock, see StoreData).
+      for (var s = 0; s < StoreData.stores.length; s++) {
+        batch.insert('product_prices', _offerRow(id, p, s));
       }
       for (final ing in p.ingredients) {
         batch.insert('product_ingredients', {
@@ -144,6 +133,101 @@ class SeedData {
     'Missha|Magic Cushion Moist Up': 0xFFE3C1A6,
     'Rom&nd|Better Than Cheek': 0xFFDDB1B6,
   };
+
+  static Map<String, Object?> _storeRow(StoreSeed s) => {
+    'name': s.name,
+    'distance_m': StoreData.fromCenter(s),
+    'address': s.address,
+    'rating': 0.0,
+    'lat': s.lat,
+    'lng': s.lng,
+    'chain': s.chain,
+    'hours': s.hours,
+    'source': s.source,
+  };
+
+  static Map<String, Object?> _offerRow(int productId, _P p, int storeIndex) {
+    final qty = StoreData.offerQty(
+      p.inStock,
+      productId,
+      storeIndex,
+      perfume: p.art == 'perfume',
+    );
+    return {
+      'product_id': productId,
+      'store_id': storeIndex + 1,
+      'price': StoreData.offerPrice(p.price, productId, storeIndex),
+      'in_stock': qty > 0 ? 1 : 0,
+      'qty': qty,
+      'source': 'demo',
+    };
+  }
+
+  /// Migration step (DB v9): the three old demo shops (ids 1..3, kept so carts
+  /// and orders stay valid) become real ones and the other real shops are
+  /// added, each with demo price and stock for every product. Prices of the
+  /// old rows are kept.
+  static Future<void> applyRealStores(DatabaseExecutor db) async {
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM stores'),
+    );
+    if ((count ?? 0) == 0) return; // a fresh install: insertAll seeds them
+    final existing = {
+      for (final r in await db.query('stores', columns: ['id']))
+        r['id']! as int,
+    };
+    final batch = db.batch();
+    for (var i = 0; i < StoreData.stores.length; i++) {
+      final row = _storeRow(StoreData.stores[i]);
+      if (existing.contains(i + 1)) {
+        batch.update('stores', row, where: 'id = ?', whereArgs: [i + 1]);
+      } else {
+        batch.insert('stores', {'id': i + 1, ...row});
+      }
+    }
+    await batch.commit(noResult: true);
+    final products = await db.query(
+      'products',
+      columns: ['id', 'price', 'in_stock', 'art'],
+    );
+    final prices = await db.query('product_prices');
+    final have = {
+      for (final r in prices) '${r['product_id']}|${r['store_id']}',
+    };
+    final b2 = db.batch();
+    for (final r in products) {
+      final id = r['id']! as int;
+      final base = r['price']! as int;
+      final stocked = (r['in_stock'] as int? ?? 1) == 1;
+      final perfume = (r['art'] as String? ?? '').startsWith('perfume');
+      for (var s = 0; s < StoreData.stores.length; s++) {
+        final qty = StoreData.offerQty(stocked, id, s, perfume: perfume);
+        if (have.contains('$id|${s + 1}')) {
+          // keep the price and stock the old row had, only add the quantity
+          final old = prices.firstWhere(
+            (x) => x['product_id'] == id && x['store_id'] == s + 1,
+          );
+          final wasIn = (old['in_stock'] as int? ?? 1) == 1;
+          b2.update(
+            'product_prices',
+            {'qty': wasIn ? (qty > 0 ? qty : 2) : 0, 'source': 'demo'},
+            where: 'id = ?',
+            whereArgs: [old['id']],
+          );
+        } else {
+          b2.insert('product_prices', {
+            'product_id': id,
+            'store_id': s + 1,
+            'price': StoreData.offerPrice(base, id, s),
+            'in_stock': qty > 0 ? 1 : 0,
+            'qty': qty,
+            'source': 'demo',
+          });
+        }
+      }
+    }
+    await b2.commit(noResult: true);
+  }
 
   /// Migration step (DB v8): stores the shade colours above.
   static Future<void> applyShades(DatabaseExecutor db) async {
@@ -410,13 +494,6 @@ class SeedData {
     }
     await batch.commit(noResult: true);
   }
-
-  // (name, distance m, address, rating)
-  static const _stores = [
-    ('Korean Beauty', 200, 'ул. Абая 45', 4.9),
-    ('Cosmetix Store', 500, 'пр. Достык 12', 4.7),
-    ('Золотое Яблоко', 1200, 'ТРЦ Dostyk Plaza', 4.8),
-  ];
 
   // (name, description, group key, enabled for the demo user)
   static const _blacklist = [

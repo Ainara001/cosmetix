@@ -28,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
     'Посоветуй тинт для губ',
     'Что подойдёт моему цветотипу?',
     'Где есть ниацинамид?',
+    'Где купить Niacinamide рядом со мной?',
     'Какой состав у крема CeraVe?',
     'Сравни цены Rom&nd и Peripera',
   ];

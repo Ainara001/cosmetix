@@ -128,6 +128,13 @@ class ProfileScreen extends StatelessWidget {
                             Navigator.pushNamed(context, AppRoutes.orders),
                       ),
                       MenuTile(
+                        icon: Icons.map_outlined,
+                        title: tr('Магазины на карте'),
+                        subtitle: tr('Подружка, Диона и другие рядом с вами'),
+                        onTap: () =>
+                            Navigator.pushNamed(context, AppRoutes.stores),
+                      ),
+                      MenuTile(
                         icon: Icons.favorite_border,
                         title: tr('Избранное'),
                         onTap: () =>
@@ -236,11 +243,15 @@ class _BeautySummary extends StatelessWidget {
         children: [
           Text(label, style: AppTextStyles.label.copyWith(color: pal.subtext)),
           const SizedBox(height: 2),
-          Text(
-            value.isEmpty ? '—' : tr(value),
-            style: AppTextStyles.bodyBold,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          // one line, scaled down: a long word is never cut in the middle
+          FittedBox(
+            alignment: Alignment.centerLeft,
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value.isEmpty ? '—' : tr(value),
+              style: AppTextStyles.bodyBold,
+              maxLines: 1,
+            ),
           ),
         ],
       ),

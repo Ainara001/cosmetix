@@ -615,7 +615,7 @@ void main() {
         expect(system, isNot(contains('Весна')));
         expect(system, isNot(contains('Сухость и шелушение')));
         expect(system, isNot(contains('Парабены')));
-        expect(system, isNot(contains('local match')));
+        expect(system, isNot(contains('match:')));
         // the whole request must not contain the user's email or phone either
         final all = jsonEncode(fake.requests.single);
         expect(all, isNot(contains('ainara')));

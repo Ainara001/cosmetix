@@ -105,6 +105,9 @@ class Product {
   );
 }
 
+/// Stock of a product in a shop.
+enum StockLevel { inStock, low, out }
+
 /// Price of one product in one store.
 class StorePrice {
   const StorePrice({
@@ -115,21 +118,77 @@ class StorePrice {
     required this.rating,
     required this.price,
     required this.inStock,
+    this.lat,
+    this.lng,
+    this.chain = '',
+    this.hours = '',
+    this.qty,
+    this.demo = true,
+    this.updatedAt,
+    this.locationSource = '',
   });
 
   final int storeId;
   final String storeName;
+
+  /// Metres from the user (or from the city centre until the location is
+  /// known).
   final int distanceM;
   final String address;
   final double rating;
   final int price;
   final bool inStock;
+  final double? lat;
+  final double? lng;
+  final String chain;
+  final String hours;
+
+  /// Units in stock, null when unknown.
+  final int? qty;
+
+  /// True for the demo offers (no real stock feed behind them).
+  final bool demo;
+
+  /// When a real feed last updated this offer (null for demo data).
+  final int? updatedAt;
+
+  /// Where the shop's position comes from.
+  final String locationSource;
+
+  bool get hasPosition => lat != null && lng != null;
+
+  /// A few units left (3 or fewer).
+  StockLevel get level => !inStock
+      ? StockLevel.out
+      : (qty != null && qty! <= 3 ? StockLevel.low : StockLevel.inStock);
+
+  /// Same offer with a distance counted from the user's position.
+  StorePrice withDistance(int meters) => StorePrice(
+    storeId: storeId,
+    storeName: storeName,
+    distanceM: meters,
+    address: address,
+    rating: rating,
+    price: price,
+    inStock: inStock,
+    lat: lat,
+    lng: lng,
+    chain: chain,
+    hours: hours,
+    qty: qty,
+    demo: demo,
+    updatedAt: updatedAt,
+    locationSource: locationSource,
+  );
 
   String get distanceLabel => distanceM >= 1000
       ? trf('{v0} км от вас', {
           'v0': (distanceM / 1000).toStringAsFixed(1).replaceAll('.', ','),
         })
       : trf('{distanceM} м от вас', {'distanceM': distanceM});
+
+  /// "открыто до 22:00" / "закрыто, откроется в 10:00"; empty when unknown.
+  String openStatus(DateTime now) => openStatusOf(hours, now);
 
   factory StorePrice.fromMap(Map<String, Object?> m) => StorePrice(
     storeId: m['store_id'] as int,
@@ -139,5 +198,80 @@ class StorePrice {
     rating: (m['rating'] as num).toDouble(),
     price: m['price'] as int,
     inStock: (m['in_stock'] as int? ?? 1) == 1,
+    lat: (m['lat'] as num?)?.toDouble(),
+    lng: (m['lng'] as num?)?.toDouble(),
+    chain: m['chain'] as String? ?? '',
+    hours: m['hours'] as String? ?? '',
+    qty: m['qty'] as int?,
+    demo: (m['offer_source'] as String? ?? 'demo') == 'demo',
+    updatedAt: m['updated_at'] as int?,
+    locationSource: m['loc_source'] as String? ?? '',
   );
+}
+
+/// A shop on the map (independent of any product).
+class StoreInfo {
+  const StoreInfo({
+    required this.id,
+    required this.name,
+    required this.chain,
+    required this.address,
+    required this.hours,
+    required this.lat,
+    required this.lng,
+    required this.source,
+    this.distanceM = 0,
+  });
+
+  final int id;
+  final String name;
+  final String chain;
+  final String address;
+  final String hours;
+  final double lat;
+  final double lng;
+  final String source;
+  final int distanceM;
+
+  StoreInfo withDistance(int meters) => StoreInfo(
+    id: id,
+    name: name,
+    chain: chain,
+    address: address,
+    hours: hours,
+    lat: lat,
+    lng: lng,
+    source: source,
+    distanceM: meters,
+  );
+
+  factory StoreInfo.fromMap(Map<String, Object?> m) => StoreInfo(
+    id: m['id'] as int,
+    name: m['name'] as String,
+    chain: m['chain'] as String? ?? '',
+    address: m['address'] as String,
+    hours: m['hours'] as String? ?? '',
+    lat: (m['lat'] as num).toDouble(),
+    lng: (m['lng'] as num).toDouble(),
+    source: m['source'] as String? ?? '',
+    distanceM: m['distance_m'] as int? ?? 0,
+  );
+}
+
+/// "открыто до 22:00" / "закрыто, откроется в 10:00" from opening hours like
+/// "Ежедневно 10:00–22:00"; empty when the hours are unknown.
+String openStatusOf(String hours, DateTime now) {
+  final m = RegExp(
+    r'(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})',
+  ).firstMatch(hours);
+  if (m == null) return '';
+  final open = int.parse(m[1]!) * 60 + int.parse(m[2]!);
+  final close = int.parse(m[3]!) * 60 + int.parse(m[4]!);
+  final t = now.hour * 60 + now.minute;
+  String hm(int v) =>
+      '${(v ~/ 60).toString().padLeft(2, '0')}:${(v % 60).toString().padLeft(2, '0')}';
+  if (t >= open && t < close) {
+    return trf('открыто до {v0}', {'v0': hm(close)});
+  }
+  return trf('закрыто, откроется в {v0}', {'v0': hm(open)});
 }

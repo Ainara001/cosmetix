@@ -36,11 +36,26 @@ class ColorTestResult {
     required this.colorType,
     required this.undertone,
     required this.skinTone,
+    this.answered = ColorTestService.totalQuestions,
   });
+
+  /// Nothing was answered: the colour type has to come from the photo (AI).
+  const ColorTestResult.unknown()
+    : colorType = '',
+      undertone = '',
+      skinTone = '',
+      answered = 0;
 
   final String colorType;
   final String undertone;
   final String skinTone;
+
+  /// How many of the [ColorTestService.totalQuestions] questions were
+  /// answered (the rest were skipped with "I don't know").
+  final int answered;
+
+  /// Too few answers to name a colour type: the photo analysis must decide.
+  bool get isWeak => answered < ColorTestService.minAnswers;
 
   String get description {
     switch (colorType) {
@@ -62,6 +77,12 @@ class ColorTestResult {
 
 class ColorTestService {
   ColorTestService._();
+
+  /// 8 colour questions + the veins question.
+  static const totalQuestions = 9;
+
+  /// Below this many answers the test does not guess: the AI looks at a photo.
+  static const minAnswers = 4;
 
   static const questions = [
     ColorQuestion('Глаза', 'Какого цвета ваши глаза?', [
@@ -189,10 +210,21 @@ class ColorTestService {
       Color(0xFF8A8083),
       0,
     ),
+    (
+      'Не уверена',
+      'Подтон определят другие ответы или ИИ по фото',
+      Color(0xFFB8B2A7),
+      0,
+    ),
   ];
 
+  /// The last veins option: "not sure" (it adds nothing to the score).
+  static const veinSkipIndex = 3;
+
   /// [warm], [depth] and [contrast] are the sums of the chosen options; [vein]
-  /// is the score of the veins test (-3 cool, 0 neutral, 3 warm).
+  /// is the score of the veins test (-3 cool, 0 neutral, 3 warm). [answered]
+  /// is how many of the 8 colour questions were answered: with skipped ones
+  /// the sums are scaled up so a short test is not biased to "light".
   ///
   /// Warm vs cool comes from the undertone score. Inside each half the
   /// "deep" type (Осень, Зима) needs deep colouring; a soft, blended look
@@ -203,7 +235,15 @@ class ColorTestService {
     required int depth,
     required int vein,
     int contrast = 0,
+    int answered = 8,
+    bool veinAnswered = true,
   }) {
+    if (answered > 0 && answered < 8) {
+      final k = 8 / answered;
+      warm = (warm * k).round();
+      depth = (depth * k).round();
+      contrast = (contrast * k).round();
+    }
     final totalWarm = warm + vein;
     final undertone = totalWarm >= 2
         ? 'Тёплый'
@@ -232,6 +272,7 @@ class ColorTestService {
       colorType: type,
       undertone: undertone,
       skinTone: tone,
+      answered: answered + (veinAnswered ? 1 : 0),
     );
   }
 }

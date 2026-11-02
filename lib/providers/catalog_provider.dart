@@ -198,6 +198,8 @@ class CatalogProvider extends ChangeNotifier {
   Future<List<StorePrice>> storePrices(int productId) =>
       _repo.getStorePrices(productId);
 
+  Future<List<StoreInfo>> stores() => _repo.getStores();
+
   /// Returns the new favourite state (null on error).
   Future<bool?> toggleFavorite(int productId) async {
     final userId = _userId;

@@ -264,6 +264,16 @@ class BeautyProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           CustomButton(
+            label: tr('Палитры цветотипов'),
+            outlined: true,
+            onPressed: () => Navigator.pushNamed(
+              context,
+              AppRoutes.palettes,
+              arguments: user.beautyProfile.colorType,
+            ),
+          ),
+          const SizedBox(height: 10),
+          CustomButton(
             label: tr('Пройти бьюти-тест заново'),
             outlined: true,
             onPressed: () => Navigator.pushNamed(context, AppRoutes.colorTest),

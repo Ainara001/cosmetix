@@ -29,20 +29,36 @@ class _UndertoneTestScreenState extends State<UndertoneTestScreen> {
       showMessage(context, tr('Выберите цвет вен'), type: MessageType.warning);
       return;
     }
-    setState(() => _saving = true);
+    final skipped = _selected == ColorTestService.veinSkipIndex;
     final result = ColorTestService.compute(
       warm: widget.args.warm,
       depth: widget.args.depth,
       contrast: widget.args.contrast,
-      vein: ColorTestService.veinQuestion[_selected!].$4,
+      answered: widget.args.answered,
+      vein: skipped ? 0 : ColorTestService.veinQuestion[_selected!].$4,
+      veinAnswered: !skipped,
     );
+    if (result.isWeak) {
+      // too many "I don't know": do not guess, let the AI look at a photo
+      final ok = await confirmDialog(
+        context,
+        title: tr('Маловато ответов'),
+        message: trf(
+          'Вы ответили на {v0} из {v1} вопросов. Цветотип лучше определить по фото: ИИ посмотрит на вас и подберёт его сам. Продолжить?',
+          {'v0': result.answered, 'v1': ColorTestService.totalQuestions},
+        ),
+        confirmLabel: tr('Определить по фото'),
+      );
+      if (!ok || !mounted) return;
+    }
+    setState(() => _saving = true);
     // nothing is saved yet: the skin questions and the optional photo follow
-    Navigator.pushNamed(
+    await Navigator.pushNamed(
       context,
       AppRoutes.skinTest,
       arguments: SkinTestArgs(color: result),
     );
-    setState(() => _saving = false);
+    if (mounted) setState(() => _saving = false);
   }
 
   @override

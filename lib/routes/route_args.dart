@@ -52,10 +52,14 @@ class UndertoneArgs {
     required this.warm,
     required this.depth,
     this.contrast = 0,
+    this.answered = 8,
   });
 
   final int warm;
   final int depth;
+
+  /// How many of the 8 colour questions were answered (the rest skipped).
+  final int answered;
 
   /// Positive = high contrast between hair/eyes and skin, negative = soft.
   final int contrast;
@@ -103,4 +107,12 @@ class BagFormArgs {
 
   final int? id;
   final int? catalogProductId;
+}
+
+/// Map of the shops. With [productId] every shop shows the price and the
+/// stock of that product.
+class StoresArgs {
+  const StoresArgs({this.productId});
+
+  final int? productId;
 }

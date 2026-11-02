@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/core/beauty/color_palettes.dart';
@@ -10,16 +12,40 @@ import 'package:cosmetix/services/ingredient_analyzer.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
+/// What the assistant knows about shops: the nearest ones and, for the
+/// products in question, the price and stock in every shop. Addresses are real,
+/// prices and stock are demo values (the prompt says so).
+class StoreContext {
+  const StoreContext({
+    required this.located,
+    required this.nearest,
+    required this.offers,
+  });
+
+  /// True when the distances are counted from the user's real position.
+  final bool located;
+  final List<StoreInfo> nearest;
+
+  /// product id -> offers, nearest shop first.
+  final Map<int, List<StorePrice>> offers;
+}
+
+typedef StoreContextLoader =
+    Future<StoreContext> Function(List<int> productIds);
+
 /// The chat assistant: an AI model (through the Cosmetix AI proxy) that knows the
 /// catalog and, only when the user agreed (`shareProfile`), their Beauty
 /// Profile and blacklist, plus the product being discussed.
 /// Throws [AiException] when the server is not available: the caller shows a
 /// friendly message, nothing else in the app depends on the chat.
 class AssistantService {
-  AssistantService(this._reco, this._client);
+  AssistantService(this._reco, this._client, {StoreContextLoader? stores})
+    // ignore: prefer_initializing_formals
+    : _stores = stores;
 
   final RecommendationService _reco;
   final AiClient _client;
+  final StoreContextLoader? _stores;
 
   /// How many previous messages are sent as conversation context.
   static const historyLimit = 8;
@@ -53,12 +79,20 @@ class AssistantService {
     bool shareProfile = false,
   }) async {
     final ctx = await _reco.loadContext(userId);
+    StoreContext? shops;
+    try {
+      final focus = _focusProducts(ctx, text, productId, shareProfile);
+      shops = await _stores?.call([for (final c in focus) c.product.id]);
+    } catch (_) {
+      shops = null; // the answer works without shop data
+    }
     final system = buildSystemPrompt(
       ctx: ctx,
       question: text,
       productId: productId,
       language: currentLang.englishName,
       shareProfile: shareProfile,
+      stores: shops,
     );
     final recent = history.length > historyLimit
         ? history.sublist(history.length - historyLimit)
@@ -163,6 +197,7 @@ class AssistantService {
     required String language,
     int? productId,
     bool shareProfile = true,
+    StoreContext? stores,
   }) {
     final p = ctx.profile;
     String v(Object? x) => x == null ? 'unknown' : '$x';
@@ -207,58 +242,109 @@ class AssistantService {
     final blacklistLine = shareProfile
         ? (blocked.isEmpty ? 'none' : blocked.join(', '))
         : 'not shared by the user';
-    return '''
+    final shops = _shopLines(stores, shareProfile);
+    // The client cuts a message at AiClient.maxMessageChars: facts about the
+    // product and the shops come BEFORE the catalog, and when the prompt is too
+    // long the catalog loses its tail instead of the facts.
+    String assemble(List<String> catalogLines) =>
+        '''
 You are Cosmetix Assistant, a friendly cosmetics assistant inside a shopping app.
 Rules:
 - Talk only about cosmetics, ingredients, routines, the user's Beauty Profile and whether products suit them.
 - You are NOT a doctor. Never diagnose and never promise that a product will not cause an allergy or a reaction. If the user describes a serious reaction (swelling, trouble breathing, severe rash, burning, pain), tell them to stop using the product and to see a doctor or pharmacist.
-- Recommend ONLY products from the CATALOG below. Never invent products, prices, stores or ingredients. If a product or fact is not in the data, say plainly that you have no data about it.
+- Recommend ONLY products from the CATALOG. Never invent products, prices, shops or ingredients. If a fact is not in the data, say plainly that you have no data.
 - Never recommend a product that contains a blacklisted ingredient.
-- Base suitability answers on the Beauty Profile and the ingredient facts you are given, and explain them in simple words.
-- When the profile is shared, each catalog line has "fits:" facts computed by the app from the user's Beauty Test. For every product you recommend, say in a few words why it suits THIS person, using only those facts (for example "suits your color type" or "the shade is close to your palette", said in the answer language). Prefer products with a higher match; for makeup choose shades that fit the user's color type, undertone or skin tone.
-- Never claim a product fits the color type when its fits say the shade is closer to another palette: offer a better product from the catalog instead.
-- For questions about acids or active ingredients (hyaluronic, salicylic, niacinamide, retinol, ...) use the "actives:" part of the catalog lines and the INCI lists; if a product has no ingredient data, say so.
-- Keep answers short (under 120 words).
-- Write plain text: no markdown (no **bold**, no # headings, no tables).
-- Every time you recommend a CATALOG product, write its full name as in the catalog and put its marker, for example [#12], right after the name. A marker never stands alone and never follows a word like "or"/"such as". Never invent a marker.
-- Mention only products that DO suit the user. Do not list products that do not fit, not even to say you do not recommend them: just say in a few words that the other shades belong to another palette.
+- Catalog lines may have "has:" (acids and actives found in the INCI list; use it for ingredient questions) and "fits:" (reasons computed by the app from the user's Beauty Test, with the match %). Say in a few words why a product suits THIS person, using only those facts, in the answer language. Prefer a higher match. Never praise a shade whose fits say it is another palette's shade.
+- Mention only products that DO suit the user, never to say you do not recommend them; just say the other shades belong to another palette.
+- Where to buy / nearest shop / cheapest / in stock: use only SHOPS: name the shop, address, distance, price and stock. Say prices and stock are demo values to confirm with the shop, never call them live. No product named: list the nearest shops and ask which product.
+- Short answers (under 120 words), plain text: no markdown.
+- Each recommended CATALOG product: its full name, then its marker like [#12] right after the name. A marker never stands alone and never follows "or"/"such as". Never invent a marker.
 - Answer in $language.
 
 USER BEAUTY PROFILE:
 $profile
 
-USER BLACKLIST (ingredients to avoid): $blacklistLine
+USER BLACKLIST: $blacklistLine
+${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail\n'}
+SHOPS (addresses real; prices and stock DEMO, not live):
+$shops
 
 CATALOG:
-${catalog.join('\n')}
-${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
+${catalogLines.join('\n')}''';
+
+    var lines = catalog;
+    var text = assemble(lines);
+    while (text.length > AiClient.maxMessageChars - 100 && lines.length > 6) {
+      lines = lines.sublist(0, lines.length - 1);
+      text = assemble(lines);
+    }
+    return text;
+  }
+
+  /// The SHOPS section, for tests.
+  @visibleForTesting
+  static String shopsForTest(StoreContext s, {required bool shareProfile}) =>
+      _shopLines(s, shareProfile);
+
+  /// The SHOPS section: nearest shops and, per product, the offers. Distances
+  /// are given only when the position is real and the user shared their data.
+  static String _shopLines(StoreContext? s, bool shareProfile) {
+    if (s == null) return 'no shop data';
+    final dist = s.located && shareProfile;
+    String km(int m) =>
+        m >= 1000 ? '${(m / 1000).toStringAsFixed(1)} km' : '$m m';
+    String where(StoreInfo x) =>
+        '${x.name}, ${x.address}${dist ? ', ${km(x.distanceM)} from the user' : ''}';
+    final out = StringBuffer(
+      dist
+          ? 'Nearest shops to the user:\n'
+          : 'Shops (the user position is unknown: do not state distances):\n',
+    );
+    for (final x in s.nearest) {
+      final st = openStatusOf(x.hours, DateTime.now());
+      out.writeln('- ${where(x)}${st.isEmpty ? '' : ' ($st)'}');
+    }
+    for (final e in s.offers.entries) {
+      out.writeln('Availability of product [#${e.key}]:');
+      for (final o in e.value) {
+        final stock = switch (o.level) {
+          StockLevel.out => 'out of stock',
+          StockLevel.low => 'few left (${o.qty} pcs)',
+          StockLevel.inStock =>
+            o.qty == null ? 'in stock' : 'in stock (${o.qty} pcs)',
+        };
+        out.writeln(
+          '- ${o.storeName}, ${o.address}${dist ? ', ${km(o.distanceM)}' : ''}: '
+          '${Formatters.price(o.price)}, $stock${o.demo ? ' [demo data]' : ''}',
+        );
+      }
+    }
+    return out.toString().trimRight();
   }
 
   /// " | actives: Niacinamide (B3), ..." for the acids and actives in the INCI.
   static String _actives(Product p) {
     final a = IngredientCatalog.activesOf(p);
-    return a.isEmpty ? '' : ' | actives: ${a.map((g) => g.label).join(', ')}';
+    return a.isEmpty ? '' : ' | has: ${a.map((g) => g.label).join(', ')}';
   }
 
-  /// " | match 84%; fits: ..." from the app's own recommendation score.
+  /// " | 84%: palette Весна; undertone Тёплый" from the app's own score.
   static String _fits(Recommendation r) {
     final facts = <String>{for (final x in r.reasons) ?_reasonFact(x)};
-    return ' | match ${r.matchPercent}%${facts.isEmpty ? '' : '; fits: ${facts.join('; ')}'}';
+    return ' | fits ${r.matchPercent}%${facts.isEmpty ? '' : ': ${facts.join('; ')}'}';
   }
 
   static String? _reasonFact(MatchReason r) => switch (r.type) {
-    MatchReasonType.colorType => 'suits color type ${r.detail}',
-    MatchReasonType.undertone => 'suits undertone ${r.detail}',
-    MatchReasonType.skinType => 'made for skin type ${r.detail}',
-    MatchReasonType.concern => 'helps with ${r.detail}',
-    MatchReasonType.gentle => 'gentle formula',
-    MatchReasonType.preference => 'matches preference: ${r.detail}',
-    MatchReasonType.shadeFit =>
-      'shade is close to the palette of color type ${r.detail}',
-    MatchReasonType.shadeOff =>
-      'shade is closer to the palette of ${r.detail}, NOT the user\'s color type',
+    MatchReasonType.colorType => 'color type ${r.detail}',
+    MatchReasonType.undertone => 'undertone ${r.detail}',
+    MatchReasonType.skinType => 'skin ${r.detail}',
+    MatchReasonType.concern => 'helps ${r.detail}',
+    MatchReasonType.gentle => 'gentle',
+    MatchReasonType.preference => 'preference ${r.detail}',
+    MatchReasonType.shadeFit => 'shade matches palette ${r.detail}',
+    MatchReasonType.shadeOff => 'shade is ${r.detail} palette, NOT the user\'s',
     MatchReasonType.skinShade => 'shade matches skin tone ${r.detail}',
-    MatchReasonType.skinShadeOff => 'shade may not match skin tone ${r.detail}',
+    MatchReasonType.skinShadeOff => 'shade off for skin tone ${r.detail}',
     _ => null,
   };
 
@@ -268,8 +354,8 @@ ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail'}''';
     if (type == null) return '';
     final pal = ColorPalettes.seasons[type]!;
     String names(List<PaletteColor> l) => l.map((c) => c.name).join(', ');
-    return '\n- flattering makeup colors for ${type.label}: ${names(pal.flattering)}'
-        '\n- colors to avoid for ${type.label}: ${names(pal.avoid)}';
+    return '\n- good makeup colors (${type.label}): ${names(pal.flattering)}'
+        '\n- avoid: ${names(pal.avoid)}';
   }
 
   static List<ProductCandidate> _focusProducts(
@@ -322,6 +408,6 @@ ${p.inci.isEmpty ? '' : '  full INCI list (published by ${Uri.tryParse(p.sourceU
   made for color types: ${c.colorTypes.isEmpty ? 'not specified' : c.colorTypes.map((e) => e.label).join(', ')}
 ${shareProfile ? '''
   blacklisted ingredients found: ${hits.isEmpty ? 'none' : hits.join(', ')}
-  local match with the user: ${match == null ? 'excluded (blacklist)' : '$match%'}${ranked.isEmpty ? '' : _fits(ranked.first)}''' : ''}''';
+  match: ${match == null ? 'excluded (blacklist)' : '$match%'}${ranked.isEmpty ? '' : _fits(ranked.first)}''' : ''}''';
   }
 }

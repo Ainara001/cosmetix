@@ -152,12 +152,17 @@ class ColorResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(tr('Ваши оттенки'), style: AppTextStyles.subtitle),
+            PaletteBlocks(palette: palette),
             const SizedBox(height: 10),
-            _Swatches(colors: palette.flattering),
-            const SizedBox(height: 14),
-            Text(tr('Лучше избегать'), style: AppTextStyles.subtitle),
-            const SizedBox(height: 10),
-            _Swatches(colors: palette.avoid, muted: true),
+            CustomButton(
+              label: tr('Палитры всех цветотипов'),
+              outlined: true,
+              onPressed: () => Navigator.pushNamed(
+                context,
+                AppRoutes.palettes,
+                arguments: p.colorType,
+              ),
+            ),
             const _ShadePicks(),
             const SizedBox(height: 14),
             Text(
@@ -222,9 +227,9 @@ class _Info extends StatelessWidget {
   );
 }
 
-/// Named colour dots (the palette of the colour type).
-class _Swatches extends StatelessWidget {
-  const _Swatches({required this.colors, this.muted = false});
+/// Named colour dots (a palette group).
+class Swatches extends StatelessWidget {
+  const Swatches({super.key, required this.colors, this.muted = false});
 
   final List<PaletteColor> colors;
   final bool muted;
@@ -301,6 +306,40 @@ class _ShadePicks extends StatelessWidget {
         Text(tr('Из каталога вам идут'), style: AppTextStyles.subtitle),
         for (final r in ranked)
           ProductMiniCard(productId: r.product.id, note: note(r)),
+      ],
+    );
+  }
+}
+
+/// All blocks of one palette (lips, blush, eyes, clothes, metals) and the
+/// colours to avoid.
+class PaletteBlocks extends StatelessWidget {
+  const PaletteBlocks({super.key, required this.palette});
+
+  final SeasonPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final g in palette.groups) ...[
+          const SizedBox(height: 12),
+          Text(
+            tr(g.title),
+            style: AppTextStyles.small.copyWith(
+              color: pal.subtext,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Swatches(colors: g.colors),
+        ],
+        const SizedBox(height: 16),
+        Text(tr('Лучше избегать'), style: AppTextStyles.subtitle),
+        const SizedBox(height: 10),
+        Swatches(colors: palette.avoid, muted: true),
       ],
     );
   }
