@@ -10,6 +10,7 @@ import 'package:cosmetix/models/social_models.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
+import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
 /// What the assistant knows about shops: the nearest ones and, for the
@@ -316,6 +317,7 @@ class AssistantService {
         ? (blocked.isEmpty ? 'none' : blocked.join(', '))
         : 'not shared by the user';
     final shops = _shopLines(stores, shareProfile);
+    final pair = _pairCheck(focus);
     // The client cuts a message at AiClient.maxMessageChars: facts about the
     // product and the shops come BEFORE the catalog, and when the prompt is too
     // long the catalog loses its tail instead of the facts.
@@ -330,6 +332,7 @@ Rules:
 - Catalog lines may have "has:" (acids and actives found in the INCI list; use it for ingredient questions) and "fits:" (reasons computed by the app from the user's Beauty Test, with the match %). Say in a few words why a product suits THIS person, using only those facts, in the answer language. Prefer a higher match. Never praise a shade whose fits say it is another palette's shade.
 - Mention only products that DO suit the user, never to say you do not recommend them; just say the other shades belong to another palette. EXCEPTION: when the user asks for alternatives or cheaper options, name 2-3 other products from the comparison, say in a few words how well each fits (use the fits facts) and compare their prices and distances.
 - Where to buy / nearest shop / cheapest / alternatives / in stock: use only SHOPS: name the shop, address, distance, price and stock. NEVER invent a price or a shop: a product without an availability line has no shop data, say so and point to its page. For "alternatives" or "cheaper" compare the products listed under "being compared" and say which one costs less, where, and how far it is. Always write the product name next to each price, never compare prices of different products as if they were the same product. Say prices and stock are demo values to confirm with the shop, never call them live. If the user asks about "the same product" or "it", it is the product from your previous answer.
+- Safety: retinoids must not be layered with AHA/BHA/PHA acids or benzoyl peroxide, and are better apart from vitamin C (C in the morning, retinol in the evening); two acids at once are too much. Sensitive skin: add products one at a time and test 3-4 days on a small area first, not a whole line at once; acids, retinoids and vitamin C are NOT gentle: suggest them only with a patch test, never as mild. Foundation: a silicone foundation over an oil-rich cream slides, a water-based one over a silicone cream or primer beads: match the bases ("base:" facts). If "APP CHECK" lines are given, repeat them in your own words.
 - Short answers (under 120 words), plain text: no markdown.
 - Each recommended CATALOG product: its full name, then its marker like [#12] right after the name. A marker never stands alone and never follows "or"/"such as". Never invent a marker.
 - Answer in $language.
@@ -338,7 +341,7 @@ USER BEAUTY PROFILE:
 $profile
 
 USER BLACKLIST: $blacklistLine
-${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail\n'}
+${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail\n'}${pair.isEmpty ? '' : '\nAPP CHECK of these products together:\n$pair\n'}
 SHOPS (addresses real; prices and stock DEMO, not live):
 $shops
 
@@ -424,6 +427,25 @@ ${catalogLines.join('\n')}''';
     return out.toString().trimRight();
   }
 
+  /// Silicone / water / oil formula of a product, for layering advice.
+  static String _baseOf(ProductCandidate c) {
+    final b = RoutineItem.fromProduct(c.product).base;
+    return b == FormulaBase.unknown ? 'unknown' : b.name;
+  }
+
+  /// What the app's own checks say about the products in question together
+  /// (conflicting actives, foundation over cream); empty for one product.
+  static String _pairCheck(List<ProductCandidate> focus) {
+    if (focus.length < 2) return '';
+    final items = [for (final c in focus) RoutineItem.fromProduct(c.product)];
+    final issues = [
+      ...ActiveRules.check(items),
+      ...MakeupCompatibility.checkAll(items),
+    ];
+    if (issues.isEmpty) return 'no conflicts found between them';
+    return issues.map((i) => '- ${i.text}').join('\n');
+  }
+
   /// " | actives: Niacinamide (B3), ..." for the acids and actives in the INCI.
   static String _actives(Product p) {
     final a = IngredientCatalog.activesOf(p);
@@ -483,6 +505,25 @@ ${catalogLines.join('\n')}''';
           .where((w) => w.length >= 4);
       if (words.any(q.contains)) found.add(c);
     }
+    // "можно ли ретинол с гликолевой кислотой?": the products are named by
+    // their active ingredient, not by their (English) name
+    if (found.length < 2) {
+      final named = IngredientCatalog.detectInText(question).intersection({
+        ...ActiveRules.acids,
+        'retinoid',
+        'vitamin_c',
+        'benzoyl',
+      });
+      for (final c in ctx.candidates) {
+        if (found.length >= 2) break;
+        if (found.contains(c)) continue;
+        if (!shareProfile &&
+            RecommendationService.isBlacklisted(c, ctx.blacklist)) {
+          continue;
+        }
+        if (IngredientCatalog.of(c.product).any(named.contains)) found.add(c);
+      }
+    }
     return found.take(2).toList();
   }
 
@@ -506,7 +547,8 @@ ${catalogLines.join('\n')}''';
 - ${p.brand} ${p.name} (${p.category}), ${Formatters.price(p.price)}${p.inStock ? '' : ', out of stock'}
   description: ${p.description}
   ingredients: ${c.ingredients.isEmpty ? 'unknown' : c.ingredients.map((i) => '${i.name}${i.isAllergen ? ' (allergen)' : ''}').join(', ')}
-${p.inci.isEmpty ? '' : '  full INCI list (published by ${Uri.tryParse(p.sourceUrl)?.host ?? 'the source'}): ${p.inci.length > 700 ? '${p.inci.substring(0, 700)}...' : p.inci}\n'}  made for skin types: ${c.skinTypes.isEmpty ? 'not specified' : c.skinTypes.map((e) => e.label).join(', ')}
+${p.inci.isEmpty ? '' : '  full INCI list (published by ${Uri.tryParse(p.sourceUrl)?.host ?? 'the source'}): ${p.inci.length > 700 ? '${p.inci.substring(0, 700)}...' : p.inci}\n'}  base: ${_baseOf(c)}
+  made for skin types: ${c.skinTypes.isEmpty ? 'not specified' : c.skinTypes.map((e) => e.label).join(', ')}
   made for color types: ${c.colorTypes.isEmpty ? 'not specified' : c.colorTypes.map((e) => e.label).join(', ')}
 ${shareProfile ? '''
   blacklisted ingredients found: ${hits.isEmpty ? 'none' : hits.join(', ')}

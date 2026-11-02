@@ -26,4 +26,8 @@ shade and market: the package is always the authoritative source.
 15.jpg  Nivea Soft Moisturizing Creme                  .../nivea-soft
 16.jpg  Mise-en-scene Perfect Serum Shampoo            .../mise-en-scene-perfect-serum-shampoo
 18.jpg  Anua Heartleaf 77 Soothing Toner               .../anua-heartleaf-77-soothing-toner-4
+19.jpg  The Ordinary Glycolic Acid 7% Toning Solution  .../the-ordinary-glycolic-acid-7-toning-solution-6
+20.jpg  The Ordinary Retinol 0.5% in Squalane          .../the-ordinary-retinol-0-5-in-squalane
+21.jpg  COSRX BHA Blackhead Power Liquid               .../cosrx-bha-blackhead-power-liquid-4
+22.jpg  Klairs Freshly Juiced Vitamin Drop             .../dear-klairs-freshly-juiced-vitamin-drop-5
 (17: the Cosmetix gift set keeps the generic illustration.)

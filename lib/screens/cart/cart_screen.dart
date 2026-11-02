@@ -7,14 +7,18 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/cart_models.dart';
 import 'package:cosmetix/models/product_filter.dart';
+import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
+import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/widgets/product_card.dart';
+import 'package:cosmetix/widgets/routine_issues_card.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -95,6 +99,41 @@ class _CartScreenState extends State<CartScreen> {
       return;
     }
     Navigator.pushNamed(context, AppRoutes.orderSuccess, arguments: order);
+  }
+
+  /// What is worth knowing before buying: conflicts of the cart with itself
+  /// and with the cosmetic bag, a patch test for a sensitive skin.
+  List<RoutineIssue> _cartIssues(
+    CartProvider cart,
+    CatalogProvider catalog,
+    CareProvider care,
+  ) {
+    final inCart = [
+      for (final i in cart.items) RoutineItem.fromProduct(i.product),
+    ];
+    final cartIds = {for (final i in cart.items) i.product.id};
+    final bag = care.bagItems(catalog.byId);
+    final bagChecks = {
+      for (final x in [
+        ...ActiveRules.check(bag),
+        ...MakeupCompatibility.checkAll(bag),
+      ])
+        x.text,
+    };
+    final all = [
+      ...inCart,
+      for (final b in bag)
+        if (b.productId == null || !cartIds.contains(b.productId)) b,
+    ];
+    return [
+      for (final x in [
+        ...ActiveRules.check(all),
+        ...MakeupCompatibility.checkAll(all),
+      ])
+        // problems that are already in the bag are shown there
+        if (!bagChecks.contains(x.text)) x,
+      ...PatchTestAdvice.forItems(inCart, sensitive: catalog.sensitiveSkin),
+    ];
   }
 
   @override
@@ -186,6 +225,34 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 ],
               ),
+            ),
+          if (cart.items.isNotEmpty)
+            Builder(
+              builder: (context) {
+                final issues = _cartIssues(
+                  cart,
+                  context.watch<CatalogProvider>(),
+                  context.watch<CareProvider>(),
+                );
+                if (issues.isEmpty) return const SizedBox.shrink();
+                // the cart grid needs room: a long list scrolls in its box
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 190),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: SingleChildScrollView(
+                        child: RoutineIssuesCard(
+                          title: tr('Перед покупкой'),
+                          issues: issues,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           Expanded(
             child: cart.loading && cart.items.isEmpty

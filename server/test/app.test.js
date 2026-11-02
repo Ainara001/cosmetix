@@ -122,7 +122,7 @@ test('validation: bad shapes, long text, wrong images are rejected', async () =>
     [{ messages: [{ role: 'system', content: 'x' }] }, 400],
     [{ messages: [{ role: 'user', content: '' }] }, 400],
     [{ messages: [{ role: 'assistant', content: 'last is assistant' }] }, 400],
-    [ask('x'.repeat(6001)), 413],
+    [ask('x'.repeat(9001)), 413],
     [{ messages: [{ role: 'user', content: 'a', images: ['not-an-image'] }] }, 415],
     [{ messages: [{ role: 'user', content: 'a', images: ['/9j/A', '/9j/B', '/9j/C'] }] }, 413],
     [{ messages: Array.from({ length: 21 }, () => ({ role: 'user', content: 'a' })) }, 413],

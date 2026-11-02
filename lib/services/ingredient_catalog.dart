@@ -127,6 +127,13 @@ class IngredientCatalog {
       const ['ретинол', 'retinol', 'ретиноид', 'retinoid'],
     ),
     IngredientGroup(
+      'benzoyl',
+      'Бензоилпероксид',
+      IngredientKind.active,
+      _re('benzoyl peroxide'),
+      const ['бензоил', 'бпо', 'benzoyl', 'benzoyl peroxide'],
+    ),
+    IngredientGroup(
       'panthenol',
       'Пантенол (B5)',
       IngredientKind.active,
@@ -301,6 +308,35 @@ class IngredientCatalog {
   }
 
   static final Map<String, Set<String>> _cache = {};
+
+  /// Search words that are too common inside other words to be used for free
+  /// text ("гликол" is in "пропиленгликоль", "молочн" in "молочное мыло").
+  static const _textUnsafe = {'гликол', 'glycol', 'молочн'};
+
+  /// Safer words for the same groups, used only for free text.
+  static const _textExtra = {
+    'glycolic': ['гликолев', 'glycolic'],
+    'lactic': ['молочная кислот', 'молочной кислот', 'lactic'],
+  };
+
+  /// Groups named in a free text (a product name typed by the user:
+  /// "Сыворотка с ретинолом", "Vitamin C 15%", "BHA тоник"). Words shorter
+  /// than 3 letters are ignored, so "ha" never matches half the alphabet.
+  static Set<String> detectInText(String text) {
+    final t = text.toLowerCase();
+    if (t.trim().isEmpty) return const {};
+    return {
+      for (final g in groups)
+        if (g.kind != IngredientKind.avoid &&
+            [
+              ...g.synonyms.where(
+                (x) => x.length >= 3 && !_textUnsafe.contains(x),
+              ),
+              ...?_textExtra[g.code],
+            ].any(t.contains))
+          g.code,
+    };
+  }
 
   /// Groups found in a product.
   static Set<String> of(Product p) =>

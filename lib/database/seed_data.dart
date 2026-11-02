@@ -37,27 +37,7 @@ class SeedData {
     for (var i = 0; i < _products.length; i++) {
       final p = _products[i];
       final id = i + 1;
-      batch.insert('products', {
-        'id': id,
-        'brand': p.brand,
-        'name': p.name,
-        'category': p.category,
-        'zone': p.zone,
-        'price': p.price,
-        'old_price': p.oldPrice,
-        'in_stock': p.inStock ? 1 : 0,
-        'art': p.artValue,
-        'color': p.color,
-        'description': p.description,
-        'inci': p.inci,
-        'source_url': p.source,
-        'shade': shades['${p.brand}|${p.name}'],
-        'natural_percent': p.natural,
-        'featured': p.featured ? 1 : 0,
-        'trending': p.trending ? 1 : 0,
-        // newer products have a later date (used by "По новизне")
-        'created_at': now - i * 86400000,
-      });
+      batch.insert('products', _productRow(id, p, now - i * 86400000));
       // The same product in every shop (DEMO prices and stock, see StoreData).
       for (var s = 0; s < StoreData.stores.length; s++) {
         batch.insert('product_prices', _offerRow(id, p, s));
@@ -133,6 +113,88 @@ class SeedData {
     'Missha|Magic Cushion Moist Up': 0xFFE3C1A6,
     'Rom&nd|Better Than Cheek': 0xFFDDB1B6,
   };
+
+  static Map<String, Object?> _productRow(int id, _P p, int createdAt) => {
+    'id': id,
+    'brand': p.brand,
+    'name': p.name,
+    'category': p.category,
+    'zone': p.zone,
+    'price': p.price,
+    'old_price': p.oldPrice,
+    'in_stock': p.inStock ? 1 : 0,
+    'art': p.artValue,
+    'color': p.color,
+    'description': p.description,
+    'inci': p.inci,
+    'source_url': p.source,
+    'shade': shades['${p.brand}|${p.name}'],
+    'natural_percent': p.natural,
+    'featured': p.featured ? 1 : 0,
+    'trending': p.trending ? 1 : 0,
+    // newer products have a later date (used by "По новизне")
+    'created_at': createdAt,
+  };
+
+  /// Migration step (DB v10): products added after the first real catalog
+  /// (acids, retinol, vitamin C, BHA) for a database that already has the
+  /// older ones; a fresh install gets them from [insertAll]. Shops and
+  /// ingredients must exist (else: nothing to attach to, nothing is done).
+  static Future<void> applyNewProducts(DatabaseExecutor db) async {
+    final existing = {
+      for (final r in await db.query(
+        'products',
+        columns: ['id', 'brand', 'name'],
+      ))
+        '${r['brand']}|${r['name']}': r['id']! as int,
+    };
+    if (existing.isEmpty) return; // a fresh install: insertAll seeds them
+    final usedIds = {
+      for (final r in await db.query('products', columns: ['id']))
+        r['id']! as int,
+    };
+    final storeCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM stores'),
+    );
+    final known = {
+      for (final r in await db.query('ingredients', columns: ['id']))
+        r['id']! as int,
+    };
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final batch = db.batch();
+    for (var i = _firstNewProduct; i < _products.length; i++) {
+      final p = _products[i];
+      if (existing.containsKey('${p.brand}|${p.name}')) continue;
+      final id = i + 1;
+      // the id belongs to another product of this database: never mix them
+      if (usedIds.contains(id)) continue;
+      batch.insert(
+        'products',
+        _productRow(id, p, now - (_products.length - i) * 3600000),
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+      for (var s = 0; s < (storeCount ?? 0); s++) {
+        batch.insert(
+          'product_prices',
+          _offerRow(id, p, s),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+      for (final ing in p.ingredients) {
+        if (known.contains(ing)) {
+          batch.insert('product_ingredients', {
+            'product_id': id,
+            'ingredient_id': ing,
+          }, conflictAlgorithm: ConflictAlgorithm.ignore);
+        }
+      }
+      _insertTraits(batch, id, p.brand, p.name);
+    }
+    await batch.commit(noResult: true);
+  }
+
+  /// Index in [_products] of the first product added after DB v9.
+  static const _firstNewProduct = 18;
 
   static Map<String, Object?> _storeRow(StoreSeed s) => {
     'name': s.name,
@@ -961,6 +1023,82 @@ class SeedData {
           'Houttuynia Cordata Extract (77%), Water, 1,2-Hexanediol, Glycerin, Betaine, Panthenol, Saccharum Officinarum (Sugar Cane) Extract, Portulaca Oleracea Extract, Butylene Glycol, Vitex Agnus Castus Extract, Chamomilla Recutita (Matricaria) Flower Extract, Arctium Lappa Root Extract, Phellinus Linteus Extract, Vitis Vinifera (Grape) Fruit Extract, Pyrus Malus (Apple) Fruit Extract, Centella Asiatica Extract, Isopentyldiol, Methylpropanediol, Acrylates/C10-30 Alkyl Acrylate Crosspolymer, Tromethamine, Disodium EDTA',
       source:
           'https://incidecoder.com/products/anua-heartleaf-77-soothing-toner-4',
+    ),
+    _P(
+      'The Ordinary',
+      'Glycolic Acid 7% Toning Solution',
+      'Уход за лицом',
+      'Лицо',
+      5200,
+      null,
+      true,
+      'bottle',
+      0xFFE9E2C8,
+      'Тонер с 7% гликолевой кислоты для мягкого отшелушивания и сияния кожи.',
+      70,
+      [1, 2],
+      photo: 'assets/products/19.jpg',
+      inci:
+          'Aqua (Water), Glycolic Acid, Rosa Damascena Flower Water, Centaurea Cyanus Flower Water, Aloe Barbadensis Leaf Water, Propanediol, Glycerin, Triethanolamine, Aminomethyl Propanol, Panax Ginseng Root Extract, Tasmannia Lanceolata Fruit/Leaf Extract, Aspartic Acid, Alanine, Glycine, Serine, Valine, Isoleucine, Proline, Threonine, Histidine, Phenylalanine, Glutamic Acid, Arginine, Pca, Sodium PCA, Sodium Lactate, Fructose, Glucose, Sucrose, Urea, Hexyl Nicotinate, Dextrin, Citric Acid, Polysorbate 20, Gellan Gum, Trisodium Ethylenediamine Disuccinate, Sodium Chloride, Hexylene Glycol, Potassium Sorbate, Sodium Benzoate, 1,2-Hexanediol, Caprylyl Glycol',
+      source:
+          'https://incidecoder.com/products/the-ordinary-glycolic-acid-7-toning-solution-6',
+    ),
+    _P(
+      'The Ordinary',
+      'Retinol 0.5% in Squalane',
+      'Уход за лицом',
+      'Лицо',
+      5900,
+      null,
+      true,
+      'bottle',
+      0xFFE8C9A0,
+      'Безводная сыворотка с 0,5% чистого ретинола в сквалане для вечернего ухода.',
+      65,
+      [],
+      photo: 'assets/products/20.jpg',
+      inci:
+          'Squalane, Caprylic/Capric Triglyceride, Simmondsia Chinensis (Jojoba) Seed Oil, Retinol 0.5%, Solanum Lycopersicum (Tomato) Fruit Extract, Rosmarinus Officinalis (Rosemary) Leaf Extract, Hydroxymethoxyphenyl Decanone, BHT',
+      source:
+          'https://incidecoder.com/products/the-ordinary-retinol-0-5-in-squalane',
+    ),
+    _P(
+      'COSRX',
+      'BHA Blackhead Power Liquid',
+      'Уход за лицом',
+      'Лицо',
+      7400,
+      null,
+      true,
+      'bottle',
+      0xFFDDE3E6,
+      'Лёгкий лосьон с бетаин салицилатом (BHA) для очищения пор и ухода за чёрными точками.',
+      85,
+      [12, 13],
+      photo: 'assets/products/21.jpg',
+      inci:
+          'Salix Alba (Willow) Bark Water, Butylene Glycol, Betaine, Niacinamide, Betaine Salicylate, 1,2-Hexanediol, Sodium Hydroxide, Sodium Hyaluronate, Panthenol, Xanthan Gum, Ethyl Hexanediol',
+      source:
+          'https://incidecoder.com/products/cosrx-bha-blackhead-power-liquid-4',
+    ),
+    _P(
+      'Klairs',
+      'Freshly Juiced Vitamin Drop',
+      'Уход за лицом',
+      'Лицо',
+      8600,
+      null,
+      true,
+      'bottle',
+      0xFFEAD9B0,
+      'Сыворотка с витамином C (аскорбиновая кислота) и центеллой для сияния кожи.',
+      80,
+      [1, 2, 13],
+      photo: 'assets/products/22.jpg',
+      inci:
+          'Aqua (Water), Propylene Glycol, Ascorbic Acid, Hydroxyethylcellulose, Citrus Junos Fruit Extract, Centella Asiatica Extract, Polysorbate 60, Illicium Verum (Anise) Fruit Extract, Chaenomeles Sinensis Fruit Extract, Paeonia Suffruticosa Root Extract, Brassica Oleracea Italica (Broccoli) Extract, Nelumbium Speciosum Flower Extract, Citrus Paradisi (Grapefruit) Fruit Extract, Scutellaria Baicalensis Root Extract, Butylene Glycol, Glycerin, Citrus Aurantium Dulcis (Orange) Oil, 1,2-Hexanediol, Sodium Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Isohexadecane, Disodium EDTA, Lavandula Angustifolia (Lavender) Oil, Camellia Sinensis Callus Culture Extract, Polysorbate 80, Disodium Phosphate, Sorbitan Oleate, Chrysanthellum Indicum Extract, Asarum Sieboldii Root Extract, Quercus Mongolica Leaf Extract, Persicaria Hydropiper Extract, Larix Europaea Wood Extract, Magnolia Obovata Bark Extract, Rheum Palmatum Root Extract, Corydalis Turtschaninovii Root Extract, Coptis Chinensis Root Extract, Sodium Phosphate, Lysine Hcl, Sodium Ascorbyl Phosphate, Acetyl Methionine, Theanine, Proline, Lecithin, Acetyl Glutamine, Bacillus/Folic Acid/Soybean Ferment Extract, Sodium Hyaluronate, SH-Oligopeptide-1, SH-Oligopeptide-2, SH-Polypeptide-1, SH-Polypeptide-11, SH-Polypeptide-9, Caprylyl Glycol, Limonene',
+      source:
+          'https://incidecoder.com/products/dear-klairs-freshly-juiced-vitamin-drop-5',
     ),
   ];
 }

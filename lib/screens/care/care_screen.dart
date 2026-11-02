@@ -7,11 +7,14 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/care_models.dart';
 import 'package:cosmetix/providers/care_provider.dart';
+import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/routine_issues_card.dart';
 
 /// "Мой уход": the user's own morning and evening plan, built from the
 /// cosmetic bag, with a mark for every product used today.
@@ -75,6 +78,32 @@ class _CareScreenState extends State<CareScreen> {
       ),
     );
     if (picked == null || !mounted) return;
+    // a new conflict with what is already in this plan: say it before adding
+    final catalog = context.read<CatalogProvider>();
+    final before = {
+      for (final i in care.planIssues(_period, catalog.byId)) i.text,
+    };
+    final fresh = [
+      for (final i in care.planIssues(
+        _period,
+        catalog.byId,
+        extra: RoutineItem.fromBag(
+          picked,
+          picked.productId == null ? null : catalog.byId(picked.productId!),
+        ),
+      ))
+        if (!before.contains(i.text)) i,
+    ];
+    if (fresh.isNotEmpty) {
+      final ok = await confirmDialog(
+        context,
+        title: tr('Возможный конфликт'),
+        message:
+            '${fresh.map((i) => i.text).join('\n\n')}\n\n${tr('Добавить в план всё равно?')}',
+        confirmLabel: tr('Добавить'),
+      );
+      if (!ok || !mounted) return;
+    }
     final error = await care.addStep(_period, picked);
     if (error != null && mounted) {
       showMessage(context, error, type: MessageType.warning);
@@ -132,6 +161,13 @@ class _CareScreenState extends State<CareScreen> {
                 style: AppTextStyles.small.copyWith(color: pal.subtext),
               ),
             ),
+          RoutineIssuesCard(
+            issues: care.planIssues(
+              _period,
+              context.watch<CatalogProvider>().byId,
+            ),
+            padding: const EdgeInsets.only(bottom: 10),
+          ),
           const SizedBox(height: 10),
           if (care.loading && steps.isEmpty)
             const Padding(

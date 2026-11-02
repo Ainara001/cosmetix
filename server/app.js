@@ -11,7 +11,7 @@ const MOCK_PREFIX =
 const LIMITS = {
   bodyBytes: 7 * 1024 * 1024,
   messages: 20,
-  textChars: 6000, // one message
+  textChars: 9000, // one message (the system prompt carries the catalog and the shops)
   totalChars: 24000, // system + all messages
   images: 2,
   imageBase64Chars: 6 * 1024 * 1024,

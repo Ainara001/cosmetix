@@ -1376,4 +1376,50 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Тёмный бордо': 'Dark burgundy',
   'Есть альтернативы подешевле рядом?':
       'Are there cheaper alternatives nearby?',
+  '«{a}» и «{b}»: ретиноиды и кислоты вместе сильно раздражают кожу, возможны жжение и шелушение. Используйте их в разные вечера.':
+      '“{a}” and “{b}”: retinoids and acids together irritate the skin badly, burning and peeling are possible. Use them on different evenings.',
+  '«{a}» и «{b}»: бензоилпероксид разрушает ретиноиды и сушит кожу. Разнесите их по времени суток.':
+      '“{a}” and “{b}”: benzoyl peroxide breaks down retinoids and dries the skin. Use them at different times of day.',
+  '«{a}» и «{b}»: ретинол и витамин C лучше разделить: витамин C утром, ретинол вечером.':
+      '“{a}” and “{b}”: it is better to separate retinol and vitamin C: vitamin C in the morning, retinol in the evening.',
+  '«{a}» и «{b}»: витамин C вместе с кислотами может жечь кожу. Используйте в разное время или в разные дни.':
+      '“{a}” and “{b}”: vitamin C together with acids can sting the skin. Use them at different times or on different days.',
+  '«{a}» и «{b}»: бензоилпероксид окисляет витамин C и снижает его действие. Используйте в разное время.':
+      '“{a}” and “{b}”: benzoyl peroxide oxidizes vitamin C and weakens it. Use them at different times.',
+  '«{a}» и «{b}»: две кислоты сразу могут пересушить кожу и ослабить её барьер. Начните с одной.':
+      '“{a}” and “{b}”: two acids at once can dry the skin and weaken its barrier. Start with one.',
+  '«{a}» и «{b}»: два средства с ретиноидами дают двойную дозу. Достаточно одного.':
+      '“{a}” and “{b}”: two products with retinoids make a double dose. One is enough.',
+  '«{u}» на маслах под «{f}» на силиконах: тон может скользить и плохо держаться. Подождите 10 минут и промокните лишнее салфеткой.':
+      '“{u}” is oil-based under “{f}” which is silicone-based: the foundation can slide and wear badly. Wait 10 minutes and blot the excess with a tissue.',
+  '«{u}» на силиконах под «{f}» на воде: основа может скатываться и ложиться пятнами. Лучше крем на водной основе или основа на силиконах.':
+      '“{u}” is silicone-based under “{f}” which is water-based: the foundation can ball up and go on patchy. Better a water-based cream or a silicone-based foundation.',
+  '«{u}» на маслах под «{f}» на воде: тон ложится неровно, возможны полосы. Дайте крему полностью впитаться.':
+      '“{u}” is oil-based under “{f}” which is water-based: the foundation goes on unevenly, streaks are possible. Let the cream absorb completely.',
+  'Сразу {n} средств для ухода при чувствительной коже: если одно не подойдёт, реакцию трудно связать с конкретным. Начните с базового крема, 3–4 дня пробуйте его на небольшом участке кожи (за ухом или на запястье), остальное добавляйте по одному.':
+      '{n} care products at once on sensitive skin: if one does not suit you, it is hard to tell which one caused the reaction. Start with a basic cream, test it for 3–4 days on a small area of skin (behind the ear or on the wrist) and add the rest one at a time.',
+  '«{a}» содержит активные компоненты: при чувствительной коже сначала нанесите на небольшой участок на 3–4 дня.':
+      '“{a}” contains active ingredients: on sensitive skin, first apply it to a small area for 3–4 days.',
+  'на воде': 'water-based',
+  'на силиконах': 'silicone-based',
+  'на маслах': 'oil-based',
+  'Формула: {v0}': 'Formula: {v0}',
+  'Бензоилпероксид': 'Benzoyl peroxide',
+  'Совместимость средств': 'Product compatibility',
+  'Не используйте эти средства вместе': 'Do not use these products together',
+  'Перед покупкой': 'Before you buy',
+  'Сочетание с вашим уходом': 'How it goes with your care',
+  'С чем сочетать': 'What to pair it with',
+  'Основа {v0}: эти средства из каталога ложатся под неё ровно, без скольжения и катышков.':
+      'The foundation is {v0}: these products from the catalog sit evenly under it, with no sliding or pilling.',
+  'Возможный конфликт': 'Possible conflict',
+  'Добавить в план всё равно?': 'Add to the plan anyway?',
+  'Тонер с 7% гликолевой кислоты для мягкого отшелушивания и сияния кожи.':
+      'Toner with 7% glycolic acid for gentle exfoliation and glowing skin.',
+  'Безводная сыворотка с 0,5% чистого ретинола в сквалане для вечернего ухода.':
+      'Water-free serum with 0.5% pure retinol in squalane for evening care.',
+  'Лёгкий лосьон с бетаин салицилатом (BHA) для очищения пор и ухода за чёрными точками.':
+      'Light lotion with betaine salicylate (BHA) to clear pores and care for blackheads.',
+  'Сыворотка с витамином C (аскорбиновая кислота) и центеллой для сияния кожи.':
+      'Serum with vitamin C (ascorbic acid) and centella for glowing skin.',
 };
