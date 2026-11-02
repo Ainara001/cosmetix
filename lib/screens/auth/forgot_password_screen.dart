@@ -71,9 +71,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               IconButton(
                 tooltip: tr('Назад'),
                 onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(
+                icon: Icon(
                   Icons.chevron_left,
-                  color: AppColors.primaryDark,
+                  color: context.pal.accent,
                   size: 30,
                 ),
               ),
@@ -88,10 +88,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         color: AppColors.primarySoft,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.vpn_key_outlined,
                         size: 36,
-                        color: AppColors.primaryDark,
+                        color: context.pal.accent,
                       ),
                     ),
                     const SizedBox(height: 14),

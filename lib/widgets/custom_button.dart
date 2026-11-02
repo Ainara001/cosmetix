@@ -65,7 +65,7 @@ class CustomButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           minimumSize: size,
           shape: shape,
-          foregroundColor: color ?? AppColors.primaryDark,
+          foregroundColor: color ?? context.pal.accent,
           side: BorderSide(color: main, width: 1.2),
           backgroundColor: Colors.transparent,
         ),

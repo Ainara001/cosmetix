@@ -16,9 +16,21 @@ import 'package:cosmetix/repositories/cart_repository.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/screens/product/product_screen.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/services/routine_checks.dart';
 import 'widget_test.dart' show pumpUntil;
+
+/// The vertical list of the product page (the page may hold small sideways
+/// lists as well).
+Finder _productList() => find
+    .descendant(
+      of: find.byType(ProductScreen),
+      matching: find.byWidgetPredicate(
+        (w) => w is Scrollable && w.axis == Axis.vertical,
+      ),
+    )
+    .first;
 
 RoutineItem _item(
   String title, {
@@ -548,7 +560,8 @@ void main() {
         (await db.query('products', where: 'id = 19')).single['name'],
         'Мой товар',
       );
-      expect((await db.query('products')).length, 18 + 1 + 3);
+      // ids 20..38 are added; 19 belongs to the user's product
+      expect((await db.query('products')).length, 18 + 1 + 19);
       // the others are complete: an offer in every shop, ingredients, traits
       final retinol =
           (await db.query(
@@ -574,7 +587,8 @@ void main() {
       );
       // running it again changes nothing
       await SeedData.applyNewProducts(db);
-      expect((await db.query('products')).length, 18 + 1 + 3);
+      // ids 20..38 are added; 19 belongs to the user's product
+      expect((await db.query('products')).length, 18 + 1 + 19);
     });
   });
 
@@ -647,20 +661,12 @@ void main() {
         });
         await boot(t, h);
         final nav = t.state<NavigatorState>(find.byType(Navigator).first);
+        // a tall screen: the whole page is on it, no scrolling needed
+        t.view.physicalSize = const Size(1080, 7000);
         nav.pushNamed(AppRoutes.product, arguments: 10);
         await _settle(t);
-        await t.scrollUntilVisible(
-          find.text('Сочетание с вашим уходом'),
-          300,
-          scrollable: find.byType(Scrollable).last,
-        );
         expect(find.text('Сочетание с вашим уходом'), findsOneWidget);
         expect(find.textContaining('на маслах под'), findsOneWidget);
-        await t.scrollUntilVisible(
-          find.text('С чем сочетать'),
-          300,
-          scrollable: find.byType(Scrollable).last,
-        );
         expect(find.text('С чем сочетать'), findsOneWidget);
       },
     );
@@ -690,7 +696,7 @@ void main() {
       await t.scrollUntilVisible(
         find.text('Сочетание с вашим уходом'),
         300,
-        scrollable: find.byType(Scrollable).last,
+        scrollable: _productList(),
       );
       expect(find.textContaining('ретиноиды и кислоты'), findsOneWidget);
       expect(

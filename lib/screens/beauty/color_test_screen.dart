@@ -122,7 +122,7 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
                         Text(
                           tr(q.section),
                           style: AppTextStyles.small.copyWith(
-                            color: AppColors.primaryDark,
+                            color: context.pal.accent,
                           ),
                         ),
                       ],
@@ -145,10 +145,7 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
                         onTap: _byPhoto,
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.auto_awesome,
-                              color: AppColors.primaryDark,
-                            ),
+                            Icon(Icons.auto_awesome, color: context.pal.accent),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(

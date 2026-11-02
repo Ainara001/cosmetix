@@ -122,7 +122,7 @@ class _CareScreenState extends State<CareScreen> {
       bigTitle: true,
       trailing: IconButton(
         tooltip: tr('История ухода'),
-        icon: const Icon(Icons.history, color: AppColors.primaryDark),
+        icon: Icon(Icons.history, color: context.pal.accent),
         onPressed: () => Navigator.pushNamed(context, AppRoutes.careHistory),
       ),
       child: ListView(

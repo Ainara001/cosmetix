@@ -277,10 +277,10 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.check_circle_outline,
                         size: 16,
-                        color: AppColors.primaryDark,
+                        color: context.pal.accent,
                       ),
                       const SizedBox(width: 8),
                       Expanded(child: Text(t, style: AppTextStyles.small)),
@@ -401,11 +401,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
       children: [
-        const Icon(
-          Icons.cloud_off_outlined,
-          size: 48,
-          color: AppColors.primaryDark,
-        ),
+        Icon(Icons.cloud_off_outlined, size: 48, color: context.pal.accent),
         const SizedBox(height: 12),
         Text(
           _error ?? tr('Не удалось проанализировать фото.'),

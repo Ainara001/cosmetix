@@ -131,7 +131,7 @@ class OrdersScreen extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     '${tr(l.name)} × ${l.quantity}',
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: AppTextStyles.small,
                                   ),

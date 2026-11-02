@@ -169,10 +169,7 @@ class _CartScreenState extends State<CartScreen> {
                 : IconButton(
                     tooltip: tr('Очистить корзину'),
                     onPressed: () => _clear(cart),
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: AppColors.primaryDark,
-                    ),
+                    icon: Icon(Icons.delete_outline, color: context.pal.accent),
                   ),
           ),
           // sorting and filters mean nothing for an empty cart
@@ -336,9 +333,9 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           Text(
                             trf('+{v0} бонусов', {'v0': cart.bonus}),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.primaryDark,
+                              color: context.pal.accent,
                             ),
                           ),
                         ],
@@ -456,7 +453,7 @@ class _RoundBtn extends StatelessWidget {
         color: AppColors.primarySoft,
         shape: BoxShape.circle,
       ),
-      child: Icon(icon, size: 16, color: AppColors.primaryDark),
+      child: Icon(icon, size: 16, color: context.pal.accent),
     ),
   );
 }

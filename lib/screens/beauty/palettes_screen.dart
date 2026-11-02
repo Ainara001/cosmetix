@@ -80,7 +80,7 @@ class _PalettesScreenState extends State<PalettesScreen> {
                     child: Text(
                       tr('Это ваш цветотип'),
                       style: AppTextStyles.small.copyWith(
-                        color: AppColors.primaryDark,
+                        color: context.pal.accent,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

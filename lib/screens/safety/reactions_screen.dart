@@ -233,10 +233,10 @@ class _InsightsCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.insights_outlined,
                   size: 18,
-                  color: AppColors.primaryDark,
+                  color: context.pal.accent,
                 ),
                 const SizedBox(width: 8),
                 Expanded(

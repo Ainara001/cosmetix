@@ -117,7 +117,7 @@ class ProductCard extends StatelessWidget {
                                   ? Icons.favorite
                                   : Icons.favorite_border,
                               size: 17,
-                              color: AppColors.primaryDark,
+                              color: context.pal.accent,
                             ),
                           ),
                         ),
@@ -136,14 +136,16 @@ class ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 10, color: pal.subtext),
                     ),
-                    // always two lines tall, so the photos in a row match
+                    // always three lines tall (long names such as "Better Than
+                    // Palette 05 Shade & Shadow Garden" are not cut in the
+                    // middle of a word), so the photos in a row match
                     SizedBox(
                       height: MediaQuery.textScalerOf(
                         context,
-                      ).scale(12.5 * 1.2 * 2),
+                      ).scale(12.5 * 1.2 * 3),
                       child: Text(
                         tr(product.name),
-                        maxLines: 2,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 12.5,

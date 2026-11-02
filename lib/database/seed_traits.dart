@@ -108,4 +108,78 @@ const Map<String, ProductTraits> seedTraits = {
     concerns: ['pigmentation', 'aging'],
     tags: ['brightening'],
   ),
+  'Rom&nd|Better Than Palette 00 Light & Glitter Garden': ProductTraits(
+    colorTypes: ['summer', 'winter'],
+    undertones: ['cool', 'neutral'],
+  ),
+  'Rom&nd|Better Than Palette 01 Pampas Garden': ProductTraits(
+    colorTypes: ['spring', 'autumn'],
+    undertones: ['warm', 'neutral'],
+  ),
+  'Rom&nd|Better Than Palette 02 Mahogany Garden': ProductTraits(
+    colorTypes: ['autumn'],
+    undertones: ['warm'],
+  ),
+  'Rom&nd|Better Than Palette 03 Rosebud Garden': ProductTraits(
+    colorTypes: ['summer', 'winter'],
+    undertones: ['cool', 'neutral'],
+  ),
+  'Rom&nd|Better Than Palette 07 Berry Fuchsia Garden': ProductTraits(
+    colorTypes: ['winter', 'summer'],
+    undertones: ['cool'],
+  ),
+  'Peripera|Ink Mood Glowy Tint 03 Rose In Mind': ProductTraits(
+    colorTypes: ['summer', 'spring'],
+    undertones: ['cool', 'neutral'],
+    tags: ['long_wearing'],
+  ),
+  'Rom&nd|Juicy Lasting Tint 01 Pomelo Skin': ProductTraits(
+    colorTypes: ['spring', 'autumn'],
+    undertones: ['warm', 'neutral'],
+    tags: ['long_wearing'],
+  ),
+  '3CE|Mood Recipe Face Blush': ProductTraits(
+    colorTypes: ['spring', 'autumn'],
+    undertones: ['warm', 'neutral'],
+  ),
+  'Torriden|Dive-In Serum': ProductTraits(
+    skinTypes: ['dry', 'normal', 'combination', 'sensitive'],
+    concerns: ['dryness'],
+    tags: ['hydrating', 'fragrance_free'],
+  ),
+  'Skin1004|Madagascar Centella Ampoule': ProductTraits(
+    skinTypes: ['sensitive', 'oily', 'combination', 'normal'],
+    concerns: ['sensitivity', 'acne'],
+    tags: ['soothing', 'fragrance_free'],
+  ),
+  'Beauty of Joseon|Glow Serum: Propolis + Niacinamide': ProductTraits(
+    skinTypes: ['oily', 'combination', 'normal'],
+    concerns: ['acne', 'pigmentation'],
+    tags: ['brightening', 'fragrance_free'],
+  ),
+  'Isntree|Hyaluronic Acid Toner': ProductTraits(
+    skinTypes: ['dry', 'normal', 'combination', 'sensitive'],
+    concerns: ['dryness'],
+    tags: ['hydrating', 'fragrance_free'],
+  ),
+  'Round Lab|1025 Dokdo Toner': ProductTraits(
+    skinTypes: ['sensitive', 'normal', 'combination', 'oily'],
+    concerns: ['sensitivity'],
+    tags: ['soothing', 'fragrance_free'],
+  ),
+  'Laneige|Lip Sleeping Mask': ProductTraits(
+    skinTypes: ['dry', 'normal'],
+    concerns: ['dryness'],
+    tags: ['hydrating'],
+  ),
+  'COSRX|Low pH Good Morning Gel Cleanser': ProductTraits(
+    skinTypes: ['oily', 'combination', 'sensitive', 'normal'],
+    concerns: ['acne'],
+    tags: ['oil_control'],
+  ),
+  'Dr.Jart+|Ceramidin Cream': ProductTraits(
+    skinTypes: ['dry', 'sensitive', 'normal'],
+    concerns: ['dryness', 'sensitivity'],
+    tags: ['hydrating', 'soothing'],
+  ),
 };

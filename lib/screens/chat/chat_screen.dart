@@ -63,7 +63,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _send([String? text]) async {
     final value = (text ?? _controller.text).trim();
     if (value.isEmpty) {
-      showMessage(context, tr('Введите сообщение'), type: MessageType.warning);
+      // nothing to send: the button just puts the keyboard away
+      FocusManager.instance.primaryFocus?.unfocus();
       return;
     }
     if (value.length > 500) {
@@ -118,129 +119,139 @@ class _ChatScreenState extends State<ChatScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SafeArea(
-      child: Container(
-        color: isDark ? pal.background : const Color(0xFFF9EEF1),
-        child: Column(
-          children: [
-            BackTitleBar(
-              title: tr('ИИ-помощник'),
-              bigTitle: true,
-              showBack: false,
-              trailing: IconButton(
-                tooltip: tr('Очистить чат'),
-                icon: const Icon(
-                  Icons.delete_sweep_outlined,
-                  color: AppColors.primaryDark,
-                ),
-                onPressed: () async {
-                  final ok = await confirmDialog(
-                    context,
-                    title: tr('Очистить переписку?'),
-                    message: tr('Все сообщения будут удалены.'),
-                    confirmLabel: tr('Очистить'),
-                    destructive: true,
-                  );
-                  if (ok && context.mounted) {
-                    await context.read<ChatProvider>().clear();
-                  }
-                },
-              ),
-            ),
-            if (ai.isMock)
-              _InfoBanner(
-                icon: Icons.science_outlined,
-                text: tr(
-                  'Тестовый режим: ключ ИИ на сервере не задан, ответы ненастоящие.',
-                ),
-              ),
-            Expanded(
-              child: ListView.builder(
-                controller: _scroll,
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                itemCount: chat.messages.length + (chat.typing ? 1 : 0),
-                itemBuilder: (_, i) {
-                  if (i >= chat.messages.length) {
-                    return _Bubble(
-                      text: tr('Печатаю…'),
-                      isUser: false,
-                      faded: true,
-                    );
-                  }
-                  final m = chat.messages[i];
-                  if (m.isUser) return _Bubble(text: m.text, isUser: true);
-                  // the assistant marks catalog products as [#id]: show the
-                  // text without markers and a tappable card per product
-                  final parsed = AssistantService.parseReply(m.text);
-                  return _Bubble(
-                    text: tr(parsed.text),
-                    isUser: false,
-                    productIds: parsed.productIds,
-                  );
-                },
-              ),
-            ),
-            if (chat.aiUnavailable)
-              _OfflineBanner(
-                failure: chat.aiFailure ?? AiFailure.unavailable,
-                retryAfter: chat.retryAfter,
-                onRetry: () => context.read<ChatProvider>().retry(),
-              ),
-            if (context.watch<CatalogProvider>().hasProfile && !ai.shareProfile)
-              _ShareProfileBanner(onAllow: () => ai.setShareProfile(true)),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: _suggestions.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (_, i) => ActionChip(
-                  label: Text(
-                    tr(_suggestions[i]),
-                    style: const TextStyle(fontSize: 12),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Container(
+          color: isDark ? pal.background : const Color(0xFFF9EEF1),
+          child: Column(
+            children: [
+              BackTitleBar(
+                title: tr('ИИ-помощник'),
+                bigTitle: true,
+                showBack: false,
+                trailing: IconButton(
+                  tooltip: tr('Очистить чат'),
+                  icon: Icon(
+                    Icons.delete_sweep_outlined,
+                    color: context.pal.accent,
                   ),
-                  backgroundColor: pal.surface,
-                  side: BorderSide(color: pal.border),
-                  onPressed: chat.typing
-                      ? _wait
-                      : () => _send(tr(_suggestions[i])),
+                  onPressed: () async {
+                    final ok = await confirmDialog(
+                      context,
+                      title: tr('Очистить переписку?'),
+                      message: tr('Все сообщения будут удалены.'),
+                      confirmLabel: tr('Очистить'),
+                      destructive: true,
+                    );
+                    if (ok && context.mounted) {
+                      await context.read<ChatProvider>().clear();
+                    }
+                  },
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => _send(),
-                      minLines: 1,
-                      maxLines: 3,
-                      inputFormatters: [LengthLimitingTextInputFormatter(500)],
-                      decoration: InputDecoration(
-                        hintText: tr('Спросите про цены, состав, скидки...'),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+              if (ai.isMock)
+                _InfoBanner(
+                  icon: Icons.science_outlined,
+                  text: tr(
+                    'Тестовый режим: ключ ИИ на сервере не задан, ответы ненастоящие.',
+                  ),
+                ),
+              Expanded(
+                // a tap on the conversation or a drag puts the keyboard away
+                child: ListView.builder(
+                  controller: _scroll,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  itemCount: chat.messages.length + (chat.typing ? 1 : 0),
+                  itemBuilder: (_, i) {
+                    if (i >= chat.messages.length) {
+                      return _Bubble(
+                        text: tr('Печатаю…'),
+                        isUser: false,
+                        faded: true,
+                      );
+                    }
+                    final m = chat.messages[i];
+                    if (m.isUser) return _Bubble(text: m.text, isUser: true);
+                    // the assistant marks catalog products as [#id]: show the
+                    // text without markers and a tappable card per product
+                    final parsed = AssistantService.parseReply(m.text);
+                    return _Bubble(
+                      text: tr(parsed.text),
+                      isUser: false,
+                      productIds: parsed.productIds,
+                    );
+                  },
+                ),
+              ),
+              if (chat.aiUnavailable)
+                _OfflineBanner(
+                  failure: chat.aiFailure ?? AiFailure.unavailable,
+                  retryAfter: chat.retryAfter,
+                  onRetry: () => context.read<ChatProvider>().retry(),
+                ),
+              if (context.watch<CatalogProvider>().hasProfile &&
+                  !ai.shareProfile)
+                _ShareProfileBanner(onAllow: () => ai.setShareProfile(true)),
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: _suggestions.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (_, i) => ActionChip(
+                    label: Text(
+                      tr(_suggestions[i]),
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    backgroundColor: pal.surface,
+                    side: BorderSide(color: pal.border),
+                    onPressed: chat.typing
+                        ? _wait
+                        : () => _send(tr(_suggestions[i])),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (_) => _send(),
+                        minLines: 1,
+                        maxLines: 3,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(500),
+                        ],
+                        decoration: InputDecoration(
+                          hintText: tr('Спросите про цены, состав, скидки...'),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filled(
-                    tooltip: tr('Отправить'),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                    const SizedBox(width: 8),
+                    IconButton.filled(
+                      tooltip: tr('Отправить'),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: chat.typing ? _wait : _send,
+                      icon: const Icon(Icons.send_rounded, color: Colors.white),
                     ),
-                    onPressed: chat.typing ? _wait : _send,
-                    icon: const Icon(Icons.send_rounded, color: Colors.white),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -309,10 +320,10 @@ class _Bubble extends StatelessWidget {
                 color: AppColors.primarySoft,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.smart_toy_outlined,
                 size: 16,
-                color: AppColors.primaryDark,
+                color: context.pal.accent,
               ),
             ),
             const SizedBox(width: 8),
@@ -341,11 +352,7 @@ class _ShareProfileBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.lock_outline,
-            size: 18,
-            color: AppColors.primaryDark,
-          ),
+          Icon(Icons.lock_outline, size: 18, color: context.pal.accent),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -380,7 +387,7 @@ class _InfoBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.primaryDark),
+          Icon(icon, size: 18, color: context.pal.accent),
           const SizedBox(width: 8),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 12))),
         ],
@@ -432,11 +439,7 @@ class _OfflineBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.cloud_off_outlined,
-            size: 20,
-            color: AppColors.primaryDark,
-          ),
+          Icon(Icons.cloud_off_outlined, size: 20, color: context.pal.accent),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

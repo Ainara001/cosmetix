@@ -118,9 +118,9 @@ CREATE TABLE reviews (
       (await db.query('products', where: 'id = 6')).single['name'],
       'Мой товар',
     );
-    // the two products of the old database + the four catalog products that
-    // the later migration adds (they never replace a user's product)
-    expect((await db.query('products')).length, 2 + 4);
+    // the two products of the old database + the twenty catalog products that
+    // the later migrations add (they never replace a user's product)
+    expect((await db.query('products')).length, 2 + 20);
     expect(
       (await db.query('products', where: 'id = 19')).single['brand'],
       'The Ordinary',
@@ -318,7 +318,7 @@ CREATE TABLE reviews (
           expect(File(art[1]).existsSync(), isTrue, reason: art[1]);
           expect(r['source_url'] as String, startsWith('https://'));
         }
-        expect(real, 21);
+        expect(real, 37);
       },
     );
   });

@@ -98,10 +98,7 @@ class _BlacklistScreenState extends State<BlacklistScreen> {
                 prefixIcon: const Icon(Icons.add, size: 20),
                 suffixIcon: IconButton(
                   tooltip: tr('Добавить'),
-                  icon: const Icon(
-                    Icons.check_circle,
-                    color: AppColors.primaryDark,
-                  ),
+                  icon: Icon(Icons.check_circle, color: context.pal.accent),
                   onPressed: _add,
                 ),
               ),

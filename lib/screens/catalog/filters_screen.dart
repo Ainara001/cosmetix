@@ -244,7 +244,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                       }),
                 style: TextStyle(
                   fontSize: 13,
-                  color: _found == 0 ? AppColors.sale : AppColors.primaryDark,
+                  color: _found == 0 ? AppColors.sale : context.pal.accent,
                 ),
               ),
             ),

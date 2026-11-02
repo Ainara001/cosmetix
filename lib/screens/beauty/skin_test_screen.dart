@@ -94,7 +94,7 @@ class _SkinTestScreenState extends State<SkinTestScreen> {
                           ? Icons.radio_button_checked
                           : Icons.radio_button_off,
                       color: _skinType == o.$1
-                          ? AppColors.primaryDark
+                          ? context.pal.accent
                           : pal.subtext,
                     ),
                   ],

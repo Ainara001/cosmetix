@@ -163,7 +163,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(c.$2, color: AppColors.primaryDark, size: 28),
+                        Icon(c.$2, color: context.pal.accent, size: 28),
                         const SizedBox(height: 6),
                         Text(
                           tr(c.$1),
@@ -231,16 +231,16 @@ class _ProductRow extends StatelessWidget {
                   ),
                   Text(
                     tr(product.name),
-                    maxLines: 1,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.bodyBold,
                   ),
                   Text(
                     fmt(product.price),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryDark,
+                      color: context.pal.accent,
                     ),
                   ),
                 ],

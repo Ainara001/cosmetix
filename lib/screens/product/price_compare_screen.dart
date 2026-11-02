@@ -173,7 +173,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                           children: [
                             Text(
                               tr(product.name),
-                              maxLines: 1,
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.bodyBold,
                             ),
@@ -231,7 +231,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                       child: AppCard(
                         onTap: () => _openStore(product, p),
                         borderColor: p.price == best && p.inStock
-                            ? AppColors.primaryDark
+                            ? context.pal.accent
                             : null,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +262,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                                 Icon(
                                   Icons.place,
                                   size: 13,
-                                  color: AppColors.primaryDark,
+                                  color: context.pal.accent,
                                 ),
                                 const SizedBox(width: 4),
                                 Expanded(

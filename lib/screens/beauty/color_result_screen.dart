@@ -63,10 +63,10 @@ class ColorResultScreen extends StatelessWidget {
                   color: AppColors.primarySoft,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.local_florist,
                   size: 48,
-                  color: AppColors.primaryDark,
+                  color: context.pal.accent,
                 ),
               ),
             ),

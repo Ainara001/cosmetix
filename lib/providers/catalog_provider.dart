@@ -187,6 +187,30 @@ class CatalogProvider extends ChangeNotifier {
     return false;
   }
 
+  /// The words of a name before its shade number: "Better Than Palette 05
+  /// Shade & Shadow Garden" -> "better than palette". Null when the name has
+  /// no number (or it is the first word), so such a product has no line.
+  static String? lineOf(Product p) {
+    final words = p.name.split(' ');
+    final at = words.indexWhere((w) => RegExp(r'^\d{1,3}$').hasMatch(w));
+    if (at < 2) return null;
+    return '${p.brand}|${words.sublist(0, at).join(' ').toLowerCase()}';
+  }
+
+  /// Other shades of the same line (same brand, same name before the number),
+  /// by shade number: the palettes 00, 01, 02... of one series.
+  List<Product> variantsOf(Product p) {
+    final line = lineOf(p);
+    if (line == null) return const [];
+    int number(Product x) => int.parse(
+      x.name.split(' ').firstWhere((w) => RegExp(r'^\d{1,3}$').hasMatch(w)),
+    );
+    return [
+      for (final x in products)
+        if (x.id != p.id && lineOf(x) == line) x,
+    ]..sort((a, b) => number(a).compareTo(number(b)));
+  }
+
   List<Product> get featured {
     final list = products.where((p) => p.featured).toList();
     return list.isEmpty ? products.take(4).toList() : list;

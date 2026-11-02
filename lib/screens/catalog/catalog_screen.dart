@@ -108,26 +108,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
-  /// One-tap composition filters: what is chosen, then the actives that the
-  /// catalog has the most of. The full list is in "Фильтры".
-  Widget _ingredientRow(CatalogProvider catalog) {
-    final counts = <String, int>{};
-    for (final p in catalog.products) {
-      for (final c in IngredientCatalog.of(p)) {
-        counts[c] = (counts[c] ?? 0) + 1;
-      }
-    }
+  /// The composition filter is picked in "Фильтры"; the catalog only shows
+  /// what is chosen (and lets you drop it), so the search area stays calm.
+  Widget _ingredientRow() {
     final chosen = {..._filter.withIngredients, ..._filter.withoutIngredients};
-    final popular =
-        counts.entries
-            .where(
-              (e) =>
-                  !chosen.contains(e.key) &&
-                  IngredientCatalog.byCode(e.key)?.kind != IngredientKind.avoid,
-            )
-            .toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
-    final codes = [...chosen, ...popular.take(7).map((e) => e.key)];
+    final codes = [...chosen];
     if (codes.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(top: 8),
@@ -178,10 +163,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
             found.join(', '),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
-              color: AppColors.primaryDark,
+              color: context.pal.accent,
             ),
           ),
       ],
@@ -268,7 +253,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ],
             ),
           ),
-          _ingredientRow(catalog),
+          _ingredientRow(),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 6, 8, 0),
             child: Row(
@@ -321,11 +306,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               catalog.hasAiOrder
                                   ? Icons.auto_awesome
                                   : Icons.auto_awesome_outlined,
-                              color: AppColors.primaryDark,
+                              color: context.pal.accent,
                             ),
                       label: Text(
                         tr('ИИ'),
-                        style: const TextStyle(color: AppColors.primaryDark),
+                        style: TextStyle(color: context.pal.accent),
                       ),
                       onPressed: _aiBusy ? null : () => _refineWithAi(catalog),
                     ),

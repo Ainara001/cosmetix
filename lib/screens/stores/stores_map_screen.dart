@@ -53,6 +53,12 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
   int? _selected;
   bool _centeredOnUser = false;
 
+  /// The map fills the whole screen (a small map shows too little); the
+  /// camera is kept when switching, so the same place stays in view.
+  bool _full = false;
+  LatLng? _camCenter;
+  double? _camZoom;
+
   @override
   void initState() {
     super.initState();
@@ -115,7 +121,7 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
   }
 
   Color _pinColor(StorePrice? o) {
-    if (o == null) return AppColors.primaryDark;
+    if (o == null) return context.pal.accent;
     return switch (o.level) {
       StockLevel.inStock => AppColors.success,
       StockLevel.low => AppColors.warning,
@@ -164,6 +170,8 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
       });
     }
 
+    if (_full) return _fullScreen(origin, rows, loc, product);
+
     return PageScaffold(
       title: product == null ? tr('Магазины рядом') : tr('Где купить'),
       bigTitle: true,
@@ -180,14 +188,21 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
                     height: 230,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child:
-                          (widget.showTiles ?? StoresMapScreen.defaultShowTiles)
-                          ? _mapView(origin, rows, loc)
-                          : Container(
-                              color: AppColors.primarySoft,
-                              alignment: Alignment.center,
-                              child: Text(tr('Карта')),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          _mapBody(origin, rows, loc),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: _MapButton(
+                              icon: Icons.fullscreen,
+                              tooltip: tr('Карта на весь экран'),
+                              onTap: () => setState(() => _full = true),
                             ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -275,18 +290,117 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
     );
   }
 
+  Widget _mapBody(
+    LatLng origin,
+    List<({StoreInfo store, StorePrice? offer, int meters})> rows,
+    LocationProvider loc,
+  ) => (widget.showTiles ?? StoresMapScreen.defaultShowTiles)
+      ? _mapView(origin, rows, loc)
+      : Container(
+          color: AppColors.primarySoft,
+          alignment: Alignment.center,
+          child: Text(tr('Карта')),
+        );
+
+  /// The map over the whole screen: pins, a button for "where am I", and the
+  /// card of the shop you tapped at the bottom.
+  Widget _fullScreen(
+    LatLng origin,
+    List<({StoreInfo store, StorePrice? offer, int meters})> rows,
+    LocationProvider loc,
+    Product? product,
+  ) {
+    final picked = rows.where((r) => r.store.id == _selected).firstOrNull;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) setState(() => _full = false);
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(child: _mapBody(origin, rows, loc)),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: _MapButton(
+                    icon: Icons.fullscreen_exit,
+                    tooltip: tr('Свернуть карту'),
+                    onTap: () => setState(() => _full = false),
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: _MapButton(
+                    icon: Icons.my_location,
+                    tooltip: tr('Моё положение'),
+                    onTap: () {
+                      try {
+                        _map.move(origin, 14);
+                      } catch (_) {
+                        // the map is not on screen (tests)
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
+            if (picked != null)
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 0,
+                child: SafeArea(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.sizeOf(context).height * 0.45,
+                    ),
+                    child: SingleChildScrollView(
+                      child: _StoreCard(
+                        store: picked.store,
+                        offer: picked.offer,
+                        meters: picked.meters,
+                        selected: true,
+                        product: product,
+                        onTap: () {},
+                        onAdd: product == null || picked.offer == null
+                            ? null
+                            : () => _addToCart(product, picked.offer!),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _mapView(
     LatLng origin,
     List<({StoreInfo store, StorePrice? offer, int meters})> rows,
     LocationProvider loc,
   ) {
     return FlutterMap(
+      key: ValueKey(_full),
       mapController: _map,
       options: MapOptions(
-        initialCenter: origin,
-        initialZoom: 12,
+        initialCenter: _camCenter ?? origin,
+        initialZoom: _camZoom ?? 12,
         minZoom: 9,
         maxZoom: 18,
+        onPositionChanged: (camera, _) {
+          _camCenter = camera.center;
+          _camZoom = camera.zoom;
+        },
         interactionOptions: const InteractionOptions(
           flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
         ),
@@ -402,6 +516,31 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
       ),
     );
   }
+}
+
+/// Round button on top of the map (expand, collapse, my position).
+class _MapButton extends StatelessWidget {
+  const _MapButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.white,
+    elevation: 3,
+    shape: const CircleBorder(),
+    child: IconButton(
+      tooltip: tooltip,
+      onPressed: onTap,
+      icon: Icon(icon, color: const Color(0xFF3A3135)),
+    ),
+  );
 }
 
 class _Pin extends StatelessWidget {
@@ -537,7 +676,7 @@ class _StoreCard extends StatelessWidget {
         AppColors.saleSoft,
         tr('Нет в наличии'),
       ),
-      null => (AppColors.primaryDark, AppColors.primarySoft, ''),
+      null => (context.pal.accent, AppColors.primarySoft, ''),
     };
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -566,7 +705,7 @@ class _StoreCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.place, size: 14, color: AppColors.primaryDark),
+                Icon(Icons.place, size: 14, color: context.pal.accent),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
