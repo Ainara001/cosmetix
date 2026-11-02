@@ -86,11 +86,7 @@ class ProductMiniCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  color: context.pal.accent,
-                  size: 20,
-                ),
+                Icon(Icons.chevron_right, color: context.pal.accent, size: 20),
               ],
             ),
           ),

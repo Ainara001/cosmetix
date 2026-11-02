@@ -19,6 +19,7 @@ import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/screens/stores/stores_map_screen.dart';
 import 'widget_test.dart' show pumpUntil;
 
@@ -87,31 +88,60 @@ void main() {
 
     test('the palettes 00, 01, 02, 03, 05 and 07 are one line', () {
       final five = byName('Palette 05');
-      final others = catalog.variantsOf(five).map((p) => p.name).toList();
-      expect(others, [
-        'Better Than Palette 00 Light & Glitter Garden',
-        'Better Than Palette 01 Pampas Garden',
-        'Better Than Palette 02 Mahogany Garden',
-        'Better Than Palette 03 Rosebud Garden',
-        'Better Than Palette 07 Berry Fuchsia Garden',
+      final shades = catalog.shadesOf(five);
+      // all of them, the product itself included, by number
+      expect(shades.map(CatalogProvider.shadeNumber), [
+        '00',
+        '01',
+        '02',
+        '03',
+        '05',
+        '07',
       ]);
-      // from another shade the same line is found, the product itself is not
-      final pampas = catalog.variantsOf(byName('Palette 01'));
-      expect(pampas.map((p) => p.id), isNot(contains(byName('Palette 01').id)));
-      expect(pampas.length, 5);
+      expect(shades.map((p) => p.id), contains(five.id));
+      // from any shade the same line is found
+      expect(
+        catalog.shadesOf(byName('Palette 01')).map((p) => p.id),
+        shades.map((p) => p.id),
+      );
+      expect(catalog.listName(five), 'Better Than Palette');
+      expect(CatalogProvider.shadeName(five), '05 Shade & Shadow Garden');
+    });
+
+    test('lists show one tile for the line, not one per shade', () {
+      final palettes = all.where((p) => p.name.contains('Better Than Palette'));
+      expect(palettes.length, 6);
+      final collapsed = catalog.collapseLines(all);
+      expect(
+        collapsed.where((p) => p.name.contains('Better Than Palette')).length,
+        1,
+      );
+      // the first one of the given order stays: the best match in a ranking
+      final reversed = catalog.collapseLines(all.reversed.toList());
+      expect(
+        reversed.firstWhere((p) => p.name.contains('Palette')).name,
+        'Better Than Palette 07 Berry Fuchsia Garden',
+      );
+      // products with one shade and without a number stay as they are
+      expect(
+        collapsed.length,
+        all.length - 5 /* palettes */ - 1 /* the second tint */,
+      );
+      expect(catalog.listName(byName('Better Than Eyes')), 'Better Than Eyes');
     });
 
     test('tints of a line, and products without a number have no line', () {
-      expect(catalog.variantsOf(byName('Glowy Tint 30')).map((p) => p.name), [
+      expect(catalog.shadesOf(byName('Glowy Tint 30')).map((p) => p.name), [
         'Ink Mood Glowy Tint 03 Rose In Mind',
+        'Ink Mood Glowy Tint 30 Happy Berry',
       ]);
-      expect(catalog.variantsOf(byName('Better Than Eyes')), isEmpty);
-      expect(catalog.variantsOf(byName('Niacinamide 10%')), isEmpty);
+      expect(catalog.shadesOf(byName('Better Than Eyes')), isEmpty);
+      expect(catalog.shadesOf(byName('Niacinamide 10%')), isEmpty);
+      // a tint that is alone in its line is just a product
+      expect(catalog.shadesOf(byName('Juicy Lasting Tint 01')), isEmpty);
       // a different brand with the same words is not the same line
       expect(
-        catalog
-            .variantsOf(byName('Better Than Palette 00'))
-            .any((p) => p.brand != 'Rom&nd'),
+        catalog.shadesOf(byName('Palette 00')).any((p) => p.brand != 'Rom&nd'),
         isFalse,
       );
     });
@@ -293,11 +323,22 @@ void main() {
       expect(find.text('Магазины рядом'), findsOneWidget);
     });
 
-    testWidgets('a palette page offers the other shades of the line', (
+    testWidgets('a palette is one product with a circle for every shade', (
       t,
     ) async {
       final h = DatabaseHelper(path: inMemoryDatabasePath);
       await boot(t, h);
+      // the catalog: one tile for the whole palette line
+      nav(t).pushNamed(
+        AppRoutes.catalog,
+        arguments: const CatalogArgs(query: 'Palette'),
+      );
+      await _settle(t);
+      expect(find.text('Better Than Palette'), findsOneWidget);
+      expect(find.textContaining('Better Than Palette 0'), findsNothing);
+      nav(t).pop();
+      await _settle(t);
+
       final id =
           (await t.runAsync(() async {
                 final db = await h.database;
@@ -309,14 +350,20 @@ void main() {
               as int;
       nav(t).pushNamed(AppRoutes.product, arguments: id);
       await _settle(t);
-      await t.scrollUntilVisible(
-        find.text('Другие оттенки'),
-        300,
-        scrollable: find.byType(Scrollable).last,
-      );
-      expect(find.text('Другие оттенки'), findsOneWidget);
-      expect(find.text('00 Light & Glitter Garden'), findsOneWidget);
-      expect(find.text('Better Than Palette 00 Light & Glitter Garden'), findsNothing);
+      // the line as the title, the chosen shade under it, a circle per shade
+      expect(find.text('Better Than Palette'), findsOneWidget);
+      expect(find.text('Оттенок: 05 Shade & Shadow Garden'), findsOneWidget);
+      for (final n in ['00', '01', '02', '03', '05', '07']) {
+        expect(find.text(n), findsOneWidget, reason: n);
+      }
+      // no separate cards of the same palette any more
+      expect(find.text('Другие оттенки'), findsNothing);
+      // a tap on a circle: the same page for that shade
+      await t.tap(find.text('02'));
+      await _settle(t);
+      expect(find.text('Оттенок: 02 Mahogany Garden'), findsOneWidget);
+      expect(find.text('Better Than Palette'), findsOneWidget);
+      await t.pump(const Duration(seconds: 1));
     });
   });
 
@@ -332,7 +379,7 @@ void main() {
       'Проверено компонентов: {n}',
       '{v0}: найдено ({v1})',
       '{v0}: не найдено',
-      'Другие оттенки',
+      'Оттенок: {v0}',
     ]) {
       expect(translationsEn[k], isNotNull, reason: 'EN: $k');
       expect(translationsKk[k], isNotNull, reason: 'KK: $k');

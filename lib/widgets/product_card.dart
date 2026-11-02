@@ -4,8 +4,29 @@ import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/settings_provider.dart';
 import 'product_art.dart';
+
+/// The tile of a product in a list: for a product with several shades it is
+/// the tile of the whole line (name of the line, a dot per shade).
+ProductCard lineCard(
+  CatalogProvider catalog,
+  Product p, {
+  required VoidCallback onTap,
+  VoidCallback? onFavorite,
+  Widget? footer,
+}) {
+  final shades = catalog.shadesOf(p);
+  return ProductCard(
+    product: p,
+    title: shades.isEmpty ? null : catalog.listName(p),
+    shades: [for (final s in shades) Color(s.shade ?? s.color)],
+    footer: footer,
+    onTap: onTap,
+    onFavorite: onFavorite,
+  );
+}
 
 /// Product tile used in the catalog, home, cart and search results.
 class ProductCard extends StatelessWidget {
@@ -16,6 +37,8 @@ class ProductCard extends StatelessWidget {
     this.onFavorite,
     this.priceOverride,
     this.footer,
+    this.title,
+    this.shades = const [],
   });
 
   final Product product;
@@ -27,6 +50,12 @@ class ProductCard extends StatelessWidget {
   /// Price from a concrete store (cart); the product price is used otherwise.
   final int? priceOverride;
   final Widget? footer;
+
+  /// Shown instead of the product name (the line of a product with shades).
+  final String? title;
+
+  /// Colours of all shades of the line: small dots on the photo.
+  final List<Color> shades;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +107,12 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ),
+                    if (shades.isNotEmpty)
+                      Positioned(
+                        right: 6,
+                        bottom: 6,
+                        child: _ShadeDots(colors: shades),
                       ),
                     if (!product.inStock)
                       Positioned(
@@ -144,7 +179,7 @@ class ProductCard extends StatelessWidget {
                         context,
                       ).scale(12.5 * 1.2 * 3),
                       child: Text(
-                        tr(product.name),
+                        tr(title ?? product.name),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -201,3 +236,54 @@ SliverGridDelegate productGridDelegate(
   crossAxisSpacing: 12,
   mainAxisExtent: extent + MediaQuery.textScalerOf(context).scale(100) - 100,
 );
+
+/// A row of small colour dots (the shades of a line) on a product photo.
+class _ShadeDots extends StatelessWidget {
+  const _ShadeDots({required this.colors});
+
+  final List<Color> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    const max = 5;
+    final shown = colors.take(max).toList();
+    final more = colors.length - shown.length;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: pal.surface.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: pal.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final c in shown)
+            Container(
+              width: 11,
+              height: 11,
+              margin: const EdgeInsets.symmetric(horizontal: 1.5),
+              decoration: BoxDecoration(
+                color: c,
+                shape: BoxShape.circle,
+                border: Border.all(color: pal.border, width: 0.5),
+              ),
+            ),
+          if (more > 0)
+            Padding(
+              padding: const EdgeInsets.only(left: 3),
+              child: Text(
+                '+$more',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: pal.subtext,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
