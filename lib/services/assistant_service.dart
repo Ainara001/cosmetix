@@ -81,8 +81,15 @@ class AssistantService {
     final ctx = await _reco.loadContext(userId);
     StoreContext? shops;
     try {
-      final focus = _focusProducts(ctx, text, productId, shareProfile);
-      shops = await _stores?.call([for (final c in focus) c.product.id]);
+      shops = await _stores?.call(
+        shopProductIds(
+          ctx: ctx,
+          text: text,
+          history: history,
+          productId: productId,
+          shareProfile: shareProfile,
+        ),
+      );
     } catch (_) {
       shops = null; // the answer works without shop data
     }
@@ -115,6 +122,72 @@ class AssistantService {
     ]);
     if (isSeriousReaction(text)) out = '$out\n\n$safetyNote';
     return out;
+  }
+
+  /// A question about alternatives, cheaper options or comparing.
+  static final _alternatives = RegExp(
+    r'альтернатив|дешевл|дешевле|подешевле|аналог|похож|друг(ой|ие|их)|сравн|'
+    r'cheaper|alternativ|similar|compare|another|other',
+    caseSensitive: false,
+  );
+
+  /// `[#12]` markers the assistant wrote in its recent answers.
+  static List<int> recentProductIds(List<ChatMessage> history) {
+    final ids = <int>[];
+    for (final m in history.reversed.take(4)) {
+      if (m.isUser) continue;
+      for (final x in _marker.allMatches(m.text)) {
+        final id = int.parse(x[1]!);
+        if (!ids.contains(id)) ids.add(id);
+      }
+    }
+    return ids;
+  }
+
+  /// Products whose price and stock in every shop go into the prompt: the ones
+  /// named in the question, the ones just discussed in the chat and, for a
+  /// question about alternatives or cheaper options, the other products of the
+  /// same kind (so the model compares real numbers instead of inventing them).
+  static List<int> shopProductIds({
+    required PersonalizationContext ctx,
+    required String text,
+    required List<ChatMessage> history,
+    int? productId,
+    bool shareProfile = false,
+    int limit = 7,
+  }) {
+    final ids = <int>[
+      for (final c in _focusProducts(ctx, text, productId, shareProfile))
+        c.product.id,
+    ];
+    final recent = recentProductIds(history);
+    for (final id in recent) {
+      if (!ids.contains(id)) ids.add(id);
+    }
+    if (ids.isNotEmpty && _alternatives.hasMatch(text)) {
+      final anchor = ctx.candidates
+          .where(
+            (c) =>
+                c.product.id == (recent.isNotEmpty ? recent.first : ids.first),
+          )
+          .firstOrNull;
+      if (anchor != null) {
+        for (final c in ctx.candidates) {
+          final p = c.product;
+          if (p.category != anchor.product.category ||
+              p.zone != anchor.product.zone ||
+              ids.contains(p.id)) {
+            continue;
+          }
+          if (!shareProfile &&
+              RecommendationService.isBlacklisted(c, ctx.blacklist)) {
+            continue;
+          }
+          ids.add(p.id);
+        }
+      }
+    }
+    return ids.take(limit).toList();
   }
 
   /// The chat bubble shows plain text, but models (Gemini especially) like
@@ -255,8 +328,8 @@ Rules:
 - Recommend ONLY products from the CATALOG. Never invent products, prices, shops or ingredients. If a fact is not in the data, say plainly that you have no data.
 - Never recommend a product that contains a blacklisted ingredient.
 - Catalog lines may have "has:" (acids and actives found in the INCI list; use it for ingredient questions) and "fits:" (reasons computed by the app from the user's Beauty Test, with the match %). Say in a few words why a product suits THIS person, using only those facts, in the answer language. Prefer a higher match. Never praise a shade whose fits say it is another palette's shade.
-- Mention only products that DO suit the user, never to say you do not recommend them; just say the other shades belong to another palette.
-- Where to buy / nearest shop / cheapest / in stock: use only SHOPS: name the shop, address, distance, price and stock. Say prices and stock are demo values to confirm with the shop, never call them live. No product named: list the nearest shops and ask which product.
+- Mention only products that DO suit the user, never to say you do not recommend them; just say the other shades belong to another palette. EXCEPTION: when the user asks for alternatives or cheaper options, name 2-3 other products from the comparison, say in a few words how well each fits (use the fits facts) and compare their prices and distances.
+- Where to buy / nearest shop / cheapest / alternatives / in stock: use only SHOPS: name the shop, address, distance, price and stock. NEVER invent a price or a shop: a product without an availability line has no shop data, say so and point to its page. For "alternatives" or "cheaper" compare the products listed under "being compared" and say which one costs less, where, and how far it is. Always write the product name next to each price, never compare prices of different products as if they were the same product. Say prices and stock are demo values to confirm with the shop, never call them live. If the user asks about "the same product" or "it", it is the product from your previous answer.
 - Short answers (under 120 words), plain text: no markdown.
 - Each recommended CATALOG product: its full name, then its marker like [#12] right after the name. A marker never stands alone and never follows "or"/"such as". Never invent a marker.
 - Answer in $language.
@@ -304,19 +377,48 @@ ${catalogLines.join('\n')}''';
       final st = openStatusOf(x.hours, DateTime.now());
       out.writeln('- ${where(x)}${st.isEmpty ? '' : ' ($st)'}');
     }
-    for (final e in s.offers.entries) {
-      out.writeln('Availability of product [#${e.key}]:');
-      for (final o in e.value) {
-        final stock = switch (o.level) {
-          StockLevel.out => 'out of stock',
-          StockLevel.low => 'few left (${o.qty} pcs)',
-          StockLevel.inStock =>
-            o.qty == null ? 'in stock' : 'in stock (${o.qty} pcs)',
-        };
-        out.writeln(
-          '- ${o.storeName}, ${o.address}${dist ? ', ${km(o.distanceM)}' : ''}: '
-          '${Formatters.price(o.price)}, $stock${o.demo ? ' [demo data]' : ''}',
-        );
+    String stockOf(StorePrice o) => switch (o.level) {
+      StockLevel.out => 'out of stock',
+      StockLevel.low => 'few left (${o.qty} pcs)',
+      StockLevel.inStock =>
+        o.qty == null ? 'in stock' : 'in stock (${o.qty} pcs)',
+    };
+    String offerLine(StorePrice o) =>
+        '${o.storeName}, ${o.address}${dist ? ', ${km(o.distanceM)}' : ''}: '
+        '${Formatters.price(o.price)}, ${stockOf(o)}${o.demo ? ' [demo data]' : ''}';
+    if (s.offers.length <= 2) {
+      // one or two products: every shop, nothing left to guess
+      for (final e in s.offers.entries) {
+        out.writeln('Availability of product [#${e.key}]:');
+        for (final o in e.value) {
+          out.writeln('- ${offerLine(o)}');
+        }
+      }
+    } else {
+      // several products (alternatives): the nearest shop that has it and the
+      // cheapest one, so the model can compare real numbers
+      out.writeln(
+        'Availability of the products being compared (use ONLY these prices):',
+      );
+      for (final e in s.offers.entries) {
+        final have = [
+          for (final o in e.value)
+            if (o.inStock) o,
+        ];
+        if (have.isEmpty) {
+          out.writeln('- [#${e.key}]: out of stock in every shop');
+          continue;
+        }
+        final nearest = ([
+          ...have,
+        ]..sort((a, b) => a.distanceM.compareTo(b.distanceM))).first;
+        final cheapest = ([
+          ...have,
+        ]..sort((a, b) => a.price.compareTo(b.price))).first;
+        out.writeln('- [#${e.key}] nearest with stock: ${offerLine(nearest)}');
+        if (cheapest.storeId != nearest.storeId) {
+          out.writeln('  cheapest with stock: ${offerLine(cheapest)}');
+        }
       }
     }
     return out.toString().trimRight();
