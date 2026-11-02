@@ -199,9 +199,13 @@ class ColorResultScreen extends StatelessWidget {
     );
   }
 
+  /// Back to the Beauty Profile when it is open under this screen, otherwise to
+  /// the first screen. A plain `ModalRoute.withName` would pop EVERY route when
+  /// the test was started from the cabinet or the home screen (the profile is
+  /// not in the stack then) and leave a black page.
   void _done(BuildContext context) => Navigator.of(
     context,
-  ).popUntil(ModalRoute.withName(AppRoutes.beautyProfile));
+  ).popUntil((r) => r.isFirst || r.settings.name == AppRoutes.beautyProfile);
 }
 
 class _Info extends StatelessWidget {

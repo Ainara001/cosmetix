@@ -103,7 +103,7 @@ class ColorTestService {
       ColorOption(
         'Чёрный / тёмный брюнет',
         Color(0xFF2B2220),
-        warm: -1,
+        warm: 0, // dark hair says "deep", not "cool"
         depth: 2,
       ),
     ]),
@@ -201,9 +201,9 @@ class ColorTestService {
       'Синие / Фиолетовые',
       'Указывает на холодный подтон',
       Color(0xFFC98B9C),
-      -3,
+      -2,
     ),
-    ('Зелёные / Оливковые', 'Указывает на тёплый подтон', Color(0xFF4F9461), 3),
+    ('Зелёные / Оливковые', 'Указывает на тёплый подтон', Color(0xFF4F9461), 2),
     (
       'Смешанные (Оба цвета)',
       'Указывает на нейтральный подтон',
@@ -222,7 +222,8 @@ class ColorTestService {
   static const veinSkipIndex = 3;
 
   /// [warm], [depth] and [contrast] are the sums of the chosen options; [vein]
-  /// is the score of the veins test (-3 cool, 0 neutral, 3 warm). [answered]
+  /// is the score of the veins test (-2 cool, 0 neutral, 2 warm: veins are hard to judge, so they
+  /// are one voice among nine, not the deciding one). [answered]
   /// is how many of the 8 colour questions were answered: with skipped ones
   /// the sums are scaled up so a short test is not biased to "light".
   ///
@@ -250,7 +251,8 @@ class ColorTestService {
         : totalWarm <= -2
         ? 'Холодный'
         : 'Нейтральный';
-    final isWarm = totalWarm > 0 || (totalWarm == 0 && vein >= 0 && warm >= 0);
+    // a tie goes to the colouring answers: the veins alone do not decide
+    final isWarm = totalWarm > 0 || (totalWarm == 0 && warm >= 0);
     final isDeep =
         depth >= 2 || (depth >= 1 && (isWarm ? contrast <= -2 : contrast >= 2));
     final String type;
