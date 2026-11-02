@@ -152,7 +152,9 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
 
   void _backToQuestions() {
     _discardPhoto();
-    Navigator.of(context).popUntil(ModalRoute.withName(AppRoutes.colorTest));
+    Navigator.of(
+      context,
+    ).popUntil((r) => r.isFirst || r.settings.name == AppRoutes.colorTest);
   }
 
   Future<void> _skip() async {
