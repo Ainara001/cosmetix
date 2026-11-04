@@ -17,6 +17,8 @@ class Product {
     required this.createdAt,
     this.inci = '',
     this.sourceUrl = '',
+    this.country,
+    this.countrySource,
     this.shade,
     this.isFavorite = false,
     this.featured = false,
@@ -40,6 +42,11 @@ class Product {
   /// Full ingredient list (INCI) as published, and the page it comes from.
   final String inci;
   final String sourceUrl;
+
+  /// Country of manufacture and the page that states it. Both are null when
+  /// no checkable source was found: the value is never guessed.
+  final String? country;
+  final String? countrySource;
 
   /// Representative colour (ARGB) of a makeup product, if known.
   final int? shade;
@@ -76,6 +83,8 @@ class Product {
     createdAt: createdAt,
     inci: inci,
     sourceUrl: sourceUrl,
+    country: country,
+    countrySource: countrySource,
     shade: shade,
     isFavorite: isFavorite ?? this.isFavorite,
     featured: featured,
@@ -98,12 +107,16 @@ class Product {
     createdAt: m['created_at'] as int? ?? 0,
     inci: m['inci'] as String? ?? '',
     sourceUrl: m['source_url'] as String? ?? '',
+    country: _nonEmpty(m['country']),
+    countrySource: _nonEmpty(m['country_source']),
     shade: m['shade'] as int?,
     isFavorite: (m['is_fav'] as int? ?? 0) == 1,
     featured: (m['featured'] as int? ?? 0) == 1,
     trending: (m['trending'] as int? ?? 0) == 1,
   );
 }
+
+String? _nonEmpty(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
 
 /// Stock of a product in a shop.
 enum StockLevel { inStock, low, out }

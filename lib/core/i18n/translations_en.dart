@@ -842,6 +842,9 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'A soothing toner with 77% houttuynia extract for sensitive skin.',
   'Полный состав (INCI)': 'Full ingredients (INCI)',
   'Источник: {v0}': 'Source: {v0}',
+  'Страна производителя: не указана': 'Country of manufacture: not stated',
+  'Страна производителя: {v0}': 'Country of manufacture: {v0}',
+  ' (источник: {v0})': ' (source: {v0})',
   'Состав может отличаться по оттенкам и сериям: сверяйтесь с упаковкой.':
       'The formula can differ by shade and batch: check the packaging.',
   'Какой состав у крема CeraVe?': 'What is in the CeraVe cream?',

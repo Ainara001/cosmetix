@@ -1,0 +1,157 @@
+{
+ "schema": 1,
+ "ingredients": [
+  {
+   "id": 1,
+   "name": "Вода / Aqua",
+   "description": "Основной растворитель, абсолютно безопасен.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 2,
+   "name": "Глицерин / Glycerin",
+   "description": "Увлажняющий компонент, удерживает влагу.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 3,
+   "name": "Токоферол / Tocopherol",
+   "description": "Витамин Е. Антиоксидант, защищает кожу.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 4,
+   "name": "Салициловая кислота / Salicylic Acid",
+   "description": "BHA-кислота. Очищает поры. Возможна сухость.",
+   "risk": 1,
+   "is_allergen": true,
+   "group_key": null
+  },
+  {
+   "id": 5,
+   "name": "Парабены / Parabens",
+   "description": "Консервант. Потенциальный аллерген.",
+   "risk": 2,
+   "is_allergen": true,
+   "group_key": "paraben"
+  },
+  {
+   "id": 6,
+   "name": "Лаурилсульфат натрия / SLS",
+   "description": "Пенообразователь, сушит кожу.",
+   "risk": 2,
+   "is_allergen": false,
+   "group_key": "sulfate"
+  },
+  {
+   "id": 7,
+   "name": "Диметикон / Dimethicone",
+   "description": "Силикон, создаёт плёнку на коже.",
+   "risk": 1,
+   "is_allergen": false,
+   "group_key": "silicone"
+  },
+  {
+   "id": 8,
+   "name": "Минеральное масло / Mineral Oil",
+   "description": "Продукт нефтепереработки.",
+   "risk": 1,
+   "is_allergen": false,
+   "group_key": "mineral_oil"
+  },
+  {
+   "id": 9,
+   "name": "Формальдегид / Formaldehyde",
+   "description": "Канцерогенный консервант.",
+   "risk": 2,
+   "is_allergen": false,
+   "group_key": "formaldehyde"
+  },
+  {
+   "id": 10,
+   "name": "Фталаты / Phthalates",
+   "description": "Токсичные фиксаторы запаха.",
+   "risk": 2,
+   "is_allergen": false,
+   "group_key": "phthalates"
+  },
+  {
+   "id": 11,
+   "name": "Триклозан / Triclosan",
+   "description": "Антибактериальное вещество.",
+   "risk": 2,
+   "is_allergen": false,
+   "group_key": "triclosan"
+  },
+  {
+   "id": 12,
+   "name": "Ниацинамид / Niacinamide",
+   "description": "Выравнивает тон и сужает поры.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 13,
+   "name": "Гиалуроновая кислота / Hyaluronic Acid",
+   "description": "Глубоко увлажняет кожу.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 14,
+   "name": "Парфюмерная композиция / Parfum",
+   "description": "Ароматизатор. Может вызвать раздражение.",
+   "risk": 1,
+   "is_allergen": true,
+   "group_key": null
+  },
+  {
+   "id": 15,
+   "name": "Тальк / Talc",
+   "description": "Матирующий наполнитель.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 16,
+   "name": "Слюда / Mica",
+   "description": "Придаёт сияние и пигмент.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 17,
+   "name": "Оксид цинка / Zinc Oxide",
+   "description": "Минеральный УФ-фильтр.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 18,
+   "name": "Пчелиный воск / Beeswax",
+   "description": "Натуральный воск, смягчает губы.",
+   "risk": 0,
+   "is_allergen": false,
+   "group_key": null
+  },
+  {
+   "id": 19,
+   "name": "Спирт денат. / Alcohol Denat.",
+   "description": "Сушит кожу, повышает проницаемость.",
+   "risk": 1,
+   "is_allergen": false,
+   "group_key": null
+  }
+ ]
+}
