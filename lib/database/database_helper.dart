@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 13;
+  static const dbVersion = 14;
 
   final String? path;
   Database? _db;
@@ -144,6 +144,16 @@ class DatabaseHelper {
     13: (db) async {
       await _addColumn(db, 'users', 'birth_year', 'INTEGER');
     },
+    // JSON catalog: country of manufacture (with the page that proves it) and
+    // the queue of store categories that need a manual look
+    14: (db) async {
+      await _addColumn(db, 'products', 'country', 'TEXT');
+      await _addColumn(db, 'products', 'country_source', 'TEXT');
+      for (final sql in _schemaV14) {
+        await db.execute(sql);
+      }
+      await SeedData.applyCountries(db);
+    },
   };
 
   static Future<void> _addColumn(
@@ -177,6 +187,7 @@ class DatabaseHelper {
   }
 
   static const _tables = [
+    'category_review_queue',
     'product_ai_classification',
     'product_tags',
     'product_concerns',
@@ -203,6 +214,27 @@ class DatabaseHelper {
     'care_steps',
     'care_logs',
     'reaction_history',
+  ];
+
+  /// Schema version 14: store categories the normalizer could not place with
+  /// certainty wait here for a human (the admin panel reads this queue).
+  static const _schemaV14 = [
+    '''
+CREATE TABLE IF NOT EXISTS category_review_queue (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  store TEXT NOT NULL DEFAULT '',
+  raw_category TEXT NOT NULL,
+  normalized_key TEXT NOT NULL,
+  product_name TEXT NOT NULL DEFAULT '',
+  reason TEXT NOT NULL,
+  candidates TEXT NOT NULL DEFAULT '',
+  ai_hint TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending',
+  resolved_type TEXT,
+  created_at INTEGER NOT NULL,
+  resolved_at INTEGER,
+  UNIQUE (store, normalized_key)
+)''',
   ];
 
   /// Schema version 6: the user's cosmetic bag, the morning / evening care

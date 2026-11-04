@@ -1,0 +1,646 @@
+{
+ "schema": 1,
+ "note": "Словарь типов товаров для нормализатора категорий (lib/services/catalog/category_normalizer.dart). Слова сравниваются как набор: без учёта порядка и окончаний. 'words' типа: достаточно одного слова. 'phrases': нужны все слова фразы, побеждает самая длинная. 'ignore': слова-описания, тип не решают (не включайте сюда слова, которые нужны фразам, например «губ», «волос»). Всё, что словарь не решает однозначно, попадает в очередь ручной проверки.",
+ "ignore": [
+  "для",
+  "и",
+  "с",
+  "на",
+  "от",
+  "по",
+  "без",
+  "the",
+  "for",
+  "and",
+  "with",
+  "of",
+  "in",
+  "лица",
+  "лицо",
+  "тела",
+  "тело",
+  "рук",
+  "ног",
+  "кожи",
+  "кожа",
+  "увлажняющий",
+  "питательный",
+  "ночной",
+  "дневной",
+  "успокаивающий",
+  "восстанавливающий",
+  "антивозрастной",
+  "освежающий",
+  "матирующий",
+  "отбеливающий",
+  "защитный",
+  "интенсивный",
+  "ежедневный",
+  "базовый",
+  "лечебный",
+  "натуральный",
+  "органический",
+  "корейский",
+  "moisturizing",
+  "moisturising",
+  "hydrating",
+  "nourishing",
+  "night",
+  "day",
+  "soothing",
+  "daily",
+  "intensive",
+  "natural",
+  "organic",
+  "korean",
+  "facial",
+  "face",
+  "body",
+  "мини",
+  "mini",
+  "new",
+  "новинка"
+ ],
+ "types": [
+  {
+   "key": "cream",
+   "name": "Крем",
+   "words": [
+    "крем",
+    "cream",
+    "creme"
+   ]
+  },
+  {
+   "key": "serum",
+   "name": "Сыворотка",
+   "words": [
+    "сыворотка",
+    "serum"
+   ]
+  },
+  {
+   "key": "toner",
+   "name": "Тонер",
+   "words": [
+    "тонер",
+    "toner",
+    "тоник"
+   ]
+  },
+  {
+   "key": "essence",
+   "name": "Эссенция",
+   "words": [
+    "эссенция",
+    "essence"
+   ]
+  },
+  {
+   "key": "ampoule",
+   "name": "Ампула",
+   "words": [
+    "ампула",
+    "ampoule"
+   ]
+  },
+  {
+   "key": "gel",
+   "name": "Гель",
+   "words": [
+    "гель",
+    "gel"
+   ]
+  },
+  {
+   "key": "lotion",
+   "name": "Лосьон",
+   "words": [
+    "лосьон",
+    "lotion"
+   ]
+  },
+  {
+   "key": "emulsion",
+   "name": "Эмульсия",
+   "words": [
+    "эмульсия",
+    "emulsion"
+   ]
+  },
+  {
+   "key": "cleanser",
+   "name": "Очищающее средство",
+   "words": [
+    "пенка",
+    "cleanser",
+    "cleansing",
+    "foam"
+   ]
+  },
+  {
+   "key": "micellar",
+   "name": "Мицеллярная вода",
+   "words": [
+    "мицеллярка"
+   ]
+  },
+  {
+   "key": "mask",
+   "name": "Маска",
+   "words": [
+    "маска",
+    "mask",
+    "масок"
+   ]
+  },
+  {
+   "key": "patches",
+   "name": "Патчи",
+   "words": [
+    "патчи",
+    "patches",
+    "patch"
+   ]
+  },
+  {
+   "key": "scrub",
+   "name": "Скраб",
+   "words": [
+    "скраб",
+    "scrub"
+   ]
+  },
+  {
+   "key": "peeling",
+   "name": "Пилинг",
+   "words": [
+    "пилинг",
+    "peeling",
+    "exfoliant"
+   ]
+  },
+  {
+   "key": "sunscreen",
+   "name": "Солнцезащитное средство",
+   "words": [
+    "спф",
+    "spf",
+    "санскрин",
+    "sunscreen",
+    "солнцезащитный"
+   ]
+  },
+  {
+   "key": "mist",
+   "name": "Мист",
+   "words": [
+    "мист",
+    "mist",
+    "спрей"
+   ]
+  },
+  {
+   "key": "oil",
+   "name": "Масло",
+   "words": [
+    "масло",
+    "oil",
+    "масел"
+   ]
+  },
+  {
+   "key": "shampoo",
+   "name": "Шампунь",
+   "words": [
+    "шампунь",
+    "shampoo"
+   ]
+  },
+  {
+   "key": "conditioner",
+   "name": "Кондиционер для волос",
+   "words": [
+    "кондиционер",
+    "conditioner"
+   ]
+  },
+  {
+   "key": "deodorant",
+   "name": "Дезодорант",
+   "words": [
+    "дезодорант",
+    "deodorant"
+   ]
+  },
+  {
+   "key": "perfume",
+   "name": "Парфюмерия",
+   "words": [
+    "духи",
+    "парфюм",
+    "perfume",
+    "parfum",
+    "fragrance",
+    "cologne",
+    "одеколон"
+   ]
+  },
+  {
+   "key": "mascara",
+   "name": "Тушь",
+   "words": [
+    "тушь",
+    "mascara"
+   ]
+  },
+  {
+   "key": "lipstick",
+   "name": "Помада",
+   "words": [
+    "помада",
+    "lipstick"
+   ]
+  },
+  {
+   "key": "lip_tint",
+   "name": "Тинт для губ",
+   "words": [
+    "тинт",
+    "tint"
+   ]
+  },
+  {
+   "key": "lip_gloss",
+   "name": "Блеск для губ",
+   "words": [
+    "блеск",
+    "gloss"
+   ]
+  },
+  {
+   "key": "blush",
+   "name": "Румяна",
+   "words": [
+    "румяна",
+    "blush"
+   ]
+  },
+  {
+   "key": "eyeshadow",
+   "name": "Тени для век",
+   "words": [
+    "тени",
+    "eyeshadow",
+    "палетка",
+    "palette",
+    "shadow",
+    "eyeshadows"
+   ]
+  },
+  {
+   "key": "eyeliner",
+   "name": "Подводка для глаз",
+   "words": [
+    "подводка",
+    "eyeliner"
+   ]
+  },
+  {
+   "key": "brow",
+   "name": "Средство для бровей",
+   "words": [
+    "бровей",
+    "brow"
+   ]
+  },
+  {
+   "key": "cushion",
+   "name": "Кушон",
+   "words": [
+    "кушон",
+    "cushion"
+   ]
+  },
+  {
+   "key": "foundation",
+   "name": "Тональная основа",
+   "words": [
+    "foundation",
+    "тональник"
+   ]
+  },
+  {
+   "key": "concealer",
+   "name": "Консилер",
+   "words": [
+    "консилер",
+    "concealer",
+    "корректор"
+   ]
+  },
+  {
+   "key": "powder",
+   "name": "Пудра",
+   "words": [
+    "пудра",
+    "powder"
+   ]
+  },
+  {
+   "key": "primer",
+   "name": "База под макияж",
+   "words": [
+    "праймер",
+    "primer"
+   ]
+  },
+  {
+   "key": "gift_set",
+   "name": "Подарочный набор",
+   "words": []
+  },
+  {
+   "key": "lip_balm",
+   "name": "Бальзам для губ",
+   "words": []
+  },
+  {
+   "key": "body_wash",
+   "name": "Гель для душа",
+   "words": []
+  },
+  {
+   "key": "hair_dye",
+   "name": "Краска для волос",
+   "words": []
+  }
+ ],
+ "phrases": [
+  {
+   "words": [
+    "тональный",
+    "крем"
+   ],
+   "type": "foundation"
+  },
+  {
+   "words": [
+    "тональная",
+    "основа"
+   ],
+   "type": "foundation"
+  },
+  {
+   "words": [
+    "bb",
+    "крем"
+   ],
+   "type": "foundation"
+  },
+  {
+   "words": [
+    "cc",
+    "крем"
+   ],
+   "type": "foundation"
+  },
+  {
+   "words": [
+    "солнцезащитный",
+    "крем"
+   ],
+   "type": "sunscreen"
+  },
+  {
+   "words": [
+    "sun",
+    "cream"
+   ],
+   "type": "sunscreen"
+  },
+  {
+   "words": [
+    "крем",
+    "от",
+    "загара"
+   ],
+   "type": "sunscreen"
+  },
+  {
+   "words": [
+    "мицеллярная",
+    "вода"
+   ],
+   "type": "micellar"
+  },
+  {
+   "words": [
+    "micellar",
+    "water"
+   ],
+   "type": "micellar"
+  },
+  {
+   "words": [
+    "парфюмерная",
+    "вода"
+   ],
+   "type": "perfume"
+  },
+  {
+   "words": [
+    "туалетная",
+    "вода"
+   ],
+   "type": "perfume"
+  },
+  {
+   "words": [
+    "eau",
+    "de",
+    "parfum"
+   ],
+   "type": "perfume"
+  },
+  {
+   "words": [
+    "eau",
+    "de",
+    "toilette"
+   ],
+   "type": "perfume"
+  },
+  {
+   "words": [
+    "гель",
+    "для",
+    "умывания"
+   ],
+   "type": "cleanser"
+  },
+  {
+   "words": [
+    "пенка",
+    "для",
+    "умывания"
+   ],
+   "type": "cleanser"
+  },
+  {
+   "words": [
+    "очищающий",
+    "гель"
+   ],
+   "type": "cleanser"
+  },
+  {
+   "words": [
+    "гидрофильное",
+    "масло"
+   ],
+   "type": "cleanser"
+  },
+  {
+   "words": [
+    "cleansing",
+    "oil"
+   ],
+   "type": "cleanser"
+  },
+  {
+   "words": [
+    "бальзам",
+    "для",
+    "губ"
+   ],
+   "type": "lip_balm"
+  },
+  {
+   "words": [
+    "lip",
+    "balm"
+   ],
+   "type": "lip_balm"
+  },
+  {
+   "words": [
+    "бальзам",
+    "для",
+    "волос"
+   ],
+   "type": "conditioner"
+  },
+  {
+   "words": [
+    "маска",
+    "для",
+    "губ"
+   ],
+   "type": "lip_balm"
+  },
+  {
+   "words": [
+    "lip",
+    "mask"
+   ],
+   "type": "lip_balm"
+  },
+  {
+   "words": [
+    "lip",
+    "sleeping",
+    "mask"
+   ],
+   "type": "lip_balm"
+  },
+  {
+   "words": [
+    "lip",
+    "tint"
+   ],
+   "type": "lip_tint"
+  },
+  {
+   "words": [
+    "lip",
+    "gloss"
+   ],
+   "type": "lip_gloss"
+  },
+  {
+   "words": [
+    "тени",
+    "для",
+    "век"
+   ],
+   "type": "eyeshadow"
+  },
+  {
+   "words": [
+    "гель",
+    "для",
+    "душа"
+   ],
+   "type": "body_wash"
+  },
+  {
+   "words": [
+    "shower",
+    "gel"
+   ],
+   "type": "body_wash"
+  },
+  {
+   "words": [
+    "пудра",
+    "рассыпчатая"
+   ],
+   "type": "powder"
+  },
+  {
+   "words": [
+    "карандаш",
+    "для",
+    "бровей"
+   ],
+   "type": "brow"
+  },
+  {
+   "words": [
+    "подарочный",
+    "набор"
+   ],
+   "type": "gift_set"
+  },
+  {
+   "words": [
+    "крем",
+    "краска"
+   ],
+   "type": "hair_dye"
+  },
+  {
+   "words": [
+    "краска",
+    "для",
+    "волос"
+   ],
+   "type": "hair_dye"
+  },
+  {
+   "words": [
+    "крем",
+    "spf"
+   ],
+   "type": "sunscreen"
+  },
+  {
+   "words": [
+    "крем",
+    "спф"
+   ],
+   "type": "sunscreen"
+  }
+ ]
+}

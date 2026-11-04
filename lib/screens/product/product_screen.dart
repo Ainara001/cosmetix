@@ -602,6 +602,7 @@ class _ProductBodyState extends State<_ProductBody> {
                             );
                           },
                         ),
+                      _CountryLine(product: product),
                       if (product.inci.isNotEmpty) ...[
                         SectionTitle(tr('Полный состав (INCI)')),
                         AppCard(
@@ -758,6 +759,35 @@ class _ProductBodyState extends State<_ProductBody> {
 
 /// Replaces the big "Add to cart" button once the product is in the cart:
 /// a compact counter, so the bar stays calm and the count is visible.
+/// Country of manufacture with its source, or an honest "not stated".
+class _CountryLine extends StatelessWidget {
+  const _CountryLine({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    final country = product.country;
+    final source = product.countrySource;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        country == null
+            ? tr('Страна производителя: не указана')
+            : trf('Страна производителя: {v0}', {'v0': country}) +
+                  (source == null
+                      ? ''
+                      : trf(' (источник: {v0})', {
+                          'v0': Uri.tryParse(source)?.host ?? source,
+                        })),
+        key: const Key('product-country'),
+        style: AppTextStyles.caption.copyWith(color: pal.subtext),
+      ),
+    );
+  }
+}
+
 class _CartStepper extends StatelessWidget {
   const _CartStepper({
     required this.quantity,
