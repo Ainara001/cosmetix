@@ -1,5 +1,6 @@
 import 'package:cosmetix/core/utils/app_paths.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
+import 'package:cosmetix/services/age_safety.dart';
 
 class AppUser {
   const AppUser({
@@ -23,6 +24,8 @@ class AppUser {
     this.beautyAnalyzedAt,
     this.preferences = const {},
     this.recoUseHistory = false,
+    this.birthYear,
+    this.beautyCompletedAt,
   });
 
   final int id;
@@ -55,6 +58,25 @@ class AppUser {
   /// cosmetic bag into account.
   final bool recoUseHistory;
 
+  /// Year of birth (optional): limits strong actives for children.
+  final int? birthYear;
+
+  /// When the skin questions were last answered (ms since epoch).
+  final int? beautyCompletedAt;
+
+  /// The careful age (see `AgeSafety`), null when the year is not given.
+  int? get age => AgeSafety.ageFromBirthYear(birthYear);
+
+  /// Time to ask again how the skin feels after washing: it changes with the
+  /// season and the care.
+  bool skinCheckDue({DateTime? now, int days = 30}) {
+    if (!hasBeautyProfile) return false;
+    final at = beautyCompletedAt;
+    if (at == null) return true;
+    final ms = (now ?? DateTime.now()).millisecondsSinceEpoch - at;
+    return ms > days * Duration.millisecondsPerDay;
+  }
+
   String get fullName => '$lastName $firstName'.trim();
 
   BeautyProfile get beautyProfile => BeautyProfile.fromLabels(
@@ -66,6 +88,7 @@ class AppUser {
     source: beautySource,
     confidence: beautyConfidence,
     preferences: preferences,
+    age: age,
   );
 
   bool get hasBeautyProfile => colorType.isNotEmpty;
@@ -96,6 +119,8 @@ class AppUser {
       beautyAnalyzedAt: m['beauty_analyzed_at'] as int?,
       preferences: Preferences.parse(m['preferences'] as String?),
       recoUseHistory: (m['reco_use_history'] as int? ?? 0) == 1,
+      birthYear: m['birth_year'] as int?,
+      beautyCompletedAt: m['beauty_completed_at'] as int?,
     );
   }
 }

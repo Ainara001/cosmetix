@@ -181,51 +181,46 @@ class _Rule {
 class ActiveRules {
   ActiveRules._();
 
-  /// AHA / BHA / PHA acids that exfoliate.
-  static const acids = {'glycolic', 'lactic', 'mandelic', 'salicylic', 'pha'};
+  /// AHA / BHA / LHA / PHA acids that exfoliate. Glycolic, lactic, BHA
+  /// (salicylic), LHA and PHA are the columns of the compatibility table;
+  /// mandelic acid is an AHA too and follows the same rows.
+  static const acids = {
+    'glycolic',
+    'lactic',
+    'mandelic',
+    'salicylic',
+    'lha',
+    'pha',
+  };
 
+  /// The rows of the compatibility table (retinoids, acids, L-ascorbic
+  /// acid). Every other pair of the table is "can be combined", so no rule.
+  /// The derivatives of vitamin C, hyaluronic acid, niacinamide, bakuchiol,
+  /// peptides and probiotics combine with everything.
   static const _rules = [
     _Rule(
       {'retinoid'},
       acids,
-      IssueSeverity.avoid,
-      '«{a}» и «{b}»: ретиноиды и кислоты вместе сильно раздражают кожу, возможны жжение и шелушение. Используйте их в разные вечера.',
-    ),
-    _Rule(
-      {'retinoid'},
-      {'benzoyl'},
-      IssueSeverity.avoid,
-      '«{a}» и «{b}»: бензоилпероксид разрушает ретиноиды и сушит кожу. Разнесите их по времени суток.',
+      IssueSeverity.caution,
+      '«{a}» и «{b}»: ретиноиды и кислоты лучше разнести по времени или дням: используйте их в разные дни или вечера.',
     ),
     _Rule(
       {'retinoid'},
       {'vitamin_c'},
       IssueSeverity.caution,
-      '«{a}» и «{b}»: ретинол и витамин C лучше разделить: витамин C утром, ретинол вечером.',
+      '«{a}» и «{b}»: ретиноиды и витамин C (аскорбиновая кислота) лучше разнести: витамин C утром, ретиноид вечером.',
     ),
     _Rule(
       {'vitamin_c'},
       acids,
       IssueSeverity.caution,
-      '«{a}» и «{b}»: витамин C вместе с кислотами может жечь кожу. Используйте в разное время или в разные дни.',
-    ),
-    _Rule(
-      {'benzoyl'},
-      {'vitamin_c'},
-      IssueSeverity.caution,
-      '«{a}» и «{b}»: бензоилпероксид окисляет витамин C и снижает его действие. Используйте в разное время.',
+      '«{a}» и «{b}»: витамин C (аскорбиновая кислота) и кислоты лучше разнести по времени или дням: витамин C утром, кислоты вечером.',
     ),
     _Rule(
       acids,
       acids,
       IssueSeverity.caution,
-      '«{a}» и «{b}»: две кислоты сразу могут пересушить кожу и ослабить её барьер. Начните с одной.',
-    ),
-    _Rule(
-      {'retinoid'},
-      {'retinoid'},
-      IssueSeverity.caution,
-      '«{a}» и «{b}»: два средства с ретиноидами дают двойную дозу. Достаточно одного.',
+      '«{a}» и «{b}»: сочетайте с осторожностью: несколько кислот могут усилить сухость, жжение или раздражение. Не наслаивайте их сразу.',
     ),
   ];
 
@@ -273,7 +268,12 @@ class ActiveRules {
   static const irritants = {...acids, 'retinoid', 'vitamin_c', 'benzoyl'};
 }
 
-/// What layers badly under a foundation.
+/// What layers badly under a foundation. Two pairings are kept, both from
+/// published practical guidance (L'Oréal Paris, HuffPost with a dermatologist,
+/// mindbodygreen): a silicone care product under a water-based foundation, and
+/// an oil-rich care product under a water-based foundation. No source was
+/// found for an oil-rich cream under a silicone foundation, so that rule was
+/// removed. This is practical advice from cosmetic guides, not clinical data.
 class MakeupCompatibility {
   MakeupCompatibility._();
 
@@ -282,13 +282,6 @@ class MakeupCompatibility {
     if (!over.isFoundation || !under.isSkincare) return null;
     final u = under.base, f = over.base;
     if (u == FormulaBase.unknown || f == FormulaBase.unknown) return null;
-    if (f == FormulaBase.silicone && u == FormulaBase.oil) {
-      return RoutineIssue(
-        IssueSeverity.caution,
-        '«{u}» на маслах под «{f}» на силиконах: тон может скользить и плохо держаться. Подождите 10 минут и промокните лишнее салфеткой.',
-        {'u': under.title, 'f': over.title},
-      );
-    }
     if (f == FormulaBase.water && u == FormulaBase.silicone) {
       return RoutineIssue(
         IssueSeverity.caution,
@@ -327,6 +320,56 @@ class MakeupCompatibility {
   }
 }
 
+/// What to know before using a strong active ingredient. Every line comes
+/// from a source: the compatibility table (sun protection SPF 30+ with acids
+/// and retinoids, retinoids in the evening), the EMA advice on retinoids and
+/// pregnancy, and the 3-day patch test that Mayo Clinic advises for acne
+/// products. Shown for every user, not only for a sensitive skin.
+class ActiveNotice {
+  ActiveNotice._();
+
+  static List<RoutineIssue> forItem(
+    RoutineItem item, {
+    bool sensitive = false,
+  }) {
+    final out = <RoutineIssue>[];
+    final a = item.actives;
+    const patch = ' Сначала на 3 дня нанесите на небольшой участок кожи.';
+    if (a.contains('retinoid')) {
+      out.add(
+        RoutineIssue(
+          IssueSeverity.caution,
+          sensitive
+              ? '«{a}» содержит ретиноид: используйте вечером, а каждое утро наносите солнцезащитное средство SPF 30+. При беременности и её планировании ретиноиды не используют: спросите врача.$patch'
+              : '«{a}» содержит ретиноид: используйте вечером, а каждое утро наносите солнцезащитное средство SPF 30+. При беременности и её планировании ретиноиды не используют: спросите врача.',
+          {'a': item.title},
+        ),
+      );
+    }
+    if (a.any(ActiveRules.acids.contains)) {
+      out.add(
+        RoutineIssue(
+          IssueSeverity.caution,
+          sensitive
+              ? '«{a}» содержит кислоту: каждое утро наносите солнцезащитное средство SPF 30+, не наслаивайте несколько кислот сразу.$patch'
+              : '«{a}» содержит кислоту: каждое утро наносите солнцезащитное средство SPF 30+, не наслаивайте несколько кислот сразу.',
+          {'a': item.title},
+        ),
+      );
+    }
+    if (a.contains('benzoyl')) {
+      out.add(
+        RoutineIssue(
+          IssueSeverity.caution,
+          '«{a}» содержит бензоилпероксид: он может раздражать кожу. Перед первым использованием 3 дня проверьте его на небольшом участке кожи.',
+          {'a': item.title},
+        ),
+      );
+    }
+    return out;
+  }
+}
+
 /// A patch test before buying a whole line, and before an active product.
 class PatchTestAdvice {
   PatchTestAdvice._();
@@ -346,7 +389,7 @@ class PatchTestAdvice {
       out.add(
         RoutineIssue(
           IssueSeverity.caution,
-          'Сразу {n} средств для ухода при чувствительной коже: если одно не подойдёт, реакцию трудно связать с конкретным. Начните с базового крема, 3–4 дня пробуйте его на небольшом участке кожи (за ухом или на запястье), остальное добавляйте по одному.',
+          'Сразу {n} средств для ухода при чувствительной коже: если одно не подойдёт, реакцию трудно связать с конкретным. Начните с базового крема, 3 дня пробуйте его на небольшом участке кожи (за ухом или на запястье), остальное добавляйте по одному.',
           {'n': care.length},
         ),
       );
@@ -356,7 +399,7 @@ class PatchTestAdvice {
         out.add(
           RoutineIssue(
             IssueSeverity.caution,
-            '«{a}» содержит активные компоненты: при чувствительной коже сначала нанесите на небольшой участок на 3–4 дня.',
+            '«{a}» содержит активные компоненты: при чувствительной коже сначала на 3 дня нанесите на небольшой участок кожи.',
             {'a': i.title},
           ),
         );

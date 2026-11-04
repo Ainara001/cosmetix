@@ -25,7 +25,11 @@ class BeautyProfile {
     this.source = BeautySource.questionnaire,
     this.confidence,
     this.preferences = const {},
+    this.age,
   });
+
+  /// The careful age of the user (see `AgeSafety`), null when not given.
+  final int? age;
 
   /// Personal preferences the user ticked (codes of [Preferences]).
   final Set<String> preferences;
@@ -47,7 +51,7 @@ class BeautyProfile {
   String get signature =>
       '${skinType?.code}|${skinTone?.code}|${undertone?.code}|'
       '${colorType?.code}|${(concerns.map((c) => c.code).toList()..sort()).join(',')}|'
-      '${(preferences.toList()..sort()).join(',')}';
+      '${(preferences.toList()..sort()).join(',')}|$age';
 
   factory BeautyProfile.fromLabels({
     String? skinType,
@@ -58,6 +62,7 @@ class BeautyProfile {
     String? source,
     double? confidence,
     Set<String> preferences = const {},
+    int? age,
   }) => BeautyProfile(
     skinType: SkinType.fromLabel(skinType),
     skinTone: SkinTone.fromLabel(skinTone),
@@ -70,6 +75,7 @@ class BeautyProfile {
     source: BeautySource.fromCode(source),
     confidence: confidence,
     preferences: preferences,
+    age: age,
   );
 }
 

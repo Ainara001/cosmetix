@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cosmetix/core/theme/app_colors.dart';
+import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/core/utils/validators.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
+import 'package:cosmetix/services/age_safety.dart';
 import 'package:cosmetix/widgets/avatar_sheet.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -26,6 +28,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController _email;
   late final TextEditingController _phone;
   late final TextEditingController _city;
+  late final TextEditingController _birthYear;
   late int _avatar;
   bool _saving = false;
 
@@ -47,12 +50,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _email = TextEditingController(text: u.email);
     _phone = TextEditingController(text: u.phone);
     _city = TextEditingController(text: u.city);
+    _birthYear = TextEditingController(text: u.birthYear?.toString() ?? '');
     _avatar = u.avatarColor;
   }
 
   @override
   void dispose() {
-    for (final c in [_first, _last, _email, _phone, _city]) {
+    for (final c in [_first, _last, _email, _phone, _city, _birthYear]) {
       c.dispose();
     }
     super.dispose();
@@ -122,6 +126,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       phone: _phone.text,
       city: _city.text,
       avatarColor: _avatar,
+      birthYear: int.tryParse(_birthYear.text.trim()),
     );
     if (!mounted) return;
     setState(() => _saving = false);
@@ -204,6 +209,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               controller: _city,
               validator: (v) =>
                   (v ?? '').length > 40 ? tr('Слишком длинное название') : null,
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              label: tr('Год рождения (необязательно)'),
+              hint: '2000',
+              controller: _birthYear,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              validator: (v) {
+                final t = (v ?? '').trim();
+                if (t.isEmpty) return null;
+                final y = int.tryParse(t);
+                if (y == null || !AgeSafety.validBirthYear(y)) {
+                  return tr('Введите год рождения, например 2000');
+                }
+                return null;
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 4),
+              child: Text(
+                tr(
+                  'Нужен для безопасности: детям до 12 лет не предлагают ретиноиды и бензоилпероксид.',
+                ),
+                style: AppTextStyles.small.copyWith(color: context.pal.subtext),
+              ),
             ),
             const SizedBox(height: 22),
             CustomButton(

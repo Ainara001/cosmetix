@@ -8,6 +8,8 @@ import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
+import 'package:cosmetix/services/age_safety.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
 /// Products, favourites, search history and the personalized ranking.
@@ -163,6 +165,16 @@ class CatalogProvider extends ChangeNotifier {
       debugPrint('AI ranking skipped: ${e.message}');
       return false;
     }
+  }
+
+  /// How many of [source] the personal picks hide because of the age of the
+  /// user (retinoids and benzoyl peroxide for a child).
+  int hiddenByAge(Iterable<Product> source) {
+    final age = _ctx.profile.age;
+    if (age == null) return 0;
+    return source
+        .where((p) => AgeSafety.blocks(age, IngredientCatalog.of(p)))
+        .length;
   }
 
   /// Match info for one product (null when it is blacklisted or unknown).

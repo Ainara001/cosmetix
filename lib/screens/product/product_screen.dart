@@ -8,6 +8,7 @@ import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/safety_models.dart';
+import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
@@ -21,6 +22,8 @@ import 'package:cosmetix/repositories/review_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
+import 'package:cosmetix/services/age_safety.dart';
+import 'package:cosmetix/services/fragrance_allergens.dart';
 import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
@@ -116,6 +119,35 @@ class _ProductBodyState extends State<_ProductBody> {
     // result ("1 в корзине") and the minus/plus buttons
   }
 
+  /// The fragrance allergens of the EU list that the composition names.
+  List<Widget> _allergenNote(BuildContext context, Product product) {
+    final found = FragranceAllergens.inProduct(product.inci);
+    if (found.isEmpty) return const [];
+    final pal = context.pal;
+    return [
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              trf('Ароматические аллергены (список ЕС): {v0}', {
+                'v0': found.join(', '),
+              }),
+              style: AppTextStyles.small.copyWith(fontWeight: FontWeight.w700),
+            ),
+            Text(
+              tr(
+                'ЕС требует называть эти вещества в составе: они вызывали аллергию у людей. Если кожа склонна к реакциям, сначала проверьте средство на небольшом участке.',
+              ),
+              style: AppTextStyles.caption.copyWith(color: pal.subtext),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
   /// "How it goes with your care": conflicts with the cosmetic bag, layering
   /// under or over a foundation, a patch test for a sensitive skin, and for a
   /// foundation the care products of the catalog that sit well under it.
@@ -129,10 +161,16 @@ class _ProductBodyState extends State<_ProductBody> {
         if (b.productId != product.id) b,
     ];
     bool mine(RoutineIssue i) => i.args.values.contains(me.title);
+    final age = context.watch<AuthProvider>().user?.age;
+    final notice = ActiveNotice.forItem(me, sensitive: catalog.sensitiveSkin);
     final issues = [
+      ...AgeSafety.issues(age, me),
       ...ActiveRules.check(all).where(mine),
       ...MakeupCompatibility.checkAll(all).where(mine),
-      ...PatchTestAdvice.forItems([me], sensitive: catalog.sensitiveSkin),
+      ...notice,
+      // the notice already carries the patch-test advice
+      if (notice.isEmpty)
+        ...PatchTestAdvice.forItems([me], sensitive: catalog.sensitiveSkin),
     ];
     final mates = <Product>[];
     if (me.isFoundation && me.base != FormulaBase.unknown) {
@@ -479,71 +517,90 @@ class _ProductBodyState extends State<_ProductBody> {
                       ),
                       SectionTitle(tr('Анализ состава')),
                       if (_analysis != null)
-                        AppCard(
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            AppRoutes.analysis,
-                            arguments: product.id,
-                          ),
-                          color: _analysis!.score >= 7.5
-                              ? context.pal.greenSoft
-                              : context.pal.redSoft,
-                          borderColor: Colors.transparent,
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: _analysis!.scoreColor,
-                                child: Text(
-                                  _analysis!.grade,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
+                        Builder(
+                          builder: (context) {
+                            final hasAllergens = FragranceAllergens.inProduct(
+                              product.inci,
+                            ).isNotEmpty;
+                            return AppCard(
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                AppRoutes.analysis,
+                                arguments: product.id,
+                              ),
+                              color: hasAllergens
+                                  ? context.pal.amberSoft
+                                  : _analysis!.score >= 7.5
+                                  ? context.pal.greenSoft
+                                  : context.pal.redSoft,
+                              borderColor: Colors.transparent,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: hasAllergens
+                                        ? AppColors.warning
+                                        : _analysis!.scoreColor,
+                                    child: Text(
+                                      _analysis!.grade,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _analysis!.score >= 7.5
-                                          ? tr('Безопасный состав')
-                                          : tr('Состав требует внимания'),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: _analysis!.scoreColor,
-                                      ),
-                                    ),
-                                    Text(
-                                      trf(
-                                        '{v0}% натуральных и немедикаментозных компонентов.',
-                                        {'v0': product.naturalPercent},
-                                      ),
-                                      style: AppTextStyles.caption.copyWith(
-                                        color: pal.subtext,
-                                      ),
-                                    ),
-                                    if (_analysis!.blacklistHits.isNotEmpty)
-                                      Text(
-                                        trf('Из вашего чёрного списка: {v0}', {
-                                          'v0': _analysis!.blacklistHits
-                                              .map(tr)
-                                              .join(', '),
-                                        }),
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.sale,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // a list of EU allergens is never "safe"
+                                        Text(
+                                          _analysis!.score >= 7.5 &&
+                                                  !hasAllergens
+                                              ? tr('Безопасный состав')
+                                              : tr('Состав требует внимания'),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: hasAllergens
+                                                ? AppColors.warning
+                                                : _analysis!.scoreColor,
+                                          ),
                                         ),
-                                      ),
-                                  ],
-                                ),
+                                        Text(
+                                          trf(
+                                            '{v0}% натуральных и немедикаментозных компонентов.',
+                                            {'v0': product.naturalPercent},
+                                          ),
+                                          style: AppTextStyles.caption.copyWith(
+                                            color: pal.subtext,
+                                          ),
+                                        ),
+                                        if (_analysis!.blacklistHits.isNotEmpty)
+                                          Text(
+                                            trf(
+                                              'Из вашего чёрного списка: {v0}',
+                                              {
+                                                'v0': _analysis!.blacklistHits
+                                                    .map(tr)
+                                                    .join(', '),
+                                              },
+                                            ),
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.sale,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.chevron_right),
+                                ],
                               ),
-                              const Icon(Icons.chevron_right),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       if (product.inci.isNotEmpty) ...[
                         SectionTitle(tr('Полный состав (INCI)')),
@@ -552,6 +609,7 @@ class _ProductBodyState extends State<_ProductBody> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ..._activeChips(context, product),
+                              ..._allergenNote(context, product),
                               SelectableText(
                                 product.inci,
                                 style: AppTextStyles.small,

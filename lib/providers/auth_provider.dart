@@ -158,6 +158,7 @@ class AuthProvider extends ChangeNotifier {
     required String phone,
     required String city,
     int? avatarColor,
+    int? birthYear,
   }) async {
     if (_user == null) return tr('Вы не авторизованы');
     try {
@@ -172,6 +173,7 @@ class AuthProvider extends ChangeNotifier {
         phone: phone,
         city: city,
         avatarColor: avatarColor,
+        birthYear: birthYear,
       );
       await reload();
       return null;

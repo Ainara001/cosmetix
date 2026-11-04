@@ -66,12 +66,12 @@ void main() {
       for (final x in ActiveRules.check(i)) x.severity,
     ];
 
-    test('retinol with an acid: do not use together', () {
+    test('retinol with an acid: keep them apart (the table)', () {
       final r = ActiveRules.check([
         _item('Retinol', actives: {'retinoid'}),
         _item('Glycolic toner', actives: {'glycolic'}),
       ]);
-      expect(r.single.severity, IssueSeverity.avoid);
+      expect(r.single.severity, IssueSeverity.caution);
       expect(r.single.text, contains('Retinol'));
       expect(r.single.text, contains('Glycolic toner'));
       expect(r.single.text, contains('ретиноиды и кислоты'));
@@ -83,17 +83,27 @@ void main() {
         _item('Retinol', actives: {'retinoid'}),
       ]);
       expect(r.single.severity, IssueSeverity.caution);
-      expect(r.single.text, contains('витамин C утром, ретинол вечером'));
+      expect(r.single.text, contains('витамин C утром, ретиноид вечером'));
     });
 
-    test('retinoid + benzoyl peroxide: avoid; vitamin C + acid: caution', () {
+    test('benzoyl peroxide is not in the table: no invented conflict', () {
       expect(
         sev([
           _item('A', actives: {'retinoid'}),
           _item('B', actives: {'benzoyl'}),
         ]),
-        [IssueSeverity.avoid],
+        isEmpty,
       );
+      expect(
+        sev([
+          _item('A', actives: {'benzoyl'}),
+          _item('B', actives: {'vitamin_c'}),
+        ]),
+        isEmpty,
+      );
+    });
+
+    test('vitamin C and an acid: caution', () {
       expect(
         sev([
           _item('A', actives: {'vitamin_c'}),
@@ -145,7 +155,7 @@ void main() {
       final acid = _item('Acid', actives: {'glycolic'});
       final r = ActiveRules.check([both, acid]);
       expect(r.length, 1);
-      expect(r.single.severity, IssueSeverity.avoid);
+      expect(r.single.severity, IssueSeverity.caution);
       expect(
         ActiveRules.check([
           _item('X', actives: {'retinoid'}, id: 5),
@@ -265,10 +275,9 @@ void main() {
     final siCream = _item('Si cream', base: FormulaBase.silicone);
     final waterCream = _item('Water cream', base: FormulaBase.water);
 
-    test('silicone foundation over an oil-rich cream slides', () {
-      final r = MakeupCompatibility.check(oilCream, siliconeFd)!;
-      expect(r.severity, IssueSeverity.caution);
-      expect(r.text, contains('скользить'));
+    test('silicone foundation over an oil-rich cream: no source, no rule', () {
+      // guides only warn about WATER-based foundation over silicone or oil
+      expect(MakeupCompatibility.check(oilCream, siliconeFd), isNull);
     });
 
     test(
@@ -303,16 +312,16 @@ void main() {
     test('in a plan only what comes BEFORE the foundation counts', () {
       final under = MakeupCompatibility.checkAll([
         oilCream,
-        siliconeFd,
+        waterFd,
       ], ordered: true);
       final after = MakeupCompatibility.checkAll([
-        siliconeFd,
+        waterFd,
         oilCream,
       ], ordered: true);
       expect(under.length, 1);
       expect(after, isEmpty);
       // in a bag the order is unknown: it is flagged either way
-      expect(MakeupCompatibility.checkAll([siliconeFd, oilCream]).length, 1);
+      expect(MakeupCompatibility.checkAll([waterFd, oilCream]).length, 1);
     });
   });
 
@@ -323,7 +332,7 @@ void main() {
       final r = PatchTestAdvice.forItems(line, sensitive: true);
       expect(r.length, 1);
       expect(r.single.text, contains('Сразу 3 средств'));
-      expect(r.single.text, contains('3–4 дня'));
+      expect(r.single.text, contains('3 дня'));
     });
 
     test('not for a normal skin, a short list or makeup', () {
@@ -390,7 +399,8 @@ void main() {
       await care.addStep(CarePeriod.evening, retinol);
       await care.addStep(CarePeriod.evening, acid);
       final evening = care.planIssues(CarePeriod.evening, none);
-      expect(evening.single.severity, IssueSeverity.avoid);
+      expect(evening.single.severity, IssueSeverity.caution);
+      expect(evening.single.text, contains('разнести'));
       // the other period is a separate routine
       expect(care.planIssues(CarePeriod.morning, none), isEmpty);
       // vitamin C in the morning, retinol in the evening: exactly the advice
@@ -474,11 +484,20 @@ void main() {
     final cerave = RoutineItem.fromProduct(
       all.firstWhere((p) => p.name.contains('Moisturizing Cream')),
     );
+    // the cushion is a silicone base: an oil cream under it is not flagged
+    expect(MakeupCompatibility.checkAll([cushion, nivea]), isEmpty);
+    expect(MakeupCompatibility.checkAll([cushion, cerave]), isEmpty);
+    // a water-based foundation over the same oil cream is
+    final waterFd = RoutineItem(
+      title: 'Water FD',
+      base: FormulaBase.water,
+      isFoundation: true,
+      isSkincare: false,
+    );
     expect(
-      MakeupCompatibility.checkAll([cushion, nivea]).single.text,
+      MakeupCompatibility.checkAll([waterFd, nivea]).single.text,
       contains('Nivea'),
     );
-    expect(MakeupCompatibility.checkAll([cushion, cerave]), isEmpty);
     // not blocked by a missing profile type
     expect(SkinType.sensitive.code, 'sensitive');
   });
@@ -510,8 +529,8 @@ void main() {
         return r.isEmpty ? null : r.single.severity;
       }
 
-      expect(verdict('Retinol 0.5%', 'Glycolic'), IssueSeverity.avoid);
-      expect(verdict('Retinol 0.5%', 'BHA Blackhead'), IssueSeverity.avoid);
+      expect(verdict('Retinol 0.5%', 'Glycolic'), IssueSeverity.caution);
+      expect(verdict('Retinol 0.5%', 'BHA Blackhead'), IssueSeverity.caution);
       expect(verdict('Retinol 0.5%', 'Vitamin Drop'), IssueSeverity.caution);
       expect(verdict('Glycolic', 'Vitamin Drop'), IssueSeverity.caution);
       expect(verdict('Glycolic', 'BHA Blackhead'), IssueSeverity.caution);
@@ -665,8 +684,8 @@ void main() {
         t.view.physicalSize = const Size(1080, 7000);
         nav.pushNamed(AppRoutes.product, arguments: 10);
         await _settle(t);
-        expect(find.text('Сочетание с вашим уходом'), findsOneWidget);
-        expect(find.textContaining('на маслах под'), findsOneWidget);
+        // the oil cream under a silicone cushion is no longer flagged
+        expect(find.textContaining('на маслах под'), findsNothing);
         expect(find.text('С чем сочетать'), findsOneWidget);
       },
     );
@@ -699,20 +718,13 @@ void main() {
         scrollable: _productList(),
       );
       expect(find.textContaining('ретиноиды и кислоты'), findsOneWidget);
-      expect(
-        find.textContaining('содержит активные компоненты'),
-        findsOneWidget,
-      );
+      // a retinoid: the notice (sun, evening, doctor) with the patch test
+      expect(find.textContaining('содержит ретиноид'), findsOneWidget);
+      expect(find.textContaining('небольшой участок'), findsOneWidget);
     });
   });
 
   test('every text the checks can show is translated (EN and KK)', () {
-    final siFd = _item(
-      'F',
-      base: FormulaBase.silicone,
-      foundation: true,
-      skincare: false,
-    );
     final wFd = _item(
       'F',
       base: FormulaBase.water,
@@ -720,13 +732,10 @@ void main() {
       skincare: false,
     );
     final all = <RoutineIssue>[
+      // retinoid + acid, retinoid + vitamin C, vitamin C + acid, acid + acid
       ...ActiveRules.check([
         _item('A', actives: {'retinoid'}),
         _item('B', actives: {'glycolic'}),
-      ]),
-      ...ActiveRules.check([
-        _item('A', actives: {'retinoid'}),
-        _item('B', actives: {'benzoyl'}),
       ]),
       ...ActiveRules.check([
         _item('A', actives: {'retinoid'}),
@@ -737,18 +746,9 @@ void main() {
         _item('B', actives: {'glycolic'}),
       ]),
       ...ActiveRules.check([
-        _item('A', actives: {'benzoyl'}),
-        _item('B', actives: {'vitamin_c'}),
-      ]),
-      ...ActiveRules.check([
         _item('A', actives: {'glycolic'}),
         _item('B', actives: {'salicylic'}),
       ]),
-      ...ActiveRules.check([
-        _item('A', actives: {'retinoid'}),
-        _item('B', actives: {'retinoid'}),
-      ]),
-      ?MakeupCompatibility.check(_item('U', base: FormulaBase.oil), siFd),
       ?MakeupCompatibility.check(_item('U', base: FormulaBase.silicone), wFd),
       ?MakeupCompatibility.check(_item('U', base: FormulaBase.oil), wFd),
       ...PatchTestAdvice.forItems([
@@ -757,7 +757,7 @@ void main() {
         _item('C'),
       ], sensitive: true),
     ];
-    expect(all.length, 12); // every rule was reached
+    expect(all.length, 8); // every rule was reached
     final keys = {
       for (final i in all) i.template,
       for (final b in FormulaBase.values)

@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 12;
+  static const dbVersion = 13;
 
   final String? path;
   Database? _db;
@@ -139,6 +139,10 @@ class DatabaseHelper {
     // palettes are the hand-picked ones (writes the same map again)
     12: (db) async {
       await SeedData.applyShades(db);
+    },
+    // year of birth (optional): strong actives are limited for children
+    13: (db) async {
+      await _addColumn(db, 'users', 'birth_year', 'INTEGER');
     },
   };
 

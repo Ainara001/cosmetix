@@ -10,7 +10,9 @@ import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
+import 'package:cosmetix/services/age_safety.dart';
 import 'package:cosmetix/services/ingredient_analyzer.dart';
+import 'package:cosmetix/services/ingredient_catalog.dart';
 
 /// Everything needed to personalize the catalog for one user.
 class PersonalizationContext {
@@ -39,7 +41,7 @@ class PersonalizationContext {
 /// by the classifier are just more input, and the optional AI re-ranking
 /// (see AiRecommendationRefiner) can only reorder what this service returns.
 ///
-/// Pipeline: blacklist exclusion (hard) -> compatibility score -> sorting.
+/// Pipeline: blacklist and age exclusion (hard) -> compatibility score -> sorting.
 class RecommendationService {
   RecommendationService(
     this._products,
@@ -127,7 +129,9 @@ class RecommendationService {
   }) {
     final allowed = [
       for (final c in candidates)
-        if (!isBlacklisted(c, blacklist)) c,
+        if (!isBlacklisted(c, blacklist) &&
+            !AgeSafety.blocks(profile.age, IngredientCatalog.of(c.product)))
+          c,
     ];
     final clock = (now ?? DateTime.now()).millisecondsSinceEpoch;
     final result = [

@@ -1,0 +1,32 @@
+{
+ "about": "Layering of care under a foundation. Practical guidance from cosmetic guides, not clinical data.",
+ "rules": [
+  {
+   "under": "silicone",
+   "over": "water",
+   "advice": "Основа на воде может скатываться и ложиться пятнами на крем на силиконах: лучше крем на водной основе или основа на силиконах.",
+   "sources": [
+    "https://www.lorealparisusa.com/beauty-magazine/makeup/face-makeup/how-to-stop-makeup-pilling",
+    "https://www.huffingtonpost.in/entry/how-to-prevent-makeup-from-rolling-and-pilling-off-your-face_in_5cf4f2e2e4b0e8085e3ce1c0",
+    "https://mindbodygreen.com/articles/why-your-foundation-is-pilling-what-to-do-about-it"
+   ],
+   "evidence": "practical guidance"
+  },
+  {
+   "under": "oil",
+   "over": "water",
+   "advice": "Основа на воде ложится неровно на крем на маслах: дайте крему полностью впитаться.",
+   "sources": [
+    "https://mindbodygreen.com/articles/why-your-foundation-is-pilling-what-to-do-about-it"
+   ],
+   "evidence": "practical guidance, weaker sources"
+  }
+ ],
+ "removed": [
+  {
+   "under": "oil",
+   "over": "silicone",
+   "reason": "no source found; guides warn only about water-based foundation"
+  }
+ ]
+}
