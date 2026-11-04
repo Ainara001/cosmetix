@@ -59,3 +59,9 @@ GoogleService-Info.plist
 # AI proxy secrets
 server/.env
 server/node_modules/
+
+# Python eval stand (tools/)
+tools/.venv/
+tools/eval/data/
+tools/eval/models/
+tools/eval/out/
