@@ -1376,30 +1376,10 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Тёмный бордо': 'Dark burgundy',
   'Есть альтернативы подешевле рядом?':
       'Are there cheaper alternatives nearby?',
-  '«{a}» и «{b}»: ретиноиды и кислоты вместе сильно раздражают кожу, возможны жжение и шелушение. Используйте их в разные вечера.':
-      '“{a}” and “{b}”: retinoids and acids together irritate the skin badly, burning and peeling are possible. Use them on different evenings.',
-  '«{a}» и «{b}»: бензоилпероксид разрушает ретиноиды и сушит кожу. Разнесите их по времени суток.':
-      '“{a}” and “{b}”: benzoyl peroxide breaks down retinoids and dries the skin. Use them at different times of day.',
-  '«{a}» и «{b}»: ретинол и витамин C лучше разделить: витамин C утром, ретинол вечером.':
-      '“{a}” and “{b}”: it is better to separate retinol and vitamin C: vitamin C in the morning, retinol in the evening.',
-  '«{a}» и «{b}»: витамин C вместе с кислотами может жечь кожу. Используйте в разное время или в разные дни.':
-      '“{a}” and “{b}”: vitamin C together with acids can sting the skin. Use them at different times or on different days.',
-  '«{a}» и «{b}»: бензоилпероксид окисляет витамин C и снижает его действие. Используйте в разное время.':
-      '“{a}” and “{b}”: benzoyl peroxide oxidizes vitamin C and weakens it. Use them at different times.',
-  '«{a}» и «{b}»: две кислоты сразу могут пересушить кожу и ослабить её барьер. Начните с одной.':
-      '“{a}” and “{b}”: two acids at once can dry the skin and weaken its barrier. Start with one.',
-  '«{a}» и «{b}»: два средства с ретиноидами дают двойную дозу. Достаточно одного.':
-      '“{a}” and “{b}”: two products with retinoids make a double dose. One is enough.',
-  '«{u}» на маслах под «{f}» на силиконах: тон может скользить и плохо держаться. Подождите 10 минут и промокните лишнее салфеткой.':
-      '“{u}” is oil-based under “{f}” which is silicone-based: the foundation can slide and wear badly. Wait 10 minutes and blot the excess with a tissue.',
   '«{u}» на силиконах под «{f}» на воде: основа может скатываться и ложиться пятнами. Лучше крем на водной основе или основа на силиконах.':
       '“{u}” is silicone-based under “{f}” which is water-based: the foundation can ball up and go on patchy. Better a water-based cream or a silicone-based foundation.',
   '«{u}» на маслах под «{f}» на воде: тон ложится неровно, возможны полосы. Дайте крему полностью впитаться.':
       '“{u}” is oil-based under “{f}” which is water-based: the foundation goes on unevenly, streaks are possible. Let the cream absorb completely.',
-  'Сразу {n} средств для ухода при чувствительной коже: если одно не подойдёт, реакцию трудно связать с конкретным. Начните с базового крема, 3–4 дня пробуйте его на небольшом участке кожи (за ухом или на запястье), остальное добавляйте по одному.':
-      '{n} care products at once on sensitive skin: if one does not suit you, it is hard to tell which one caused the reaction. Start with a basic cream, test it for 3–4 days on a small area of skin (behind the ear or on the wrist) and add the rest one at a time.',
-  '«{a}» содержит активные компоненты: при чувствительной коже сначала нанесите на небольшой участок на 3–4 дня.':
-      '“{a}” contains active ingredients: on sensitive skin, first apply it to a small area for 3–4 days.',
   'на воде': 'water-based',
   'на силиконах': 'silicone-based',
   'на маслах': 'oil-based',
@@ -1467,4 +1447,52 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Nourishing cream with ceramides that restores the barrier and softens dry skin.',
   'Другие оттенки': 'Other shades',
   'Оттенок: {v0}': 'Shade: {v0}',
+  'Год рождения (необязательно)': 'Year of birth (optional)',
+  'Введите год рождения, например 2000':
+      'Enter a year of birth, for example 2000',
+  'Как кожа сейчас после умывания?':
+      'How does your skin feel after washing now?',
+  'Кожа меняется: проверьте, не стала ли она суше. Ответ обновит подбор и предупреждения.':
+      'Skin changes: check whether it has become drier. Your answer updates the picks and the warnings.',
+  'Тип кожи: {t}': 'Skin type: {t}',
+  '«{a}» и «{b}»: ретиноиды и кислоты лучше разнести по времени или дням: используйте их в разные дни или вечера.':
+      '“{a}” and “{b}”: retinoids and acids are better kept apart in time or on different days: use them on different days or evenings.',
+  '«{a}» и «{b}»: ретиноиды и витамин C (аскорбиновая кислота) лучше разнести: витамин C утром, ретиноид вечером.':
+      '“{a}” and “{b}”: retinoids and vitamin C (ascorbic acid) are better kept apart: vitamin C in the morning, the retinoid in the evening.',
+  '«{a}» и «{b}»: витамин C (аскорбиновая кислота) и кислоты лучше разнести по времени или дням: витамин C утром, кислоты вечером.':
+      '“{a}” and “{b}”: vitamin C (ascorbic acid) and acids are better kept apart in time or on different days: vitamin C in the morning, acids in the evening.',
+  '«{a}» и «{b}»: сочетайте с осторожностью: несколько кислот могут усилить сухость, жжение или раздражение. Не наслаивайте их сразу.':
+      '“{a}” and “{b}”: combine with care: several acids can increase dryness, stinging or irritation. Do not layer them right away.',
+  'Это средство с ретиноидом или бензоилпероксидом не подходит в вашем возрасте. Спросите врача.':
+      'This product with a retinoid or benzoyl peroxide is not suitable for your age. Ask a doctor.',
+  '«{a}» содержит ретиноид или бензоилпероксид: детям до {n} лет их не предлагают. Спросите врача.':
+      '“{a}” contains a retinoid or benzoyl peroxide: they are not offered to children under {n}. Ask a doctor.',
+  '«{a}» содержит кислоту: возрастных рекомендаций для детей до {n} лет мы не нашли, сначала спросите врача.':
+      '“{a}” contains an acid: we found no age guidance for children under {n}, ask a doctor first.',
+  '«{a}» содержит ретиноид: используйте вечером, а каждое утро наносите солнцезащитное средство SPF 30+. При беременности и её планировании ретиноиды не используют: спросите врача.':
+      '“{a}” contains a retinoid: use it in the evening and apply SPF 30+ sunscreen every morning. Retinoids are not used during pregnancy or when planning one: ask a doctor.',
+  '«{a}» содержит кислоту: каждое утро наносите солнцезащитное средство SPF 30+, не наслаивайте несколько кислот сразу.':
+      '“{a}” contains an acid: apply SPF 30+ sunscreen every morning and do not layer several acids at once.',
+  '«{a}» содержит бензоилпероксид: он может раздражать кожу. Перед первым использованием 3 дня проверьте его на небольшом участке кожи.':
+      '“{a}” contains benzoyl peroxide: it can irritate the skin. Test it on a small area of skin for 3 days before the first use.',
+  'Сразу {n} средств для ухода при чувствительной коже: если одно не подойдёт, реакцию трудно связать с конкретным. Начните с базового крема, 3 дня пробуйте его на небольшом участке кожи (за ухом или на запястье), остальное добавляйте по одному.':
+      '{n} care products at once on sensitive skin: if one does not suit you, it is hard to tell which one caused the reaction. Start with a basic cream, test it on a small area of skin (behind the ear or on the wrist) for 3 days, and add the rest one at a time.',
+  '«{a}» содержит активные компоненты: при чувствительной коже сначала на 3 дня нанесите на небольшой участок кожи.':
+      '“{a}” contains active ingredients: on sensitive skin, first apply it to a small area of skin for 3 days.',
+  '«{a}» содержит ретиноид: используйте вечером, а каждое утро наносите солнцезащитное средство SPF 30+. При беременности и её планировании ретиноиды не используют: спросите врача. Сначала на 3 дня нанесите на небольшой участок кожи.':
+      '“{a}” contains a retinoid: use it in the evening and apply SPF 30+ sunscreen every morning. Retinoids are not used during pregnancy or when planning one: ask a doctor. First apply it to a small area of skin for 3 days.',
+  '«{a}» содержит кислоту: каждое утро наносите солнцезащитное средство SPF 30+, не наслаивайте несколько кислот сразу. Сначала на 3 дня нанесите на небольшой участок кожи.':
+      '“{a}” contains an acid: apply SPF 30+ sunscreen every morning and do not layer several acids at once. First apply it to a small area of skin for 3 days.',
+  'LHA (каприлоил салициловая кислота)': 'LHA (capryloyl salicylic acid)',
+  'Производные витамина C': 'Vitamin C derivatives',
+  'Нужен для безопасности: детям до 12 лет не предлагают ретиноиды и бензоилпероксид.':
+      'Used for safety: children under 12 are not offered retinoids and benzoyl peroxide.',
+  'Скрыто по возрасту: {n}. Ретиноиды и бензоилпероксид детям до 12 лет не предлагают.':
+      'Hidden because of age: {n}. Retinoids and benzoyl peroxide are not offered to children under 12.',
+  'Без ароматических аллергенов (список ЕС)':
+      'Free of fragrance allergens (EU list)',
+  'Ароматические аллергены (список ЕС): {v0}':
+      'Fragrance allergens (EU list): {v0}',
+  'ЕС требует называть эти вещества в составе: они вызывали аллергию у людей. Если кожа склонна к реакциям, сначала проверьте средство на небольшом участке.':
+      'The EU requires these substances to be named in the ingredients: they have caused allergies in people. If your skin is prone to reactions, test the product on a small area first.',
 };

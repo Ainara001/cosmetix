@@ -8,6 +8,7 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/app_user.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/avatar_sheet.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
@@ -121,6 +122,10 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 14),
                       _BeautySummary(user: user),
+                      if (user.skinCheckDue()) ...[
+                        const SizedBox(height: 10),
+                        const _SkinCheckIn(),
+                      ],
                       const SizedBox(height: 14),
                       MenuTile(
                         icon: Icons.shopping_cart_outlined,
@@ -326,6 +331,71 @@ class _BeautySummary extends StatelessWidget {
             outlined: done,
             onPressed: () => Navigator.pushNamed(context, AppRoutes.colorTest),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Asks again how the skin feels a couple of hours after washing. The answer
+/// changes the skin type, so the recommendations and the warnings follow the
+/// season and the care.
+class _SkinCheckIn extends StatelessWidget {
+  const _SkinCheckIn();
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    return AppCard(
+      radius: 20,
+      color: pal.blushSoft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr('Как кожа сейчас после умывания?'),
+            style: AppTextStyles.bodyBold,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            tr(
+              'Кожа меняется: проверьте, не стала ли она суше. Ответ обновит подбор и предупреждения.',
+            ),
+            style: AppTextStyles.small.copyWith(color: pal.subtext),
+          ),
+          const SizedBox(height: 10),
+          for (final o in SkinTestQuestions.skinTypeOptions)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () async {
+                  await context.read<AuthProvider>().updateBeauty(
+                    skinType: o.$3,
+                    markCompleted: true,
+                  );
+                  if (!context.mounted) return;
+                  showMessage(
+                    context,
+                    trf('Тип кожи: {t}', {'t': tr(o.$3).toLowerCase()}),
+                    type: MessageType.success,
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: pal.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: pal.border),
+                  ),
+                  child: Text(tr(o.$2), style: AppTextStyles.body),
+                ),
+              ),
+            ),
         ],
       ),
     );

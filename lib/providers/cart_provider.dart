@@ -10,6 +10,10 @@ class CartProvider extends ChangeNotifier {
 
   final CartRepository _repo;
 
+  /// Why a product must not be sold to this user (their age), or null. Set
+  /// by the app, which knows the signed-in user.
+  String? Function(Product product)? guard;
+
   List<CartItem> items = [];
   List<Order> orders = [];
   bool loading = false;
@@ -87,6 +91,8 @@ class CartProvider extends ChangeNotifier {
     if (!product.inStock) {
       return tr('Товара нет в наличии, добавить его в корзину нельзя');
     }
+    final blocked = guard?.call(product);
+    if (blocked != null) return tr(blocked);
     try {
       await _repo.add(userId, product.id, storeId);
       items = await _repo.getItems(userId);

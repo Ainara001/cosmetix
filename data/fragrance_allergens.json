@@ -1,0 +1,920 @@
+{
+ "about": "Fragrance allergens and other substances that the EU requires to be named in the ingredient list (Annex III of Regulation (EC) 1223/2009).",
+ "source": "https://publications.europa.eu/resource/celex/02009R1223-20230816",
+ "amended_by": "https://eur-lex.europa.eu/eli/reg/2023/1545/oj",
+ "note": "Consolidated text, no legal effect. Thresholds: 0.001 % leave-on, 0.01 % rinse-off.",
+ "count": 81,
+ "entries": [
+  {
+   "ref": 45,
+   "inci": [
+    "Benzyl Alcohol"
+   ],
+   "cas": [
+    "100-51-6"
+   ],
+   "chemical": "Benzyl alcohol ( 38 )"
+  },
+  {
+   "ref": 46,
+   "inci": [
+    "6-Methyl Coumarin"
+   ],
+   "cas": [
+    "92-48-8"
+   ],
+   "chemical": "6-Methylcoumarin ( 38 )"
+  },
+  {
+   "ref": 67,
+   "inci": [
+    "Amyl cinnamal"
+   ],
+   "cas": [
+    "122-40-7"
+   ],
+   "chemical": "2-Benzylideneheptanal"
+  },
+  {
+   "ref": 69,
+   "inci": [
+    "Cinnamyl alcohol"
+   ],
+   "cas": [
+    "104-54-1"
+   ],
+   "chemical": "Cinnamyl alcohol"
+  },
+  {
+   "ref": 70,
+   "inci": [
+    "Citral",
+    "Geranial",
+    "Neral"
+   ],
+   "cas": [
+    "5392-40-5",
+    "141-27-5",
+    "106-26-3"
+   ],
+   "chemical": "3,7-Dimethyl-2,6-octadienal"
+  },
+  {
+   "ref": 71,
+   "inci": [
+    "Eugenol"
+   ],
+   "cas": [
+    "97-53-0"
+   ],
+   "chemical": "Phenol, 2-methoxy-4-(2-propenyl)"
+  },
+  {
+   "ref": 72,
+   "inci": [
+    "Hydroxycitronellal"
+   ],
+   "cas": [
+    "107-75-5"
+   ],
+   "chemical": "7-Hydroxycitronellal"
+  },
+  {
+   "ref": 73,
+   "inci": [
+    "Isoeugenol"
+   ],
+   "cas": [
+    "97-54-1"
+   ],
+   "chemical": "Phenol, 2-methoxy-4-(1-propenyl)"
+  },
+  {
+   "ref": 74,
+   "inci": [
+    "Amylcinnamyl alcohol"
+   ],
+   "cas": [
+    "101-85-9"
+   ],
+   "chemical": "2-Pentyl-3-phenylprop-2-en-1-ol"
+  },
+  {
+   "ref": 75,
+   "inci": [
+    "Benzyl salicylate"
+   ],
+   "cas": [
+    "118-58-1"
+   ],
+   "chemical": "Benzyl salicylate"
+  },
+  {
+   "ref": 76,
+   "inci": [
+    "Cinnamal"
+   ],
+   "cas": [
+    "104-55-2"
+   ],
+   "chemical": "2-Propenal, 3-phenyl-"
+  },
+  {
+   "ref": 77,
+   "inci": [
+    "Coumarin"
+   ],
+   "cas": [
+    "91-64-5"
+   ],
+   "chemical": "2H-1-Benzopyran-2-one"
+  },
+  {
+   "ref": 78,
+   "inci": [
+    "Geraniol"
+   ],
+   "cas": [
+    "106-24-1"
+   ],
+   "chemical": "2,6-Octadien-1-ol, 3,7-dimethyl-, (2E)-"
+  },
+  {
+   "ref": 80,
+   "inci": [
+    "Anise alcohol"
+   ],
+   "cas": [
+    "105-13-5"
+   ],
+   "chemical": "4-Methoxybenzyl alcohol"
+  },
+  {
+   "ref": 81,
+   "inci": [
+    "Benzyl cinnamate"
+   ],
+   "cas": [
+    "103-41-3"
+   ],
+   "chemical": "2-Propenoic acid, 3-phenyl-, phenylmethyl ester"
+  },
+  {
+   "ref": 82,
+   "inci": [
+    "Farnesol"
+   ],
+   "cas": [
+    "4602-84-0"
+   ],
+   "chemical": "2,6,10-Dodecatrien-1-ol, 3,7,11-trimethyl-"
+  },
+  {
+   "ref": 84,
+   "inci": [
+    "Linalool"
+   ],
+   "cas": [
+    "78-70-6"
+   ],
+   "chemical": "1,6-Octadien-3-ol, 3,7-dimethyl-"
+  },
+  {
+   "ref": 85,
+   "inci": [
+    "Benzyl benzoate"
+   ],
+   "cas": [
+    "120-51-4"
+   ],
+   "chemical": "Benzyl benzoate"
+  },
+  {
+   "ref": 86,
+   "inci": [
+    "Citronellol"
+   ],
+   "cas": [
+    "106-22-9",
+    "26489-01-0"
+   ],
+   "chemical": "Citronellol/ (±) 3,7-Dimethyl-6-octen-1-ol"
+  },
+  {
+   "ref": 87,
+   "inci": [
+    "Hexyl cinnamal"
+   ],
+   "cas": [
+    "101-86-0"
+   ],
+   "chemical": "2-Benzylideneoctanal"
+  },
+  {
+   "ref": 88,
+   "inci": [
+    "Limonene"
+   ],
+   "cas": [
+    "138-86-3",
+    "7705-14-8"
+   ],
+   "chemical": "1-methyl-4-prop-1-en-2-yl-cyclohexene; dl-limonene (racemic); Dipentene ( 37 )"
+  },
+  {
+   "ref": 89,
+   "inci": [
+    "Methyl 2-Octynoate"
+   ],
+   "cas": [
+    "111-12-6"
+   ],
+   "chemical": "Methyl Oct-2-ynoate; Methyl heptine carbonate"
+  },
+  {
+   "ref": 90,
+   "inci": [
+    "alpha-Isomethyl ionone"
+   ],
+   "cas": [
+    "127-51-5"
+   ],
+   "chemical": "3-Methyl-4-(2,6,6-trimethyl-2-cyclohexen-1-yl)-3-buten-2-one"
+  },
+  {
+   "ref": 91,
+   "inci": [
+    "Evernia prunastri extract"
+   ],
+   "cas": [
+    "90028-68-5"
+   ],
+   "chemical": "Oak moss extract"
+  },
+  {
+   "ref": 92,
+   "inci": [
+    "Evernia furfuracea extract"
+   ],
+   "cas": [
+    "90028-67-4"
+   ],
+   "chemical": "Treemoss extract"
+  },
+  {
+   "ref": 109,
+   "inci": [
+    "Pinus Mugo Leaf Oil",
+    "Pinus Mugo Twig Leaf Extract",
+    "Pinus Mugo Twig Oil"
+   ],
+   "cas": [
+    "90082-72-7"
+   ],
+   "chemical": "Pinus mugo leaf and twig oil and extract ( 38 )"
+  },
+  {
+   "ref": 114,
+   "inci": [
+    "Pinus Pumila Needle Extract",
+    "Pinus Pumila Twig Leaf Extract",
+    "Pinus Pumila Twig Leaf Oil"
+   ],
+   "cas": [
+    "97676-05-6"
+   ],
+   "chemical": "Pinus pumila leaf and twig oil and extract ( 38 )"
+  },
+  {
+   "ref": 122,
+   "inci": [
+    "Cedrus Atlantica Bark Extract",
+    "Cedrus Atlantica Bark Oil",
+    "Cedrus Atlantica Bark Water",
+    "Cedrus Atlantica Leaf Extract",
+    "Cedrus Atlantica Wood Extract",
+    "Cedrus Atlantica Wood Oil"
+   ],
+   "cas": [
+    "92201-55-3",
+    "8023-85-6"
+   ],
+   "chemical": "Cedrus atlantica oil and extract ( 38 )"
+  },
+  {
+   "ref": 124,
+   "inci": [
+    "Turpentine"
+   ],
+   "cas": [
+    "9005-90-7",
+    "8006-64-2",
+    "8052-14-0"
+   ],
+   "chemical": "Turpentine gum ( Pinus spp.); Turpentine oil and rectified oil; Turpentine, steam distilled ( Pinus spp.) ( 38 )"
+  },
+  {
+   "ref": 131,
+   "inci": [
+    "Alpha-Terpinene"
+   ],
+   "cas": [
+    "99-86-5"
+   ],
+   "chemical": "p-Mentha-1,3-diene ( 38 )"
+  },
+  {
+   "ref": 133,
+   "inci": [
+    "Terpinolene"
+   ],
+   "cas": [
+    "586-62-9"
+   ],
+   "chemical": "p-Mentha-1,4(8)-diene ( 38 )"
+  },
+  {
+   "ref": 154,
+   "inci": [
+    "Myroxylon Balsamum Pereirae Balsam Extract",
+    "Myroxylon Balsamum Pereirae Balsam Oil",
+    "Myroxylon Pereirae Oil",
+    "Myroxylon Pereirae Resin Extract",
+    "Myroxylon Pereirae Resin"
+   ],
+   "cas": [
+    "8007-00-9"
+   ],
+   "chemical": "Myroxylon balsamum var. pereirae ; extracts and distillates; Balsam Peru oil, absolute and anhydrol (Balsam Oil Peru) ( 38 )"
+  },
+  {
+   "ref": 157,
+   "inci": [
+    "Alpha-Damascone",
+    "cis-Rose ketone 1"
+   ],
+   "cas": [
+    "43052-87-5",
+    "23726-94-5"
+   ],
+   "chemical": "1-(2,6,6-trimethyl-2-cyclohexen-1-yl)-2-buten-1-one ( 38 )"
+  },
+  {
+   "ref": 175,
+   "inci": [
+    "3-Propylidenephthalide"
+   ],
+   "cas": [
+    "17369-59-4"
+   ],
+   "chemical": "3-Propylidene-1(3H)-isobenzofuranone; 3-Propylidenephthalide ( 38 )"
+  },
+  {
+   "ref": 196,
+   "inci": [
+    "Lippia citriodora absolute"
+   ],
+   "cas": [
+    "8024-12-2",
+    "85116-63-8"
+   ],
+   "chemical": "Verbena absolute ( 38 ) ( 39 )"
+  },
+  {
+   "ref": 324,
+   "inci": [
+    "Methyl Salicylate"
+   ],
+   "cas": [
+    "119-36-8"
+   ],
+   "chemical": "Methyl 2-hydroxybenzoate ( 38 )"
+  },
+  {
+   "ref": 327,
+   "inci": [
+    "Acetyl Cedrene"
+   ],
+   "cas": [
+    "32388-55-9"
+   ],
+   "chemical": "[3R-(3α,3aβ,7β,8aα)]-1-(2,3,4,7,8,8a-hexahydro-3,6,8,8-tetramethyl-1H-3a,7-methanoazulen-5-yl)ethan-1-one ( 40 )"
+  },
+  {
+   "ref": 328,
+   "inci": [
+    "Amyl Salicylate"
+   ],
+   "cas": [
+    "2050-08-0"
+   ],
+   "chemical": "Pentyl-2-hydroxy-benzoate ( 40 )"
+  },
+  {
+   "ref": 329,
+   "inci": [
+    "Anethole"
+   ],
+   "cas": [
+    "104-46-1",
+    "4180-23-8"
+   ],
+   "chemical": "1-Methoxy-4-(1E)-1-propen-1-yl-benzene (trans-Anethole) ( 40 )"
+  },
+  {
+   "ref": 330,
+   "inci": [
+    "Benzaldehyde"
+   ],
+   "cas": [
+    "100-52-7"
+   ],
+   "chemical": "Benzaldehyde ( 40 )"
+  },
+  {
+   "ref": 331,
+   "inci": [
+    "Camphor"
+   ],
+   "cas": [
+    "76-22-2",
+    "21368-68-3",
+    "464-49-3",
+    "464-48-2"
+   ],
+   "chemical": "Bornan-2-one; 1,7,7-Trimethylbi-cyclo[2.2.1]-2-heptanone ( 40 )"
+  },
+  {
+   "ref": 332,
+   "inci": [
+    "Beta-Caryophyllene"
+   ],
+   "cas": [
+    "87-44-5"
+   ],
+   "chemical": "(1R,4E,9S)-4,11,11-Trimethyl-8-methylenebicyclo[7.2.0]undec-4-ene ( 40 )"
+  },
+  {
+   "ref": 333,
+   "inci": [
+    "Carvone"
+   ],
+   "cas": [
+    "99-49-0",
+    "6485-40-1",
+    "2244-16-8"
+   ],
+   "chemical": "2-methyl-5-(prop-1-en-2-yl)cyclohex-2-en-1-one;(5R)-2-Methyl-5-prop-1-en-2-ylcyclohex-2-en-1-one;(5S)-2-Methyl-5-prop-1-en-2-ylcyclohex-2-en-1-one ( 40 )"
+  },
+  {
+   "ref": 334,
+   "inci": [
+    "Dimethyl Phenethyl Acetate"
+   ],
+   "cas": [
+    "151-05-3"
+   ],
+   "chemical": "2-Methyl-1-phenyl-2-propyl acetate; Dimethylbenzyl Carbinyl Acetate ( 40 )"
+  },
+  {
+   "ref": 335,
+   "inci": [
+    "Hexadecanolactone"
+   ],
+   "cas": [
+    "109-29-5"
+   ],
+   "chemical": "Oxacyclohepta-decan-2-one ( 40 )"
+  },
+  {
+   "ref": 336,
+   "inci": [
+    "Hexamethylindanopyran"
+   ],
+   "cas": [
+    "1222-05-5"
+   ],
+   "chemical": "1,3,4,6,7,8-Hexahydro-4,6,6,7,8,8-hexamethylcyclopenta-γ-2-benzopyran ( 40 )"
+  },
+  {
+   "ref": 337,
+   "inci": [
+    "Linalyl Acetate"
+   ],
+   "cas": [
+    "115-95-7"
+   ],
+   "chemical": "3,7-Dimethyl octa-1,6-diene-3-yl acetate ( 40 )"
+  },
+  {
+   "ref": 338,
+   "inci": [
+    "Menthol"
+   ],
+   "cas": [
+    "89-78-1",
+    "1490-04-6",
+    "2216-51-5",
+    "15356-60-2"
+   ],
+   "chemical": "Menthol; dl-menthol; l-menthol; d-menthol ( 40 )"
+  },
+  {
+   "ref": 339,
+   "inci": [
+    "Trimethylcyclopentenyl Methylisopentenol"
+   ],
+   "cas": [
+    "67801-20-1"
+   ],
+   "chemical": "3-Methyl-5-(2,2,3-Trimethyl-3-Cyclopentenyl)pent-4-en-2-ol ( 40 )"
+  },
+  {
+   "ref": 340,
+   "inci": [
+    "Salicylaldehyde"
+   ],
+   "cas": [
+    "90-02-8"
+   ],
+   "chemical": "o-Hydroxy-benzaldehyde ( 40 )"
+  },
+  {
+   "ref": 341,
+   "inci": [
+    "Santalol"
+   ],
+   "cas": [
+    "11031-45-1",
+    "115-71-9",
+    "77-42-9"
+   ],
+   "chemical": "5-(2,3-Dimethyl-tricyclo[2.2.1.02,6]-hept-3-yl)-2-methylpent-2-en-1-ol (alpha-Santalol); (1S-(1a,2a(Z),4a))-2-Methyl-5-(2-methyl-3-methylenebicyclo[2.2.1]hept-2-yl)-2-penten-1-ol (beta-Santalol) ( 40 )"
+  },
+  {
+   "ref": 342,
+   "inci": [
+    "Sclareol"
+   ],
+   "cas": [
+    "515-03-7"
+   ],
+   "chemical": "[1R-(1alpha)]-alpha-Ethenyldecahydro-2-hydroxy-a,2,5,5,8a-pentamethyl-1-naphthalenepropanol ( 40 )"
+  },
+  {
+   "ref": 343,
+   "inci": [
+    "Terpineol"
+   ],
+   "cas": [
+    "8000-41-7",
+    "98-55-5",
+    "138-87-4",
+    "586-81-2"
+   ],
+   "chemical": "2-(4-methylcyclohex-3-en-1-yl)propan-2-ol; p-Menth-1-en-8-ol (alpha-Terpineol); 1-methyl-4-(1-methylvinyl)cyclohexan-1-ol (beta-Terpineol); 1-methyl-4-(1-methylethylidene)cyclohexan-1-ol (gamma-Terpineol) ( 40 )"
+  },
+  {
+   "ref": 344,
+   "inci": [
+    "Tetramethyl acetyloctahydronaphthalenes"
+   ],
+   "cas": [
+    "54464-57-2",
+    "54464-59-4",
+    "68155-66-8",
+    "68155-67-9"
+   ],
+   "chemical": "1-(1,2,3,4,5,6,7,8-octahydro-2,3,8,8-tetramethyl-2-naphthyl)ethan-1-one; 1-(1,2,3,4,5,6,7,8-octahydro-2,3,5,5-tetramethyl-2-naphthyl)ethan-1-one; 1-(1,2,3,5,6,7,8,8a-octahydro-2,3,8,8-tetramethyl-2-naphthyl)ethan-1-one; 1-(1,2,3,4,6,7,8,8a-octahydro-2,3,8,8-tetramethyl-2-naphthyl)ethan-1-one ( 40 )"
+  },
+  {
+   "ref": 345,
+   "inci": [
+    "Trimethylbenzenepropanol"
+   ],
+   "cas": [
+    "103694-68-4"
+   ],
+   "chemical": "3-(2,2-Dimethyl-3-hydroxypropyl)toluene ( 40 )"
+  },
+  {
+   "ref": 346,
+   "inci": [
+    "Vanillin"
+   ],
+   "cas": [
+    "121-33-5"
+   ],
+   "chemical": "4-Hydroxy-3-methoxybenz-aldehyde ( 40 )"
+  },
+  {
+   "ref": 347,
+   "inci": [
+    "Cananga Odorata Flower Extract",
+    "Cananga Odorata Flower Oil"
+   ],
+   "cas": [
+    "83863-30-3",
+    "8006-81-3",
+    "68606-83-7",
+    "93686-30-7"
+   ],
+   "chemical": "Cananga odorata flower oil and extract; Ylang Ylang flower oil and extract ( 40 )"
+  },
+  {
+   "ref": 348,
+   "inci": [
+    "Cinnamomum Cassia Leaf Oil"
+   ],
+   "cas": [
+    "8007-80-5",
+    "84961-46-6"
+   ],
+   "chemical": "Cinnamomum cassia leaf Oil ( 40 )"
+  },
+  {
+   "ref": 349,
+   "inci": [
+    "Cinnamomum Zeylanicum Bark Oil"
+   ],
+   "cas": [
+    "8015-91-6",
+    "84649-98-9"
+   ],
+   "chemical": "Cinnamomum zeylanicum bark oil ( 40 )"
+  },
+  {
+   "ref": 350,
+   "inci": [
+    "Citrus Aurantium Amara Flower Oil"
+   ],
+   "cas": [
+    "72968-50-4"
+   ],
+   "chemical": "Citrus aurantium amara and dulcis flower oil ( 40 )"
+  },
+  {
+   "ref": 351,
+   "inci": [
+    "Citrus Aurantium Amara Peel Oil"
+   ],
+   "cas": [
+    "68916-04-1",
+    "72968-50-4"
+   ],
+   "chemical": "Citrus aurantium amara and dulcis peel oil ( 40 )"
+  },
+  {
+   "ref": 352,
+   "inci": [
+    "Citrus Aurantium Bergamia Peel Oil"
+   ],
+   "cas": [
+    "8007-75-8",
+    "89957-91-5",
+    "68648-33-9",
+    "8007-75-8",
+    "85049-52-1"
+   ],
+   "chemical": "Citrus aurantium bergamia oil (Bergamot oil) ( 40 )"
+  },
+  {
+   "ref": 353,
+   "inci": [
+    "Citrus Limon Peel Oil"
+   ],
+   "cas": [
+    "84929-31-7",
+    "8008-56-8"
+   ],
+   "chemical": "Citrus limon oil ( 40 )"
+  },
+  {
+   "ref": 354,
+   "inci": [
+    "Cymbopogon Schoenanthus Oil"
+   ],
+   "cas": [
+    "8007-02-1",
+    "89998-16-3"
+   ],
+   "chemical": "Cymbopogon citratus / schoenanthus/flexuosus oils ( 40 )"
+  },
+  {
+   "ref": 355,
+   "inci": [
+    "Eucalyptus Globulus Leaf Oil"
+   ],
+   "cas": [
+    "97926-40-4",
+    "8000-48-4"
+   ],
+   "chemical": "Eucalyptus globulus oil ( 40 )"
+  },
+  {
+   "ref": 356,
+   "inci": [
+    "Eugenia Caryophyllus Leaf Oil"
+   ],
+   "cas": [
+    "8000-34-8",
+    "8015-97-2",
+    "84961-50-2"
+   ],
+   "chemical": "Eugenia caryophyllus oil ( 40 )"
+  },
+  {
+   "ref": 357,
+   "inci": [
+    "Jasminum Grandiflorum Flower Extract",
+    "Jasminum Officinale Oil",
+    "Jasminum Officinale Flower Extract"
+   ],
+   "cas": [
+    "84776-64-7",
+    "90045-94-6",
+    "8022-96-6",
+    "8024-43-9",
+    "90045-94-6"
+   ],
+   "chemical": "Jasminum grandiflorum / officinale oil and extract ( 40 )"
+  },
+  {
+   "ref": 358,
+   "inci": [
+    "Juniperus Virginiana Oil",
+    "Juniperus Virginiana Wood Oil"
+   ],
+   "cas": [
+    "8000-27-9",
+    "85085-41-2"
+   ],
+   "chemical": "Juniperus virginiana oil ( 40 )"
+  },
+  {
+   "ref": 359,
+   "inci": [
+    "Laurus Nobilis Leaf Oil"
+   ],
+   "cas": [
+    "8002-41-3",
+    "8007-48-5",
+    "84603-73-6"
+   ],
+   "chemical": "Laurus nobilis oil ( 40 ) ( 42 )"
+  },
+  {
+   "ref": 360,
+   "inci": [
+    "Lavandula Hybrida Oil",
+    "Lavandula Hybrida Extract",
+    "Lavandula Hybrida Flower Extract",
+    "Lavandula Intermedia Flower/Leaf/Stem Extract; Lavandula Intermedia Flower/Leaf/Stem Oil; Lavandula Intermedia Oil",
+    "Lavandula Angustifolia Oil; Lavandula Angustifolia Flower/Leaf/Stem Extract"
+   ],
+   "cas": [
+    "91722-69-9",
+    "8022-15-9",
+    "93455-96-0",
+    "93455-97-1",
+    "92623-76-2",
+    "84776-65-8",
+    "8000-28-0",
+    "90063-37-9",
+    "84776-65-8",
+    "8000-28-0",
+    "90063-37-9"
+   ],
+   "chemical": "Lavandula hybrida oil/extract;"
+  },
+  {
+   "ref": 361,
+   "inci": [
+    "Mentha Piperita Oil"
+   ],
+   "cas": [
+    "8006-90-4",
+    "84082-70-2"
+   ],
+   "chemical": "Mentha piperita oil ( 40 )"
+  },
+  {
+   "ref": 362,
+   "inci": [
+    "Mentha Viridis Leaf Oil"
+   ],
+   "cas": [
+    "8008-79-5",
+    "84696-51-5"
+   ],
+   "chemical": "Mentha spicata oil (spearmint oil) ( 40 )"
+  },
+  {
+   "ref": 363,
+   "inci": [
+    "Narcissus Poeticus Extract"
+   ],
+   "cas": [
+    "90064-26-9",
+    "68917-12-4"
+   ],
+   "chemical": "Narcissus poeticus/pseudonarcissus/jonquilla/tazetta extract ( 40 )"
+  },
+  {
+   "ref": 364,
+   "inci": [
+    "Pelargonium Graveolens Flower Oil"
+   ],
+   "cas": [
+    "90082-51-2",
+    "8000-46-2"
+   ],
+   "chemical": "Pelargonium graveolens oil ( 40 )"
+  },
+  {
+   "ref": 365,
+   "inci": [
+    "Pogostemon Cablin Oil"
+   ],
+   "cas": [
+    "8014-09-3",
+    "84238-39-1"
+   ],
+   "chemical": "Pogostemon cablin oil ( 40 )"
+  },
+  {
+   "ref": 366,
+   "inci": [
+    "Rosa Damascena Flower Oil",
+    "Rosa Damascena Flower Extract",
+    "Rosa Alba Flower Oil; Rosa Alba Flower Extract",
+    "Rosa Canina Flower Oil",
+    "Rosa Centifolia Flower Oil; Rosa Centifolia Flower Extract",
+    "Rosa Gallica Flower Oil"
+   ],
+   "cas": [
+    "8007-01-0",
+    "90106-38-0",
+    "93334-48-6",
+    "84696-47-9",
+    "84604-12-6",
+    "84604-13-7"
+   ],
+   "chemical": "Rosa damascena flower oil/extract;"
+  },
+  {
+   "ref": 367,
+   "inci": [
+    "Santalum Album Oil"
+   ],
+   "cas": [
+    "8006-87-9",
+    "84787-70-2"
+   ],
+   "chemical": "Santalum album oil ( 40 )"
+  },
+  {
+   "ref": 368,
+   "inci": [
+    "Eugenyl Acetate"
+   ],
+   "cas": [
+    "93-28-7"
+   ],
+   "chemical": "Phenol, 2-methoxy-4-(2-propenyl)-, acetate ( 40 )"
+  },
+  {
+   "ref": 369,
+   "inci": [
+    "Geranyl Acetate"
+   ],
+   "cas": [
+    "105-87-3"
+   ],
+   "chemical": "2,6-Octadien-1-ol, 3,7-dimethyl-,1-acetate, (2E)- ( 40 )"
+  },
+  {
+   "ref": 370,
+   "inci": [
+    "Isoeugenyl Acetate"
+   ],
+   "cas": [
+    "93-29-8"
+   ],
+   "chemical": "2-Methoxy-4-prop-1-enylphenyl acetate ( 40 )"
+  },
+  {
+   "ref": 371,
+   "inci": [
+    "Pinene"
+   ],
+   "cas": [
+    "80-56-8",
+    "7785-70-8",
+    "127-91-3",
+    "18172-67-3"
+   ],
+   "chemical": "2,6,6-Trimethylbi-cyclo[3.1.1]hept-2-ene (alpha-Pinene); 6,6-Dimethyl- 2-methylenebicyclo[3.1.1]heptane (beta-Pinene) ( 40 ) ( 41 )"
+  }
+ ]
+}

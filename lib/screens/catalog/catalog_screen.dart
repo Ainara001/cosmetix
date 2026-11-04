@@ -12,6 +12,7 @@ import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
 import 'package:cosmetix/routes/route_args.dart';
@@ -181,9 +182,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
         ? _sort
         : (catalog.hasProfile ? ProductSort.forYou : ProductSort.newest);
     var items = ProductFilter.apply(catalog.products, _filter, sort);
+    var hiddenByAge = 0;
     final matches = <int, int>{};
     if (sort == ProductSort.forYou) {
       // search/filters first, then blacklist exclusion and personal ranking
+      hiddenByAge = catalog.hiddenByAge(items);
       final ranked = catalog.recommend(items);
       items = [for (final r in ranked) r.product];
       for (final r in ranked) {
@@ -330,6 +333,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ],
             ),
           ),
+          if (hiddenByAge > 0)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                trf(
+                  'Скрыто по возрасту: {n}. Ретиноиды и бензоилпероксид детям до 12 лет не предлагают.',
+                  {'n': hiddenByAge},
+                ),
+                style: AppTextStyles.small.copyWith(color: pal.subtext),
+              ),
+            ),
           Expanded(child: _body(catalog, items, matches)),
         ],
       ),

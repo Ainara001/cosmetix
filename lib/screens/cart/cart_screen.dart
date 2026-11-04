@@ -7,6 +7,7 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/cart_models.dart';
 import 'package:cosmetix/models/product_filter.dart';
+import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
@@ -16,6 +17,7 @@ import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/services/age_safety.dart';
 import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/widgets/product_card.dart';
 import 'package:cosmetix/widgets/routine_issues_card.dart';
@@ -107,6 +109,7 @@ class _CartScreenState extends State<CartScreen> {
     CartProvider cart,
     CatalogProvider catalog,
     CareProvider care,
+    int? age,
   ) {
     final inCart = [
       for (final i in cart.items) RoutineItem.fromProduct(i.product),
@@ -126,6 +129,7 @@ class _CartScreenState extends State<CartScreen> {
         if (b.productId == null || !cartIds.contains(b.productId)) b,
     ];
     return [
+      for (final i in inCart) ...AgeSafety.issues(age, i),
       for (final x in [
         ...ActiveRules.check(all),
         ...MakeupCompatibility.checkAll(all),
@@ -230,6 +234,7 @@ class _CartScreenState extends State<CartScreen> {
                   cart,
                   context.watch<CatalogProvider>(),
                   context.watch<CareProvider>(),
+                  context.watch<AuthProvider>().user?.age,
                 );
                 if (issues.isEmpty) return const SizedBox.shrink();
                 // the cart grid needs room: a long list scrolls in its box

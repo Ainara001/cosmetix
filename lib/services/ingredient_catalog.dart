@@ -1,4 +1,5 @@
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/services/fragrance_allergens.dart';
 
 /// What a group stands for in the composition filter.
 enum IngredientKind {
@@ -59,7 +60,8 @@ class IngredientCatalog {
       'salicylic',
       'Салициловая кислота (BHA)',
       IngredientKind.acid,
-      _re('salicylic acid|betaine salicylate'),
+      // LHA (capryloyl salicylic acid) is its own group
+      _re('^(?!.*capryloyl).*(salicylic acid|betaine salicylate)'),
       const ['салицил', 'salicyl', 'bha'],
     ),
     IngredientGroup(
@@ -75,6 +77,13 @@ class IngredientCatalog {
       IngredientKind.acid,
       _re(r'^lactic acid'),
       const ['молочн', 'lactic', 'aha'],
+    ),
+    IngredientGroup(
+      'lha',
+      'LHA (каприлоил салициловая кислота)',
+      IngredientKind.acid,
+      _re('capryloyl salicylic'),
+      const ['lha', 'каприлоил', 'capryloyl'],
     ),
     IngredientGroup(
       'azelaic',
@@ -94,8 +103,18 @@ class IngredientCatalog {
       'vitamin_c',
       'Витамин C (аскорбиновая кислота)',
       IngredientKind.acid,
-      _re('ascorb'),
-      const ['витамин c', 'витамин с', 'аскорб', 'ascorb', 'vitamin c'],
+      // L-ascorbic acid itself; its derivatives are a group of their own
+      _re(
+        '^(?!.*(ascorbyl|ethyl ascorbic|ascorbate|glucoside)).*ascorbic acid',
+      ),
+      const ['витамин c', 'витамин с', 'аскорб', 'ascorbic', 'vitamin c'],
+    ),
+    IngredientGroup(
+      'vitamin_c_derivative',
+      'Производные витамина C',
+      IngredientKind.active,
+      _re('ascorbyl|ethyl ascorbic|ascorbate|ascorbic acid 2-glucoside'),
+      const ['производные витамина', 'ascorbyl', 'ascorbate'],
     ),
     IngredientGroup(
       'tranexamic',
@@ -245,6 +264,13 @@ class IngredientCatalog {
       const ['отдушк', 'парфюм', 'fragrance', 'parfum'],
     ),
     IngredientGroup(
+      'fragrance_allergen',
+      'Без ароматических аллергенов (список ЕС)',
+      IngredientKind.avoid,
+      FragranceAllergens.pattern,
+      const ['аллерген', 'allergen'],
+    ),
+    IngredientGroup(
       'alcohol',
       'Без спирта',
       IngredientKind.avoid,
@@ -296,7 +322,11 @@ class IngredientCatalog {
     if (cached != null) return cached;
     final tokens = [
       for (final t in inci.toLowerCase().split(RegExp(r'\s*,\s*')))
-        if (t.trim().isNotEmpty) t.trim(),
+        if (t.trim().isNotEmpty) ...[
+          t.trim(),
+          // "Citrus Limon (Lemon) Peel Oil" is also "citrus limon peel oil"
+          if (t.contains('(')) FragranceAllergens.normalize(t),
+        ],
     ];
     final found = <String>{
       for (final g in groups)

@@ -155,6 +155,7 @@ class UserRepository {
     required String phone,
     required String city,
     int? avatarColor,
+    int? birthYear,
   }) async {
     final db = await _helper.database;
     await db.update(
@@ -166,6 +167,7 @@ class UserRepository {
         'email': email.trim().toLowerCase(),
         'phone': phone.trim(),
         'city': city.trim(),
+        'birth_year': birthYear,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: 'id = ?',

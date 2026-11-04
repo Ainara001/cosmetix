@@ -1,0 +1,136 @@
+{
+ "about": "Compatibility of active ingredients: a transcription of the table \"Сочетаемость активных ингредиентов\" supplied by the project owner (author and date are not printed on it). Every pair not listed is \"ok\" (can be combined).",
+ "statuses": {
+  "ok": "можно сочетать",
+  "care": "сочетать с осторожностью (несколько кислот могут усилить сухость, жжение или раздражение, не наслаивать сразу)",
+  "sep": "лучше разнести по времени или дням (витамин C утром, ретиноиды и кислоты вечером или в разные дни)"
+ },
+ "ingredients": {
+  "hyaluronic": "Гиалуроновая кислота",
+  "niacinamide": "Ниацинамид",
+  "retinoid": "Ретиноиды",
+  "bakuchiol": "Бакучиол",
+  "glycolic": "Гликолевая кислота",
+  "lactic": "Молочная кислота",
+  "salicylic": "BHA (салициловая кислота)",
+  "lha": "LHA (каприлоил-салициловая кислота)",
+  "pha": "PHA (глюконолактон, лактобионовая кислота)",
+  "peptide": "Пептиды",
+  "vitamin_c": "Витамин C (L-аскорбиновая кислота)",
+  "vitamin_c_derivative": "Производные витамина C",
+  "probiotic": "Бифидобактерии, пробиотические компоненты"
+ },
+ "pairs": [
+  {
+   "a": "retinoid",
+   "b": "glycolic",
+   "status": "sep"
+  },
+  {
+   "a": "retinoid",
+   "b": "lactic",
+   "status": "sep"
+  },
+  {
+   "a": "retinoid",
+   "b": "salicylic",
+   "status": "sep"
+  },
+  {
+   "a": "retinoid",
+   "b": "lha",
+   "status": "sep"
+  },
+  {
+   "a": "retinoid",
+   "b": "pha",
+   "status": "sep"
+  },
+  {
+   "a": "retinoid",
+   "b": "vitamin_c",
+   "status": "sep"
+  },
+  {
+   "a": "glycolic",
+   "b": "lactic",
+   "status": "care"
+  },
+  {
+   "a": "glycolic",
+   "b": "salicylic",
+   "status": "care"
+  },
+  {
+   "a": "glycolic",
+   "b": "lha",
+   "status": "care"
+  },
+  {
+   "a": "glycolic",
+   "b": "pha",
+   "status": "care"
+  },
+  {
+   "a": "glycolic",
+   "b": "vitamin_c",
+   "status": "sep"
+  },
+  {
+   "a": "lactic",
+   "b": "salicylic",
+   "status": "care"
+  },
+  {
+   "a": "lactic",
+   "b": "lha",
+   "status": "care"
+  },
+  {
+   "a": "lactic",
+   "b": "pha",
+   "status": "care"
+  },
+  {
+   "a": "lactic",
+   "b": "vitamin_c",
+   "status": "sep"
+  },
+  {
+   "a": "salicylic",
+   "b": "lha",
+   "status": "care"
+  },
+  {
+   "a": "salicylic",
+   "b": "pha",
+   "status": "care"
+  },
+  {
+   "a": "salicylic",
+   "b": "vitamin_c",
+   "status": "sep"
+  },
+  {
+   "a": "lha",
+   "b": "pha",
+   "status": "care"
+  },
+  {
+   "a": "lha",
+   "b": "vitamin_c",
+   "status": "sep"
+  },
+  {
+   "a": "pha",
+   "b": "vitamin_c",
+   "status": "sep"
+  }
+ ],
+ "notes": [
+  "Если активы уже объединены в одну формулу производителем, конфликт не показывается.",
+  "При использовании кислот и ретиноидов каждое утро наносить солнцезащитное средство широкого спектра SPF 30+.",
+  "Таблица ориентир, а не список химически несовместимых ингредиентов; учитывать концентрацию, частоту применения и состояние барьера кожи.",
+  "Миндальная кислота в таблице отсутствует: приложение относит её к AHA и применяет те же правила (это распространение правила таблицы)."
+ ]
+}

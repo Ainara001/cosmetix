@@ -26,6 +26,7 @@ import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/location_provider.dart';
+import 'package:cosmetix/services/age_safety.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
@@ -181,7 +182,9 @@ class _CosmetixAppState extends State<CosmetixApp> {
               value: _catalogProvider,
             ),
             ChangeNotifierProvider(
-              create: (_) => CartProvider(CartRepository(widget.helper)),
+              create: (_) =>
+                  CartProvider(CartRepository(widget.helper))
+                    ..guard = (p) => AgeSafety.blockReason(_auth.user?.age, p),
             ),
             ChangeNotifierProvider<CareProvider>.value(value: _care),
             ChangeNotifierProvider<SafetyProvider>.value(
