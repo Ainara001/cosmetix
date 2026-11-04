@@ -15,6 +15,10 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:cosmetix/database/database_helper.dart';
 
 void main() {
+  // A file in tool/ has no flutter_test_config.dart, so the test binding is not
+  // set up for it. Since the catalog is read from assets (rootBundle), seeding
+  // fails with "Binding has not yet been initialized" without this line.
+  TestWidgetsFlutterBinding.ensureInitialized();
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 

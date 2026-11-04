@@ -122,8 +122,9 @@ The seed file `seed/catalog.json` is generated, not written by hand:
 flutter test tool/export_server_seed.dart          # from the repository root
 ```
 
-Export again, and read the diff, whenever the app's catalog changes (for example
-when the catalog moves to JSON files or gets a manufacturer country). The seed is
+After the app's catalog changes, run `flutter test tool/export_server_seed.dart`,
+read the diff and commit `server/seed/catalog.json` (for example when the catalog
+moves to JSON files or gets a manufacturer country). The seed is
 loaded only into an empty database, so an existing server keeps its data: new
 catalog fields reach it through a new migration, not through the seed.
 
