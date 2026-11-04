@@ -2,6 +2,9 @@
 
 const http = require('node:http');
 
+const { HttpError } = require('./http-error');
+const { createApi } = require('./routes');
+
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 const MOCK_PREFIX =
@@ -64,15 +67,6 @@ function readConfig(env) {
     retryDelayMs: msEnv(env, 'UPSTREAM_RETRY_MS', 800),
     forceMock: env.MOCK === '1',
   };
-}
-
-class HttpError extends Error {
-  constructor(status, code, message, extra = {}) {
-    super(message);
-    this.status = status;
-    this.code = code;
-    this.extra = extra;
-  }
 }
 
 function sniffImageType(b64) {
@@ -208,8 +202,15 @@ function toGeminiBody(req, config) {
   return body;
 }
 
-function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now() } = {}) {
+function createApp({
+  env = process.env,
+  fetchImpl = fetch,
+  now = () => Date.now(),
+  // a pg Pool; without it only /health and /v1/chat work
+  db = null,
+} = {}) {
   const config = readConfig(env);
+  const api = createApi({ db, env, now });
   const mock = config.forceMock || config.apiKey === '';
 
   /** ip -> request timestamps within the last minute */
@@ -258,12 +259,12 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
     }
   }
 
-  async function readBody(req) {
+  async function readBody(req, maxBytes = LIMITS.bodyBytes) {
     const chunks = [];
     let size = 0;
     for await (const chunk of req) {
       size += chunk.length;
-      if (size > LIMITS.bodyBytes) {
+      if (size > maxBytes) {
         throw new HttpError(413, 'too_long', 'The request body is too large');
       }
       chunks.push(chunk);
@@ -444,6 +445,22 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
       });
       res.end(body);
     };
+    const sendReply = (reply, extra = {}) => {
+      if (reply.body === null) {
+        res.writeHead(reply.status, { 'cache-control': 'no-store', ...extra, ...reply.headers });
+        return res.end();
+      }
+      if (reply.raw) {
+        res.writeHead(reply.status, {
+          'content-length': Buffer.byteLength(reply.body),
+          'cache-control': 'no-store',
+          ...extra,
+          ...reply.headers,
+        });
+        return res.end(reply.body);
+      }
+      return send(reply.status, reply.body, { ...extra, ...reply.headers });
+    };
     try {
       const url = new URL(req.url, 'http://localhost');
       if (req.method === 'GET' && url.pathname === '/health') {
@@ -467,6 +484,15 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
         budget.used += result.usage.inputTokens + result.usage.outputTokens;
         return send(200, { text: result.text, mock, usage: result.usage });
       }
+      if (api.isApiPath(url.pathname)) {
+        // the app API needs the shared app token when one is configured; the
+        // admin panel has its own sign-in instead
+        if (url.pathname.startsWith('/v1/')) authorize(req);
+        // a 64 KB cap is plenty for catalog, profile and event requests
+        const reply = await api.handle(req, url, () => readBody(req, 64 * 1024));
+        const extra = api.isAdminPath(url.pathname) ? api.adminHeaders : {};
+        return sendReply(reply, extra);
+      }
       throw new HttpError(404, 'not_found', 'Not found');
     } catch (e) {
       if (e instanceof HttpError) {
@@ -474,12 +500,12 @@ function createApp({ env = process.env, fetchImpl = fetch, now = () => Date.now(
         return send(e.status, { error: e.code, message: e.message, ...e.extra }, headers);
       }
       // unexpected: no details to the client, nothing sensitive in the log
-      console.error('unexpected error:', e && e.name);
+      console.error('unexpected error:', e && e.name, e && e.code);
       return send(500, { error: 'internal', message: 'Internal error' });
     }
   });
 
-  return { server, config, mock, budget };
+  return { server, config, mock, budget, api };
 }
 
 module.exports = {

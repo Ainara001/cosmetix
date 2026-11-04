@@ -1,4 +1,11 @@
-# Cosmetix AI proxy
+# Cosmetix server
+
+One Node process with three parts: the **AI proxy** (`/v1/chat`), the **catalog
+and profile API** on PostgreSQL (`/v1/...`) and a small **admin panel**
+(`/admin`). The database part is optional: without `DATABASE_URL` only the AI
+proxy runs. See [PostgreSQL, catalog API and admin panel](#postgresql-catalog-api-and-admin-panel).
+
+## AI proxy
 
 Minimal backend for the AI consultant. The mobile app never talks to an AI
 provider directly and never contains an API key: it calls this proxy, the proxy
@@ -62,10 +69,105 @@ behind HTTPS when it is reachable from the internet. In the app set the address
 in **Кабинет → Настройки → ИИ-ассистент** or build with
 `--dart-define=AI_BASE_URL=https://your-host`.
 
+## PostgreSQL, catalog API and admin panel
+
+Needs PostgreSQL 13+ (`gen_random_uuid()` is built in) and `npm install` once
+(the only dependency is `pg`).
+
+```bash
+cd server
+npm install
+createdb cosmetix                                  # or any empty database
+echo 'DATABASE_URL=postgres://user:password@localhost:5432/cosmetix' >> .env
+npm run migrate                                    # creates the tables (migrations/*.sql)
+npm run seed                                       # loads the app catalog, only into an empty catalog
+npm run create-admin -- yourname                   # asks for a password (12+ characters)
+npm start                                          # then open http://localhost:8787/admin
+```
+
+`npm start` also applies new migrations by itself (`AUTO_MIGRATE=0` turns that
+off). `.env` is git-ignored; keys and passwords never go into the repository.
+Without `ADMIN_PASSWORD` in the environment, `create-admin` asks for the
+password in the terminal without echoing it; running it again for the same name
+changes the password and signs that admin out everywhere.
+
+### What is in the database
+
+| Table | Content |
+| --- | --- |
+| `products`, `brands`, `categories` | the catalog; `products.inci` is the full ingredient list, `products.source_url` the page it came from, `products.country` the manufacturer's country (**empty until somebody fills it in**) |
+| `ingredients`, `product_ingredients` | the ingredients the app explains (risk, allergens) and which product contains them |
+| `product_traits` | what a product suits: skin type, colour type, undertone, concern, tag |
+| `stores`, `prices` | shops (position and where it comes from) and the price / stock of a product in each shop |
+| `app_users` | anonymous devices: random id, token **hash**, **year** of birth, skin profile. No e-mail, password, name or exact date of birth |
+| `reactions` | reaction diary entries (severity 1–5) synced from the app |
+| `activity_events` | activity events; type `app_open` is a sign-in to the app |
+| `admins`, `admin_sessions`, `admin_audit` | admin accounts (scrypt hashes), sessions (token hash), and a log of every product change with old and new values |
+
+**Demo data is marked.** The catalog is exported from the app's built-in seed
+(`lib/database/seed_data.dart`, SQLite schema version 12 on `main` at the time of
+export). Its prices (`products.price`, every row of `prices`) are placeholder
+values from the app, not real shop prices: they carry `source = 'demo'`
+(`price_source` on the product), the API returns it as `priceSource`, and the
+admin panel shows a «демо» tag. A price edited in the panel becomes
+`price_source = 'admin'`. Shop positions come from OpenStreetMap or, for one
+chain, from public job ads and are marked as unverified in `stores.source`.
+
+The seed file `seed/catalog.json` is generated, not written by hand:
+
+```bash
+flutter test tool/export_server_seed.dart          # from the repository root
+```
+
+### API for the app
+
+Every `/v1/...` route needs the `x-app-token` header when `APP_TOKEN` is set.
+Errors are JSON `{ error, message }` as for `/v1/chat`.
+
+| Route | Meaning |
+| --- | --- |
+| `GET /v1/catalog/products` | list; query `category`, `brand` (exact names), `q` (name or brand contains), `updatedSince` (ISO time, for sync), `limit` (≤ 200, default 100), `offset` → `{ items, total, limit, offset }` |
+| `GET /v1/catalog/products/:id` | one product with `ingredients`, `traits` and `prices` per shop |
+| `GET /v1/catalog/categories`, `/brands`, `/stores`, `/ingredients` | reference lists |
+| `POST /v1/devices` | the device registers itself → `{ userId, token }` (keep the token, it is shown once; 20 per hour per address) |
+| `GET /v1/profile`, `PUT /v1/profile`, `DELETE /v1/profile` | `Authorization: Bearer <token>`. `PUT` is partial: `{ birthYear, skinType, skinTone, undertone, colorType, skinConcerns[], city }`, absent = unchanged, `null` = clear. `DELETE` removes the user with all their data |
+| `GET /v1/reactions`, `PUT /v1/reactions/:clientId`, `DELETE /v1/reactions/:clientId` | reaction diary; `clientId` is the id in the app's own database, so repeating a `PUT` never duplicates: `{ productId?, title, severity 1–5, date "YYYY-MM-DD", notes? }` |
+| `POST /v1/events` | `{ events: [{ type, props?, clientTime? }] }`, up to 50 per request; `type` is `snake_case` (send `app_open` when the app starts); `props` ≤ 2 000 bytes, no personal data please |
+
+The server keeps only the **year** of birth. It does not compute an age: the
+app (or the safety rules) do that from `birthYear`.
+
+### Admin panel
+
+`/admin` (Russian UI): overview counters; **Товары** (search, filter, edit name,
+category, country, price, INCI list); **Входы** (`app_open` events);
+**События** (all events, filter by type); **Устройства** (anonymous devices with
+counts, no profile data); **Правки** (who changed what).
+
+* The admin signs in with a name and password of its own (separate from the app,
+  which has no passwords). Sessions last 12 hours, the cookie is `HttpOnly`,
+  `SameSite=Strict` (and `Secure` with `ADMIN_COOKIE_SECURE=1`); every change
+  also needs a custom header, so another website cannot send one.
+* 10 wrong passwords from one address lock the sign-in for 15 minutes.
+* The page loads nothing from other sites (CSP `default-src 'none'`) and writes
+  server text only with `textContent`.
+* The panel is meant for a trusted network or behind HTTPS; it is not hardened
+  for the open internet beyond the points above.
+
 ## Tests
 
 ```bash
-cd server && node --test
+cd server && npm test
 ```
 
-They use a fake Anthropic API, so they cost nothing and need no key.
+The 21 tests of the AI proxy use a fake AI API and need nothing else. The
+database and admin tests need a PostgreSQL database they may write to:
+
+```bash
+TEST_DATABASE_URL=postgres://user@localhost:5432/cosmetix_test npm test
+```
+
+Each test file creates its own schema (`t_<random>`) in that database and drops
+it at the end, so nothing else there is touched. **Without `TEST_DATABASE_URL`
+those tests are skipped** (the run says so: "skipped"), so a green run without
+it does not cover the database part.

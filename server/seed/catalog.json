@@ -1,0 +1,7533 @@
+{
+ "meta": {
+  "generatedBy": "tool/export_server_seed.dart",
+  "sqliteSchemaVersion": 12,
+  "note": "Prices and stock in products.price and product_prices come from the app demo data (source = \"demo\"); they are not real shop prices."
+ },
+ "stores": [
+  {
+   "id": 1,
+   "name": "Диона",
+   "distance_m": 4697,
+   "address": "пр. Сарыарка, 15",
+   "rating": 0.0,
+   "lat": 51.16801,
+   "lng": 71.4079,
+   "chain": "Диона",
+   "hours": "Ежедневно 10:00–22:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 2,
+   "name": "Золотое Яблоко",
+   "distance_m": 4615,
+   "address": "пр. Кабанбай батыра, 62",
+   "rating": 0.0,
+   "lat": 51.08961,
+   "lng": 71.40607,
+   "chain": "Золотое Яблоко",
+   "hours": "Ежедневно 10:00–22:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 3,
+   "name": "MonAmie",
+   "distance_m": 4200,
+   "address": "ул. Кенесары, 42",
+   "rating": 0.0,
+   "lat": 51.16586,
+   "lng": 71.435,
+   "chain": "MonAmie",
+   "hours": "Ежедневно 10:00–21:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 4,
+   "name": "Диона",
+   "distance_m": 6873,
+   "address": "ул. Ильяса Есенберлина, 24",
+   "rating": 0.0,
+   "lat": 51.18907,
+   "lng": 71.41327,
+   "chain": "Диона",
+   "hours": "",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 5,
+   "name": "Диона",
+   "distance_m": 3136,
+   "address": "ул. Жумабека Ташенова, 23",
+   "rating": 0.0,
+   "lat": 51.15374,
+   "lng": 71.44946,
+   "chain": "Диона",
+   "hours": "",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 6,
+   "name": "Диона",
+   "distance_m": 3789,
+   "address": "пр. Республики, 15",
+   "rating": 0.0,
+   "lat": 51.16224,
+   "lng": 71.42778,
+   "chain": "Диона",
+   "hours": "Ежедневно 09:00–22:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 7,
+   "name": "Диона",
+   "distance_m": 4246,
+   "address": "ул. Жирентаева",
+   "rating": 0.0,
+   "lat": 51.15544,
+   "lng": 71.47306,
+   "chain": "Диона",
+   "hours": "",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 8,
+   "name": "Диона",
+   "distance_m": 4436,
+   "address": "ул. Кенесары, 64",
+   "rating": 0.0,
+   "lat": 51.16496,
+   "lng": 71.45509,
+   "chain": "Диона",
+   "hours": "Ежедневно 10:00–22:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 9,
+   "name": "MonAmie",
+   "distance_m": 3492,
+   "address": "пр. Республики, 8",
+   "rating": 0.0,
+   "lat": 51.1596,
+   "lng": 71.42949,
+   "chain": "MonAmie",
+   "hours": "Ежедневно 10:00–21:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 10,
+   "name": "The Face Shop",
+   "distance_m": 1256,
+   "address": "пр. Кабанбай батыра, 21",
+   "rating": 0.0,
+   "lat": 51.12819,
+   "lng": 71.4124,
+   "chain": "The Face Shop",
+   "hours": "Ежедневно 10:00–22:00",
+   "source": "OpenStreetMap"
+  },
+  {
+   "id": 11,
+   "name": "Подружка",
+   "distance_m": 6898,
+   "address": "пр. Нургисы Тлендиева, 12а (ТЦ Коктал)",
+   "rating": 0.0,
+   "lat": 51.1812,
+   "lng": 71.379,
+   "chain": "Подружка",
+   "hours": "",
+   "source": "Адрес из открытых объявлений сети (не проверен)"
+  },
+  {
+   "id": 12,
+   "name": "Подружка",
+   "distance_m": 2665,
+   "address": "ул. Сыганак, 17Б",
+   "rating": 0.0,
+   "lat": 51.1306,
+   "lng": 71.3924,
+   "chain": "Подружка",
+   "hours": "",
+   "source": "Адрес из открытых объявлений сети (не проверен)"
+  },
+  {
+   "id": 13,
+   "name": "Подружка",
+   "distance_m": 3990,
+   "address": "пр. Кабанбай батыра, 58Б",
+   "rating": 0.0,
+   "lat": 51.0957,
+   "lng": 71.40616,
+   "chain": "Подружка",
+   "hours": "",
+   "source": "Адрес из открытых объявлений сети (не проверен)"
+  }
+ ],
+ "ingredients": [
+  {
+   "id": 1,
+   "name": "Вода / Aqua",
+   "description": "Основной растворитель, абсолютно безопасен.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 2,
+   "name": "Глицерин / Glycerin",
+   "description": "Увлажняющий компонент, удерживает влагу.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 3,
+   "name": "Токоферол / Tocopherol",
+   "description": "Витамин Е. Антиоксидант, защищает кожу.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 4,
+   "name": "Салициловая кислота / Salicylic Acid",
+   "description": "BHA-кислота. Очищает поры. Возможна сухость.",
+   "risk": 1,
+   "is_allergen": 1,
+   "group_key": null
+  },
+  {
+   "id": 5,
+   "name": "Парабены / Parabens",
+   "description": "Консервант. Потенциальный аллерген.",
+   "risk": 2,
+   "is_allergen": 1,
+   "group_key": "paraben"
+  },
+  {
+   "id": 6,
+   "name": "Лаурилсульфат натрия / SLS",
+   "description": "Пенообразователь, сушит кожу.",
+   "risk": 2,
+   "is_allergen": 0,
+   "group_key": "sulfate"
+  },
+  {
+   "id": 7,
+   "name": "Диметикон / Dimethicone",
+   "description": "Силикон, создаёт плёнку на коже.",
+   "risk": 1,
+   "is_allergen": 0,
+   "group_key": "silicone"
+  },
+  {
+   "id": 8,
+   "name": "Минеральное масло / Mineral Oil",
+   "description": "Продукт нефтепереработки.",
+   "risk": 1,
+   "is_allergen": 0,
+   "group_key": "mineral_oil"
+  },
+  {
+   "id": 9,
+   "name": "Формальдегид / Formaldehyde",
+   "description": "Канцерогенный консервант.",
+   "risk": 2,
+   "is_allergen": 0,
+   "group_key": "formaldehyde"
+  },
+  {
+   "id": 10,
+   "name": "Фталаты / Phthalates",
+   "description": "Токсичные фиксаторы запаха.",
+   "risk": 2,
+   "is_allergen": 0,
+   "group_key": "phthalates"
+  },
+  {
+   "id": 11,
+   "name": "Триклозан / Triclosan",
+   "description": "Антибактериальное вещество.",
+   "risk": 2,
+   "is_allergen": 0,
+   "group_key": "triclosan"
+  },
+  {
+   "id": 12,
+   "name": "Ниацинамид / Niacinamide",
+   "description": "Выравнивает тон и сужает поры.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 13,
+   "name": "Гиалуроновая кислота / Hyaluronic Acid",
+   "description": "Глубоко увлажняет кожу.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 14,
+   "name": "Парфюмерная композиция / Parfum",
+   "description": "Ароматизатор. Может вызвать раздражение.",
+   "risk": 1,
+   "is_allergen": 1,
+   "group_key": null
+  },
+  {
+   "id": 15,
+   "name": "Тальк / Talc",
+   "description": "Матирующий наполнитель.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 16,
+   "name": "Слюда / Mica",
+   "description": "Придаёт сияние и пигмент.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 17,
+   "name": "Оксид цинка / Zinc Oxide",
+   "description": "Минеральный УФ-фильтр.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 18,
+   "name": "Пчелиный воск / Beeswax",
+   "description": "Натуральный воск, смягчает губы.",
+   "risk": 0,
+   "is_allergen": 0,
+   "group_key": null
+  },
+  {
+   "id": 19,
+   "name": "Спирт денат. / Alcohol Denat.",
+   "description": "Сушит кожу, повышает проницаемость.",
+   "risk": 1,
+   "is_allergen": 0,
+   "group_key": null
+  }
+ ],
+ "products": [
+  {
+   "id": 1,
+   "brand": "3CE",
+   "name": "Super Slim Waterproof Mascara",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 2500,
+   "old_price": 5000,
+   "in_stock": 1,
+   "art": "tube|assets/products/1.jpg",
+   "color": 4294227650,
+   "description": "Тонкая водостойкая тушь для аккуратного прокрашивания каждой ресницы.",
+   "natural_percent": 94,
+   "featured": 1,
+   "trending": 1,
+   "inci": "Isododecane, Trimethylsiloxysilicate, Microcrystalline Wax, Polyethylene, Disteardimonium Hectorite, Dextrin Palmitate/Ethylhexanoate, Iron Oxide Black (Ci 77499), Silica, Hydrogenated Polyisobutene, Silica Silylate, Vp/Eicosene Copolymer, Polypropylsilsesquioxane, Ethylene/Propylene Copolymer, Propylene Carbonate, Glyceryl Caprylate, Sorbitan Isostearate, Polymethylsilsesquioxane, Triethoxycaprylylsilane",
+   "source_url": "https://incidecoder.com/products/3ce-super-slim-waterproof-mascara",
+   "shade": null,
+   "age_ms": 0
+  },
+  {
+   "id": 2,
+   "brand": "Rom&nd",
+   "name": "Better Than Palette 05 Shade & Shadow Garden",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 4800,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/2.jpg",
+   "color": 4294363603,
+   "description": "Палетка из десяти матовых и сияющих оттенков для повседневного макияжа глаз.",
+   "natural_percent": 86,
+   "featured": 0,
+   "trending": 1,
+   "inci": "Talc, Mica (Ci 77019), Nylon-12, Boron Nitride, Neopentyl Glycol Diethylhexanoate, Phenyl Trimethicone, Dimethicone, Methylpropanediol, Titanium Dioxide (Ci 77891), Magnesium Myristate, Diisostearyl Malate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Isostearyl Neopentanoate, Octyldodecyl Stearoyl Stearate, Iron Oxides (Ci 77492), Iron Oxides (Ci 77491), Propanediol, Polybutene, Magnesium Stearate, Iron Oxides (Ci 77499), Hydrogenated Lecithin, Lauroyl Lysine, Triethoxycaprylylsilane, Yellow 5 Lake (Ci 19140), Methicone, Ultramarines (Ci 77007), Red 30 (Ci 73360), Water",
+   "source_url": "https://incidecoder.com/products/rom-nd-better-than-palette-05-shade-shadow-garden",
+   "shade": 4291600774,
+   "age_ms": 86400000
+  },
+  {
+   "id": 3,
+   "brand": "Peripera",
+   "name": "Heart Jam Glow Lip",
+   "category": "Макияж",
+   "zone": "Губы",
+   "price": 3500,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "tube|assets/products/3.jpg",
+   "color": 4292897404,
+   "description": "Сияющая помада-бальзам для губ с лёгким цветом и блеском.",
+   "natural_percent": 90,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Diisostearyl Malate, Bis-Behenyl/Isostearyl/Phytosteryl Dimer Dilinoleyl Dimer Dilinoleate, Polyglyceryl-2 Triisostearate, Paraffin, Tridecyl Trimellitate, Bis-Diglyceryl Polyacyladipate-2, Pentaerythrityl Tetraisostearate, Microcrystalline Wax, Sorbitan Isostearate, 1,2-Hexanediol, Synthetic Beeswax, Disteardimonium Hectorite, Titanium Dioxide, Phloxine B, Ethylene/Propylene Copolymer, Propylene Carbonate, Sunset Yellow Fcf, Tartrazine, Lithol Rubine Bca, Brilliant Blue Fcf, Fragrance, Persea Gratissima (Avocado) Oil, Butyrospermum Parkii (Shea) Butter, Prunus Armeniaca (Apricot) Kernel Oil",
+   "source_url": "https://incidecoder.com/products/peripera-heart-jam-glow-lip",
+   "shade": 4291972702,
+   "age_ms": 172800000
+  },
+  {
+   "id": 4,
+   "brand": "Rom&nd",
+   "name": "Better Than Eyes",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/4.jpg",
+   "color": 4289759866,
+   "description": "Компактная палетка из четырёх оттенков теней: матовые и мерцающие.",
+   "natural_percent": 82,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Caprylic/Capric Triglyceride, Silica, Iron Oxides (Ci 77492), Iron Oxides (Ci 77491), Iron Oxides (Ci 77499), Magnesium Myristate, Nylon-12, Methylpropanediol, Dimethiconol Stearate, Dimethicone, Propanediol, Lauroyl Lysine, Triethoxycaprylylsilane, Methicone, Water, Titanium Dioxide (Ci 77891), Yellow 5 Lake (Ci 19140), Mica (Ci 77019), Octyldodecyl Stearoyl Stearate, Phenyl Trimethicone, Octyldodecanol, Diisostearyl Malate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Hydrogenated Lecithin, Calcium Titanium Borosilicate, Synthetic Fluorphlogopite, Methyl Methacrylate Crosspolymer, Vinyl Dimethicone/Methicone Silsesquioxane Crosspolymer, Calcium Aluminum Borosilicate, Neopentyl Glycol Diethylhexanoate, Hexyl Laurate, Dimethicone/Vinyl Dimethicone Crosspolymer, Diglyceryl Sebacate/Isopalmitate, Polypropylene, Sorbitan Sesquiisostearate, Aluminum Distearate, PTFE, Synthetic Wax, Tin Oxide (Ci 77861), Phenoxyethanol, Macadamia Ternifolia (Macadamia) Seed Oil, Carmine (Ci 75470)",
+   "source_url": "https://incidecoder.com/products/romand-better-than-eyes",
+   "shade": 4291267208,
+   "age_ms": 259200000
+  },
+  {
+   "id": 5,
+   "brand": "COSRX",
+   "name": "Advanced Snail 96 Mucin Power Essence",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 6900,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/5.jpg",
+   "color": 4290762962,
+   "description": "Лёгкая эссенция с 96% муцина улитки для увлажнения и восстановления кожи.",
+   "natural_percent": 96,
+   "featured": 1,
+   "trending": 0,
+   "inci": "Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Polyacrylate, Phenoxyethanol, Sodium Hyaluronate, Allantoin, Ethyl Hexanediol, Carbomer, Panthenol, Arginine",
+   "source_url": "https://incidecoder.com/products/cosrx-advanced-snail-96-mucin-power-essence-3",
+   "shade": null,
+   "age_ms": 345600000
+  },
+  {
+   "id": 6,
+   "brand": "Maison Margiela",
+   "name": "Replica Lazy Sunday Morning",
+   "category": "Парфюмерия",
+   "zone": "",
+   "price": 9800,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "perfume|assets/products/6.jpg",
+   "color": 4292458710,
+   "description": "Мягкий пудровый аромат: груша, ирис, роза и белый мускус.",
+   "natural_percent": 70,
+   "featured": 1,
+   "trending": 0,
+   "inci": "Alcohol, Fragrance, Water, Benzyl Salicylate, Benzyl Alcohol, Butyl Methoxydibenzoylmethane, Ethylhexyl Methoxycinnamate, Linalool, Citronellol, Geraniol, Cinnamyl Alcohol, Hydroxycitronellal, Farnesol, Limonene, CI 60730, CI 19140",
+   "source_url": "https://www.costco.com/maison-margiela-replica-lazy-sunday-morning-eau-de-toilette-34-fl-oz.product.100984918.html",
+   "shade": null,
+   "age_ms": 432000000
+  },
+  {
+   "id": 7,
+   "brand": "Peripera",
+   "name": "Ink The Velvet 31 Wine Nude",
+   "category": "Макияж",
+   "zone": "Губы",
+   "price": 3200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "tube|assets/products/7.jpg",
+   "color": 4292440191,
+   "description": "Бархатный тинт для губ с матовым финишем и стойким цветом.",
+   "natural_percent": 91,
+   "featured": 1,
+   "trending": 0,
+   "inci": "Dimethicone, Dimethicone/Vinyl Dimethicone Crosspolymer, Water, Polyglyceryl-2 Triisostearate, Cetyl PEG/PPG-10/1 Dimethicone, Isododecane, Butylene Glycol, Ci 77891, Vinyl Dimethicone/Methicone Silsesquioxane Crosspolymer, Dimethicone Crosspolymer, Ci 77492, Ci 77499, Diisostearyl Malate, Ci 77491, 1,2-Hexanediol, VP/Hexadecene Copolymer, PEG-60 Hydrogenated Castor Oil, Ci 15850, Disteardimonium Hectorite, Phenoxyethanol, Fragrance, Propylene Carbonate, Aluminum Hydroxide, Ci 19140, Ci 17200, Ci 42090",
+   "source_url": "https://incidecoder.com/products/peripera-ink-the-velvet-31-wine-nude",
+   "shade": 4285873732,
+   "age_ms": 518400000
+  },
+  {
+   "id": 8,
+   "brand": "Peripera",
+   "name": "Ink Mood Glowy Tint 30 Happy Berry",
+   "category": "Макияж",
+   "zone": "Губы",
+   "price": 1500,
+   "old_price": 4000,
+   "in_stock": 1,
+   "art": "tube|assets/products/8.jpg",
+   "color": 4293232789,
+   "description": "Глянцевый тинт для губ с эффектом сочных увлажнённых губ.",
+   "natural_percent": 84,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Diphenyl Dimethicone, Diisostearyl Malate, Bis-Diglyceryl Polyacyladipate-2, Hydrogenated Polyisobutene, Bis-Behenyl/Isostearyl/Phytosteryl Dimer Dilinoleyl Dimer Dilinoleate, Diglycerin, Dipropylene Glycol, Cetyl PEG/PPG-10/1 Dimethicone, Hydrogenated Polydecene, Polysorbate 60, Sorbitan Isostearate, Diisostearoyl Polyglyceryl-3 Dimer Dilinoleate, Pentylene Glycol, Hydroxyethyl Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Phenoxyethanol, Fragrance, Yellow 6 (Ci 15985), Ethylhexylglycerin, Red 33 (Ci 17200), Yellow 5 (Ci 19140), Red 28 (Ci 45410), Aluminum Hydroxide, Ammonium Polyacrylate, Butylene Glycol, Blue 1 (Ci 42090), Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate, Hamamelis Virginiana (Witch Hazel) Leaf Extract, Lilium Tigrinum Extract",
+   "source_url": "https://incidecoder.com/products/peripera-ink-mood-glowy-tint-30-happy-berry",
+   "shade": 4294216851,
+   "age_ms": 604800000
+  },
+  {
+   "id": 9,
+   "brand": "Rom&nd",
+   "name": "Glasting Color Gloss",
+   "category": "Макияж",
+   "zone": "Губы",
+   "price": 3200,
+   "old_price": 5500,
+   "in_stock": 1,
+   "art": "tube|assets/products/9.jpg",
+   "color": 4293895344,
+   "description": "Блеск для губ с цветом и зеркальным эффектом.",
+   "natural_percent": 85,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Hydrogenated Polyisobutene, Bis-Behenyl/Isostearyl/Phytosteryl Dimer Dilinoleyl Dimer Dilinoleate, Diisostearyl Malate, Simmondsia Chinensis (Jojoba) Seed Oil, Silica Dimethyl Silylate, Synthetic Wax, Sorbitan Isostearate, 1,2-Hexanediol, Titanium Dioxide (Ci 77891), Phenoxyethanol, Yellow 5 Lake (Ci 19140), Red 7 Lake (Ci 15850), Fragrance, Blue 1 Lake (Ci 42090)",
+   "source_url": "https://incidecoder.com/products/rom-nd-glasting-color-gloss-2",
+   "shade": 4289692808,
+   "age_ms": 691200000
+  },
+  {
+   "id": 10,
+   "brand": "Missha",
+   "name": "Magic Cushion Moist Up",
+   "category": "Макияж",
+   "zone": "Лицо",
+   "price": 4800,
+   "old_price": 6000,
+   "in_stock": 1,
+   "art": "compact|assets/products/10.jpg",
+   "color": 4294035893,
+   "description": "Увлажняющий кушон с SPF и лёгким покрытием.",
+   "natural_percent": 80,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water(Aqua), Disteardimonium Hectorite, Pentylene Glycol, Magnesium Sulfate, Cetearyl Dimethicone/Vinyl Dimethicone Crosspolymer, PEG-10 Dimethicone, Acrylates/Polytrimethylsiloxymethacrylate Copolymer, Camellia Sinensis Leaf Water, Salvia Officinalis (Sage) Leaf Water, Ethylhexyl Palmitate, Cyclopentasiloxane, Butylene Glycol Dicaprylate/Dicaprate, Ethylhexyl Salicylate, Fragrance(Parfum), Vinyl Dimethicone/Methicone Silsesquioxane Crosspolymer, Synthetic Fluorphlogopite, Octanediol, Ethylhexylglycerin, Ethylhexyl Methoxycinnamate, Methyl Trimethicone, Alumina, Triethoxycaprylylsilane, Diphenylsiloxy Phenyl Trimethicone, Trisiloxane, Isopropyl Myristate, Ethyl Hexanediol, Lecithin, Acrylates/Stearyl Acrylate/Dimethicone Methacrylate Copolymer, Aluminum Hydroxide, Isododecane, Polypropylsilsesquioxane, Isostearic Acid, Glycerin, Polyhydroxystearic Acid, Polyglyceryl-3 Polyricinoleate, Phenoxyethanol, Niacinamide, Dimethicone, Adenosine, Ci 77492, Ci 77491, Ci 77891, Stearic Acid, Ci 77499, Lauryl PEG-10 Tris(Trimethylsiloxy)silylethyl Dimethicone, Butylene Glycol, 1,2-Hexanediol, Disodium EDTA, Nelumbo Nucifera Root Water",
+   "source_url": "https://incidecoder.com/products/missha-magic-cushion-moist-up",
+   "shade": 4293116326,
+   "age_ms": 777600000
+  },
+  {
+   "id": 11,
+   "brand": "Beauty of Joseon",
+   "name": "Relief Sun: Rice + Probiotics SPF50+",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 7200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "cream|assets/products/11.jpg",
+   "color": 4294173609,
+   "description": "Лёгкий солнцезащитный крем SPF50+ с рисовым экстрактом и пробиотиками.",
+   "natural_percent": 88,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Oryza Sativa (Rice) Extract (30%), Dibutyl Adipate, Propanediol, Diethylamino Hydroxybenzoyl Hexyl Benzoate, Polymethylsilsesquioxane, Ethylhexyl Triazone, Niacinamide, Methylene Bis-Benzotriazolyl Tetramethylbutylphenol, Coco-Caprylate/Caprate, Caprylyl Methicone, Diethylhexyl Butamido Triazone, Glycerin, Butylene Glycol, Oryza Sativa (Rice) Germ Extract, Camellia Sinensis Leaf Extract, Lactobacillus/Pumpkin Ferment Extract, Bacillus/Soybean Ferment Extract, Saccharum Officinarum (Sugarcane) Extract, Macrocystis Pyrifera (Kelp) Extract, Cocos Nucifera (Coconut) Fruit Extract, Panax Ginseng Root Extract, Monascus/Rice Ferment, Pentylene Glycol, Behenyl Alcohol, Poly C10-30 Alkyl Acrylate, Polyglyceryl-3 Methylglucose Distearate, Decyl Glucoside, Tromethamine, Carbomer, Acrylates/C10-30 Alkyl Acrylate Crosspolymer, 1,2-Hexanediol, Sodium Stearoyl Glutamate, Polyacrylate Crosspolymer-6, Ethylhexylglycerin, Adenosine, Xanthan Gum, Tocopherol, Lactobacillus/Rice Ferment, Aspergillus Ferment, Saccharomyces/Rice Ferment Filtrate",
+   "source_url": "https://incidecoder.com/products/beauty-of-joseon-rice-probiotics-sunscreen",
+   "shade": null,
+   "age_ms": 864000000
+  },
+  {
+   "id": 12,
+   "brand": "The Ordinary",
+   "name": "Niacinamide 10% + Zinc 1%",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 5600,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/12.jpg",
+   "color": 4291417834,
+   "description": "Сыворотка с 10% ниацинамида и 1% цинка для кожи с несовершенствами и расширенными порами.",
+   "natural_percent": 92,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Aqua (Water), Niacinamide, Zinc Pca, Tamarindus Indica Seed Gum, Pentylene Glycol, Carrageenan, Acacia Senegal Gum, Xanthan Gum, PPG-26-Buteth-26, PEG-40 Hydrogenated Castor Oil, Ethoxydiglycol, Phenoxyethanol, Chlorphenesin",
+   "source_url": "https://incidecoder.com/products/the-ordinary-niacinamide-10-zinc-1-8",
+   "shade": null,
+   "age_ms": 950400000
+  },
+  {
+   "id": 13,
+   "brand": "Rom&nd",
+   "name": "Better Than Cheek",
+   "category": "Макияж",
+   "zone": "Лицо",
+   "price": 4900,
+   "old_price": 5900,
+   "in_stock": 1,
+   "art": "compact|assets/products/13.jpg",
+   "color": 4293961116,
+   "description": "Пудровые румяна с естественным оттенком для нежного румянца.",
+   "natural_percent": 83,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Talc, Mica (Ci 77019), Silica, Boron Nitride, Hexyl Laurate, Dimethicone, Caprylic/Capric Triglyceride, Manganese Violet (Ci 77742), Diphenylsiloxy Phenyl Trimethicone, Magnesium Myristate, Methylpropanediol, Calcium Carbonate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Propanediol, Ultramarines (Ci 77007), Triethoxycaprylylsilane, Iron Oxide Yellow (Ci 77492), Iron Oxide Red (Ci 77491), Methicone, Red 30 (Ci 73360), Iron Oxide Black (Ci 77499), Kaolin, Yellow 5 Lake (Ci 19140), Water",
+   "source_url": "https://incidecoder.com/products/romand-better-than-cheek",
+   "shade": 4292719030,
+   "age_ms": 1036800000
+  },
+  {
+   "id": 14,
+   "brand": "CeraVe",
+   "name": "Moisturizing Cream",
+   "category": "Тело и ванна",
+   "zone": "Тело",
+   "price": 8400,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "cream|assets/products/14.jpg",
+   "color": 4290763979,
+   "description": "Увлажняющий крем с тремя церамидами и гиалуроновой кислотой для сухой кожи.",
+   "natural_percent": 75,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Ceramide NP, Ceramide AP, Ceramide EOP, Phytosphingosine, Cholesterol, Hyaluronic Acid, Sodium Lauroyl Lactylate, Dimethicone, Petrolatum, Behentrimonium Methosulfate, Potassium Phosphate, Dipotassium Phosphate, Phenoxyethanol, Methylparaben, Propylparaben, Disodium EDTA, Carbomer, Xanthan Gum",
+   "source_url": "https://incidecoder.com/products/cerave-moisturizing-cream-6",
+   "shade": null,
+   "age_ms": 1123200000
+  },
+  {
+   "id": 15,
+   "brand": "Nivea",
+   "name": "Soft Moisturizing Creme",
+   "category": "Тело и ванна",
+   "zone": "Тело",
+   "price": 3900,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "cream|assets/products/15.jpg",
+   "color": 4293449156,
+   "description": "Лёгкий увлажняющий крем для лица, тела и рук.",
+   "natural_percent": 72,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Myristyl Alcohol, Mineral Oil (Paraffinum Liquidum), Glycerin, Butylene Glycol, Alcohol Denatured, Stearic Acid, Petrolatum, Myristyl Myristate, Glyceryl Stearate, Hydrogenated Coco-Glycerides, Dimethicone, Simmondsia Chinensis (Jojoba) Seed Oil (Jojoba), Tocopheryl Acetate (Vitamin E), Polyglyceryl-2 Caprate, Phenoxyethanol, Lanolin Alcohol, Fragrance, Carbomer, Sodium Hydroxide, Cetyl Phosphate, Methylparaben, Ethylparaben, Propylparaben, Butylparaben, Isobutylparaben",
+   "source_url": "https://incidecoder.com/products/nivea-soft",
+   "shade": null,
+   "age_ms": 1209600000
+  },
+  {
+   "id": 16,
+   "brand": "Mise-en-scène",
+   "name": "Perfect Serum Shampoo",
+   "category": "Волосы",
+   "zone": "",
+   "price": 5100,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/16.jpg",
+   "color": 4294105255,
+   "description": "Шампунь с маслами арганы и жожоба для гладких и блестящих волос.",
+   "natural_percent": 68,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water/Aqua/Eau, Sodium Laureth Sulfate, Glycerin, Cocamidopropyl Betaine, Laureth-6 Carboxylic Acid, Fragrance/Parfum, Sodium Chloride, PEG-60 Hydrogenated Castor Oil, Polyquaternium-10, Dimethiconol, Sodium Lauroyl Sarcosinate, Tea-Dodecylbenzenesulfonate, Sodium Benzoate, Citric Acid, Tetrasodium EDTA, Ethylhexylglycerin, Limonene, Disodium EDTA, Linalool, Argania Spinosa Kernel Oil, Simmondsia Chinensis (Jojoba) Seed Oil, Cocos Nucifera (Coconut) Oil, Tocopherol, Olea Europaea (Olive) Fruit Oil, Prunus Armeniaca (Apricot) Kernel Oil, Sclerocarya Birrea Seed Oil, Camellia Japonica Seed Oil, Coco-Caprylate/Caprate, Caprylyl Glycol, Alcohol Denat, PEG-150 Pentaerythrityl Tetrastearate, PPG-2 Hydroxyethyl Cocamide, Glycolipids",
+   "source_url": "https://incidecoder.com/products/mise-en-scene-perfect-serum-shampoo",
+   "shade": null,
+   "age_ms": 1296000000
+  },
+  {
+   "id": 17,
+   "brand": "Cosmetix",
+   "name": "Подарочный набор «Нежность»",
+   "category": "Подарки",
+   "zone": "",
+   "price": 14900,
+   "old_price": 18900,
+   "in_stock": 1,
+   "art": "box",
+   "color": 4293507012,
+   "description": "Набор уходовой косметики в подарочной упаковке.",
+   "natural_percent": 85,
+   "featured": 0,
+   "trending": 0,
+   "inci": "",
+   "source_url": "",
+   "shade": null,
+   "age_ms": 1382400000
+  },
+  {
+   "id": 18,
+   "brand": "Anua",
+   "name": "Heartleaf 77% Soothing Toner",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 6300,
+   "old_price": null,
+   "in_stock": 0,
+   "art": "bottle|assets/products/18.jpg",
+   "color": 4290369968,
+   "description": "Успокаивающий тонер с 77% экстракта хауттюйнии для чувствительной кожи.",
+   "natural_percent": 95,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Houttuynia Cordata Extract (77%), Water, 1,2-Hexanediol, Glycerin, Betaine, Panthenol, Saccharum Officinarum (Sugar Cane) Extract, Portulaca Oleracea Extract, Butylene Glycol, Vitex Agnus Castus Extract, Chamomilla Recutita (Matricaria) Flower Extract, Arctium Lappa Root Extract, Phellinus Linteus Extract, Vitis Vinifera (Grape) Fruit Extract, Pyrus Malus (Apple) Fruit Extract, Centella Asiatica Extract, Isopentyldiol, Methylpropanediol, Acrylates/C10-30 Alkyl Acrylate Crosspolymer, Tromethamine, Disodium EDTA",
+   "source_url": "https://incidecoder.com/products/anua-heartleaf-77-soothing-toner-4",
+   "shade": null,
+   "age_ms": 1468800000
+  },
+  {
+   "id": 19,
+   "brand": "The Ordinary",
+   "name": "Glycolic Acid 7% Toning Solution",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/19.jpg",
+   "color": 4293518024,
+   "description": "Тонер с 7% гликолевой кислоты для мягкого отшелушивания и сияния кожи.",
+   "natural_percent": 70,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Aqua (Water), Glycolic Acid, Rosa Damascena Flower Water, Centaurea Cyanus Flower Water, Aloe Barbadensis Leaf Water, Propanediol, Glycerin, Triethanolamine, Aminomethyl Propanol, Panax Ginseng Root Extract, Tasmannia Lanceolata Fruit/Leaf Extract, Aspartic Acid, Alanine, Glycine, Serine, Valine, Isoleucine, Proline, Threonine, Histidine, Phenylalanine, Glutamic Acid, Arginine, Pca, Sodium PCA, Sodium Lactate, Fructose, Glucose, Sucrose, Urea, Hexyl Nicotinate, Dextrin, Citric Acid, Polysorbate 20, Gellan Gum, Trisodium Ethylenediamine Disuccinate, Sodium Chloride, Hexylene Glycol, Potassium Sorbate, Sodium Benzoate, 1,2-Hexanediol, Caprylyl Glycol",
+   "source_url": "https://incidecoder.com/products/the-ordinary-glycolic-acid-7-toning-solution-6",
+   "shade": null,
+   "age_ms": 1555200000
+  },
+  {
+   "id": 20,
+   "brand": "The Ordinary",
+   "name": "Retinol 0.5% in Squalane",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 5900,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/20.jpg",
+   "color": 4293446048,
+   "description": "Безводная сыворотка с 0,5% чистого ретинола в сквалане для вечернего ухода.",
+   "natural_percent": 65,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Squalane, Caprylic/Capric Triglyceride, Simmondsia Chinensis (Jojoba) Seed Oil, Retinol 0.5%, Solanum Lycopersicum (Tomato) Fruit Extract, Rosmarinus Officinalis (Rosemary) Leaf Extract, Hydroxymethoxyphenyl Decanone, BHT",
+   "source_url": "https://incidecoder.com/products/the-ordinary-retinol-0-5-in-squalane",
+   "shade": null,
+   "age_ms": 1641600000
+  },
+  {
+   "id": 21,
+   "brand": "COSRX",
+   "name": "BHA Blackhead Power Liquid",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 7400,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/21.jpg",
+   "color": 4292731878,
+   "description": "Лёгкий лосьон с бетаин салицилатом (BHA) для очищения пор и ухода за чёрными точками.",
+   "natural_percent": 85,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Salix Alba (Willow) Bark Water, Butylene Glycol, Betaine, Niacinamide, Betaine Salicylate, 1,2-Hexanediol, Sodium Hydroxide, Sodium Hyaluronate, Panthenol, Xanthan Gum, Ethyl Hexanediol",
+   "source_url": "https://incidecoder.com/products/cosrx-bha-blackhead-power-liquid-4",
+   "shade": null,
+   "age_ms": 1728000000
+  },
+  {
+   "id": 22,
+   "brand": "Klairs",
+   "name": "Freshly Juiced Vitamin Drop",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 8600,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/22.jpg",
+   "color": 4293581232,
+   "description": "Сыворотка с витамином C (аскорбиновая кислота) и центеллой для сияния кожи.",
+   "natural_percent": 80,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Aqua (Water), Propylene Glycol, Ascorbic Acid, Hydroxyethylcellulose, Citrus Junos Fruit Extract, Centella Asiatica Extract, Polysorbate 60, Illicium Verum (Anise) Fruit Extract, Chaenomeles Sinensis Fruit Extract, Paeonia Suffruticosa Root Extract, Brassica Oleracea Italica (Broccoli) Extract, Nelumbium Speciosum Flower Extract, Citrus Paradisi (Grapefruit) Fruit Extract, Scutellaria Baicalensis Root Extract, Butylene Glycol, Glycerin, Citrus Aurantium Dulcis (Orange) Oil, 1,2-Hexanediol, Sodium Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Isohexadecane, Disodium EDTA, Lavandula Angustifolia (Lavender) Oil, Camellia Sinensis Callus Culture Extract, Polysorbate 80, Disodium Phosphate, Sorbitan Oleate, Chrysanthellum Indicum Extract, Asarum Sieboldii Root Extract, Quercus Mongolica Leaf Extract, Persicaria Hydropiper Extract, Larix Europaea Wood Extract, Magnolia Obovata Bark Extract, Rheum Palmatum Root Extract, Corydalis Turtschaninovii Root Extract, Coptis Chinensis Root Extract, Sodium Phosphate, Lysine Hcl, Sodium Ascorbyl Phosphate, Acetyl Methionine, Theanine, Proline, Lecithin, Acetyl Glutamine, Bacillus/Folic Acid/Soybean Ferment Extract, Sodium Hyaluronate, SH-Oligopeptide-1, SH-Oligopeptide-2, SH-Polypeptide-1, SH-Polypeptide-11, SH-Polypeptide-9, Caprylyl Glycol, Limonene",
+   "source_url": "https://incidecoder.com/products/dear-klairs-freshly-juiced-vitamin-drop-5",
+   "shade": null,
+   "age_ms": 1814400000
+  },
+  {
+   "id": 23,
+   "brand": "Rom&nd",
+   "name": "Better Than Palette 00 Light & Glitter Garden",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/23.jpg",
+   "color": 4292462812,
+   "description": "Десять чистых глиттеров без матовых оттенков: прозрачный опал, шампань, розовое золото и ледяная сирень.",
+   "natural_percent": 40,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Polybutylene Terephthalate, Bis-Diglyceryl Polyacyladipate-2, Acrylates Copolymer, Ethylene/Va Copolymer, Polyethylene Terephthalate, Octyldodecyl Stearoyl Stearate, Calcium Aluminum Borosilicate, Magnesium Stearate, Phenylpropyldimethylsiloxysilicate, Methylpropanediol, Hydrogenated Polydecene, Trimethylsiloxysilicate, Propanediol, Silica, Titanium Dioxide (Ci 77891), Mica (Ci 77019), Iron Oxides (Ci 77491), Ethylene/Propylene Copolymer, Carmine (Ci 75470), Tin Oxide (Ci 77861), Triethoxycaprylylsilane, Yellow 5 (Ci 19140), Water",
+   "source_url": "https://incidecoder.com/products/rom-nd-better-than-palette-light-and-glitter-garden",
+   "shade": 4292462812,
+   "age_ms": 1900800000
+  },
+  {
+   "id": 24,
+   "brand": "Rom&nd",
+   "name": "Better Than Palette 01 Pampas Garden",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/24.jpg",
+   "color": 4293043596,
+   "description": "Персиковые, коралловые и золотисто-шампанские оттенки на тёплой слоновой кости: яркие тона поздней весны.",
+   "natural_percent": 40,
+   "featured": 0,
+   "trending": 1,
+   "inci": "Talc, Mica (Ci 77019), Polybutylene Terephthalate, Bis-Diglyceryl Polyacyladipate-2, Acrylates Copolymer, Ethylene/Va Copolymer, Calcium Aluminum Borosilicate, Polyglyceryl-2 Triisostearate, Calcium Titanium Borosilicate, Titanium Dioxide (Ci 77891), Calcium Sodium Borosilicate, Silica, Methylpropanediol, Magnesium Stearate, Water, Tin Oxide (Ci 77861), Sunset Yellow Fcf (Ci 15985), Red Iron Oxide (Ci 77491), Polyethylene Terephthalate, Propanediol, Carmine (Ci 75470), Dimethicone, Synthetic Fluorphlogopite, Phenyl Trimethicone, Methyl Methacrylate Crosspolymer, Diisostearyl Malate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Nylon-12, Magnesium Myristate, Synthetic Wax, Triethoxycaprylylsilane, Phenoxyethanol, Tartrazine (Ci 19140), Helindone Pink Cn (Ci 73360), Yellow Iron Oxide (Ci 77492), Octyldodecanol, Octyldodecyl Stearoyl Stearate, Boron Nitride, Caprylic/Capric Triglyceride, Dimethiconol Stearate, Methicone, Hydrogenated Lecithin, Black Iron Oxide (Ci 77499), Ultramarines (Ci 77007), Triethylhexanoin, Hydrogenated Castor Oil Isostearate, Polybutene, Lauroyl Lysine, Manganese Violet (Ci 77742), Macadamia Integrifolia Seed Oil",
+   "source_url": "https://incidecoder.com/products/romand-better-than-palette-pampas-garden",
+   "shade": 4293043596,
+   "age_ms": 1987200000
+  },
+  {
+   "id": 25,
+   "brand": "Rom&nd",
+   "name": "Better Than Palette 02 Mahogany Garden",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/25.jpg",
+   "color": 4289755733,
+   "description": "Карамель, корица и жидкое золото, переходящие в шоколад: сияние золотого часа.",
+   "natural_percent": 40,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Talc, Mica (Ci 77019), Polybutylene Terephthalate, Bis-Diglyceryl Polyacyladipate-2, Acrylates Copolymer, Ethylene/Va Copolymer, Calcium Aluminum Borosilicate, Polyglyceryl-2 Triisostearate, Calcium Titanium Borosilicate, Titanium Dioxide (Ci 77891), Calcium Sodium Borosilicate, Silica, Methylpropanediol, Magnesium Stearate, Water, Tin Oxide (Ci 77861), Sunset Yellow Fcf (Ci 15985), Red Iron Oxide (Ci 77491), Polyethylene Terephthalate, Propanediol, Carmine (Ci 75470), Dimethicone, Synthetic Fluorphlogopite, Phenyl Trimethicone, Methyl Methacrylate Crosspolymer, Diisostearyl Malate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Nylon-12, Magnesium Myristate, Synthetic Wax, Triethoxycaprylylsilane, Phenoxyethanol, Tartrazine (Ci 19140), Helindone Pink Cn (Ci 73360), Yellow Iron Oxide (Ci 77492), Octyldodecanol, Octyldodecyl Stearoyl Stearate, Boron Nitride, Caprylic/Capric Triglyceride, Dimethiconol Stearate, Methicone, Hydrogenated Lecithin, Black Iron Oxide (Ci 77499), Ultramarines (Ci 77007), Triethylhexanoin, Hydrogenated Castor Oil Isostearate, Polybutene, Lauroyl Lysine, Manganese Violet (Ci 77742), Macadamia Integrifolia Seed Oil",
+   "source_url": "https://incidecoder.com/products/romand-better-than-palette-pampas-garden",
+   "shade": 4289755733,
+   "age_ms": 2073600000
+  },
+  {
+   "id": 26,
+   "brand": "Rom&nd",
+   "name": "Better Than Palette 03 Rosebud Garden",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/26.jpg",
+   "color": 4290873998,
+   "description": "Пыльная роза, мальва и мягкий розово-бежевый: прохладное спокойствие и романтичный финиш.",
+   "natural_percent": 40,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Talc, Mica (Ci 77019), Polybutylene Terephthalate, Bis-Diglyceryl Polyacyladipate-2, Acrylates Copolymer, Ethylene/Va Copolymer, Calcium Aluminum Borosilicate, Polyglyceryl-2 Triisostearate, Calcium Titanium Borosilicate, Titanium Dioxide (Ci 77891), Calcium Sodium Borosilicate, Silica, Methylpropanediol, Magnesium Stearate, Water, Tin Oxide (Ci 77861), Sunset Yellow Fcf (Ci 15985), Red Iron Oxide (Ci 77491), Polyethylene Terephthalate, Propanediol, Carmine (Ci 75470), Dimethicone, Synthetic Fluorphlogopite, Phenyl Trimethicone, Methyl Methacrylate Crosspolymer, Diisostearyl Malate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Nylon-12, Magnesium Myristate, Synthetic Wax, Triethoxycaprylylsilane, Phenoxyethanol, Tartrazine (Ci 19140), Helindone Pink Cn (Ci 73360), Yellow Iron Oxide (Ci 77492), Octyldodecanol, Octyldodecyl Stearoyl Stearate, Boron Nitride, Caprylic/Capric Triglyceride, Dimethiconol Stearate, Methicone, Hydrogenated Lecithin, Black Iron Oxide (Ci 77499), Ultramarines (Ci 77007), Triethylhexanoin, Hydrogenated Castor Oil Isostearate, Polybutene, Lauroyl Lysine, Manganese Violet (Ci 77742), Macadamia Integrifolia Seed Oil",
+   "source_url": "https://incidecoder.com/products/romand-better-than-palette-pampas-garden",
+   "shade": 4290873998,
+   "age_ms": 2160000000
+  },
+  {
+   "id": 27,
+   "brand": "Rom&nd",
+   "name": "Better Than Palette 07 Berry Fuchsia Garden",
+   "category": "Макияж",
+   "zone": "Глаза",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "palette|assets/products/27.jpg",
+   "color": 4288893307,
+   "description": "Фуксия, слива и ледяная лаванда на холодных розовых: самая смелая палетка для вечера.",
+   "natural_percent": 40,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Talc, Mica (Ci 77019), Polybutylene Terephthalate, Bis-Diglyceryl Polyacyladipate-2, Acrylates Copolymer, Ethylene/Va Copolymer, Calcium Aluminum Borosilicate, Polyglyceryl-2 Triisostearate, Calcium Titanium Borosilicate, Titanium Dioxide (Ci 77891), Calcium Sodium Borosilicate, Silica, Methylpropanediol, Magnesium Stearate, Water, Tin Oxide (Ci 77861), Sunset Yellow Fcf (Ci 15985), Red Iron Oxide (Ci 77491), Polyethylene Terephthalate, Propanediol, Carmine (Ci 75470), Dimethicone, Synthetic Fluorphlogopite, Phenyl Trimethicone, Methyl Methacrylate Crosspolymer, Diisostearyl Malate, Dipentaerythrityl Hexahydroxystearate/Hexastearate/Hexarosinate, Nylon-12, Magnesium Myristate, Synthetic Wax, Triethoxycaprylylsilane, Phenoxyethanol, Tartrazine (Ci 19140), Helindone Pink Cn (Ci 73360), Yellow Iron Oxide (Ci 77492), Octyldodecanol, Octyldodecyl Stearoyl Stearate, Boron Nitride, Caprylic/Capric Triglyceride, Dimethiconol Stearate, Methicone, Hydrogenated Lecithin, Black Iron Oxide (Ci 77499), Ultramarines (Ci 77007), Triethylhexanoin, Hydrogenated Castor Oil Isostearate, Polybutene, Lauroyl Lysine, Manganese Violet (Ci 77742), Macadamia Integrifolia Seed Oil",
+   "source_url": "https://incidecoder.com/products/romand-better-than-palette-pampas-garden",
+   "shade": 4288893307,
+   "age_ms": 2246400000
+  },
+  {
+   "id": 28,
+   "brand": "Peripera",
+   "name": "Ink Mood Glowy Tint 03 Rose In Mind",
+   "category": "Макияж",
+   "zone": "Губы",
+   "price": 1500,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "tube|assets/products/28.jpg",
+   "color": 4294025384,
+   "description": "Глянцевый тинт для губ нежно-розового оттенка с эффектом сочных увлажнённых губ.",
+   "natural_percent": 45,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Diphenyl Dimethicone, Diisostearyl Malate, Bis-Diglyceryl Polyacyladipate-2, Hydrogenated Polyisobutene, Bis-Behenyl/Isostearyl/Phytosteryl Dimer Dilinoleyl Dimer Dilinoleate, Diglycerin, Cetyl PEG/PPG-10/1 Dimethicone, Dipropylene Glycol, Hydrogenated Poly (C6-14 Olefin), Polysorbate 60, Sorbitan Isostearate, Diisostearoyl Polyglyceryl-3 Dimer Dilinoleate, Pentylene Glycol, Hydroxyethyl Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Caprylic/Capric Triglyceride, Squalane, Ceteareth-20, Ethylene/Propylene Copolymer, Phenoxyethanol, Glycerin, Titanium Dioxide (Ci 77891), Polyglycerin-3, Yellow 6 (Ci 15985), Fragrance, Ethylhexylglycerin, Red 28 (Ci 45410), Red 33 (Ci 17200), Blue 1 (Ci 42090), Hamamelis Virginiana (Witch Hazel) Leaf Extract, Lilium Tigrinum Extract, Butylene Glycol",
+   "source_url": "https://incidecoder.com/products/peripera-ink-mood-glowy-tint-03-rose-in-mind",
+   "shade": 4291850089,
+   "age_ms": 2332800000
+  },
+  {
+   "id": 29,
+   "brand": "Rom&nd",
+   "name": "Juicy Lasting Tint 01 Pomelo Skin",
+   "category": "Макияж",
+   "zone": "Губы",
+   "price": 3600,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "tube|assets/products/29.jpg",
+   "color": 4293437839,
+   "description": "Стойкий глянцевый тинт персиково-нюдового оттенка: блеск, как глазурь на фруктах.",
+   "natural_percent": 45,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Octyldodecanol, Alcohol Denat, Polysorbate 60, Trimethylsiloxyphenyl Dimethicone, Ethylcellulose, Behenyl Alcohol, Pentylene Glycol, Phytosteryl Isostearyl Dimer Dilinoleate, Acrylates Copolymer, Sorbitan Stearate, Silica, Sodium Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Isohexadecane, Diisostearyl Malate, Phenoxyethanol, Titanium Dioxide (Ci 77891), Polyglyceryl-2 Triisostearate, Glyceryl Stearate, PEG-100 Stearate, Iron Oxides (Ci 77491), Polysorbate 80, Iron Oxides (Ci 77492), Iron Oxides (Ci 77499), Sorbitan Oleate, Fragrance, Trisodium Ethylenediamine Disuccinate, Flavor, Ethylhexylglycerin, Red 7 Lake (Ci 15850), Polyglyceryl-2 Diisostearate, Yellow 6 (Ci 15985), Red 33 (Ci 17200), Benzyl Alcohol, Linalool, Blue 1 (Ci 42090), Raspberry Seed Oil/Tocopheryl Succinate Aminopropanediol Esters, Prunus Domestica Seed Extract, Mangifera Indica (Mango) Seed Butter, Butylene Glycol, 1,2-Hexanediol, Dimethylsilanol Hyaluronate, Hydrolyzed Hyaluronic Acid, Hydrolyzed Sodium Hyaluronate, Sodium Hyaluronate, Hyaluronic Acid, Potassium Hyaluronate, Sodium Hyaluronate Crosspolymer, Hydroxypropyltrimonium Hyaluronate, Sodium Hyaluronate Dimethylsilanol, Sodium Acetylated Hyaluronate",
+   "source_url": "https://incidecoder.com/products/rom-nd-juicy-lasting-tint-new-01-pomelo-skin",
+   "shade": 4292583820,
+   "age_ms": 2419200000
+  },
+  {
+   "id": 30,
+   "brand": "3CE",
+   "name": "Mood Recipe Face Blush",
+   "category": "Макияж",
+   "zone": "Лицо",
+   "price": 4200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "compact|assets/products/30.jpg",
+   "color": 4293767578,
+   "description": "Нежные румяна в компактной коробочке тёплого персикового оттенка для естественного румянца.",
+   "natural_percent": 40,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Talc, Mica (Ci 77019), Titanium Dioxide (Ci 77891), Octyldodecyl Stearoyl Stearate, Phenyl Trimethicone, Silica, Nylon-12, Iron Oxides (Ci 77491), Magnesium Myristate, Magnesium Stearate, Dimethicone, Macadamia Ternifolia Seed Oil, Propanediol, Hdi/Trimethylol Hexyllactone Crosspolymer, Lauroyl Lysine, Methicone, Hydrogenated Lecithin, Triethoxycaprylylsilane, Iron Oxides (Ci 77499), Iron Oxides (Ci 77492), Yellow 5 Lake (Ci 19140), Ultramarines (Ci 77007), Red 30 (Ci 73360), Carmine (Ci 75470)",
+   "source_url": "https://incidecoder.com/products/3ce-mood-recipe-face-blush",
+   "shade": 4292321160,
+   "age_ms": 2505600000
+  },
+  {
+   "id": 31,
+   "brand": "Torriden",
+   "name": "Dive-In Serum",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 7900,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/31.jpg",
+   "color": 4292470510,
+   "description": "Лёгкая сыворотка с низкомолекулярной гиалуроновой кислотой для глубокого увлажнения.",
+   "natural_percent": 85,
+   "featured": 0,
+   "trending": 1,
+   "inci": "Water, Butylene Glycol, Glycerin, Dipropylene Glycol, 1,2-Hexanediol, Panthenol, Sodium Hyaluronate, Hydrolyzed Hyaluronic Acid, Sodium Acetylated Hyaluronate, Sodium Hyaluronate Crosspolymer, Hydrolyzed Sodium Hyaluronate, Allantoin, Trehalose, Betaine, Propanediol, Portulaca Oleracea Extract, Hamamelis Virginiana Extract, Madecassoside, Madecassic Acid, Ceramide NP, Beta-Glucan, Malachite Extract, Cholesterol, Pentylene Glycol, Glyceryl Acrylate/Acrylic Acid Copolymer, Pvm/Ma Copolymer, Polyglyceryl-10 Laurate, Xanthan Gum, Tromethamine, Carbomer, Ethylhexylglycerin, Scutellaria Baicalensis Root Extract, Paeonia Suffruticosa Root Extract",
+   "source_url": "https://incidecoder.com/products/torriden-dive-in-serum",
+   "shade": null,
+   "age_ms": 2592000000
+  },
+  {
+   "id": 32,
+   "brand": "Skin1004",
+   "name": "Madagascar Centella Ampoule",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 7600,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/32.jpg",
+   "color": 4293514912,
+   "description": "Успокаивающая ампула с экстрактом центеллы азиатской для чувствительной и раздражённой кожи.",
+   "natural_percent": 95,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Glycerin, Butylene Glycol, Centella Asiatica Extract, 1,2-Hexanediol, Cellulose Gum, Ethylhexylglycerin",
+   "source_url": "https://incidecoder.com/products/skin1004-madagascar-centella-ampoule",
+   "shade": null,
+   "age_ms": 2678400000
+  },
+  {
+   "id": 33,
+   "brand": "Beauty of Joseon",
+   "name": "Glow Serum: Propolis + Niacinamide",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 7800,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/33.jpg",
+   "color": 4293511562,
+   "description": "Сыворотка с прополисом и ниацинамидом для сияния кожи и баланса себума.",
+   "natural_percent": 90,
+   "featured": 1,
+   "trending": 0,
+   "inci": "Propolis Extract, Dipropylene Glycol, Glycerin, Butylene Glycol, Water, Niacinamide, 1,2-Hexanediol, Melia Azadirachta Flower Extract, Melia Azadirachta Leaf Extract, Sodium Hyaluronate, Curcuma Longa (Turmeric) Root Extract, Ocimum Sanctum Leaf Extract, Theobroma Cacao (Cocoa) Seed Extract, Melaleuca Alternifolia (Tea Tree) Extract, Centella Asiatica Extract, Corallina Officinalis Extract, Lotus Corniculatus Seed Extract, Calophyllum Inophyllum Seed Oil, Betaine Salicylate, Sodium Polyacryloyldimethyl Taurate, Tromethamine, Polyglyceryl-10 Laurate, Caprylyl Glycol, Ethylhexylglycerin, Dextrin, Pentylene Glycol, Octanediol, Tocopherol, Xanthan Gum, Carbomer",
+   "source_url": "https://incidecoder.com/products/beauty-of-joseon-glow-serum-propolis-niacinamide",
+   "shade": null,
+   "age_ms": 2764800000
+  },
+  {
+   "id": 34,
+   "brand": "Isntree",
+   "name": "Hyaluronic Acid Toner",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 6400,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/34.jpg",
+   "color": 4293126382,
+   "description": "Лёгкий тонер с гиалуроновой кислотой для мгновенного увлажнения.",
+   "natural_percent": 90,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Propanediol, 1,2-Hexanediol, Sodium Hyaluronate, Trehalose, Sodium PCA, Glycerin, Hyaluronic Acid, Aloe Barbadensis Leaf Extract, Althaea Rosea Root Extract, Betula Alba Juice, Portulaca Oleracea Extract, Hydrolyzed Sodium Hyaluronate, Beta-Glucan, Panthenol, Pentylene Glycol, Caprylyl Glycol, Butylene Glycol",
+   "source_url": "https://incidecoder.com/products/isntree-hyaluronic-acid-toner",
+   "shade": null,
+   "age_ms": 2851200000
+  },
+  {
+   "id": 35,
+   "brand": "Round Lab",
+   "name": "1025 Dokdo Toner",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 5900,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "bottle|assets/products/35.jpg",
+   "color": 4292338924,
+   "description": "Мягкий тонер с глубинной морской водой для ежедневного ухода без раздражения.",
+   "natural_percent": 92,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Purified Water, Butylene Glycol, Glycerin, Pentylene Glycol, Propanediol, Chondrus Crispus Extract, Saccharum Officinarum (Sugarcane) Extract, Sea Water, 1,2-Hexanediol, Protease, Betaine, Panthenol, Ethylhexylglycerin, Allantoin, Xanthan Gum, Disodium EDTA",
+   "source_url": "https://incidecoder.com/products/round-lab-1025-dokdo-toner-2",
+   "shade": null,
+   "age_ms": 2937600000
+  },
+  {
+   "id": 36,
+   "brand": "Laneige",
+   "name": "Lip Sleeping Mask",
+   "category": "Уход за лицом",
+   "zone": "Губы",
+   "price": 7200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "cream|assets/products/36.jpg",
+   "color": 4293895093,
+   "description": "Ночная маска для губ: увлажняет, смягчает и восстанавливает кожу губ за ночь.",
+   "natural_percent": 60,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Diisostearyl Malate, Hydrogenated Polyisobutene, Phytosteryl/Isostearyl/Cetyl/Stearyl/Behenyl Dimer Dilinoleate, Hydrogenated Poly(C6-14 Olefin), Polybutene, Microcrystalline Wax\\Cera Microcristallina\\Cire Microcristalline, Butyrospermum Parkii (Shea) Butter, Synthetic Wax, Euphorbia Cerifera (Candelilla) Wax/Candelilla Cera/Cire De Candelilla, Sucrose Tetrastearate Triacetate, Butylene/Ethylene/Styrene Copolymer, Ethylene/Propylene/Styrene Copolymer, Mica (Ci 77019), Astrocaryum Murumuru Seed Butter, Titanium Dioxide (Ci 77891), Dimethicone, Fragrance/Parfum, Polyglyceryl-2 Diisostearate, Dehydroacetic Acid, Methicone, Copernicia Cerifera (Carnauba) Wax / Cera Carnauba / Cire De Carnauba, Polyglyceryl-2 Triisostearate, Yellow 6 Lake (Ci 15985), Red 6 (Ci 15850), Polyhydroxystearic Acid, Water / Aqua Eau, Potassium Alginate, Propanediol, Glycerin, Alcohol, Lycium Chinense Fruit Extract, Vaccinium Macrocarpon (Cranberry) Fruit Extract, Fragaria Chiloensis (Strawberry) Fruit Extract, Rubus Idaeus (Raspberry) Fruit Extract, Sapindus Mukorossi Fruit Extract, Vaccinium Angustifolium (Blueberry) Fruit Extract, Rubus Chamaemorus Seed Extract, Coffea Arabica (Coffee) Seed Extract, Chenopodium Quinoa Seed Extract, Magnesium Sulfate, Calcium Chloride, Sodium Hyaluronate, Beta-Glucan, Manganese Sulfate, Zinc Sulfate, Ascorbyl Glucoside",
+   "source_url": "https://incidecoder.com/products/laneige-lip-sleeping-mask",
+   "shade": null,
+   "age_ms": 3024000000
+  },
+  {
+   "id": 37,
+   "brand": "COSRX",
+   "name": "Low pH Good Morning Gel Cleanser",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 5200,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "tube|assets/products/37.jpg",
+   "color": 4292733936,
+   "description": "Мягкий гель для умывания с pH около 5,5 для ежедневного очищения кожи.",
+   "natural_percent": 85,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Cocamidopropyl Betaine, Sodium Lauroyl Methyl Isethionate, Sodium Chloride, Polysorbate 20, Styrax Japonicus Branch/Fruit/Leaf Extract, Butylene Glycol, Saccharomyces Ferment, Cryptomeria Japonica Leaf Extract, Nelumbo Nucifera Leaf Extract, Pinus Palustris Leaf Extract, Ulmus Davidiana Root Extract, Oenothera Biennis (Evening Primrose) Flower Extract, Pueraria Lobata Root Extract, Melaleuca Alternifolia (Tea Tree) Leaf Oil, Allantoin, Caprylyl Glycol, Ethylhexylglycerin, Betaine Salicylate, Citric Acid, Ethyl Hexanediol, 1,2-Hexanediol, Trisodium Ethylenediamine Disuccinate, Sodium Benzoate, Disodium EDTA",
+   "source_url": "https://incidecoder.com/products/cosrx-low-ph-good-morning-gel-cleanser",
+   "shade": null,
+   "age_ms": 3110400000
+  },
+  {
+   "id": 38,
+   "brand": "Dr.Jart+",
+   "name": "Ceramidin Cream",
+   "category": "Уход за лицом",
+   "zone": "Лицо",
+   "price": 11500,
+   "old_price": null,
+   "in_stock": 1,
+   "art": "cream|assets/products/38.jpg",
+   "color": 4294108012,
+   "description": "Питательный крем с керамидами восстанавливает барьер и смягчает сухую кожу.",
+   "natural_percent": 65,
+   "featured": 0,
+   "trending": 0,
+   "inci": "Water, Glycerin, Dipropylene Glycol, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Hydrogenated Poly(C6-14 Olefin), Hydrogenated Polydecene, Methyl Trimethicone, 1, 2-Hexanediol, Bifida Ferment Lysate, Phenyl Trimethicone, Vegetable Oil, Butyrospermum Parkii (Shea) Butter, Glyceryl Stearate SE, Ceramide NP, Stearic Acid, Algae Extract, Eclipta Prostrata Leaf Extract, Cetearyl Glucoside, Hydrogenated Lecithin, Microcrystalline Cellulose, Butylene Glycol, C12-16 Alcohols, Ammonium Acryloyldimethyltaurate/VP Copolymer, Malt Extract, Beta Vulgaris (Beet) Root Extract, Melia Azadirachta Flower Extract, Melia Azadirachta Leaf Extract, Theobroma Cacoa (Cocoa) Seed Extract, Curcuma Longa (Turmeric) Root Extract, Ocimum Sanctum Leaf Extract, Amaranthus Caudatus Seed Extract, Ulmus Davidiana Root Extract, Avena Sativa (Oat) Kernel Extract, Cynara Scolymus (Artichoke) Leaf Extract, Pteris Multifida Extract, Artemisia Vulgaris Extract, Corallina Officinalis Extract, Pyracantha Fortuneana Fruit Extract, Glyceryl Polymethacrylate, Cholesterol, Citrus Aurantium Bergamia (Bergamot) Fruit Oil, Hydrolyzed Corn Starch, Sodium Hyaluronate, Pelargonium Graveolens Flower Oil, Fructooligosaccharides, Beta-Glucan, Dextrin, Disodium EDTA, Panthenol, Polyquaternium-51, Raffinose, Hydrolyzed Hyaluronic Acid, Folic Acid, Salvia Officinalis (Sage) Oil, Pogostemon Cablin Oil, Tromethamine, Ceramide AP, Ceramide AS, Ceramide NS, Palmitoyl Pentapeptide-4, Ceramide EOP",
+   "source_url": "https://incidecoder.com/products/dr-jart-ceramidin-cream-3",
+   "shade": null,
+   "age_ms": 3196800000
+  }
+ ],
+ "product_ingredients": [
+  {
+   "product_id": 2,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 2,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 2,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 2,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 3,
+   "ingredient_id": 8
+  },
+  {
+   "product_id": 3,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 3,
+   "ingredient_id": 18
+  },
+  {
+   "product_id": 4,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 4,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 4,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 5,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 6,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 6,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 6,
+   "ingredient_id": 19
+  },
+  {
+   "product_id": 7,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 7,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 7,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 8,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 8,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 8,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 9,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 10,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 10,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 10,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 10,
+   "ingredient_id": 12
+  },
+  {
+   "product_id": 10,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 11,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 11,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 11,
+   "ingredient_id": 3
+  },
+  {
+   "product_id": 11,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 11,
+   "ingredient_id": 12
+  },
+  {
+   "product_id": 12,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 12,
+   "ingredient_id": 12
+  },
+  {
+   "product_id": 13,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 13,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 13,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 13,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 14,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 14,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 14,
+   "ingredient_id": 5
+  },
+  {
+   "product_id": 14,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 14,
+   "ingredient_id": 8
+  },
+  {
+   "product_id": 14,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 3
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 5
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 8
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 15,
+   "ingredient_id": 19
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 3
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 6
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 16,
+   "ingredient_id": 19
+  },
+  {
+   "product_id": 17,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 17,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 17,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 17,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 18,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 18,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 19,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 19,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 21,
+   "ingredient_id": 12
+  },
+  {
+   "product_id": 21,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 22,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 22,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 22,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 23,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 23,
+   "ingredient_id": 10
+  },
+  {
+   "product_id": 23,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 24,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 24,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 24,
+   "ingredient_id": 10
+  },
+  {
+   "product_id": 24,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 24,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 25,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 25,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 25,
+   "ingredient_id": 10
+  },
+  {
+   "product_id": 25,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 25,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 26,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 26,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 26,
+   "ingredient_id": 10
+  },
+  {
+   "product_id": 26,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 26,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 27,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 27,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 27,
+   "ingredient_id": 10
+  },
+  {
+   "product_id": 27,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 27,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 28,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 28,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 28,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 28,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 29,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 29,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 29,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 29,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 29,
+   "ingredient_id": 19
+  },
+  {
+   "product_id": 30,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 30,
+   "ingredient_id": 15
+  },
+  {
+   "product_id": 30,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 31,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 31,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 31,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 32,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 32,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 33,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 33,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 33,
+   "ingredient_id": 3
+  },
+  {
+   "product_id": 33,
+   "ingredient_id": 12
+  },
+  {
+   "product_id": 33,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 34,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 34,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 34,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 35,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 13
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 14
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 16
+  },
+  {
+   "product_id": 36,
+   "ingredient_id": 19
+  },
+  {
+   "product_id": 37,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 38,
+   "ingredient_id": 1
+  },
+  {
+   "product_id": 38,
+   "ingredient_id": 2
+  },
+  {
+   "product_id": 38,
+   "ingredient_id": 7
+  },
+  {
+   "product_id": 38,
+   "ingredient_id": 13
+  }
+ ],
+ "product_prices": [
+  {
+   "id": 1,
+   "product_id": 1,
+   "store_id": 1,
+   "price": 3700,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 2,
+   "product_id": 1,
+   "store_id": 2,
+   "price": 2500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 3,
+   "product_id": 1,
+   "store_id": 3,
+   "price": 3100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 4,
+   "product_id": 1,
+   "store_id": 4,
+   "price": 2400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 5,
+   "product_id": 1,
+   "store_id": 5,
+   "price": 2400,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 6,
+   "product_id": 1,
+   "store_id": 6,
+   "price": 2400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 7,
+   "product_id": 1,
+   "store_id": 7,
+   "price": 2400,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 8,
+   "product_id": 1,
+   "store_id": 8,
+   "price": 2400,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 9,
+   "product_id": 1,
+   "store_id": 9,
+   "price": 3000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 10,
+   "product_id": 1,
+   "store_id": 10,
+   "price": 3600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 11,
+   "product_id": 1,
+   "store_id": 11,
+   "price": 2900,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 12,
+   "product_id": 1,
+   "store_id": 12,
+   "price": 2900,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 13,
+   "product_id": 1,
+   "store_id": 13,
+   "price": 2900,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 14,
+   "product_id": 2,
+   "store_id": 1,
+   "price": 6000,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 15,
+   "product_id": 2,
+   "store_id": 2,
+   "price": 4800,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 16,
+   "product_id": 2,
+   "store_id": 3,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 17,
+   "product_id": 2,
+   "store_id": 4,
+   "price": 4500,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 18,
+   "product_id": 2,
+   "store_id": 5,
+   "price": 4700,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 19,
+   "product_id": 2,
+   "store_id": 6,
+   "price": 4900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 20,
+   "product_id": 2,
+   "store_id": 7,
+   "price": 4600,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 21,
+   "product_id": 2,
+   "store_id": 8,
+   "price": 4800,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 22,
+   "product_id": 2,
+   "store_id": 9,
+   "price": 5100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 23,
+   "product_id": 2,
+   "store_id": 10,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 24,
+   "product_id": 2,
+   "store_id": 11,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 25,
+   "product_id": 2,
+   "store_id": 12,
+   "price": 5100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 26,
+   "product_id": 2,
+   "store_id": 13,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 27,
+   "product_id": 3,
+   "store_id": 1,
+   "price": 4700,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 28,
+   "product_id": 3,
+   "store_id": 2,
+   "price": 3500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 29,
+   "product_id": 3,
+   "store_id": 3,
+   "price": 4100,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 30,
+   "product_id": 3,
+   "store_id": 4,
+   "price": 3500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 31,
+   "product_id": 3,
+   "store_id": 5,
+   "price": 3400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 32,
+   "product_id": 3,
+   "store_id": 6,
+   "price": 3300,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 33,
+   "product_id": 3,
+   "store_id": 7,
+   "price": 3200,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 34,
+   "product_id": 3,
+   "store_id": 8,
+   "price": 3600,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 35,
+   "product_id": 3,
+   "store_id": 9,
+   "price": 4100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 36,
+   "product_id": 3,
+   "store_id": 10,
+   "price": 4600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 37,
+   "product_id": 3,
+   "store_id": 11,
+   "price": 3800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 38,
+   "product_id": 3,
+   "store_id": 12,
+   "price": 3700,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 39,
+   "product_id": 3,
+   "store_id": 13,
+   "price": 4100,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 40,
+   "product_id": 4,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 41,
+   "product_id": 4,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 42,
+   "product_id": 4,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 43,
+   "product_id": 4,
+   "store_id": 4,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 44,
+   "product_id": 4,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 45,
+   "product_id": 4,
+   "store_id": 6,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 46,
+   "product_id": 4,
+   "store_id": 7,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 47,
+   "product_id": 4,
+   "store_id": 8,
+   "price": 4900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 48,
+   "product_id": 4,
+   "store_id": 9,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 49,
+   "product_id": 4,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 50,
+   "product_id": 4,
+   "store_id": 11,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 51,
+   "product_id": 4,
+   "store_id": 12,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 52,
+   "product_id": 4,
+   "store_id": 13,
+   "price": 5400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 53,
+   "product_id": 5,
+   "store_id": 1,
+   "price": 8100,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 54,
+   "product_id": 5,
+   "store_id": 2,
+   "price": 6900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 55,
+   "product_id": 5,
+   "store_id": 3,
+   "price": 7500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 56,
+   "product_id": 5,
+   "store_id": 4,
+   "price": 7000,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 57,
+   "product_id": 5,
+   "store_id": 5,
+   "price": 6800,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 58,
+   "product_id": 5,
+   "store_id": 6,
+   "price": 6600,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 59,
+   "product_id": 5,
+   "store_id": 7,
+   "price": 6900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 60,
+   "product_id": 5,
+   "store_id": 8,
+   "price": 6700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 61,
+   "product_id": 5,
+   "store_id": 9,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 62,
+   "product_id": 5,
+   "store_id": 10,
+   "price": 8000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 63,
+   "product_id": 5,
+   "store_id": 11,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 64,
+   "product_id": 5,
+   "store_id": 12,
+   "price": 7400,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 65,
+   "product_id": 5,
+   "store_id": 13,
+   "price": 7200,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 66,
+   "product_id": 6,
+   "store_id": 1,
+   "price": 11000,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 67,
+   "product_id": 6,
+   "store_id": 2,
+   "price": 9800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 68,
+   "product_id": 6,
+   "store_id": 3,
+   "price": 10400,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 69,
+   "product_id": 6,
+   "store_id": 4,
+   "price": 9700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 70,
+   "product_id": 6,
+   "store_id": 5,
+   "price": 9700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 71,
+   "product_id": 6,
+   "store_id": 6,
+   "price": 9700,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 72,
+   "product_id": 6,
+   "store_id": 7,
+   "price": 9700,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 73,
+   "product_id": 6,
+   "store_id": 8,
+   "price": 9700,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 74,
+   "product_id": 6,
+   "store_id": 9,
+   "price": 10300,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 75,
+   "product_id": 6,
+   "store_id": 10,
+   "price": 10900,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 76,
+   "product_id": 6,
+   "store_id": 11,
+   "price": 10200,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 77,
+   "product_id": 6,
+   "store_id": 12,
+   "price": 10200,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 78,
+   "product_id": 6,
+   "store_id": 13,
+   "price": 10200,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 79,
+   "product_id": 7,
+   "store_id": 1,
+   "price": 4400,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 80,
+   "product_id": 7,
+   "store_id": 2,
+   "price": 3200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 81,
+   "product_id": 7,
+   "store_id": 3,
+   "price": 3800,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 82,
+   "product_id": 7,
+   "store_id": 4,
+   "price": 2900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 83,
+   "product_id": 7,
+   "store_id": 5,
+   "price": 3100,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 84,
+   "product_id": 7,
+   "store_id": 6,
+   "price": 3300,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 85,
+   "product_id": 7,
+   "store_id": 7,
+   "price": 3000,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 86,
+   "product_id": 7,
+   "store_id": 8,
+   "price": 3200,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 87,
+   "product_id": 7,
+   "store_id": 9,
+   "price": 3500,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 88,
+   "product_id": 7,
+   "store_id": 10,
+   "price": 4300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 89,
+   "product_id": 7,
+   "store_id": 11,
+   "price": 3800,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 90,
+   "product_id": 7,
+   "store_id": 12,
+   "price": 3500,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 91,
+   "product_id": 7,
+   "store_id": 13,
+   "price": 3700,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 92,
+   "product_id": 8,
+   "store_id": 1,
+   "price": 2700,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 93,
+   "product_id": 8,
+   "store_id": 2,
+   "price": 1500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 94,
+   "product_id": 8,
+   "store_id": 3,
+   "price": 2100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 95,
+   "product_id": 8,
+   "store_id": 4,
+   "price": 1500,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 96,
+   "product_id": 8,
+   "store_id": 5,
+   "price": 1400,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 97,
+   "product_id": 8,
+   "store_id": 6,
+   "price": 1300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 98,
+   "product_id": 8,
+   "store_id": 7,
+   "price": 1200,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 99,
+   "product_id": 8,
+   "store_id": 8,
+   "price": 1600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 100,
+   "product_id": 8,
+   "store_id": 9,
+   "price": 2100,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 101,
+   "product_id": 8,
+   "store_id": 10,
+   "price": 2600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 102,
+   "product_id": 8,
+   "store_id": 11,
+   "price": 1800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 103,
+   "product_id": 8,
+   "store_id": 12,
+   "price": 1700,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 104,
+   "product_id": 8,
+   "store_id": 13,
+   "price": 2100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 105,
+   "product_id": 9,
+   "store_id": 1,
+   "price": 4400,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 106,
+   "product_id": 9,
+   "store_id": 2,
+   "price": 3200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 107,
+   "product_id": 9,
+   "store_id": 3,
+   "price": 3800,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 108,
+   "product_id": 9,
+   "store_id": 4,
+   "price": 3000,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 109,
+   "product_id": 9,
+   "store_id": 5,
+   "price": 3100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 110,
+   "product_id": 9,
+   "store_id": 6,
+   "price": 3200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 111,
+   "product_id": 9,
+   "store_id": 7,
+   "price": 3300,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 112,
+   "product_id": 9,
+   "store_id": 8,
+   "price": 2900,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 113,
+   "product_id": 9,
+   "store_id": 9,
+   "price": 3600,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 114,
+   "product_id": 9,
+   "store_id": 10,
+   "price": 4300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 115,
+   "product_id": 9,
+   "store_id": 11,
+   "price": 3700,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 116,
+   "product_id": 9,
+   "store_id": 12,
+   "price": 3800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 117,
+   "product_id": 9,
+   "store_id": 13,
+   "price": 3400,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 118,
+   "product_id": 10,
+   "store_id": 1,
+   "price": 6000,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 119,
+   "product_id": 10,
+   "store_id": 2,
+   "price": 4800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 120,
+   "product_id": 10,
+   "store_id": 3,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 121,
+   "product_id": 10,
+   "store_id": 4,
+   "price": 4900,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 122,
+   "product_id": 10,
+   "store_id": 5,
+   "price": 4700,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 123,
+   "product_id": 10,
+   "store_id": 6,
+   "price": 4500,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 124,
+   "product_id": 10,
+   "store_id": 7,
+   "price": 4800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 125,
+   "product_id": 10,
+   "store_id": 8,
+   "price": 4600,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 126,
+   "product_id": 10,
+   "store_id": 9,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 127,
+   "product_id": 10,
+   "store_id": 10,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 128,
+   "product_id": 10,
+   "store_id": 11,
+   "price": 5000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 129,
+   "product_id": 10,
+   "store_id": 12,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 130,
+   "product_id": 10,
+   "store_id": 13,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 131,
+   "product_id": 11,
+   "store_id": 1,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 132,
+   "product_id": 11,
+   "store_id": 2,
+   "price": 7200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 133,
+   "product_id": 11,
+   "store_id": 3,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 134,
+   "product_id": 11,
+   "store_id": 4,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 135,
+   "product_id": 11,
+   "store_id": 5,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 136,
+   "product_id": 11,
+   "store_id": 6,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 137,
+   "product_id": 11,
+   "store_id": 7,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 138,
+   "product_id": 11,
+   "store_id": 8,
+   "price": 7100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 139,
+   "product_id": 11,
+   "store_id": 9,
+   "price": 7700,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 140,
+   "product_id": 11,
+   "store_id": 10,
+   "price": 8300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 141,
+   "product_id": 11,
+   "store_id": 11,
+   "price": 7600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 142,
+   "product_id": 11,
+   "store_id": 12,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 143,
+   "product_id": 11,
+   "store_id": 13,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 144,
+   "product_id": 12,
+   "store_id": 1,
+   "price": 6800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 145,
+   "product_id": 12,
+   "store_id": 2,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 146,
+   "product_id": 12,
+   "store_id": 3,
+   "price": 6200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 147,
+   "product_id": 12,
+   "store_id": 4,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 148,
+   "product_id": 12,
+   "store_id": 5,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 149,
+   "product_id": 12,
+   "store_id": 6,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 150,
+   "product_id": 12,
+   "store_id": 7,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 151,
+   "product_id": 12,
+   "store_id": 8,
+   "price": 5600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 152,
+   "product_id": 12,
+   "store_id": 9,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 153,
+   "product_id": 12,
+   "store_id": 10,
+   "price": 6700,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 154,
+   "product_id": 12,
+   "store_id": 11,
+   "price": 6200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 155,
+   "product_id": 12,
+   "store_id": 12,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 156,
+   "product_id": 12,
+   "store_id": 13,
+   "price": 6100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 157,
+   "product_id": 13,
+   "store_id": 1,
+   "price": 6100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 158,
+   "product_id": 13,
+   "store_id": 2,
+   "price": 4900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 159,
+   "product_id": 13,
+   "store_id": 3,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 160,
+   "product_id": 13,
+   "store_id": 4,
+   "price": 4900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 161,
+   "product_id": 13,
+   "store_id": 5,
+   "price": 4800,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 162,
+   "product_id": 13,
+   "store_id": 6,
+   "price": 4700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 163,
+   "product_id": 13,
+   "store_id": 7,
+   "price": 4600,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 164,
+   "product_id": 13,
+   "store_id": 8,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 165,
+   "product_id": 13,
+   "store_id": 9,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 166,
+   "product_id": 13,
+   "store_id": 10,
+   "price": 6000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 167,
+   "product_id": 13,
+   "store_id": 11,
+   "price": 5200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 168,
+   "product_id": 13,
+   "store_id": 12,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 169,
+   "product_id": 13,
+   "store_id": 13,
+   "price": 5500,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 170,
+   "product_id": 14,
+   "store_id": 1,
+   "price": 9600,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 171,
+   "product_id": 14,
+   "store_id": 2,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 172,
+   "product_id": 14,
+   "store_id": 3,
+   "price": 9000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 173,
+   "product_id": 14,
+   "store_id": 4,
+   "price": 8200,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 174,
+   "product_id": 14,
+   "store_id": 5,
+   "price": 8300,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 175,
+   "product_id": 14,
+   "store_id": 6,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 176,
+   "product_id": 14,
+   "store_id": 7,
+   "price": 8500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 177,
+   "product_id": 14,
+   "store_id": 8,
+   "price": 8100,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 178,
+   "product_id": 14,
+   "store_id": 9,
+   "price": 8800,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 179,
+   "product_id": 14,
+   "store_id": 10,
+   "price": 9500,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 180,
+   "product_id": 14,
+   "store_id": 11,
+   "price": 8900,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 181,
+   "product_id": 14,
+   "store_id": 12,
+   "price": 9000,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 182,
+   "product_id": 14,
+   "store_id": 13,
+   "price": 8600,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 183,
+   "product_id": 15,
+   "store_id": 1,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 184,
+   "product_id": 15,
+   "store_id": 2,
+   "price": 3900,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 185,
+   "product_id": 15,
+   "store_id": 3,
+   "price": 4500,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 186,
+   "product_id": 15,
+   "store_id": 4,
+   "price": 4000,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 187,
+   "product_id": 15,
+   "store_id": 5,
+   "price": 3800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 188,
+   "product_id": 15,
+   "store_id": 6,
+   "price": 3600,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 189,
+   "product_id": 15,
+   "store_id": 7,
+   "price": 3900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 190,
+   "product_id": 15,
+   "store_id": 8,
+   "price": 3700,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 191,
+   "product_id": 15,
+   "store_id": 9,
+   "price": 4600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 192,
+   "product_id": 15,
+   "store_id": 10,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 193,
+   "product_id": 15,
+   "store_id": 11,
+   "price": 4100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 194,
+   "product_id": 15,
+   "store_id": 12,
+   "price": 4400,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 195,
+   "product_id": 15,
+   "store_id": 13,
+   "price": 4200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 196,
+   "product_id": 16,
+   "store_id": 1,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 197,
+   "product_id": 16,
+   "store_id": 2,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 198,
+   "product_id": 16,
+   "store_id": 3,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 199,
+   "product_id": 16,
+   "store_id": 4,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 200,
+   "product_id": 16,
+   "store_id": 5,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 201,
+   "product_id": 16,
+   "store_id": 6,
+   "price": 5000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 202,
+   "product_id": 16,
+   "store_id": 7,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 203,
+   "product_id": 16,
+   "store_id": 8,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 204,
+   "product_id": 16,
+   "store_id": 9,
+   "price": 5600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 205,
+   "product_id": 16,
+   "store_id": 10,
+   "price": 6200,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 206,
+   "product_id": 16,
+   "store_id": 11,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 207,
+   "product_id": 16,
+   "store_id": 12,
+   "price": 5500,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 208,
+   "product_id": 16,
+   "store_id": 13,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 209,
+   "product_id": 17,
+   "store_id": 1,
+   "price": 16100,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 210,
+   "product_id": 17,
+   "store_id": 2,
+   "price": 14900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 211,
+   "product_id": 17,
+   "store_id": 3,
+   "price": 15500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 212,
+   "product_id": 17,
+   "store_id": 4,
+   "price": 14600,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 213,
+   "product_id": 17,
+   "store_id": 5,
+   "price": 14800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 214,
+   "product_id": 17,
+   "store_id": 6,
+   "price": 15000,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 215,
+   "product_id": 17,
+   "store_id": 7,
+   "price": 14700,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 216,
+   "product_id": 17,
+   "store_id": 8,
+   "price": 14900,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 217,
+   "product_id": 17,
+   "store_id": 9,
+   "price": 15200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 218,
+   "product_id": 17,
+   "store_id": 10,
+   "price": 16000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 219,
+   "product_id": 17,
+   "store_id": 11,
+   "price": 15500,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 220,
+   "product_id": 17,
+   "store_id": 12,
+   "price": 15200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 221,
+   "product_id": 17,
+   "store_id": 13,
+   "price": 15400,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 222,
+   "product_id": 18,
+   "store_id": 1,
+   "price": 7500,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 223,
+   "product_id": 18,
+   "store_id": 2,
+   "price": 6300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 224,
+   "product_id": 18,
+   "store_id": 3,
+   "price": 6900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 225,
+   "product_id": 18,
+   "store_id": 4,
+   "price": 6300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 226,
+   "product_id": 18,
+   "store_id": 5,
+   "price": 6200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 227,
+   "product_id": 18,
+   "store_id": 6,
+   "price": 6100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 228,
+   "product_id": 18,
+   "store_id": 7,
+   "price": 6000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 229,
+   "product_id": 18,
+   "store_id": 8,
+   "price": 6400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 230,
+   "product_id": 18,
+   "store_id": 9,
+   "price": 6900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 231,
+   "product_id": 18,
+   "store_id": 10,
+   "price": 7400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 232,
+   "product_id": 18,
+   "store_id": 11,
+   "price": 6600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 233,
+   "product_id": 18,
+   "store_id": 12,
+   "price": 6500,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 234,
+   "product_id": 18,
+   "store_id": 13,
+   "price": 6900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 235,
+   "product_id": 19,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 236,
+   "product_id": 19,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 237,
+   "product_id": 19,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 238,
+   "product_id": 19,
+   "store_id": 4,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 239,
+   "product_id": 19,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 240,
+   "product_id": 19,
+   "store_id": 6,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 241,
+   "product_id": 19,
+   "store_id": 7,
+   "price": 5300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 242,
+   "product_id": 19,
+   "store_id": 8,
+   "price": 4900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 243,
+   "product_id": 19,
+   "store_id": 9,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 244,
+   "product_id": 19,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 245,
+   "product_id": 19,
+   "store_id": 11,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 246,
+   "product_id": 19,
+   "store_id": 12,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 247,
+   "product_id": 19,
+   "store_id": 13,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 248,
+   "product_id": 20,
+   "store_id": 1,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 249,
+   "product_id": 20,
+   "store_id": 2,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 250,
+   "product_id": 20,
+   "store_id": 3,
+   "price": 6500,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 251,
+   "product_id": 20,
+   "store_id": 4,
+   "price": 6000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 252,
+   "product_id": 20,
+   "store_id": 5,
+   "price": 5800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 253,
+   "product_id": 20,
+   "store_id": 6,
+   "price": 5600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 254,
+   "product_id": 20,
+   "store_id": 7,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 255,
+   "product_id": 20,
+   "store_id": 8,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 256,
+   "product_id": 20,
+   "store_id": 9,
+   "price": 6600,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 257,
+   "product_id": 20,
+   "store_id": 10,
+   "price": 7000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 258,
+   "product_id": 20,
+   "store_id": 11,
+   "price": 6100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 259,
+   "product_id": 20,
+   "store_id": 12,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 260,
+   "product_id": 20,
+   "store_id": 13,
+   "price": 6200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 261,
+   "product_id": 21,
+   "store_id": 1,
+   "price": 8600,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 262,
+   "product_id": 21,
+   "store_id": 2,
+   "price": 7400,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 263,
+   "product_id": 21,
+   "store_id": 3,
+   "price": 8000,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 264,
+   "product_id": 21,
+   "store_id": 4,
+   "price": 7300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 265,
+   "product_id": 21,
+   "store_id": 5,
+   "price": 7300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 266,
+   "product_id": 21,
+   "store_id": 6,
+   "price": 7300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 267,
+   "product_id": 21,
+   "store_id": 7,
+   "price": 7300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 268,
+   "product_id": 21,
+   "store_id": 8,
+   "price": 7300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 269,
+   "product_id": 21,
+   "store_id": 9,
+   "price": 7900,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 270,
+   "product_id": 21,
+   "store_id": 10,
+   "price": 8500,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 271,
+   "product_id": 21,
+   "store_id": 11,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 272,
+   "product_id": 21,
+   "store_id": 12,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 273,
+   "product_id": 21,
+   "store_id": 13,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 274,
+   "product_id": 22,
+   "store_id": 1,
+   "price": 9800,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 275,
+   "product_id": 22,
+   "store_id": 2,
+   "price": 8600,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 276,
+   "product_id": 22,
+   "store_id": 3,
+   "price": 9200,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 277,
+   "product_id": 22,
+   "store_id": 4,
+   "price": 8300,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 278,
+   "product_id": 22,
+   "store_id": 5,
+   "price": 8500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 279,
+   "product_id": 22,
+   "store_id": 6,
+   "price": 8700,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 280,
+   "product_id": 22,
+   "store_id": 7,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 281,
+   "product_id": 22,
+   "store_id": 8,
+   "price": 8600,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 282,
+   "product_id": 22,
+   "store_id": 9,
+   "price": 8900,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 283,
+   "product_id": 22,
+   "store_id": 10,
+   "price": 9700,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 284,
+   "product_id": 22,
+   "store_id": 11,
+   "price": 9200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 285,
+   "product_id": 22,
+   "store_id": 12,
+   "price": 8900,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 286,
+   "product_id": 22,
+   "store_id": 13,
+   "price": 9100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 287,
+   "product_id": 23,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 288,
+   "product_id": 23,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 289,
+   "product_id": 23,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 290,
+   "product_id": 23,
+   "store_id": 4,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 291,
+   "product_id": 23,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 292,
+   "product_id": 23,
+   "store_id": 6,
+   "price": 5000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 293,
+   "product_id": 23,
+   "store_id": 7,
+   "price": 4900,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 294,
+   "product_id": 23,
+   "store_id": 8,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 295,
+   "product_id": 23,
+   "store_id": 9,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 296,
+   "product_id": 23,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 297,
+   "product_id": 23,
+   "store_id": 11,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 298,
+   "product_id": 23,
+   "store_id": 12,
+   "price": 5400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 299,
+   "product_id": 23,
+   "store_id": 13,
+   "price": 5800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 300,
+   "product_id": 24,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 301,
+   "product_id": 24,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 302,
+   "product_id": 24,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 303,
+   "product_id": 24,
+   "store_id": 4,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 304,
+   "product_id": 24,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 305,
+   "product_id": 24,
+   "store_id": 6,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 306,
+   "product_id": 24,
+   "store_id": 7,
+   "price": 5300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 307,
+   "product_id": 24,
+   "store_id": 8,
+   "price": 4900,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 308,
+   "product_id": 24,
+   "store_id": 9,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 309,
+   "product_id": 24,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 310,
+   "product_id": 24,
+   "store_id": 11,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 311,
+   "product_id": 24,
+   "store_id": 12,
+   "price": 5800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 312,
+   "product_id": 24,
+   "store_id": 13,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 313,
+   "product_id": 25,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 314,
+   "product_id": 25,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 315,
+   "product_id": 25,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 316,
+   "product_id": 25,
+   "store_id": 4,
+   "price": 5300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 317,
+   "product_id": 25,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 318,
+   "product_id": 25,
+   "store_id": 6,
+   "price": 4900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 319,
+   "product_id": 25,
+   "store_id": 7,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 320,
+   "product_id": 25,
+   "store_id": 8,
+   "price": 5000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 321,
+   "product_id": 25,
+   "store_id": 9,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 322,
+   "product_id": 25,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 323,
+   "product_id": 25,
+   "store_id": 11,
+   "price": 5400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 324,
+   "product_id": 25,
+   "store_id": 12,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 325,
+   "product_id": 25,
+   "store_id": 13,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 326,
+   "product_id": 26,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 327,
+   "product_id": 26,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 328,
+   "product_id": 26,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 329,
+   "product_id": 26,
+   "store_id": 4,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 330,
+   "product_id": 26,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 331,
+   "product_id": 26,
+   "store_id": 6,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 332,
+   "product_id": 26,
+   "store_id": 7,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 333,
+   "product_id": 26,
+   "store_id": 8,
+   "price": 5100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 334,
+   "product_id": 26,
+   "store_id": 9,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 335,
+   "product_id": 26,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 336,
+   "product_id": 26,
+   "store_id": 11,
+   "price": 5600,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 337,
+   "product_id": 26,
+   "store_id": 12,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 338,
+   "product_id": 26,
+   "store_id": 13,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 339,
+   "product_id": 27,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 340,
+   "product_id": 27,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 341,
+   "product_id": 27,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 342,
+   "product_id": 27,
+   "store_id": 4,
+   "price": 4900,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 343,
+   "product_id": 27,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 344,
+   "product_id": 27,
+   "store_id": 6,
+   "price": 5300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 345,
+   "product_id": 27,
+   "store_id": 7,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 346,
+   "product_id": 27,
+   "store_id": 8,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 347,
+   "product_id": 27,
+   "store_id": 9,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 348,
+   "product_id": 27,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 349,
+   "product_id": 27,
+   "store_id": 11,
+   "price": 5800,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 350,
+   "product_id": 27,
+   "store_id": 12,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 351,
+   "product_id": 27,
+   "store_id": 13,
+   "price": 5700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 352,
+   "product_id": 28,
+   "store_id": 1,
+   "price": 2700,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 353,
+   "product_id": 28,
+   "store_id": 2,
+   "price": 1500,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 354,
+   "product_id": 28,
+   "store_id": 3,
+   "price": 2100,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 355,
+   "product_id": 28,
+   "store_id": 4,
+   "price": 1500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 356,
+   "product_id": 28,
+   "store_id": 5,
+   "price": 1400,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 357,
+   "product_id": 28,
+   "store_id": 6,
+   "price": 1300,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 358,
+   "product_id": 28,
+   "store_id": 7,
+   "price": 1200,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 359,
+   "product_id": 28,
+   "store_id": 8,
+   "price": 1600,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 360,
+   "product_id": 28,
+   "store_id": 9,
+   "price": 2100,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 361,
+   "product_id": 28,
+   "store_id": 10,
+   "price": 2600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 362,
+   "product_id": 28,
+   "store_id": 11,
+   "price": 1800,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 363,
+   "product_id": 28,
+   "store_id": 12,
+   "price": 1700,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 364,
+   "product_id": 28,
+   "store_id": 13,
+   "price": 2100,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 365,
+   "product_id": 29,
+   "store_id": 1,
+   "price": 4800,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 366,
+   "product_id": 29,
+   "store_id": 2,
+   "price": 3600,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 367,
+   "product_id": 29,
+   "store_id": 3,
+   "price": 4200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 368,
+   "product_id": 29,
+   "store_id": 4,
+   "price": 3400,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 369,
+   "product_id": 29,
+   "store_id": 5,
+   "price": 3500,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 370,
+   "product_id": 29,
+   "store_id": 6,
+   "price": 3600,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 371,
+   "product_id": 29,
+   "store_id": 7,
+   "price": 3700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 372,
+   "product_id": 29,
+   "store_id": 8,
+   "price": 3300,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 373,
+   "product_id": 29,
+   "store_id": 9,
+   "price": 4000,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 374,
+   "product_id": 29,
+   "store_id": 10,
+   "price": 4700,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 375,
+   "product_id": 29,
+   "store_id": 11,
+   "price": 4100,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 376,
+   "product_id": 29,
+   "store_id": 12,
+   "price": 4200,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 377,
+   "product_id": 29,
+   "store_id": 13,
+   "price": 3800,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 378,
+   "product_id": 30,
+   "store_id": 1,
+   "price": 5400,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 379,
+   "product_id": 30,
+   "store_id": 2,
+   "price": 4200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 380,
+   "product_id": 30,
+   "store_id": 3,
+   "price": 4800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 381,
+   "product_id": 30,
+   "store_id": 4,
+   "price": 4300,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 382,
+   "product_id": 30,
+   "store_id": 5,
+   "price": 4100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 383,
+   "product_id": 30,
+   "store_id": 6,
+   "price": 3900,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 384,
+   "product_id": 30,
+   "store_id": 7,
+   "price": 4200,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 385,
+   "product_id": 30,
+   "store_id": 8,
+   "price": 4000,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 386,
+   "product_id": 30,
+   "store_id": 9,
+   "price": 4900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 387,
+   "product_id": 30,
+   "store_id": 10,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 388,
+   "product_id": 30,
+   "store_id": 11,
+   "price": 4400,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 389,
+   "product_id": 30,
+   "store_id": 12,
+   "price": 4700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 390,
+   "product_id": 30,
+   "store_id": 13,
+   "price": 4500,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 391,
+   "product_id": 31,
+   "store_id": 1,
+   "price": 9100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 392,
+   "product_id": 31,
+   "store_id": 2,
+   "price": 7900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 393,
+   "product_id": 31,
+   "store_id": 3,
+   "price": 8500,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 394,
+   "product_id": 31,
+   "store_id": 4,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 395,
+   "product_id": 31,
+   "store_id": 5,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 396,
+   "product_id": 31,
+   "store_id": 6,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 397,
+   "product_id": 31,
+   "store_id": 7,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 398,
+   "product_id": 31,
+   "store_id": 8,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 399,
+   "product_id": 31,
+   "store_id": 9,
+   "price": 8400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 400,
+   "product_id": 31,
+   "store_id": 10,
+   "price": 9000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 401,
+   "product_id": 31,
+   "store_id": 11,
+   "price": 8300,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 402,
+   "product_id": 31,
+   "store_id": 12,
+   "price": 8300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 403,
+   "product_id": 31,
+   "store_id": 13,
+   "price": 8300,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 404,
+   "product_id": 32,
+   "store_id": 1,
+   "price": 8800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 405,
+   "product_id": 32,
+   "store_id": 2,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 406,
+   "product_id": 32,
+   "store_id": 3,
+   "price": 8200,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 407,
+   "product_id": 32,
+   "store_id": 4,
+   "price": 7300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 408,
+   "product_id": 32,
+   "store_id": 5,
+   "price": 7500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 409,
+   "product_id": 32,
+   "store_id": 6,
+   "price": 7700,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 410,
+   "product_id": 32,
+   "store_id": 7,
+   "price": 7400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 411,
+   "product_id": 32,
+   "store_id": 8,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 412,
+   "product_id": 32,
+   "store_id": 9,
+   "price": 7900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 413,
+   "product_id": 32,
+   "store_id": 10,
+   "price": 8700,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 414,
+   "product_id": 32,
+   "store_id": 11,
+   "price": 8200,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 415,
+   "product_id": 32,
+   "store_id": 12,
+   "price": 7900,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 416,
+   "product_id": 32,
+   "store_id": 13,
+   "price": 8100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 417,
+   "product_id": 33,
+   "store_id": 1,
+   "price": 9000,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 418,
+   "product_id": 33,
+   "store_id": 2,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 419,
+   "product_id": 33,
+   "store_id": 3,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 420,
+   "product_id": 33,
+   "store_id": 4,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 421,
+   "product_id": 33,
+   "store_id": 5,
+   "price": 7700,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 422,
+   "product_id": 33,
+   "store_id": 6,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 423,
+   "product_id": 33,
+   "store_id": 7,
+   "price": 7500,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 424,
+   "product_id": 33,
+   "store_id": 8,
+   "price": 7900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 425,
+   "product_id": 33,
+   "store_id": 9,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 426,
+   "product_id": 33,
+   "store_id": 10,
+   "price": 8900,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 427,
+   "product_id": 33,
+   "store_id": 11,
+   "price": 8100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 428,
+   "product_id": 33,
+   "store_id": 12,
+   "price": 8000,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 429,
+   "product_id": 33,
+   "store_id": 13,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 430,
+   "product_id": 34,
+   "store_id": 1,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 431,
+   "product_id": 34,
+   "store_id": 2,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 432,
+   "product_id": 34,
+   "store_id": 3,
+   "price": 7000,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 433,
+   "product_id": 34,
+   "store_id": 4,
+   "price": 6200,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 434,
+   "product_id": 34,
+   "store_id": 5,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 435,
+   "product_id": 34,
+   "store_id": 6,
+   "price": 6400,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 436,
+   "product_id": 34,
+   "store_id": 7,
+   "price": 6500,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 437,
+   "product_id": 34,
+   "store_id": 8,
+   "price": 6100,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 438,
+   "product_id": 34,
+   "store_id": 9,
+   "price": 6800,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 439,
+   "product_id": 34,
+   "store_id": 10,
+   "price": 7500,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 440,
+   "product_id": 34,
+   "store_id": 11,
+   "price": 6900,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 441,
+   "product_id": 34,
+   "store_id": 12,
+   "price": 7000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 442,
+   "product_id": 34,
+   "store_id": 13,
+   "price": 6600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 443,
+   "product_id": 35,
+   "store_id": 1,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 444,
+   "product_id": 35,
+   "store_id": 2,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 445,
+   "product_id": 35,
+   "store_id": 3,
+   "price": 6500,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 446,
+   "product_id": 35,
+   "store_id": 4,
+   "price": 6000,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 447,
+   "product_id": 35,
+   "store_id": 5,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 448,
+   "product_id": 35,
+   "store_id": 6,
+   "price": 5600,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 449,
+   "product_id": 35,
+   "store_id": 7,
+   "price": 5900,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 450,
+   "product_id": 35,
+   "store_id": 8,
+   "price": 5700,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 451,
+   "product_id": 35,
+   "store_id": 9,
+   "price": 6600,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 452,
+   "product_id": 35,
+   "store_id": 10,
+   "price": 7000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 453,
+   "product_id": 35,
+   "store_id": 11,
+   "price": 6100,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 454,
+   "product_id": 35,
+   "store_id": 12,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 455,
+   "product_id": 35,
+   "store_id": 13,
+   "price": 6200,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 456,
+   "product_id": 36,
+   "store_id": 1,
+   "price": 8400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 457,
+   "product_id": 36,
+   "store_id": 2,
+   "price": 7200,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 458,
+   "product_id": 36,
+   "store_id": 3,
+   "price": 7800,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 459,
+   "product_id": 36,
+   "store_id": 4,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 460,
+   "product_id": 36,
+   "store_id": 5,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 461,
+   "product_id": 36,
+   "store_id": 6,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 462,
+   "product_id": 36,
+   "store_id": 7,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 463,
+   "product_id": 36,
+   "store_id": 8,
+   "price": 7100,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 464,
+   "product_id": 36,
+   "store_id": 9,
+   "price": 7700,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 465,
+   "product_id": 36,
+   "store_id": 10,
+   "price": 8300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 466,
+   "product_id": 36,
+   "store_id": 11,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 467,
+   "product_id": 36,
+   "store_id": 12,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 468,
+   "product_id": 36,
+   "store_id": 13,
+   "price": 7600,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 469,
+   "product_id": 37,
+   "store_id": 1,
+   "price": 6400,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 470,
+   "product_id": 37,
+   "store_id": 2,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 471,
+   "product_id": 37,
+   "store_id": 3,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 472,
+   "product_id": 37,
+   "store_id": 4,
+   "price": 4900,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 473,
+   "product_id": 37,
+   "store_id": 5,
+   "price": 5100,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 474,
+   "product_id": 37,
+   "store_id": 6,
+   "price": 5300,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 475,
+   "product_id": 37,
+   "store_id": 7,
+   "price": 5000,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 476,
+   "product_id": 37,
+   "store_id": 8,
+   "price": 5200,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 477,
+   "product_id": 37,
+   "store_id": 9,
+   "price": 5500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 478,
+   "product_id": 37,
+   "store_id": 10,
+   "price": 6300,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 479,
+   "product_id": 37,
+   "store_id": 11,
+   "price": 5800,
+   "in_stock": 1,
+   "qty": 9,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 480,
+   "product_id": 37,
+   "store_id": 12,
+   "price": 5500,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 481,
+   "product_id": 37,
+   "store_id": 13,
+   "price": 5700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 482,
+   "product_id": 38,
+   "store_id": 1,
+   "price": 12700,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 483,
+   "product_id": 38,
+   "store_id": 2,
+   "price": 11500,
+   "in_stock": 1,
+   "qty": 3,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 484,
+   "product_id": 38,
+   "store_id": 3,
+   "price": 12100,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 485,
+   "product_id": 38,
+   "store_id": 4,
+   "price": 11500,
+   "in_stock": 1,
+   "qty": 1,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 486,
+   "product_id": 38,
+   "store_id": 5,
+   "price": 11400,
+   "in_stock": 1,
+   "qty": 2,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 487,
+   "product_id": 38,
+   "store_id": 6,
+   "price": 11300,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 488,
+   "product_id": 38,
+   "store_id": 7,
+   "price": 11200,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 489,
+   "product_id": 38,
+   "store_id": 8,
+   "price": 11600,
+   "in_stock": 1,
+   "qty": 4,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 490,
+   "product_id": 38,
+   "store_id": 9,
+   "price": 12100,
+   "in_stock": 1,
+   "qty": 5,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 491,
+   "product_id": 38,
+   "store_id": 10,
+   "price": 12600,
+   "in_stock": 1,
+   "qty": 6,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 492,
+   "product_id": 38,
+   "store_id": 11,
+   "price": 11800,
+   "in_stock": 1,
+   "qty": 7,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 493,
+   "product_id": 38,
+   "store_id": 12,
+   "price": 11700,
+   "in_stock": 0,
+   "qty": 0,
+   "source": "demo",
+   "updated_at": null
+  },
+  {
+   "id": 494,
+   "product_id": 38,
+   "store_id": 13,
+   "price": 12100,
+   "in_stock": 1,
+   "qty": 8,
+   "source": "demo",
+   "updated_at": null
+  }
+ ],
+ "product_skin_types": [
+  {
+   "product_id": 5,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 15,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 15,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 20,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 20,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 20,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 21,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 21,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 22,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 22,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 22,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 36,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 36,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 37,
+   "skin_type": "combination",
+   "source": "seed"
+  },
+  {
+   "product_id": 37,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 37,
+   "skin_type": "oily",
+   "source": "seed"
+  },
+  {
+   "product_id": 37,
+   "skin_type": "sensitive",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "skin_type": "dry",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "skin_type": "normal",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "skin_type": "sensitive",
+   "source": "seed"
+  }
+ ],
+ "product_color_types": [
+  {
+   "product_id": 2,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 2,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 2,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 3,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 3,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 4,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 4,
+   "color_type": "winter",
+   "source": "seed"
+  },
+  {
+   "product_id": 7,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 7,
+   "color_type": "winter",
+   "source": "seed"
+  },
+  {
+   "product_id": 8,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 8,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 9,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 9,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 13,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 13,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 13,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 23,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 23,
+   "color_type": "winter",
+   "source": "seed"
+  },
+  {
+   "product_id": 24,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 24,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 25,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 26,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 26,
+   "color_type": "winter",
+   "source": "seed"
+  },
+  {
+   "product_id": 27,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 27,
+   "color_type": "winter",
+   "source": "seed"
+  },
+  {
+   "product_id": 28,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 28,
+   "color_type": "summer",
+   "source": "seed"
+  },
+  {
+   "product_id": 29,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 29,
+   "color_type": "spring",
+   "source": "seed"
+  },
+  {
+   "product_id": 30,
+   "color_type": "autumn",
+   "source": "seed"
+  },
+  {
+   "product_id": 30,
+   "color_type": "spring",
+   "source": "seed"
+  }
+ ],
+ "product_undertones": [
+  {
+   "product_id": 2,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 2,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 3,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 3,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 4,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 4,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 7,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 7,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 8,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 8,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 9,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 9,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 13,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 13,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 23,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 23,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 24,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 24,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 25,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 26,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 26,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 27,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 28,
+   "undertone": "cool",
+   "source": "seed"
+  },
+  {
+   "product_id": 28,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 29,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 29,
+   "undertone": "warm",
+   "source": "seed"
+  },
+  {
+   "product_id": 30,
+   "undertone": "neutral",
+   "source": "seed"
+  },
+  {
+   "product_id": 30,
+   "undertone": "warm",
+   "source": "seed"
+  }
+ ],
+ "product_concerns": [
+  {
+   "product_id": 5,
+   "concern": "aging",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "concern": "aging",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "concern": "pigmentation",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "concern": "acne",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "concern": "pigmentation",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 15,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "concern": "acne",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "concern": "sensitivity",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "concern": "aging",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "concern": "pigmentation",
+   "source": "seed"
+  },
+  {
+   "product_id": 20,
+   "concern": "aging",
+   "source": "seed"
+  },
+  {
+   "product_id": 20,
+   "concern": "pigmentation",
+   "source": "seed"
+  },
+  {
+   "product_id": 21,
+   "concern": "acne",
+   "source": "seed"
+  },
+  {
+   "product_id": 22,
+   "concern": "aging",
+   "source": "seed"
+  },
+  {
+   "product_id": 22,
+   "concern": "pigmentation",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "concern": "acne",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "concern": "sensitivity",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "concern": "acne",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "concern": "pigmentation",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "concern": "sensitivity",
+   "source": "seed"
+  },
+  {
+   "product_id": 36,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 37,
+   "concern": "acne",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "concern": "dryness",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "concern": "sensitivity",
+   "source": "seed"
+  }
+ ],
+ "product_tags": [
+  {
+   "product_id": 1,
+   "tag": "long_wearing",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 5,
+   "tag": "soothing",
+   "source": "seed"
+  },
+  {
+   "product_id": 6,
+   "tag": "fragrance",
+   "source": "seed"
+  },
+  {
+   "product_id": 7,
+   "tag": "long_wearing",
+   "source": "seed"
+  },
+  {
+   "product_id": 8,
+   "tag": "long_wearing",
+   "source": "seed"
+  },
+  {
+   "product_id": 10,
+   "tag": "spf",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 11,
+   "tag": "spf",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "tag": "brightening",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 12,
+   "tag": "oil_control",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 14,
+   "tag": "soothing",
+   "source": "seed"
+  },
+  {
+   "product_id": 15,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 16,
+   "tag": "fragrance",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 18,
+   "tag": "soothing",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "tag": "brightening",
+   "source": "seed"
+  },
+  {
+   "product_id": 19,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 20,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 21,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 21,
+   "tag": "oil_control",
+   "source": "seed"
+  },
+  {
+   "product_id": 22,
+   "tag": "brightening",
+   "source": "seed"
+  },
+  {
+   "product_id": 28,
+   "tag": "long_wearing",
+   "source": "seed"
+  },
+  {
+   "product_id": 29,
+   "tag": "long_wearing",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 31,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 32,
+   "tag": "soothing",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "tag": "brightening",
+   "source": "seed"
+  },
+  {
+   "product_id": 33,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 34,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "tag": "fragrance_free",
+   "source": "seed"
+  },
+  {
+   "product_id": 35,
+   "tag": "soothing",
+   "source": "seed"
+  },
+  {
+   "product_id": 36,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 37,
+   "tag": "oil_control",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "tag": "hydrating",
+   "source": "seed"
+  },
+  {
+   "product_id": 38,
+   "tag": "soothing",
+   "source": "seed"
+  }
+ ]
+}
