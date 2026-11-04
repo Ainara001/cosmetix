@@ -316,8 +316,8 @@ class _Bubble extends StatelessWidget {
             Container(
               width: 28,
               height: 28,
-              decoration: const BoxDecoration(
-                color: AppColors.primarySoft,
+              decoration: BoxDecoration(
+                color: context.pal.pinkSoft,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -347,7 +347,7 @@ class _ShareProfileBanner extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
       decoration: BoxDecoration(
-        color: AppColors.primarySoft,
+        color: context.pal.pinkSoft,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -382,7 +382,7 @@ class _InfoBanner extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.primarySoft,
+        color: context.pal.pinkSoft,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -434,7 +434,7 @@ class _OfflineBanner extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: const EdgeInsets.fromLTRB(12, 8, 6, 8),
       decoration: BoxDecoration(
-        color: AppColors.primarySoft,
+        color: context.pal.pinkSoft,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(

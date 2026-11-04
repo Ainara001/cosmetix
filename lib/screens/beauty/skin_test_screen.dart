@@ -115,7 +115,7 @@ class _SkinTestScreenState extends State<SkinTestScreen> {
                 FilterChip(
                   label: Text(tr(c.label)),
                   selected: _concerns.contains(c),
-                  selectedColor: AppColors.primarySoft,
+                  selectedColor: context.pal.pinkSoft,
                   checkmarkColor: AppColors.primaryDark,
                   onSelected: (v) => setState(() {
                     v ? _concerns.add(c) : _concerns.remove(c);

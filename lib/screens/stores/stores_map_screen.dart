@@ -297,7 +297,7 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
   ) => (widget.showTiles ?? StoresMapScreen.defaultShowTiles)
       ? _mapView(origin, rows, loc)
       : Container(
-          color: AppColors.primarySoft,
+          color: context.pal.pinkSoft,
           alignment: Alignment.center,
           child: Text(tr('Карта')),
         );
@@ -661,7 +661,7 @@ class _StoreCard extends StatelessWidget {
     final (chipColor, chipBg, chipText) = switch (o?.level) {
       StockLevel.inStock => (
         AppColors.success,
-        AppColors.successSoft,
+        context.pal.greenSoft,
         o!.qty == null
             ? tr('В наличии')
             : trf('В наличии · {v0} шт.', {'v0': o.qty}),
@@ -673,10 +673,10 @@ class _StoreCard extends StatelessWidget {
       ),
       StockLevel.out => (
         AppColors.sale,
-        AppColors.saleSoft,
+        context.pal.redSoft,
         tr('Нет в наличии'),
       ),
-      null => (context.pal.accent, AppColors.primarySoft, ''),
+      null => (context.pal.accent, context.pal.pinkSoft, ''),
     };
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),

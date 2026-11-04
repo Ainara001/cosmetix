@@ -53,8 +53,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                 Container(
                   width: 96,
                   height: 96,
-                  decoration: const BoxDecoration(
-                    color: AppColors.successSoft,
+                  decoration: BoxDecoration(
+                    color: context.pal.greenSoft,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

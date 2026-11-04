@@ -134,13 +134,13 @@ class _ColorTestScreenState extends State<ColorTestScreen> {
                         value: (_step + 1) / _steps.length,
                         minHeight: 6,
                         color: AppColors.primary,
-                        backgroundColor: AppColors.primarySoft,
+                        backgroundColor: context.pal.pinkSoft,
                       ),
                     ),
                     const SizedBox(height: 12),
                     if (_step == 0)
                       AppCard(
-                        color: AppColors.primarySoft,
+                        color: context.pal.pinkSoft,
                         borderColor: Colors.transparent,
                         onTap: _byPhoto,
                         child: Row(

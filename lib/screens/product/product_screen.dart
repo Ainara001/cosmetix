@@ -236,7 +236,7 @@ class _ProductBodyState extends State<_ProductBody> {
             ActionChip(
               visualDensity: VisualDensity.compact,
               label: Text(tr(g.label), style: const TextStyle(fontSize: 12)),
-              backgroundColor: AppColors.primarySoft,
+              backgroundColor: context.pal.pinkSoft,
               side: BorderSide.none,
               onPressed: () => Navigator.pushNamed(
                 context,
@@ -376,7 +376,7 @@ class _ProductBodyState extends State<_ProductBody> {
                             ),
                             decoration: BoxDecoration(
                               color: product.inStock
-                                  ? AppColors.successSoft
+                                  ? context.pal.greenSoft
                                   : pal.field,
                               borderRadius: BorderRadius.circular(6),
                             ),
@@ -486,8 +486,8 @@ class _ProductBodyState extends State<_ProductBody> {
                             arguments: product.id,
                           ),
                           color: _analysis!.score >= 7.5
-                              ? AppColors.successSoft
-                              : AppColors.saleSoft,
+                              ? context.pal.greenSoft
+                              : context.pal.redSoft,
                           borderColor: Colors.transparent,
                           child: Row(
                             children: [
@@ -719,7 +719,7 @@ class _CartStepper extends StatelessWidget {
       onPressed: onTap,
       icon: Icon(icon, color: context.pal.accent),
       style: IconButton.styleFrom(
-        backgroundColor: AppColors.primarySoft,
+        backgroundColor: context.pal.pinkSoft,
         minimumSize: const Size(44, 44),
       ),
     );
@@ -886,7 +886,7 @@ class _StoreRow extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 17,
-              backgroundColor: AppColors.primarySoft,
+              backgroundColor: context.pal.pinkSoft,
               child: Text(
                 '0$index',
                 style: TextStyle(fontSize: 12, color: context.pal.accent),
@@ -935,7 +935,7 @@ class _StoreRow extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: switch (price.level) {
-                      StockLevel.inStock => AppColors.successSoft,
+                      StockLevel.inStock => context.pal.greenSoft,
                       StockLevel.low => const Color(0xFFFBF0D9),
                       StockLevel.out => pal.field,
                     },

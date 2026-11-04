@@ -82,8 +82,8 @@ class EmptyState extends StatelessWidget {
             Container(
               width: 84,
               height: 84,
-              decoration: const BoxDecoration(
-                color: AppColors.primarySoft,
+              decoration: BoxDecoration(
+                color: context.pal.pinkSoft,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 38, color: context.pal.accent),
@@ -208,7 +208,7 @@ class MenuTile extends StatelessWidget {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.primarySoft,
+                    color: context.pal.pinkSoft,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, color: context.pal.accent, size: 22),
@@ -279,7 +279,7 @@ class StarPicker extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: i <= value ? AppColors.primary : AppColors.primarySoft,
+                color: i <= value ? AppColors.primary : context.pal.pinkSoft,
                 shape: BoxShape.circle,
               ),
               child: Icon(

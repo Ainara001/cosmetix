@@ -261,7 +261,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
         ),
         const SizedBox(height: 14),
         AppCard(
-          color: AppColors.primarySoft,
+          color: context.pal.pinkSoft,
           borderColor: Colors.transparent,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

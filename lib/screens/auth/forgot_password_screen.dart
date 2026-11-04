@@ -84,8 +84,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     Container(
                       width: 84,
                       height: 84,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primarySoft,
+                      decoration: BoxDecoration(
+                        color: context.pal.pinkSoft,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(

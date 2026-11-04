@@ -142,7 +142,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 if (a.blacklistHits.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   AppCard(
-                    color: AppColors.saleSoft,
+                    color: context.pal.redSoft,
                     borderColor: AppColors.danger.withValues(alpha: 0.3),
                     onTap: () =>
                         Navigator.pushNamed(context, AppRoutes.blacklist),
@@ -171,7 +171,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 if (a.allergens.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   AppCard(
-                    color: AppColors.saleSoft,
+                    color: context.pal.redSoft,
                     borderColor: Colors.transparent,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

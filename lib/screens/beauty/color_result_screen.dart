@@ -59,8 +59,8 @@ class ColorResultScreen extends StatelessWidget {
               child: Container(
                 width: 96,
                 height: 96,
-                decoration: const BoxDecoration(
-                  color: AppColors.primarySoft,
+                decoration: BoxDecoration(
+                  color: context.pal.pinkSoft,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

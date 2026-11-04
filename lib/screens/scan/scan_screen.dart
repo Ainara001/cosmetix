@@ -249,7 +249,7 @@ class _ScanScreenState extends State<ScanScreen> {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           AppCard(
-            color: AppColors.primarySoft,
+            color: context.pal.pinkSoft,
             borderColor: Colors.transparent,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,7 +364,7 @@ class _ScanScreenState extends State<ScanScreen> {
         )
       else
         AppCard(
-          color: _matches.isEmpty ? AppColors.successSoft : AppColors.saleSoft,
+          color: _matches.isEmpty ? context.pal.greenSoft : context.pal.redSoft,
           borderColor: Colors.transparent,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,7 +437,7 @@ class _ScanScreenState extends State<ScanScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: hitNames.contains(i) ? AppColors.saleSoft : pal.field,
+                color: hitNames.contains(i) ? context.pal.redSoft : pal.field,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

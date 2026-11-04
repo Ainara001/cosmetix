@@ -95,7 +95,7 @@ class OrdersScreen extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.successSoft,
+                          color: context.pal.greenSoft,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(

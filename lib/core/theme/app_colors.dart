@@ -27,6 +27,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.border,
     required this.field,
     required this.accent,
+    required this.pinkSoft,
+    required this.blushSoft,
+    required this.redSoft,
+    required this.greenSoft,
+    required this.amberSoft,
   });
 
   final Color background;
@@ -40,6 +45,14 @@ class AppPalette extends ThemeExtension<AppPalette> {
   /// on [AppColors.primarySoft] in the light theme (4.5:1), lighter in dark.
   final Color accent;
 
+  /// Soft tinted backgrounds of cards and chips. In the dark theme they are
+  /// dark tints, so the (light) text on them stays readable.
+  final Color pinkSoft;
+  final Color blushSoft;
+  final Color redSoft;
+  final Color greenSoft;
+  final Color amberSoft;
+
   static const light = AppPalette(
     background: Color(0xFFF8F4F5),
     surface: Colors.white,
@@ -48,6 +61,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
     border: Color(0xFFEBDCE0),
     field: Color(0xFFF1EDEE),
     accent: Color(0xFF94455D),
+    pinkSoft: AppColors.primarySoft,
+    blushSoft: AppColors.blush,
+    redSoft: AppColors.saleSoft,
+    greenSoft: AppColors.successSoft,
+    amberSoft: Color(0xFFFBF0D9),
   );
 
   static const dark = AppPalette(
@@ -58,6 +76,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
     border: Color(0xFF3A3135),
     field: Color(0xFF2C2528),
     accent: Color(0xFFE0A3B5),
+    pinkSoft: Color(0xFF3A2A31),
+    blushSoft: Color(0xFF2F2429),
+    redSoft: Color(0xFF402428),
+    greenSoft: Color(0xFF203329),
+    amberSoft: Color(0xFF3B3221),
   );
 
   @override
@@ -69,6 +92,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? border,
     Color? field,
     Color? accent,
+    Color? pinkSoft,
+    Color? blushSoft,
+    Color? redSoft,
+    Color? greenSoft,
+    Color? amberSoft,
   }) {
     return AppPalette(
       background: background ?? this.background,
@@ -78,6 +106,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
       border: border ?? this.border,
       field: field ?? this.field,
       accent: accent ?? this.accent,
+      pinkSoft: pinkSoft ?? this.pinkSoft,
+      blushSoft: blushSoft ?? this.blushSoft,
+      redSoft: redSoft ?? this.redSoft,
+      greenSoft: greenSoft ?? this.greenSoft,
+      amberSoft: amberSoft ?? this.amberSoft,
     );
   }
 
@@ -92,6 +125,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
       border: Color.lerp(border, other.border, t)!,
       field: Color.lerp(field, other.field, t)!,
       accent: Color.lerp(accent, other.accent, t)!,
+      pinkSoft: Color.lerp(pinkSoft, other.pinkSoft, t)!,
+      blushSoft: Color.lerp(blushSoft, other.blushSoft, t)!,
+      redSoft: Color.lerp(redSoft, other.redSoft, t)!,
+      greenSoft: Color.lerp(greenSoft, other.greenSoft, t)!,
+      amberSoft: Color.lerp(amberSoft, other.amberSoft, t)!,
     );
   }
 }

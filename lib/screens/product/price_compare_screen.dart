@@ -280,7 +280,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.successSoft,
+                                      color: context.pal.greenSoft,
                                       borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: Text(

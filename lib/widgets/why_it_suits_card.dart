@@ -53,7 +53,7 @@ class WhyItSuitsCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 14),
       child: AppCard(
-        color: AppColors.primarySoft,
+        color: context.pal.pinkSoft,
         borderColor: Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

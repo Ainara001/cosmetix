@@ -129,7 +129,7 @@ class FavoritesScreen extends StatelessWidget {
                     ),
                   ),
                 AppCard(
-                  color: AppColors.primarySoft,
+                  color: context.pal.pinkSoft,
                   borderColor: Colors.transparent,
                   onTap: settings.pushEnabled
                       ? null

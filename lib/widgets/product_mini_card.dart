@@ -28,7 +28,7 @@ class ProductMiniCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Material(
-        color: AppColors.blush,
+        color: context.pal.blushSoft,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),

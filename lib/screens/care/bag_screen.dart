@@ -67,7 +67,7 @@ class BagScreen extends StatelessWidget {
           if (attention.isNotEmpty) ...[
             const SizedBox(height: 14),
             AppCard(
-              color: AppColors.saleSoft,
+              color: context.pal.redSoft,
               borderColor: Colors.transparent,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,7 +228,7 @@ class ExpiryChip extends StatelessWidget {
           'v1': days,
           'v2': Formatters.plural(days!, 'день', 'дня', 'дней'),
         }),
-        AppColors.successSoft,
+        context.pal.greenSoft,
         AppColors.success,
       ),
       ExpiryState.soon => (
@@ -239,14 +239,14 @@ class ExpiryChip extends StatelessWidget {
                 'v1': days,
                 'v2': Formatters.plural(days!, 'день', 'дня', 'дней'),
               }),
-        AppColors.saleSoft,
+        context.pal.redSoft,
         AppColors.sale,
       ),
       ExpiryState.expired => (
         trf('Срок использования истёк {v0}', {
           'v0': Formatters.date(product.useUntil!),
         }),
-        AppColors.saleSoft,
+        context.pal.redSoft,
         AppColors.sale,
       ),
     };

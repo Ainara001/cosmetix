@@ -62,6 +62,21 @@ void main() {
     expect(_contrast(dark.accent, dark.surface), greaterThan(4.5));
   });
 
+  test('text stays readable on every soft card background in both themes', () {
+    for (final pal in [AppPalette.light, AppPalette.dark]) {
+      for (final bg in [
+        pal.pinkSoft,
+        pal.blushSoft,
+        pal.redSoft,
+        pal.greenSoft,
+        pal.amberSoft,
+      ]) {
+        expect(_contrast(pal.text, bg), greaterThan(7), reason: '$bg');
+        expect(_contrast(pal.subtext, bg), greaterThan(4.5), reason: '$bg');
+      }
+    }
+  });
+
   group('shades of one line', () {
     late DatabaseHelper helper;
     late List<Product> all;
