@@ -60,7 +60,8 @@ async function boot({ pool, env = {}, now } = {}) {
     }
     return { status: res.status, data, text, headers: res.headers };
   }
-  return { call, api, close: () => new Promise((r) => server.close(r)) };
+  const port = server.address().port;
+  return { call, api, port, host: `127.0.0.1:${port}`, close: () => new Promise((r) => server.close(r)) };
 }
 
 /** Registers a device and returns { userId, auth } for later calls. */

@@ -9,6 +9,7 @@ const { createLimiter } = require('../ratelimit');
 const { registerCatalog } = require('./catalog');
 const { registerAppUser } = require('./app-user');
 const { registerAdmin } = require('./admin');
+const { checkAdminAccess } = require('./admin-guard');
 
 const ADMIN_DIR = path.join(__dirname, '..', 'admin');
 const STATIC = {
@@ -64,6 +65,8 @@ function createApi({ db, env = process.env, now = () => Date.now() }) {
     async handle(req, url, readBody) {
       const { pathname } = url;
       if (!this.isApiPath(pathname)) return null;
+      // before anything else, so an outsider learns nothing about the panel
+      if (this.isAdminPath(pathname)) checkAdminAccess(req, env);
       if (!db) {
         throw new HttpError(503, 'db_not_configured', 'The database is not configured (DATABASE_URL)');
       }
@@ -78,6 +81,8 @@ function createApi({ db, env = process.env, now = () => Date.now() }) {
     },
 
     adminHeaders: ADMIN_HEADERS,
+    // exposed for tests: every route that is registered
+    router,
   };
 }
 

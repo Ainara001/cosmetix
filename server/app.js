@@ -4,6 +4,7 @@ const http = require('node:http');
 
 const { HttpError } = require('./http-error');
 const { createApi } = require('./routes');
+const { isDbUnavailable } = require('./db/errors');
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
@@ -498,6 +499,15 @@ function createApp({
       if (e instanceof HttpError) {
         const headers = e.extra.retryAfter ? { 'retry-after': String(e.extra.retryAfter) } : {};
         return send(e.status, { error: e.code, message: e.message, ...e.extra }, headers);
+      }
+      if (isDbUnavailable(e)) {
+        // the database is down or too slow: the AI proxy and /health keep working
+        console.error('database unavailable:', (e && e.code) || (e && e.name));
+        return send(
+          503,
+          { error: 'db_unavailable', message: 'The database is not available, try again later' },
+          { 'retry-after': '5' },
+        );
       }
       // unexpected: no details to the client, nothing sensitive in the log
       console.error('unexpected error:', e && e.name, e && e.code);

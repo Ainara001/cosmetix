@@ -1,7 +1,7 @@
 {
  "meta": {
   "generatedBy": "tool/export_server_seed.dart",
-  "sqliteSchemaVersion": 12,
+  "sqliteSchemaVersion": 13,
   "note": "Prices and stock in products.price and product_prices come from the app demo data (source = \"demo\"); they are not real shop prices."
  },
  "stores": [

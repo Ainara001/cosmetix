@@ -107,8 +107,9 @@ changes the password and signs that admin out everywhere.
 | `admins`, `admin_sessions`, `admin_audit` | admin accounts (scrypt hashes), sessions (token hash), and a log of every product change with old and new values |
 
 **Demo data is marked.** The catalog is exported from the app's built-in seed
-(`lib/database/seed_data.dart`, SQLite schema version 12 on `main` at the time of
-export). Its prices (`products.price`, every row of `prices`) are placeholder
+(`lib/database/seed_data.dart`, SQLite schema version 13). It was compared with
+a fresh export from `main` at commit `67a1e14` (PR #15 merged): the data is the
+same, only the version number differs. Its prices (`products.price`, every row of `prices`) are placeholder
 values from the app, not real shop prices: they carry `source = 'demo'`
 (`price_source` on the product), the API returns it as `priceSource`, and the
 admin panel shows a «демо» tag. A price edited in the panel becomes
@@ -120,6 +121,11 @@ The seed file `seed/catalog.json` is generated, not written by hand:
 ```bash
 flutter test tool/export_server_seed.dart          # from the repository root
 ```
+
+Export again, and read the diff, whenever the app's catalog changes (for example
+when the catalog moves to JSON files or gets a manufacturer country). The seed is
+loaded only into an empty database, so an existing server keeps its data: new
+catalog fields reach it through a new migration, not through the seed.
 
 ### API for the app
 
@@ -153,8 +159,34 @@ counts, no profile data); **Правки** (who changed what).
 * 10 wrong passwords from one address lock the sign-in for 15 minutes.
 * The page loads nothing from other sites (CSP `default-src 'none'`) and writes
   server text only with `textContent`.
-* The panel is meant for a trusted network or behind HTTPS; it is not hardened
-  for the open internet beyond the points above.
+* A change that carries a foreign `Origin` header (a page of another site) is
+  refused, and the server sends no CORS headers, so another site can neither
+  act nor read.
+* **By default the panel works only on the machine the server runs on**: the
+  connection must come from a loopback address and the `Host` header must be
+  `localhost`, `127.0.0.1` or `[::1]` (this also stops DNS rebinding). From
+  another device it answers `403 admin_local_only`. The reason: the server speaks
+  plain HTTP, so a password typed from another device would cross the network
+  unencrypted. The app API (`/v1/...`) is not affected and stays reachable from
+  a phone on the same Wi-Fi.
+* **Not for the open internet as it is.** To reach the panel remotely put the
+  server behind a reverse proxy that terminates HTTPS, and set
+  `ADMIN_ALLOW_REMOTE=1`, `ADMIN_COOKIE_SECURE=1` and
+  `ADMIN_ALLOWED_HOSTS=admin.example.com` (the `Host` header is still checked;
+  `X-Forwarded-For` is never trusted). Also keep the proxy from exposing
+  `/admin` to everyone if you can (an IP allow-list or its own login). Nothing in
+  this repository publishes the server anywhere.
+
+### When the database is not available
+
+`DATABASE_URL` empty: `/health` and `/v1/chat` work, the database routes answer
+`503 db_not_configured`. `DATABASE_URL` set but the database down, unreachable,
+overloaded or too slow (`PG_CONNECT_TIMEOUT_MS` 5000, `PG_STATEMENT_TIMEOUT_MS`
+10000): those routes answer `503 db_unavailable` with `Retry-After: 5`, `/health`
+and `/v1/chat` keep working, and a connection that dies while idle is dropped
+quietly (the next query opens a new one). At start-up an unreachable database
+stops the server with `startup failed: ...` (no connection string in the
+message). Anything else unexpected is a plain `500 internal` with no details.
 
 ## Tests
 

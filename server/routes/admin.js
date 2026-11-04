@@ -5,6 +5,7 @@ const { verifyPassword, newToken, hashToken, DUMMY_HASH } = require('../auth');
 const { bad, intParam, optString, requireObject, UUID_RE } = require('../validate');
 const { Reply } = require('../router');
 const { listProducts, productDetails } = require('./catalog');
+const { checkSameOrigin } = require('./admin-guard');
 
 const COOKIE = 'cx_admin';
 const SESSION_HOURS = 12;
@@ -33,8 +34,11 @@ function readCookie(req, name) {
 
 /** The signed-in admin of this request, or 401. Changes also need the CSRF header. */
 async function requireAdmin(db, req) {
-  if (req.method !== 'GET' && req.headers['x-requested-with'] !== CSRF_HEADER) {
-    throw new HttpError(403, 'forbidden', 'Missing x-requested-with header');
+  if (req.method !== 'GET') {
+    checkSameOrigin(req);
+    if (req.headers['x-requested-with'] !== CSRF_HEADER) {
+      throw new HttpError(403, 'forbidden', 'Missing x-requested-with header');
+    }
   }
   const token = readCookie(req, COOKIE);
   if (!token) throw new HttpError(401, 'unauthorized', 'Sign in first');
@@ -83,6 +87,7 @@ function parseProductPatch(body) {
 
 function registerAdmin(router, { loginLimiter, cookieSecure }) {
   router.add('POST', '/admin/api/login', async ({ db, req, body }) => {
+    checkSameOrigin(req);
     const ip = req.socket.remoteAddress || 'unknown';
     if (loginLimiter.blocked(ip)) {
       throw new HttpError(429, 'rate_limited', 'Too many failed sign-ins, try again later', {

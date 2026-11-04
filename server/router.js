@@ -15,7 +15,7 @@ class Router {
   }
 
   add(method, pattern, handler) {
-    this.routes.push({ method, re: compile(pattern), handler });
+    this.routes.push({ method, pattern, re: compile(pattern), handler });
   }
 
   /**
