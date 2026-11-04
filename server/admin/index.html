@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosmetix — админка</title>
+  <link rel="stylesheet" href="/admin/style.css">
+</head>
+<body>
+  <main id="login" class="login" hidden>
+    <form id="login-form" class="card" autocomplete="on">
+      <h1>Cosmetix · админка</h1>
+      <label>Логин
+        <input name="username" autocomplete="username" required maxlength="100">
+      </label>
+      <label>Пароль
+        <input name="password" type="password" autocomplete="current-password" required maxlength="200">
+      </label>
+      <button type="submit">Войти</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </main>
+
+  <div id="app" hidden>
+    <header class="top">
+      <strong>Cosmetix · админка</strong>
+      <nav id="tabs">
+        <button data-tab="overview" class="active">Обзор</button>
+        <button data-tab="products">Товары</button>
+        <button data-tab="logins">Входы</button>
+        <button data-tab="events">События</button>
+        <button data-tab="users">Устройства</button>
+        <button data-tab="audit">Правки</button>
+      </nav>
+      <span class="who"><span id="who"></span> <button id="logout" class="link">Выйти</button></span>
+    </header>
+
+    <main class="content">
+      <section id="tab-overview"></section>
+
+      <section id="tab-products" hidden>
+        <div class="toolbar">
+          <input id="p-q" type="search" placeholder="Поиск по названию или бренду" maxlength="100">
+          <select id="p-cat"><option value="">Все категории</option></select>
+        </div>
+        <table id="p-table">
+          <thead><tr><th>№</th><th>Бренд</th><th>Название</th><th>Категория</th><th>Страна</th><th>Цена, ₸</th><th>INCI</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div id="p-pager" class="pager"></div>
+      </section>
+
+      <section id="tab-logins" hidden>
+        <p class="hint">Каждый вход в приложение — событие <code>app_open</code>.</p>
+        <table id="l-table"><thead><tr><th>Когда</th><th>Устройство</th><th>Данные</th></tr></thead><tbody></tbody></table>
+        <div id="l-pager" class="pager"></div>
+      </section>
+
+      <section id="tab-events" hidden>
+        <div class="toolbar"><input id="e-type" placeholder="Тип события, например product_view" maxlength="40"></div>
+        <table id="e-table"><thead><tr><th>Когда</th><th>Устройство</th><th>Тип</th><th>Данные</th></tr></thead><tbody></tbody></table>
+        <div id="e-pager" class="pager"></div>
+      </section>
+
+      <section id="tab-users" hidden>
+        <p class="hint">Анонимные устройства: без имени, почты и пароля. Профиль здесь не показывается.</p>
+        <table id="u-table"><thead><tr><th>Устройство</th><th>Создано</th><th>Последняя активность</th><th>Входов</th><th>Событий</th></tr></thead><tbody></tbody></table>
+        <div id="u-pager" class="pager"></div>
+      </section>
+
+      <section id="tab-audit" hidden>
+        <table id="a-table"><thead><tr><th>Когда</th><th>Кто</th><th>Товар</th><th>Что изменено</th></tr></thead><tbody></tbody></table>
+      </section>
+    </main>
+
+    <dialog id="editor">
+      <form method="dialog" id="edit-form">
+        <h2 id="ed-title"></h2>
+        <p id="ed-sub" class="hint"></p>
+        <label>Название <input name="name" maxlength="200" required></label>
+        <label>Категория <input name="category" list="cat-list" maxlength="60" required></label>
+        <datalist id="cat-list"></datalist>
+        <label>Страна производителя <input name="country" maxlength="60" placeholder="не указана"></label>
+        <label>Цена, ₸ <input name="price" type="number" min="0" max="10000000" step="1" required></label>
+        <p id="ed-price-note" class="hint"></p>
+        <label>Состав (INCI) <textarea name="inci" rows="7" maxlength="8000"></textarea></label>
+        <p id="ed-src" class="hint"></p>
+        <p id="ed-error" class="error" role="alert"></p>
+        <div class="actions">
+          <button type="button" id="ed-cancel" class="secondary">Отмена</button>
+          <button type="submit" id="ed-save">Сохранить</button>
+        </div>
+      </form>
+    </dialog>
+  </div>
+  <script src="/admin/app.js"></script>
+</body>
+</html>

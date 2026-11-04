@@ -1,14 +1,20 @@
 {
-  "name": "cosmetix-ai-proxy",
+  "name": "cosmetix-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Minimal secure proxy between the Cosmetix app and the Anthropic Claude API. The API key lives only here, in environment variables.",
+  "description": "Cosmetix server: AI proxy (Gemini / Claude), catalog and profile API on PostgreSQL, admin panel. Keys live only in environment variables.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node --test"
+    "test": "node --test \"test/*.test.js\"",
+    "migrate": "node db/cli.js migrate",
+    "seed": "node db/cli.js seed",
+    "create-admin": "node db/cli.js create-admin"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
   }
 }
