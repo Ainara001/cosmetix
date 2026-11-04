@@ -21,6 +21,12 @@ test('without DATABASE_URL the new routes answer 503, /health keeps working', as
   await new Promise((r) => server.close(r));
 });
 
+test('createPool: no DATABASE_URL means no pool', () => {
+  const { createPool } = require('../db/pool');
+  assert.equal(createPool({}), null);
+  assert.equal(createPool({ DATABASE_URL: '   ' }), null);
+});
+
 test('PostgreSQL catalog API', { skip: SKIP }, async (t) => {
   const db = await createTestDb();
   const app = await boot({ pool: db.pool });

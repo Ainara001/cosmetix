@@ -72,7 +72,9 @@ in **Кабинет → Настройки → ИИ-ассистент** or buil
 ## PostgreSQL, catalog API and admin panel
 
 Needs PostgreSQL 13+ (`gen_random_uuid()` is built in) and `npm install` once
-(the only dependency is `pg`).
+(the only dependency is `pg`). `pg` is loaded only when `DATABASE_URL` is set:
+the AI proxy alone still starts without `npm install`, exactly as before; with
+`DATABASE_URL` set and no `npm install` the server stops with a message saying so.
 
 ```bash
 cd server
