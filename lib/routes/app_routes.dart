@@ -1,4 +1,5 @@
 import 'package:cosmetix/core/i18n/tr.dart';
+import 'package:cosmetix/features/virtual_makeup/virtual_makeup.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/models/cart_models.dart';
@@ -52,6 +53,7 @@ class AppRoutes {
   static const main = '/main';
   static const catalog = '/catalog';
   static const search = '/search';
+  static const virtualMakeup = '/virtual-makeup';
   static const filters = '/filters';
   static const product = '/product';
   static const priceCompare = '/price-compare';
@@ -130,6 +132,8 @@ class AppRoutes {
         page = StoresMapScreen(productId: a is StoresArgs ? a.productId : null);
       case palettes:
         page = PalettesScreen(highlight: a is ColorType ? a : null);
+      case virtualMakeup:
+        page = const VirtualMakeupScreen();
       case editProfile:
         page = const EditProfileScreen();
       case AppRoutes.settings:
