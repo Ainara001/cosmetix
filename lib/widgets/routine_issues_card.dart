@@ -19,9 +19,6 @@ class RoutineIssuesCard extends StatelessWidget {
   final String? title;
   final EdgeInsetsGeometry padding;
 
-  static const _cautionBg = Color(0xFFFBF0D9);
-  static const _cautionFg = Color(0xFF8A5A0B);
-
   @override
   Widget build(BuildContext context) {
     if (issues.isEmpty) return const SizedBox.shrink();
@@ -32,8 +29,14 @@ class RoutineIssuesCard extends StatelessWidget {
         if (seen.add(i.text)) i,
     ]..sort((a, b) => a.severity.index.compareTo(b.severity.index));
     final worst = list.first.severity;
-    final bg = worst == IssueSeverity.avoid ? AppColors.saleSoft : _cautionBg;
-    final fg = worst == IssueSeverity.avoid ? AppColors.sale : _cautionFg;
+    final bg = worst == IssueSeverity.avoid
+        ? context.pal.redSoft
+        : context.pal.amberSoft;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    // readable on the tinted card in both themes
+    final cautionFg = dark ? const Color(0xFFF0C46E) : const Color(0xFF8A5A0B);
+    final avoidFg = dark ? const Color(0xFFFF8F8F) : AppColors.sale;
+    final fg = worst == IssueSeverity.avoid ? avoidFg : cautionFg;
     return Padding(
       padding: padding,
       child: Container(
@@ -76,8 +79,8 @@ class RoutineIssuesCard extends StatelessWidget {
                         Icons.circle,
                         size: 6,
                         color: i.severity == IssueSeverity.avoid
-                            ? AppColors.sale
-                            : _cautionFg,
+                            ? avoidFg
+                            : cautionFg,
                       ),
                     ),
                     const SizedBox(width: 8),

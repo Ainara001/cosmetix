@@ -188,7 +188,7 @@ class _ReactionsScreenState extends State<ReactionsScreen> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.saleSoft,
+                                  color: context.pal.redSoft,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -226,7 +226,7 @@ class _InsightsCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 14),
       child: AppCard(
-        color: AppColors.primarySoft,
+        color: context.pal.pinkSoft,
         borderColor: Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

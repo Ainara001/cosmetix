@@ -63,7 +63,7 @@ class _PalettesScreenState extends State<PalettesScreen> {
           ),
           const SizedBox(height: 12),
           AppCard(
-            color: AppColors.primarySoft,
+            color: context.pal.pinkSoft,
             borderColor: Colors.transparent,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

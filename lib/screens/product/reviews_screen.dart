@@ -286,7 +286,7 @@ class _ReviewsBodyState extends State<_ReviewsBody> {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primarySoft,
+                                color: context.pal.pinkSoft,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -527,8 +527,7 @@ class _ReviewPhoto extends StatelessWidget {
           File(path),
           fit: BoxFit.cover,
           cacheWidth: 360,
-          errorBuilder: (_, _, _) =>
-              const ColoredBox(color: AppColors.primarySoft),
+          errorBuilder: (_, _, _) => ColoredBox(color: context.pal.pinkSoft),
         ),
       ),
     );

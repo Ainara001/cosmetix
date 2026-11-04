@@ -76,7 +76,7 @@ class BeautyProfileScreen extends StatelessWidget {
     }) {
       return AppCard(
         onTap: onTap,
-        color: accent ? AppColors.primarySoft : null,
+        color: accent ? context.pal.pinkSoft : null,
         borderColor: accent ? Colors.transparent : null,
         padding: const EdgeInsets.all(12),
         child: Column(

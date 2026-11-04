@@ -172,7 +172,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 activeTrackColor: AppColors.salmon,
-                inactiveTrackColor: AppColors.primarySoft,
+                inactiveTrackColor: context.pal.pinkSoft,
                 thumbColor: Colors.white,
                 overlayColor: AppColors.primary.withValues(alpha: 0.15),
                 trackHeight: 10,
@@ -233,7 +233,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.primarySoft,
+                color: context.pal.pinkSoft,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Text(

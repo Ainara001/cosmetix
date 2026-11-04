@@ -276,7 +276,10 @@ class _Banner extends StatelessWidget {
                           tr('Специальное предложение'),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.small,
+                          // the pill is white in both themes: dark text
+                          style: AppTextStyles.small.copyWith(
+                            color: const Color(0xFF1E1A1C),
+                          ),
                         ),
                       ),
                       Icon(
@@ -363,8 +366,8 @@ class _QuickAccess extends StatelessWidget {
                 Container(
                   width: 36,
                   height: 36,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primarySoft,
+                  decoration: BoxDecoration(
+                    color: context.pal.pinkSoft,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(i.$1, size: 20, color: context.pal.accent),

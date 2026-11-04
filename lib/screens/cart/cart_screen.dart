@@ -449,8 +449,8 @@ class _RoundBtn extends StatelessWidget {
     child: Container(
       width: 28,
       height: 28,
-      decoration: const BoxDecoration(
-        color: AppColors.primarySoft,
+      decoration: BoxDecoration(
+        color: context.pal.pinkSoft,
         shape: BoxShape.circle,
       ),
       child: Icon(icon, size: 16, color: context.pal.accent),
