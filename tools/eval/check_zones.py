@@ -1,0 +1,65 @@
+"""Zone overlay check: draws zones on every photo and writes a contact sheet.
+
+    tools/.venv/bin/python tools/eval/check_zones.py tools/eval/data/photos out_dir
+"""
+import csv
+import glob
+import os
+import sys
+
+import cv2
+import numpy as np
+
+sys.path.insert(0, os.path.dirname(__file__))
+import face_zones as fz
+
+
+def main(src, out_dir):
+    os.makedirs(out_dir, exist_ok=True)
+    zoner = fz.FaceZoner()
+    files = sorted(sum((glob.glob(os.path.join(src, e)) for e in ('*.jpg', '*.jpeg', '*.png')), []))
+    rows, tiles = [], []
+    for f in files:
+        bgr = cv2.imread(f)
+        name = os.path.splitext(os.path.basename(f))[0]
+        res = zoner.detect(bgr)
+        if res is None:
+            rows.append(dict(photo=name, faces=0))
+            print(name, 'NO FACE')
+            continue
+        masks = fz.zone_masks(res.points, bgr.shape)
+        face_area = int((fz.face_mask(res.points, bgr.shape) > 0).sum())
+        vis = fz.draw_overlay(bgr, res.points, masks)
+        cv2.imwrite(os.path.join(out_dir, f'{name}_zones.jpg'), vis)
+        pose = fz.head_pose(res.points)
+        row = dict(photo=name, faces=res.n_faces, ms=round(res.inference_ms, 1), face_px=face_area,
+                   yaw_offset=round(pose['yaw_offset'], 3), roll_deg=round(pose['roll_deg'], 1))
+        for z, m in masks.items():
+            row[f'{z}_pct'] = round(float(100 * (m > 0).sum() / face_area), 1)
+        rows.append(row)
+        print(' '.join(f'{k}={v}' for k, v in row.items()))
+        x0, y0 = res.points[:, :2].min(0).astype(int)
+        x1, y1 = res.points[:, :2].max(0).astype(int)
+        pad = int(0.15 * (x1 - x0))
+        crop = vis[max(0, y0 - pad):y1 + pad, max(0, x0 - pad):x1 + pad]
+        s = 360 / max(crop.shape[:2])
+        crop = cv2.resize(crop, None, fx=s, fy=s)
+        tile = np.full((380, 360, 3), 255, np.uint8)
+        tile[:crop.shape[0], :crop.shape[1]] = crop
+        cv2.putText(tile, name, (4, 374), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+        tiles.append(tile)
+    keys = sorted({k for r in rows for k in r})
+    with open(os.path.join(out_dir, 'zones_stats.csv'), 'w', newline='') as fh:
+        w = csv.DictWriter(fh, fieldnames=keys)
+        w.writeheader()
+        w.writerows(rows)
+    for s in range(0, len(tiles), 12):
+        chunk = tiles[s:s + 12]
+        while len(chunk) % 4:
+            chunk.append(np.full((380, 360, 3), 255, np.uint8))
+        sheet = np.vstack([np.hstack(chunk[i:i + 4]) for i in range(0, len(chunk), 4)])
+        cv2.imwrite(os.path.join(out_dir, f'sheet_{s // 12}.jpg'), sheet)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1], sys.argv[2])
