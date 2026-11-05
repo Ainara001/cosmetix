@@ -8,6 +8,9 @@ cannot hide a blurry face:
                   face width so the number does not depend on the photo size
   skin_L_mean     mean CIELAB L* (0-100) over the skin zones (reported only: it
                   depends on the person's skin tone, so it is not used to judge)
+  skin_chroma     median CIELAB chroma sqrt(a*a+b*b) over the skin zones: ~0 means a black-and-white
+                  photo, where tone, undertone and colour type cannot be judged at all.
+                  (Rule added AFTER the hold-out run showed 3 grayscale photos passing the gate.)
   face_p95_luma   95th percentile of luma (0-255) inside the face oval: how bright
                   the brightest part of the face is. A dark room gives a low value
                   whatever the skin tone, which is why it is used instead of the mean
@@ -38,6 +41,7 @@ T = {
     'face_px_min': (160, 100),       # below warn: little detail; below reject: not usable
     'sharpness_min': (60.0, 25.0),
     'face_p95_luma_min': (110, 80),
+    'skin_chroma_min': (3.0, 2.0),
     'clipped_pct_max': (4.0, 12.0),
     'crushed_pct_max': (25.0, 50.0),
     'lr_asym_max': (0.35, float('inf')),   # side light: warn only, never reject
@@ -52,12 +56,10 @@ class Quality:
     reasons: list = field(default_factory=list)
 
 
-def _lab_L(bgr):
-    return cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)[:, :, 0].astype(np.float32) * (100.0 / 255.0)
-
-
-def measure(bgr: np.ndarray, points: np.ndarray) -> dict:
-    masks = fz.zone_masks(points, bgr.shape)
+def measure(bgr: np.ndarray, points: np.ndarray, masks: dict | None = None) -> dict:
+    """masks: pass the result of fz.zone_masks if you already have it (saves a recompute)."""
+    if masks is None:
+        masks = fz.zone_masks(points, bgr.shape)
     skin = np.zeros(bgr.shape[:2], np.uint8)
     for m in masks.values():
         skin |= m
@@ -66,13 +68,19 @@ def measure(bgr: np.ndarray, points: np.ndarray) -> dict:
     x0, y0 = np.floor(points[fz.FACE_OVAL, :2].min(0)).astype(int)
     x1, y1 = np.ceil(points[fz.FACE_OVAL, :2].max(0)).astype(int)
     x0, y0 = max(0, x0), max(0, y0)
-    crop = cv2.cvtColor(bgr[y0:y1, x0:x1], cv2.COLOR_BGR2GRAY)
-    s = NORM_FACE_W / face_w
-    crop = cv2.resize(crop, None, fx=s, fy=s, interpolation=cv2.INTER_AREA if s < 1 else cv2.INTER_CUBIC)
-    sharp = float(cv2.Laplacian(crop, cv2.CV_64F).var())
-    L = _lab_L(bgr)
+    x1, y1 = min(bgr.shape[1], x1), min(bgr.shape[0], y1)
+    if x1 - x0 < 8 or y1 - y0 < 8:      # face (almost) outside the frame
+        sharp = 0.0
+    else:
+        crop = cv2.cvtColor(bgr[y0:y1, x0:x1], cv2.COLOR_BGR2GRAY)
+        s = NORM_FACE_W / face_w
+        crop = cv2.resize(crop, None, fx=s, fy=s, interpolation=cv2.INTER_AREA if s < 1 else cv2.INTER_CUBIC)
+        sharp = float(cv2.Laplacian(crop, cv2.CV_64F).var())
+    lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
+    L = lab[:, :, 0] * (100.0 / 255.0)
     luma = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
     sk = skin > 0
+    lab_ab = lab[:, :, 1:][sk] - 128.0
     n = max(1, int(sk.sum()))
     cl, cr = masks['cheek_left'] > 0, masks['cheek_right'] > 0
     lr = np.nan
@@ -84,6 +92,7 @@ def measure(bgr: np.ndarray, points: np.ndarray) -> dict:
         'face_px': round(face_w, 1),
         'sharpness': round(sharp, 1),
         'skin_L_mean': round(float(L[sk].mean()), 1) if sk.any() else float('nan'),
+        'skin_chroma': round(float(np.median(np.hypot(lab_ab[:, 0], lab_ab[:, 1]))), 2) if sk.any() else float('nan'),
         'face_p95_luma': round(float(np.percentile(luma[fz.face_mask(points, bgr.shape) > 0], 95)), 1),
         'clipped_pct': round(100.0 * float((luma[sk] >= CLIP_LUMA).sum()) / n, 2),
         'crushed_pct': round(100.0 * float((luma[sk] <= CRUSH_LUMA).sum()) / n, 2),
@@ -123,6 +132,7 @@ def judge(m: dict, n_faces: int = 1) -> Quality:
 
     low('face_px_min', 'face width px', m['face_px'])
     low('sharpness_min', 'blur (sharpness)', m['sharpness'])
+    low('skin_chroma_min', 'grayscale photo (skin colour chroma)', m['skin_chroma'])
     low('face_p95_luma_min', 'dark photo (brightest face part, luma)', m['face_p95_luma'])
     high('clipped_pct_max', 'blown highlights %', m['clipped_pct'])
     high('crushed_pct_max', 'crushed shadows %', m['crushed_pct'])

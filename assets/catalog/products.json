@@ -74,7 +74,15 @@
    "legacy_name": "Peripera|Палетка Peripera Ink Cozy",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "line": "Rom&nd|better than palette",
+    "shade_code": "05",
+    "shade_name": "Shade & Shadow Garden",
+    "colour_status": "missing",
+    "note": "palette of several pans: the catalog holds one colour for the whole palette, the colours of the separate pans are not known"
+   }
   },
   {
    "brand": "Peripera",
@@ -115,7 +123,13 @@
    "legacy_name": "Flower Knows|Strawberry Lip Tint",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "lips",
+    "colour": 4291972702,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -156,7 +170,12 @@
    "legacy_name": "Rom&nd|Better Than Eyes",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "colour_status": "missing",
+    "note": "the catalog holds one sampled colour for the whole product, no data about the colours of its shades"
+   }
   },
   {
    "brand": "COSRX",
@@ -279,7 +298,16 @@
    "legacy_name": "Flower Knows|Тинт для губ Flower Knows",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "lips",
+    "line": "Peripera|ink the velvet",
+    "shade_code": "31",
+    "shade_name": "Wine Nude",
+    "colour": 4285873732,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "Peripera",
@@ -322,7 +350,16 @@
    "legacy_name": "Peripera|Тинт Peripera Ink",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "lips",
+    "line": "Peripera|ink mood glowy tint",
+    "shade_code": "30",
+    "shade_name": "Happy Berry",
+    "colour": 4294216851,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -361,7 +398,13 @@
    "legacy_name": "Rom&nd|Блеск Rom&nd Glasting",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "lips",
+    "colour": 4289692808,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "Missha",
@@ -543,7 +586,13 @@
    "legacy_name": "Rom&nd|Румяна Better Than Cheek",
    "added_in_db_version": 7,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "blush",
+    "colour": 4292719030,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "CeraVe",
@@ -949,7 +998,15 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "line": "Rom&nd|better than palette",
+    "shade_code": "00",
+    "shade_name": "Light & Glitter Garden",
+    "colour_status": "missing",
+    "note": "palette of several pans: the catalog holds one colour for the whole palette, the colours of the separate pans are not known"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -991,7 +1048,15 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "line": "Rom&nd|better than palette",
+    "shade_code": "01",
+    "shade_name": "Pampas Garden",
+    "colour_status": "missing",
+    "note": "palette of several pans: the catalog holds one colour for the whole palette, the colours of the separate pans are not known"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -1031,7 +1096,15 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "line": "Rom&nd|better than palette",
+    "shade_code": "02",
+    "shade_name": "Mahogany Garden",
+    "colour_status": "missing",
+    "note": "palette of several pans: the catalog holds one colour for the whole palette, the colours of the separate pans are not known"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -1073,7 +1146,15 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "line": "Rom&nd|better than palette",
+    "shade_code": "03",
+    "shade_name": "Rosebud Garden",
+    "colour_status": "missing",
+    "note": "palette of several pans: the catalog holds one colour for the whole palette, the colours of the separate pans are not known"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -1114,7 +1195,15 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "eyeshadow",
+    "line": "Rom&nd|better than palette",
+    "shade_code": "07",
+    "shade_name": "Berry Fuchsia Garden",
+    "colour_status": "missing",
+    "note": "palette of several pans: the catalog holds one colour for the whole palette, the colours of the separate pans are not known"
+   }
   },
   {
    "brand": "Peripera",
@@ -1157,7 +1246,16 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "lips",
+    "line": "Peripera|ink mood glowy tint",
+    "shade_code": "03",
+    "shade_name": "Rose In Mind",
+    "colour": 4291850089,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "Rom&nd",
@@ -1201,7 +1299,16 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "lips",
+    "line": "Rom&nd|juicy lasting tint",
+    "shade_code": "01",
+    "shade_name": "Pomelo Skin",
+    "colour": 4292583820,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "3CE",
@@ -1241,7 +1348,13 @@
    },
    "added_in_db_version": 10,
    "country": null,
-   "country_source": null
+   "country_source": null,
+   "try_on": {
+    "kind": "blush",
+    "colour": 4292321160,
+    "colour_source": "catalog field products.shade (DB v8/v12): sampled from the product photo or picked by hand by the app developers; not manufacturer data, the packaging does not always match the real colour",
+    "colour_status": "legacy_estimate"
+   }
   },
   {
    "brand": "Torriden",

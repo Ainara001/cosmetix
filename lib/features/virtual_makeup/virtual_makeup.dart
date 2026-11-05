@@ -3,6 +3,7 @@
 /// Self-contained module: the app only needs [VirtualMakeupScreen].
 library;
 
+export 'catalog/try_on_item.dart';
 export 'domain/face_geometry.dart';
 export 'domain/face_quality.dart';
 export 'domain/makeup_look.dart';

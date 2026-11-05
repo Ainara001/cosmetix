@@ -1,0 +1,6 @@
+# Direct dependencies of the evaluation stand, pinned to the versions the report was produced with.
+# mediapipe itself requires opencv-contrib-python: do NOT also install opencv-python / -headless
+# (two cv2 packages overwrite each other's files).
+mediapipe==1.2.2
+opencv-contrib-python==5.0.0.93
+numpy==2.5.4

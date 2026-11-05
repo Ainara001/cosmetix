@@ -1559,4 +1559,24 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Фото обрабатывается на телефоне: оно не отправляется на сервер и не сохраняется.':
       'The photo is processed on the phone: it is not sent to a server and not saved.',
   'Выбрать фото': 'Choose a photo',
+  'Цвет по данным производителя': 'Colour from the manufacturer\'s data',
+  'Цвет измерен по образцу производителя, приблизительно':
+      'Colour measured on the manufacturer\'s swatch, approximate',
+  'Цвет оценён по фото товара, не по данным производителя':
+      'Colour estimated from the product photo, not the manufacturer\'s data',
+  'Цвет оттенка приблизительный: он зависит от освещения на фото, экрана и свойств косметики. Реальный продукт может выглядеть иначе.':
+      'The shade colour is approximate: it depends on the light in the photo, the screen and the properties of the cosmetic. The real product may look different.',
+  'Другие оттенки линейки': 'Other shades of the line',
+  'Подбор по виду макияжа': 'Choose by kind of makeup',
+  'Для этого вида в каталоге пока нет товаров с известным цветом. Выберите «Свой цвет».':
+      'There are no products with a known colour for this kind in the catalog yet. Choose “Custom colour”.',
+  'К карточке товара': 'To the product page',
+  'Покрытие: {v0}': 'Finish: {v0}',
+  'матовое': 'matte',
+  'сатиновое': 'satin',
+  'глянцевое': 'glossy',
+  'с шиммером': 'with shimmer',
+  'Примерить': 'Try on',
+  'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
+      'Try-on is not available: the catalog has no colour data for this shade.',
 };

@@ -18,32 +18,9 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import face_zones as fz
 import photo_quality as pq
+from transforms import blur, gain, gamma, shrink
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-
-
-def blur(f):
-    def run(bgr, face_w):
-        s = f * face_w
-        return cv2.GaussianBlur(bgr, (0, 0), s)
-    return run
-
-
-def gamma(g):
-    lut = np.array([255 * (i / 255) ** g for i in range(256)], np.uint8)
-    return lambda bgr, face_w: cv2.LUT(bgr, lut)
-
-
-def gain(k):
-    return lambda bgr, face_w: np.clip(bgr.astype(np.float32) * k, 0, 255).astype(np.uint8)
-
-
-def shrink(target_w):
-    def run(bgr, face_w):
-        s = target_w / face_w
-        small = cv2.resize(bgr, None, fx=s, fy=s, interpolation=cv2.INTER_AREA)
-        return small
-    return run
 
 
 KINDS = {
@@ -62,6 +39,10 @@ def main(src, out):
     for f in sorted(glob.glob(os.path.join(src, '*.jpg'))):
         bgr = cv2.imread(f)
         res = zoner.detect(bgr)
+        if res is None:
+            originals['reject'] += 1
+            print('no face found, skipped as a base photo:', os.path.basename(f))
+            continue
         q = pq.judge(pq.measure(bgr, res.points), res.n_faces)
         originals[q.verdict] += 1
         if q.verdict == 'ok':

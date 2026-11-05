@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import 'package:cosmetix/database/try_on_data.dart';
+
 /// Curated "who is this product for" lists of a catalog product (the AI
 /// classifier can add more, see `product_ai_classification`).
 class ProductTraits {
@@ -55,6 +57,7 @@ class ProductSeed {
     required this.country,
     required this.countrySource,
     required this.demo,
+    this.tryOn,
   });
 
   final String brand;
@@ -101,6 +104,10 @@ class ProductSeed {
 
   /// The product itself is made up (the Cosmetix gift set).
   final bool demo;
+
+  /// How the product looks on a face for the virtual try-on (null: the catalog
+  /// says nothing, the product is not offered for try-on).
+  final TryOnSeed? tryOn;
 
   /// `brand|name`, the key of a product across databases.
   String get key => '$brand|$name';
@@ -169,6 +176,9 @@ class ProductSeed {
       country: country,
       countrySource: countrySource,
       demo: demo,
+      tryOn: j['try_on'] is Map<String, Object?>
+          ? TryOnSeed.fromJson(name, j['try_on'] as Map<String, Object?>)
+          : null,
     );
   }
 }

@@ -28,26 +28,54 @@ CLASSES = ['acne', 'scar', 'redness']
 MIN_POS_FOR_TRUST = 30     # below this many positives (or negatives) the numbers are marked unreliable
 
 
+class DataError(ValueError):
+    """A problem in an input file; the message names the file, row and column."""
+
+
 def read_csv(path, key='image'):
-    with open(path, newline='', encoding='utf-8') as fh:
-        rows = list(csv.DictReader(fh))
-    out = {}
-    for r in rows:
-        if r.get(key) in out:
-            raise ValueError(f'{path}: duplicate image {r[key]!r}')
-        out[r[key]] = r
+    # utf-8-sig: Excel / Numbers write a BOM that would rename the first column
+    with open(path, newline='', encoding='utf-8-sig') as fh:
+        reader = csv.DictReader(fh)
+        names = [(n or '').strip() for n in (reader.fieldnames or [])]
+        if key not in names:
+            raise DataError(f'{path}: no "{key}" column (found: {names})')
+        reader.fieldnames = names
+        out = {}
+        for line, r in enumerate(reader, start=2):
+            name = (r.get(key) or '').strip()
+            if not name:
+                raise DataError(f'{path}:{line}: empty "{key}"')
+            if name in out:
+                raise DataError(f'{path}:{line}: duplicate image {name!r}')
+            r[key] = name
+            r['_line'] = line
+            out[name] = r
     return out
 
 
-def to_bin(v):
-    v = (v or '').strip().lower()
-    if v == '':
+def to_bin(v, where=''):
+    s = (v or '').strip().lower()
+    if s == '':
         return None
-    if v in ('1', 'true', 'yes'):
+    if s in ('1', 'true', 'yes', '1.0'):
         return 1
-    if v in ('0', 'false', 'no'):
+    if s in ('0', 'false', 'no', '0.0'):
         return 0
-    raise ValueError(f'expected 0/1, got {v!r}')
+    raise DataError(f'{where}expected 0/1 or blank, got {v!r}')
+
+
+def to_level(v, where=''):
+    """Severity level: an integer, '2' and '2.0' both fine; blank = None."""
+    s = (v or '').strip()
+    if s == '':
+        return None
+    try:
+        f = float(s)
+    except ValueError:
+        raise DataError(f'{where}severity must be a number, got {v!r}') from None
+    if f != int(f):
+        raise DataError(f'{where}severity must be a whole number, got {v!r}')
+    return int(f)
 
 
 def wilson(k: int, n: int, z: float = 1.96):
@@ -117,7 +145,12 @@ def multiclass_metrics(pairs, labels):
 
 
 def weighted_kappa(answered, labels):
-    """Quadratic-weighted Cohen's kappa for ordered labels (severity 0..3)."""
+    """Quadratic-weighted Cohen's kappa for ordered NUMERIC labels (severity 0..3).
+
+    The weight is the squared difference of the label VALUES, not of their rank
+    among the labels that happen to occur: a missing level must not shrink the
+    distance between 1 and 3. (kappa does not depend on the scale of the weights.)
+    """
     idx = {c: i for i, c in enumerate(labels)}
     k, n = len(labels), len(answered)
     if n == 0 or k < 2:
@@ -130,7 +163,7 @@ def weighted_kappa(answered, labels):
     num = den = 0.0
     for i in range(k):
         for j in range(k):
-            w = ((i - j) / (k - 1)) ** 2
+            w = (labels[i] - labels[j]) ** 2
             num += w * O[i][j]
             den += w * rows[i] * cols[j] / n
     return 1 - num / den if den else float('nan')
@@ -140,15 +173,20 @@ def evaluate(labels, preds):
     """labels/preds: dicts image -> row. Returns a dict with everything."""
     missing = [i for i in labels if i not in preds]
     extra = [i for i in preds if i not in labels]
+    if labels and len(missing) == len(labels):
+        raise DataError('no image name in the predictions matches the labels '
+                        f'(labels look like {next(iter(labels))!r}, predictions like '
+                        f'{next(iter(preds), None)!r}): check folder prefixes and extensions')
     result = dict(n_labelled=len(labels), n_missing_pred=len(missing), n_extra_pred=len(extra),
                   classes={}, severity=None)
     for c in CLASSES:
         pairs = []
         for img, row in labels.items():
-            t = to_bin(row.get(c))
+            t = to_bin(row.get(c), f'labels line {row.get("_line", "?")}, column {c}: ')
             if t is None:
                 continue
-            pairs.append((t, to_bin(preds.get(img, {}).get(c))))
+            prow = preds.get(img, {})
+            pairs.append((t, to_bin(prow.get(c), f'predictions line {prow.get("_line", "?")}, column {c}: ')))
         if pairs:
             m = binary_metrics(pairs)
             m['cm'] = confusion_matrix(pairs, [0, 1])
@@ -156,11 +194,11 @@ def evaluate(labels, preds):
     if any((r.get('severity') or '').strip() for r in labels.values()):
         pairs = []
         for img, row in labels.items():
-            t = (row.get('severity') or '').strip()
-            if not t:
+            t = to_level(row.get('severity'), f'labels line {row.get("_line", "?")}: ')
+            if t is None:
                 continue
-            p = (preds.get(img, {}).get('severity') or '').strip()
-            pairs.append((int(t), int(p) if p else None))
+            prow = preds.get(img, {})
+            pairs.append((t, to_level(prow.get('severity'), f'predictions line {prow.get("_line", "?")}: ')))
         lab = sorted({t for t, _ in pairs} | {p for _, p in pairs if p is not None})
         mm = multiclass_metrics(pairs, lab)
         mm['labels'] = lab
@@ -212,7 +250,11 @@ def main(argv=None):
     ap.add_argument('predictions')
     ap.add_argument('--md', help='write the markdown report here')
     a = ap.parse_args(argv)
-    res = evaluate(read_csv(a.labels), read_csv(a.predictions))
+    try:
+        res = evaluate(read_csv(a.labels), read_csv(a.predictions))
+    except DataError as e:
+        print(f'input error: {e}', file=sys.stderr)
+        return 2
     md = render_md(res)
     print(md)
     if a.md:

@@ -77,6 +77,7 @@ class SeedData {
     });
     await batch.commit(noResult: true);
 
+    await applyTryOn(db, catalog);
     await insertUserDefaults(db, 1, demo: true);
     await _insertReviews(db, now);
   }
@@ -306,6 +307,46 @@ class SeedData {
         where: 'brand = ? AND name = ?',
         whereArgs: [p.brand, p.name],
       );
+    }
+    await batch.commit(noResult: true);
+  }
+
+  /// Migration step (DB v15) and fresh install: the try-on data of the catalog
+  /// products that have it (`try_on` in products.json). Only what the catalog
+  /// states is written; a colour never appears without its source and status
+  /// (the parser refuses that). Rows are found by `brand|name`, so another
+  /// product of the same database is never touched; existing rows are replaced
+  /// by the catalog's data for the same product.
+  static Future<void> applyTryOn(
+    DatabaseExecutor db, [
+    CatalogData? from,
+  ]) async {
+    final catalog = from ?? await CatalogData.load();
+    final ids = {
+      for (final r in await db.query(
+        'products',
+        columns: ['id', 'brand', 'name'],
+      ))
+        '${r['brand']}|${r['name']}': r['id']! as int,
+    };
+    final batch = db.batch();
+    for (final p in catalog.products) {
+      final t = p.tryOn;
+      final id = ids[p.key];
+      if (t == null || id == null) continue;
+      batch.insert('product_shades', {
+        'product_id': id,
+        'kind': t.kind,
+        'line_key': t.line,
+        'shade_code': t.shadeCode,
+        'shade_name': t.shadeName,
+        'colour': t.colour,
+        'colour_source': t.colourSource,
+        'colour_status': t.colourStatus,
+        'finish': t.finish,
+        'finish_source': t.finishSource,
+        'note': t.note,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
     }
     await batch.commit(noResult: true);
   }

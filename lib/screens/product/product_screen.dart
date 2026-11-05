@@ -9,6 +9,7 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
+import 'package:cosmetix/screens/product/try_on_button.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
@@ -402,6 +403,7 @@ class _ProductBodyState extends State<_ProductBody> {
                         style: AppTextStyles.h2,
                       ),
                       ..._shadePicker(context, product),
+                      TryOnButton(productId: product.id),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,

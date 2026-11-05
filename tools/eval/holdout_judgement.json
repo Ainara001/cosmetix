@@ -1,0 +1,210 @@
+{
+ "h000": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h001": {
+  "label": "S",
+  "why": "soft, small face but frontal"
+ },
+ "h002": {
+  "label": "U",
+  "why": "black and white"
+ },
+ "h003": {
+  "label": "U",
+  "why": "face blown out, shot from below"
+ },
+ "h004": {
+  "label": "S",
+  "why": "frontal wide-angle selfie, glasses"
+ },
+ "h005": {
+  "label": "S",
+  "why": "frontal, good light"
+ },
+ "h006": {
+  "label": "S",
+  "why": "frontal, moustache"
+ },
+ "h007": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h008": {
+  "label": "U",
+  "why": "turned about 45 degrees"
+ },
+ "h010": {
+  "label": "M",
+  "why": "strong filter / soft vignette"
+ },
+ "h011": {
+  "label": "M",
+  "why": "turned, side light"
+ },
+ "h012": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h013": {
+  "label": "S",
+  "why": "frontal, glasses, sharp face"
+ },
+ "h015": {
+  "label": "U",
+  "why": "black and white, half of the face in hard shadow"
+ },
+ "h016": {
+  "label": "U",
+  "why": "sunglasses, very dark, tongue out"
+ },
+ "h017": {
+  "label": "M",
+  "why": "cap covers the forehead, glasses, soft"
+ },
+ "h018": {
+  "label": "U",
+  "why": "turned, looking aside"
+ },
+ "h019": {
+  "label": "M",
+  "why": "sunglasses"
+ },
+ "h021": {
+  "label": "U",
+  "why": "face cut off, zones landed on an arm"
+ },
+ "h023": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h024": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h025": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h026": {
+  "label": "U",
+  "why": "turned, face tattoo"
+ },
+ "h027": {
+  "label": "U",
+  "why": "turned, profile-like"
+ },
+ "h028": {
+  "label": "U",
+  "why": "black and white, turned"
+ },
+ "h029": {
+  "label": "U",
+  "why": "print of a magazine cover, turned"
+ },
+ "h030": {
+  "label": "S",
+  "why": "frontal wide-angle, strong make-up"
+ },
+ "h033": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h035": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h036": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h037": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h039": {
+  "label": "U",
+  "why": "turned about 40 degrees"
+ },
+ "h040": {
+  "label": "S",
+  "why": "frontal, beard"
+ },
+ "h041": {
+  "label": "U",
+  "why": "turned selfie"
+ },
+ "h042": {
+  "label": "S",
+  "why": "frontal, small beard"
+ },
+ "h043": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h044": {
+  "label": "M",
+  "why": "turned, object in the mouth"
+ },
+ "h045": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h046": {
+  "label": "M",
+  "why": "small face, glasses"
+ },
+ "h047": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h048": {
+  "label": "S",
+  "why": "frontal, glasses"
+ },
+ "h049": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h050": {
+  "label": "S",
+  "why": "frontal, elderly, harsh light on one side"
+ },
+ "h051": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h052": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h053": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h054": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h055": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h056": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h057": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h058": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ },
+ "h059": {
+  "label": "U",
+  "why": "no face large enough / no real face (group, far away, artwork, landscape, building)"
+ }
+}
