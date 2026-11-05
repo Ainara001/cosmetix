@@ -338,7 +338,7 @@ void main() {
       expect(find.text('Магазины рядом'), findsOneWidget);
     });
 
-    testWidgets('a palette is one product with a circle for every shade', (
+    testWidgets('a palette is one product with a pill for every variant', (
       t,
     ) async {
       final h = DatabaseHelper(path: inMemoryDatabasePath);
@@ -365,18 +365,21 @@ void main() {
               as int;
       nav(t).pushNamed(AppRoutes.product, arguments: id);
       await _settle(t);
-      // the line as the title, the chosen shade under it, a circle per shade
+      // the line as the title, the chosen variant under it, a pill per variant
       expect(find.text('Better Than Palette'), findsOneWidget);
-      expect(find.text('Оттенок: 05 Shade & Shadow Garden'), findsOneWidget);
+      expect(
+        find.text('Вариант палетки: 05 Shade & Shadow Garden'),
+        findsOneWidget,
+      );
       for (final n in ['00', '01', '02', '03', '05', '07']) {
         expect(find.text(n), findsOneWidget, reason: n);
       }
       // no separate cards of the same palette any more
       expect(find.text('Другие оттенки'), findsNothing);
-      // a tap on a circle: the same page for that shade
+      // a tap on a pill: the same page for that variant
       await t.tap(find.text('02'));
       await _settle(t);
-      expect(find.text('Оттенок: 02 Mahogany Garden'), findsOneWidget);
+      expect(find.text('Вариант палетки: 02 Mahogany Garden'), findsOneWidget);
       expect(find.text('Better Than Palette'), findsOneWidget);
       await t.pump(const Duration(seconds: 1));
     });

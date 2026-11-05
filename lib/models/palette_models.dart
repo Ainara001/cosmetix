@@ -32,6 +32,38 @@ class ProductLine {
   bool get isPalette => kind.endsWith('_palette');
 }
 
+/// What a list needs to know about a catalog product in one glance: which line
+/// it belongs to, which variant it is and whether it is a palette. Loaded for
+/// every product at once (see `CatalogStructureRepository.summaries`).
+class VariantSummary {
+  const VariantSummary({
+    required this.productId,
+    required this.lineKey,
+    required this.lineName,
+    required this.kind,
+    required this.code,
+    required this.name,
+    required this.panCount,
+  });
+
+  final int productId;
+  final String? lineKey;
+
+  /// The line without a shade number ("Better Than Palette"); null when the
+  /// product has no line.
+  final String? lineName;
+
+  /// `eyeshadow_palette`, `lips`, `blush`, `eyeshadow` ...
+  final String kind;
+  final String? code;
+  final String? name;
+
+  /// Number of cells a source confirmed; null when it is not established.
+  final int? panCount;
+
+  bool get isPalette => kind.endsWith('_palette');
+}
+
 /// One variant of a line: a catalog product with its own id, price, cart line
 /// and favourite (palette 01, palette 02 ...).
 class LineVariant {

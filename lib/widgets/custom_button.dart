@@ -13,6 +13,7 @@ class CustomButton extends StatelessWidget {
     this.loading = false,
     this.icon,
     this.color,
+    this.compact = false,
   });
 
   final String label;
@@ -21,6 +22,9 @@ class CustomButton extends StatelessWidget {
   final bool loading;
   final IconData? icon;
   final Color? color;
+
+  /// A smaller button (40 px) for rows of secondary actions inside a card.
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -38,15 +42,15 @@ class CustomButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 20),
-                const SizedBox(width: 8),
+                Icon(icon, size: compact ? 18 : 20),
+                SizedBox(width: compact ? 6 : 8),
               ],
               Flexible(
                 child: Text(
                   label,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
+                  style: TextStyle(
+                    fontSize: compact ? 13 : 15,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -56,7 +60,7 @@ class CustomButton extends StatelessWidget {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
     );
-    final size = const Size.fromHeight(AppDimensions.buttonHeight);
+    final size = Size.fromHeight(compact ? 40 : AppDimensions.buttonHeight);
     final action = loading ? null : onPressed;
 
     if (outlined) {

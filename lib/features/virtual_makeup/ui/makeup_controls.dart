@@ -2,6 +2,7 @@ import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/widgets/app_card.dart';
+import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 
 import '../domain/makeup_look.dart';
@@ -243,12 +244,9 @@ class _ColorSheetState extends State<_ColorSheet> {
             (v) => _hsl = _hsl.withLightness(v),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () => Navigator.pop(context, _hsl.toColor()),
-              child: Text(tr('Готово')),
-            ),
+          CustomButton(
+            onPressed: () => Navigator.pop(context, _hsl.toColor()),
+            label: tr('Готово'),
           ),
         ],
       ),

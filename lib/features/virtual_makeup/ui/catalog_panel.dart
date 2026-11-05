@@ -2,6 +2,8 @@ import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/widgets/app_card.dart';
+import 'package:cosmetix/widgets/common_widgets.dart';
+import 'package:cosmetix/widgets/pill_segments.dart';
 import 'package:flutter/material.dart';
 
 import '../catalog/try_on_item.dart';
@@ -17,23 +19,22 @@ class ColourModeBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<ColourMode>(
+    return PillSegments<ColourMode>(
       key: const Key('vm-colour-mode'),
-      showSelectedIcon: false,
       segments: [
-        ButtonSegment(
+        PillSegment(
           value: ColourMode.catalog,
-          icon: const Icon(Icons.storefront_outlined),
-          label: Text(tr('Каталог')),
+          icon: Icons.storefront_outlined,
+          label: tr('Каталог'),
         ),
-        ButtonSegment(
+        PillSegment(
           value: ColourMode.manual,
-          icon: const Icon(Icons.palette_outlined),
-          label: Text(tr('Свой цвет')),
+          icon: Icons.palette_outlined,
+          label: tr('Свой цвет'),
         ),
       ],
-      selected: {controller.colourMode},
-      onSelectionChanged: (v) => v.first == ColourMode.catalog
+      selected: controller.colourMode,
+      onChanged: (v) => v == ColourMode.catalog
           ? controller.useCatalogColours()
           : controller.useManualColours(),
     );
@@ -95,7 +96,14 @@ class CatalogPanel extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         if (current != null && c.lineShades.isNotEmpty) ...[
-          Text(tr('Другие оттенки линейки'), style: AppTextStyles.bodyBold),
+          Text(
+            tr(
+              current.panKey != null
+                  ? 'Цвета палетки'
+                  : 'Другие оттенки линейки',
+            ),
+            style: AppTextStyles.bodyBold,
+          ),
           const SizedBox(height: 8),
           SizedBox(
             height: 78,
@@ -104,9 +112,11 @@ class CatalogPanel extends StatelessWidget {
               children: [
                 for (final s in c.lineShades)
                   ShadeChip(
-                    key: Key('vm-shade-${s.productId}'),
+                    key: s.panKey != null
+                        ? Key('vm-pan-${s.panKey}')
+                        : Key('vm-shade-${s.productId}'),
                     item: s,
-                    selected: s.productId == current.productId,
+                    selected: s == current,
                     onTap: () => c.applyItem(s),
                   ),
               ],
@@ -118,13 +128,14 @@ class CatalogPanel extends StatelessWidget {
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
+          runSpacing: 8,
           children: [
             for (final z in MakeupZone.values)
-              ChoiceChip(
+              AppChip(
                 key: Key('vm-kind-${z.name}'),
-                label: Text(tr(MakeupPalettes.zoneName(z))),
+                label: tr(MakeupPalettes.zoneName(z)),
                 selected: c.browseKind == z,
-                onSelected: (_) => c.loadBrowse(z),
+                onTap: () => c.loadBrowse(z),
               ),
           ],
         ),
@@ -220,6 +231,12 @@ class SelectedItemCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (item.cellLabel != null)
+                      Text(
+                        item.cellLabel!,
+                        key: Key('vm-item-cell-${item.kind.name}'),
+                        style: AppTextStyles.small,
+                      ),
                     if (item.finish != null)
                       Text(
                         trf('Покрытие: {v0}', {
@@ -310,7 +327,10 @@ class ShadeChip extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                item.shadeCode ?? item.shadeName ?? '',
+                item.panPosition?.toString() ??
+                    item.shadeCode ??
+                    item.shadeName ??
+                    '',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.caption,
