@@ -5,6 +5,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:cosmetix/app.dart';
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/product_filter.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
@@ -116,6 +117,39 @@ void main() {
     expect(find.text('Для вас'), findsNothing); // not offered yet
     expect(find.text('Сначала дешёвые'), findsOneWidget);
     expect(find.text('Сначала дорогие'), findsOneWidget);
+  });
+
+  testWidgets('the result screen shows no confidence percent of the AI', (
+    t,
+  ) async {
+    t.view.physicalSize = const Size(1080, 2400);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    final (helper, _) = await newUser(t);
+    await t.pumpWidget(CosmetixApp(helper: helper));
+    await pumpUntil(t, find.text('Кабинет'));
+    nav(t).pushNamed(
+      AppRoutes.colorResult,
+      arguments: BeautyResultArgs(
+        profile: BeautyProfile.fromLabels(
+          skinType: 'Сухая',
+          skinTone: 'Светлый',
+          undertone: 'Холодный',
+          colorType: 'Лето',
+          concerns: const ['Сухость и шелушение'],
+          source: 'questionnaire_photo',
+          confidence: 0.82, // an old saved profile may still carry the number
+        ),
+        photoUsed: true,
+      ),
+    );
+    await _settle(t);
+    expect(find.text('Бьюти-профиль'), findsWidgets);
+    expect(find.text('Опросник + анализ фото'), findsOneWidget);
+    // the model's own number is not shown: no percent, no word about confidence
+    expect(find.textContaining('Уверенность'), findsNothing);
+    expect(find.textContaining('82%'), findsNothing);
+    expect(find.textContaining('82 %'), findsNothing);
   });
 
   testWidgets('finishing the Beauty Test (photo skipped) turns "For you" on', (
