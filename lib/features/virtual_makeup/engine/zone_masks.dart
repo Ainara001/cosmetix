@@ -61,11 +61,11 @@ class ZoneMaskBuilder {
     return o;
   }
 
-  static List<Offset> _lerpLine(List<Offset> line, double u) {
+  /// The point at fraction [u] (0..1) along a polyline.
+  static Offset _pointAlong(List<Offset> line, double u) {
     final pos = u * (line.length - 1);
     final i = pos.floor().clamp(0, line.length - 2);
-    final t = pos - i;
-    return [Offset.lerp(line[i], line[i + 1], t)!];
+    return Offset.lerp(line[i], line[i + 1], pos - i)!;
   }
 
   static MaskPatch _eyeshadow(FacePoints f, int w, int h, double fw) {
@@ -92,7 +92,7 @@ class ZoneMaskBuilder {
       for (final s in scales) {
         final top = <Offset>[];
         for (var i = 0; i < e.lash.length; i++) {
-          final brow = _lerpLine(e.brow, i / (e.lash.length - 1)).first;
+          final brow = _pointAlong(e.brow, i / (e.lash.length - 1));
           top.add(Offset.lerp(e.lash[i], brow, s)!);
         }
         final poly = [...e.lash, ...top.reversed];

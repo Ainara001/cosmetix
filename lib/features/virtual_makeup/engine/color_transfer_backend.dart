@@ -49,18 +49,24 @@ class ColorTransferBackend implements MakeupBackend {
     final face = request.face;
     final out = face.image.copy();
     final protection = request.protection;
-    for (final zone in MakeupZone.values) {
+    final w = face.image.width;
+    final zones = [
+      for (final zone in MakeupZone.values)
+        if (request.look.of(zone).active && !face.maskOf(zone).isEmpty) zone,
+    ];
+    // Where two zones cover the same pixel their shifts ADD UP: the second zone
+    // starts from what the first one produced, not from the original photo.
+    // (One zone alone never needs this, so the map is only made for several.)
+    final touched = zones.length > 1 ? Uint8List(w * face.image.height) : null;
+    for (final zone in zones) {
       final look = request.look.of(zone);
-      if (!look.active) continue;
       final patch = face.maskOf(zone);
-      if (patch.isEmpty) continue;
       final lab = _labOf(face, zone, patch);
       final target = ColorMath.colorToLab(look.color);
       final kl = _lightness[zone]!, kc = _chroma[zone]!;
       final dl = (target.l - lab.meanL) * kl;
       final da = (target.a - lab.meanA) * kc;
       final db = (target.b - lab.meanB) * kc;
-      final w = face.image.width;
       for (var py = 0; py < patch.height; py++) {
         final y = patch.y0 + py;
         for (var px = 0; px < patch.width; px++) {
@@ -71,13 +77,22 @@ class ColorTransferBackend implements MakeupBackend {
           if (protection != null) p *= 1 - protection.at(x, y);
           if (p < _minEffect) continue;
           final i = py * patch.width + px;
-          ColorMath.labToRgb(
-            lab.l[i] + p * dl,
-            lab.a[i] + p * da,
-            lab.b[i] + p * db,
-            out.pixels,
-            (y * w + x) * 4,
-          );
+          final o = (y * w + x) * 4;
+          var l = lab.l[i], a = lab.a[i], b = lab.b[i];
+          if (touched != null) {
+            if (touched[y * w + x] != 0) {
+              final c = ColorMath.rgbToLab(
+                out.pixels[o],
+                out.pixels[o + 1],
+                out.pixels[o + 2],
+              );
+              l = c.l;
+              a = c.a;
+              b = c.b;
+            }
+            touched[y * w + x] = 1;
+          }
+          ColorMath.labToRgb(l + p * dl, a + p * da, b + p * db, out.pixels, o);
         }
       }
     }

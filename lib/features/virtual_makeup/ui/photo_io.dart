@@ -1,8 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../engine/rgba_image.dart';
 
@@ -27,24 +29,39 @@ class ImagePickerMakeupPhotoSource implements MakeupPhotoSource {
     if (x == null) return null;
     final bytes = await x.readAsBytes();
     try {
-      final f = File(x.path);
-      // only the temporary copy of the picker, never the user's own file
-      if (x.path.contains('/tmp/') ||
-          x.path.contains('/cache/') ||
-          x.path.contains('/Caches/') ||
-          x.path.contains('image_picker')) {
+      // only the picker's own temporary copy, never the user's file
+      if (isInsideAny(x.path, await tempRoots())) {
+        final f = File(x.path);
         if (await f.exists()) await f.delete();
       }
     } catch (_) {}
     return bytes;
   }
+
+  /// The folders where the picker puts its copies. On Android that is the cache
+  /// folder (= `getTemporaryDirectory`); on iOS it is `NSTemporaryDirectory`
+  /// (= `Directory.systemTemp`), which is NOT the folder `getTemporaryDirectory`
+  /// returns there (that one is Caches). Both are the app's own folders.
+  @visibleForTesting
+  static Future<List<String>> tempRoots() async => [
+    (await getTemporaryDirectory()).path,
+    Directory.systemTemp.path,
+  ];
+
+  /// True when [path] lies strictly inside one of [roots].
+  @visibleForTesting
+  static bool isInsideAny(String path, Iterable<String> roots) => roots.any(
+    (r) => r.isNotEmpty && p.isWithin(p.normalize(r), p.normalize(path)),
+  );
 }
 
 class PhotoDecoder {
   PhotoDecoder._();
 
-  /// Decodes [bytes] to RGBA with the long side at most [maxSide] pixels (the
-  /// EXIF rotation is applied by the decoder). Throws when it is not a picture.
+  /// Decodes [bytes] to RGBA with the long side at most [maxSide] pixels. The
+  /// engine's decoder applies the EXIF rotation and reports the turned size;
+  /// `photo_decode_test.dart` checks that for orientations 1, 6 and 8 on the
+  /// test engine (not yet on a phone). Throws when it is not a picture.
   static Future<RgbaImage> decode(Uint8List bytes, {int maxSide = 1280}) async {
     final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
     final descriptor = await ui.ImageDescriptor.encoded(buffer);

@@ -353,11 +353,43 @@ void main() {
     expect(tester0(t), isNull);
   });
 
-  testWidgets('leaving the screen frees the face finder', (t) async {
+  testWidgets('leaving the screen keeps a face finder that was handed in', (
+    t,
+  ) async {
     final (lm, _) = await open(t);
     await t.pumpWidget(host(const SizedBox()));
     await t.pump();
-    expect(lm.disposed, isTrue);
+    // the caller made it and may use it again; only a finder the screen made
+    // itself is freed with the screen (covered in controller_test.dart)
+    expect(lm.disposed, isFalse);
+  });
+
+  testWidgets('a refused second photo leaves the first on the screen', (
+    t,
+  ) async {
+    final (lm, _) = await open(t);
+    await pickPhoto(t);
+    expect(find.byKey(const Key('vm-photo')), findsOneWidget);
+
+    lm.faces = [];
+    await reveal(t, find.byKey(const Key('vm-other-photo')));
+    await t.tap(find.byKey(const Key('vm-other-photo')));
+    // the notice is at the top of the list, which is now scrolled down
+    for (
+      var i = 0;
+      i < 40 && find.byKey(const Key('vm-no-face')).evaluate().isEmpty;
+      i++
+    ) {
+      await t.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await t.pump(const Duration(milliseconds: 50));
+      await t.drag(find.byType(Scrollable).first, const Offset(0, 3000));
+      await t.pump();
+    }
+    expect(find.byKey(const Key('vm-no-face')), findsOneWidget);
+    expect(find.byKey(const Key('vm-photo')), findsOneWidget);
+    expect(find.byKey(const Key('vm-tabs')), findsOneWidget);
   });
 }
 

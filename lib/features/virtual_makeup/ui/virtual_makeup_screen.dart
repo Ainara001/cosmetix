@@ -45,8 +45,10 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
   void initState() {
     super.initState();
     _photos = widget.photos ?? const ImagePickerMakeupPhotoSource();
+    // a face finder made here is freed here; one passed in stays its owner's
     _c = VirtualMakeupController(
       landmarks: widget.landmarks ?? MediaPipeLandmarkProvider(),
+      ownsLandmarks: widget.landmarks == null,
     )..addListener(_onChange);
   }
 
@@ -123,32 +125,16 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
           ),
         ];
       case MakeupStatus.noFace:
-        return [
-          _problem(
-            'Лицо не найдено. Выберите фото, где лицо хорошо видно и смотрит в камеру.',
-            const Key('vm-no-face'),
-          ),
-          _picker(context),
-        ];
+        return [_notice(MakeupNotice.noFace), _picker(context)];
       case MakeupStatus.severalFaces:
-        return [
-          _problem(
-            'На фото несколько лиц. Выберите фото с одним лицом: иначе примерка была бы догадкой.',
-            const Key('vm-several-faces'),
-          ),
-          _picker(context),
-        ];
+        return [_notice(MakeupNotice.severalFaces), _picker(context)];
       case MakeupStatus.failed:
-        return [
-          _problem(
-            'Не удалось обработать фото. Попробуйте другое.',
-            const Key('vm-failed'),
-          ),
-          _picker(context),
-        ];
+        return [_notice(MakeupNotice.failed), _picker(context)];
       case MakeupStatus.ready:
         final q = _c.quality!;
         return [
+          // the last photo was refused, the one before it is still here
+          if (_c.notice != null) _notice(_c.notice!),
           MakeupPhotoView(
             controller: _c,
             editing: _tab == _Tab.protection,
@@ -257,6 +243,21 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
       ),
     );
   }
+
+  Widget _notice(MakeupNotice n) => switch (n) {
+    MakeupNotice.noFace => _problem(
+      'Лицо не найдено. Выберите фото, где лицо хорошо видно и смотрит в камеру.',
+      const Key('vm-no-face'),
+    ),
+    MakeupNotice.severalFaces => _problem(
+      'На фото несколько лиц. Выберите фото с одним лицом: иначе примерка была бы догадкой.',
+      const Key('vm-several-faces'),
+    ),
+    MakeupNotice.failed => _problem(
+      'Не удалось обработать фото. Попробуйте другое.',
+      const Key('vm-failed'),
+    ),
+  };
 
   Widget _problem(String text, Key key) => Padding(
     padding: const EdgeInsets.only(bottom: 12),

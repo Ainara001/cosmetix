@@ -46,7 +46,7 @@ class MakeupLook {
     MakeupZone.blush => blush,
   };
 
-  MakeupLook with_(MakeupZone zone, ZoneLook value) => switch (zone) {
+  MakeupLook withZone(MakeupZone zone, ZoneLook value) => switch (zone) {
     MakeupZone.lips => MakeupLook(
       lips: value,
       eyeshadow: eyeshadow,

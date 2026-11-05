@@ -120,9 +120,16 @@ void main() {
       final out = render(const MakeupLook());
       final small = sideBySide([downscale(f.image, 3), downscale(out, 3)]);
       final file = File('test/virtual_makeup/goldens/default_look.png');
-      if (Platform.environment['UPDATE_GOLDENS'] == '1' || !file.existsSync()) {
+      // the picture is written only on purpose (UPDATE_GOLDENS=1); a missing
+      // file is a failure, not a reason to make a new "correct" answer
+      if (Platform.environment['UPDATE_GOLDENS'] == '1') {
         file.writeAsBytesSync(await png(small));
       }
+      expect(
+        file.existsSync(),
+        isTrue,
+        reason: 'run once with UPDATE_GOLDENS=1 and check the picture by eye',
+      );
       final stored = await PhotoDecoder.decode(file.readAsBytesSync());
       expect(stored.width, small.width);
       expect(stored.height, small.height);

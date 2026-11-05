@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../domain/face_quality.dart';
 import '../domain/makeup_look.dart';
@@ -15,6 +16,9 @@ import 'photo_io.dart';
 
 enum MakeupStatus { empty, loading, noFace, severalFaces, ready, failed }
 
+/// Why the LAST photo was not taken while an earlier photo is still on screen.
+enum MakeupNotice { noFace, severalFaces, failed }
+
 enum CompareMode { result, original, split }
 
 /// The state of the try-on screen. It holds ONE photo in memory (never saved,
@@ -22,12 +26,17 @@ enum CompareMode { result, original, split }
 class VirtualMakeupController extends ChangeNotifier {
   VirtualMakeupController({
     required this.landmarks,
+    this.ownsLandmarks = true,
     this.backend = const ColorTransferBackend(),
     this.maxSide = 1280,
     this.debounce = const Duration(milliseconds: 60),
   });
 
   final FaceLandmarkProvider landmarks;
+
+  /// Whether [dispose] also frees [landmarks]. False when the caller made the
+  /// provider and keeps using it after this screen.
+  final bool ownsLandmarks;
   final MakeupBackend backend;
   final int maxSide;
   final Duration debounce;
@@ -42,56 +51,107 @@ class VirtualMakeupController extends ChangeNotifier {
   CompareMode compare = CompareMode.result;
   double split = 0.5;
 
+  /// Set when a new photo was refused and the previous one stayed.
+  MakeupNotice? notice;
+
   /// A small picture of the protected area and of the suggestion for drawing.
   ui.Image? protectionOverlay;
   ui.Image? suggestionOverlay;
 
   Timer? _timer;
   int _renderSeq = 0;
+  int _loadSeq = 0;
   bool _disposed = false;
 
   FaceQuality? get quality => face?.quality;
   bool get hasPhoto => face != null;
 
   /// Decodes a photo, finds the face and renders the first result.
+  ///
+  /// A photo that cannot be used (no face, several faces, broken file) does not
+  /// throw away the photo already on screen: that one stays and [notice] says
+  /// why the new one was refused. If a newer call starts meanwhile, this one
+  /// gives up without touching anything.
   Future<void> loadPhoto(Uint8List bytes) async {
+    final seq = ++_loadSeq;
+    final hadPhoto = face != null;
+    notice = null;
     _setStatus(MakeupStatus.loading);
+    ui.Image? original, result;
+    var adopted = false;
     try {
       final rgba = await PhotoDecoder.decode(bytes, maxSide: maxSide);
       final faces = await landmarks.detect(rgba);
-      _clear();
-      if (faces.isEmpty) {
-        _setStatus(MakeupStatus.noFace);
-        return;
-      }
-      if (faces.length > 1) {
-        _setStatus(MakeupStatus.severalFaces);
+      if (_superseded(seq)) return;
+      if (faces.length != 1) {
+        _refuse(
+          hadPhoto,
+          faces.isEmpty ? MakeupStatus.noFace : MakeupStatus.severalFaces,
+        );
         return;
       }
       final prepared = PreparedFace.from(rgba, faces.first);
-      originalImage = await PhotoDecoder.toUiImage(rgba);
+      final fresh = ProtectionMask(rgba.width, rgba.height);
+      original = await PhotoDecoder.toUiImage(rgba);
+      result = await _draw(prepared, const MakeupLook(), fresh);
+      if (_superseded(seq)) return;
+      // nothing below awaits: the swap is one step
+      _timer?.cancel();
+      _renderSeq++;
+      _clear();
       face = prepared;
-      protection = ProtectionMask(rgba.width, rgba.height);
+      protection = fresh;
+      originalImage = original;
+      resultImage = result;
+      adopted = true;
       look = const MakeupLook();
       compare = CompareMode.result;
-      await _renderNow();
       _setStatus(MakeupStatus.ready);
     } catch (e) {
       debugPrint('virtual makeup: $e');
+      if (!_superseded(seq)) _refuse(hadPhoto, MakeupStatus.failed);
+    } finally {
+      if (!adopted) {
+        original?.dispose();
+        result?.dispose();
+      }
+    }
+  }
+
+  bool _superseded(int seq) => _disposed || seq != _loadSeq;
+
+  /// The new photo is not usable. With an earlier photo the screen stays on it.
+  void _refuse(bool hadPhoto, MakeupStatus why) {
+    if (hadPhoto) {
+      notice = switch (why) {
+        MakeupStatus.noFace => MakeupNotice.noFace,
+        MakeupStatus.severalFaces => MakeupNotice.severalFaces,
+        _ => MakeupNotice.failed,
+      };
+      _setStatus(MakeupStatus.ready);
+    } else {
       _clear();
-      _setStatus(MakeupStatus.failed);
+      _setStatus(why);
     }
   }
 
   void _clear() {
-    originalImage?.dispose();
-    resultImage?.dispose();
-    protectionOverlay?.dispose();
-    suggestionOverlay?.dispose();
+    _disposeLater(originalImage);
+    _disposeLater(resultImage);
+    _disposeLater(protectionOverlay);
+    _disposeLater(suggestionOverlay);
     originalImage = resultImage = protectionOverlay = suggestionOverlay = null;
     face = null;
     protection = null;
     suggestion = null;
+  }
+
+  /// A picture may still be on the frame being drawn; free it after that frame.
+  static void _disposeLater(ui.Image? image) {
+    if (image == null) return;
+    final binding = SchedulerBinding.instance;
+    binding.addPostFrameCallback((_) => image.dispose());
+    binding.scheduleFrame();
   }
 
   void _setStatus(MakeupStatus s) {
@@ -106,7 +166,7 @@ class VirtualMakeupController extends ChangeNotifier {
   // ---------------------------------------------------------------- the look
 
   void setZone(MakeupZone zone, ZoneLook value) {
-    look = look.with_(zone, value);
+    look = look.withZone(zone, value);
     _scheduleRender();
     _notify();
   }
@@ -134,18 +194,23 @@ class VirtualMakeupController extends ChangeNotifier {
     final f = face;
     if (f == null) return;
     final seq = ++_renderSeq;
-    final out = await backend.render(
-      MakeupRequest(face: f, look: look, protection: protection),
-    );
-    final img = await PhotoDecoder.toUiImage(out);
+    final img = await _draw(f, look, protection);
     if (_disposed || seq != _renderSeq) {
       img.dispose();
       return;
     }
-    resultImage?.dispose();
+    _disposeLater(resultImage);
     resultImage = img;
     _notify();
   }
+
+  Future<ui.Image> _draw(
+    PreparedFace f,
+    MakeupLook l,
+    ProtectionMask? p,
+  ) async => PhotoDecoder.toUiImage(
+    await backend.render(MakeupRequest(face: f, look: l, protection: p)),
+  );
 
   // ------------------------------------------------------ protection (by hand)
 
@@ -194,7 +259,7 @@ class VirtualMakeupController extends ChangeNotifier {
   }
 
   void _maskChanged({bool renderNow = false}) {
-    unawaited(_refreshOverlays());
+    _requestOverlays();
     if (renderNow) _scheduleRender();
     _notify();
   }
@@ -207,7 +272,7 @@ class VirtualMakeupController extends ChangeNotifier {
     final f = face;
     if (f == null) return;
     suggestion = BlemishSuggester.suggest(f.image, f.masks, f.points.faceWidth);
-    unawaited(_refreshOverlays());
+    _requestOverlays();
     _notify();
   }
 
@@ -221,44 +286,59 @@ class VirtualMakeupController extends ChangeNotifier {
 
   void dismissSuggestion() {
     suggestion = null;
-    unawaited(_refreshOverlays());
+    _requestOverlays();
     _notify();
   }
 
-  Future<void> _refreshOverlays() async {
-    final f = face;
-    if (f == null) return;
-    final w = f.image.width, h = f.image.height;
-    final p = protection, s = suggestion;
-    final pi = p != null && !p.isEmpty
-        ? await _overlay(p.data, w, h, const [34, 160, 220])
-        : null;
-    final si = s != null && s.reliable && s.regions > 0
-        ? await _overlay(s.mask, w, h, const [250, 190, 40])
-        : null;
-    if (_disposed) {
-      pi?.dispose();
-      si?.dispose();
-      return;
+  // The overlay pictures are rebuilt in the background. A brush can ask for a
+  // new one on every pointer move: asks made while one is being built are
+  // folded into ONE more round, so pictures never arrive out of order.
+  bool _overlayBusy = false;
+  bool _overlayDirty = false;
+
+  void _requestOverlays() {
+    _overlayDirty = true;
+    if (!_overlayBusy) unawaited(_overlayLoop());
+  }
+
+  Future<void> _overlayLoop() async {
+    _overlayBusy = true;
+    try {
+      while (_overlayDirty && !_disposed) {
+        _overlayDirty = false;
+        final f = face;
+        if (f == null) continue;
+        final w = f.image.width, h = f.image.height;
+        final p = protection, s = suggestion;
+        // the pixels are taken now, before any await, so they match this moment
+        final pp = p != null && !p.isEmpty
+            ? overlayPixels(p.data, w, h, const [34, 160, 220])
+            : null;
+        final sp = s != null && s.reliable && s.regions > 0
+            ? overlayPixels(s.mask, w, h, const [250, 190, 40])
+            : null;
+        final pi = pp == null ? null : await PhotoDecoder.toUiImage(pp);
+        final si = sp == null ? null : await PhotoDecoder.toUiImage(sp);
+        if (_disposed || !identical(f, face)) {
+          pi?.dispose();
+          si?.dispose();
+          continue;
+        }
+        _disposeLater(protectionOverlay);
+        _disposeLater(suggestionOverlay);
+        protectionOverlay = pi;
+        suggestionOverlay = si;
+        _notify();
+      }
+    } finally {
+      _overlayBusy = false;
     }
-    protectionOverlay?.dispose();
-    suggestionOverlay?.dispose();
-    protectionOverlay = pi;
-    suggestionOverlay = si;
-    _notify();
   }
 
   /// A coloured, half-transparent picture of a mask, at most 360 px across.
-  static Future<ui.Image> _overlay(
-    Uint8List mask,
-    int w,
-    int h,
-    List<int> rgb,
-  ) => PhotoDecoder.toUiImage(overlayPixels(mask, w, h, rgb));
-
-  /// The pixels of that picture. The colour is PREMULTIPLIED by the alpha, as
-  /// the engine draws it: where the mask is 0 every channel is 0 (clear), where
-  /// it is 255 the colour is at 55 % opacity.
+  /// The colour is PREMULTIPLIED by the alpha, as the engine draws it: where
+  /// the mask is 0 every channel is 0 (clear), where it is 255 the colour is at
+  /// 55 % opacity.
   @visibleForTesting
   static RgbaImage overlayPixels(Uint8List mask, int w, int h, List<int> rgb) {
     final step = (w > h ? w : h) > 360 ? ((w > h ? w : h) / 360).ceil() : 1;
@@ -283,11 +363,12 @@ class VirtualMakeupController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _timer?.cancel();
-    originalImage?.dispose();
-    resultImage?.dispose();
-    protectionOverlay?.dispose();
-    suggestionOverlay?.dispose();
-    unawaited(landmarks.dispose());
+    _disposeLater(originalImage);
+    _disposeLater(resultImage);
+    _disposeLater(protectionOverlay);
+    _disposeLater(suggestionOverlay);
+    originalImage = resultImage = protectionOverlay = suggestionOverlay = null;
+    if (ownsLandmarks) unawaited(landmarks.dispose());
     super.dispose();
   }
 }

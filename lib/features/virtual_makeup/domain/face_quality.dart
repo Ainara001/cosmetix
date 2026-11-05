@@ -28,9 +28,6 @@ class FaceQuality {
   /// The try-on is not run for several faces (it would be a guess).
   bool get canRun => faceCount == 1;
 
-  /// True when the result should be marked as less reliable.
-  bool get lowReliability => issues.any((i) => i != QualityIssue.severalFaces);
-
   static const maxYawRatio = 1.5;
   static const minYawRatio = 0.65;
   static const maxRollDegrees = 20.0;

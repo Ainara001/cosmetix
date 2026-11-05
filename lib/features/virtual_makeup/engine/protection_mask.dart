@@ -18,15 +18,22 @@ class ProtectionMask {
   final List<_Snapshot> _undo = [];
   final List<_Snapshot> _redo = [];
 
-  bool get isEmpty => !data.any((v) => v != 0);
+  /// How many pixels are protected at all. Kept up to date by every method of
+  /// this class (so [isEmpty] and [coverage] cost nothing, also while a brush
+  /// is moving); [data] is for reading, change it only through the methods.
+  int _protected = 0;
+
+  bool get isEmpty => _protected == 0;
 
   /// Share of the photo that is protected, 0..1.
-  double get coverage {
+  double get coverage => _protected / data.length;
+
+  void _recount() {
     var n = 0;
     for (final v in data) {
       if (v != 0) n++;
     }
-    return n / data.length;
+    _protected = n;
   }
 
   /// 0..1 at a pixel.
@@ -60,10 +67,16 @@ class ProtectionMask {
         if (d > radius) continue;
         final cover = d <= inner ? 1.0 : 1 - (d - inner) / (radius - inner);
         final i = y * width + x;
-        if (erase) {
-          data[i] = math.max(0, data[i] - (cover * 255).round());
-        } else {
-          data[i] = math.max(data[i], (cover * 255).round());
+        final before = data[i];
+        final after = erase
+            ? math.max(0, before - (cover * 255).round())
+            : math.max(before, (cover * 255).round());
+        if (after == before) continue;
+        data[i] = after;
+        if (before == 0) {
+          _protected++;
+        } else if (after == 0) {
+          _protected--;
         }
       }
     }
@@ -91,7 +104,10 @@ class ProtectionMask {
     assert(suggestion.length == data.length);
     beginStroke();
     for (var i = 0; i < data.length; i++) {
-      if (suggestion[i] > data[i]) data[i] = suggestion[i];
+      if (suggestion[i] > data[i]) {
+        if (data[i] == 0) _protected++;
+        data[i] = suggestion[i];
+      }
     }
   }
 
@@ -102,23 +118,27 @@ class ProtectionMask {
     if (_undo.isEmpty) return;
     _redo.add(_Snapshot(Uint8List.fromList(data)));
     data.setAll(0, _undo.removeLast().data);
+    _recount();
   }
 
   void redo() {
     if (_redo.isEmpty) return;
     _undo.add(_Snapshot(Uint8List.fromList(data)));
     data.setAll(0, _redo.removeLast().data);
+    _recount();
   }
 
   void clear() {
     if (isEmpty) return;
     beginStroke();
     data.fillRange(0, data.length, 0);
+    _protected = 0;
   }
 
   ProtectionMask copy() {
     final m = ProtectionMask(width, height);
     m.data.setAll(0, data);
+    m._protected = _protected;
     return m;
   }
 }
