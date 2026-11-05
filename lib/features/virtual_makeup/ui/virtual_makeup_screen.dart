@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
@@ -6,10 +8,12 @@ import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 import 'package:flutter/material.dart';
 
+import '../catalog/try_on_item.dart';
 import '../domain/face_quality.dart';
 import '../domain/makeup_look.dart';
 import '../landmarks/face_landmark_provider.dart';
 import '../landmarks/mediapipe_landmark_provider.dart';
+import 'catalog_panel.dart';
 import 'disclaimer_banner.dart';
 import 'makeup_controls.dart';
 import 'mask_editor.dart';
@@ -23,11 +27,28 @@ enum _Tab { makeup, protection }
 /// Self-contained: it does not read the catalog, the database or the skin
 /// analysis, and it does not change them.
 class VirtualMakeupScreen extends StatefulWidget {
-  const VirtualMakeupScreen({super.key, this.landmarks, this.photos});
+  const VirtualMakeupScreen({
+    super.key,
+    this.landmarks,
+    this.photos,
+    this.catalog,
+    this.productId,
+    this.onOpenProduct,
+  });
 
   /// Tests and future engines can replace the face finder and the photo source.
   final FaceLandmarkProvider? landmarks;
   final MakeupPhotoSource? photos;
+
+  /// The products of the shop that can be tried on (null: only the colours
+  /// the user picks by hand, as in the first stage).
+  final TryOnCatalog? catalog;
+
+  /// A catalog product to show right away (the "Try on" button of its page).
+  final int? productId;
+
+  /// How to open the page of a product (cart, favourites live there).
+  final ValueChanged<int>? onOpenProduct;
 
   @override
   State<VirtualMakeupScreen> createState() => _VirtualMakeupScreenState();
@@ -49,7 +70,10 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
     _c = VirtualMakeupController(
       landmarks: widget.landmarks ?? MediaPipeLandmarkProvider(),
       ownsLandmarks: widget.landmarks == null,
+      catalog: widget.catalog,
     )..addListener(_onChange);
+    final id = widget.productId;
+    if (id != null) unawaited(_c.startWith(id));
   }
 
   void _onChange() {
@@ -109,7 +133,7 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
     final pal = context.pal;
     switch (_c.status) {
       case MakeupStatus.empty:
-        return [_picker(context)];
+        return [_picker(context), ..._catalogBlock()];
       case MakeupStatus.loading:
         return [
           const SizedBox(height: 60),
@@ -125,11 +149,23 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
           ),
         ];
       case MakeupStatus.noFace:
-        return [_notice(MakeupNotice.noFace), _picker(context)];
+        return [
+          _notice(MakeupNotice.noFace),
+          _picker(context),
+          ..._catalogBlock(),
+        ];
       case MakeupStatus.severalFaces:
-        return [_notice(MakeupNotice.severalFaces), _picker(context)];
+        return [
+          _notice(MakeupNotice.severalFaces),
+          _picker(context),
+          ..._catalogBlock(),
+        ];
       case MakeupStatus.failed:
-        return [_notice(MakeupNotice.failed), _picker(context)];
+        return [
+          _notice(MakeupNotice.failed),
+          _picker(context),
+          ..._catalogBlock(),
+        ];
       case MakeupStatus.ready:
         final q = _c.quality!;
         return [
@@ -190,14 +226,17 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
           ),
           const SizedBox(height: 10),
           if (_tab == _Tab.makeup)
-            for (final z in MakeupZone.values) ...[
-              ZoneControl(
-                zone: z,
-                look: _c.look.of(z),
-                onChanged: (v) => _c.setZone(z, v),
-              ),
-              const SizedBox(height: 8),
-            ]
+            if (widget.catalog != null)
+              ..._catalogBlock(withZoneControls: true)
+            else
+              for (final z in MakeupZone.values) ...[
+                ZoneControl(
+                  zone: z,
+                  look: _c.look.of(z),
+                  onChanged: (v) => _c.setZone(z, v),
+                ),
+                const SizedBox(height: 8),
+              ]
           else
             MaskEditorPanel(
               controller: _c,
@@ -215,6 +254,28 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
           ),
         ];
     }
+  }
+
+  /// The choice between products of the catalog and own colours, and what
+  /// goes with the chosen mode. Empty when the screen has no catalog.
+  List<Widget> _catalogBlock({bool withZoneControls = false}) {
+    if (widget.catalog == null) return const [];
+    return [
+      const SizedBox(height: 10),
+      ColourModeBar(controller: _c),
+      const SizedBox(height: 10),
+      if (_c.colourMode == ColourMode.catalog)
+        CatalogPanel(controller: _c, onOpenProduct: widget.onOpenProduct)
+      else if (withZoneControls)
+        for (final z in MakeupZone.values) ...[
+          ZoneControl(
+            zone: z,
+            look: _c.look.of(z),
+            onChanged: (v) => _c.setZone(z, v),
+          ),
+          const SizedBox(height: 8),
+        ],
+    ];
   }
 
   Widget _issue(QualityIssue issue) {
