@@ -14,6 +14,7 @@ import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
+import 'package:cosmetix/services/ai/ai_config.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/widgets/app_card.dart';
@@ -97,6 +98,12 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     }
   }
 
+  Future<bool> _photoAllowed(AiProvider ai) async {
+    if (!AiConfig.photoAnalysisAtBuild) return false;
+    if (ai.status != AiStatus.online) await ai.testConnection();
+    return ai.photoAnalysisAllowed;
+  }
+
   Future<void> _analyze() async {
     final photo = _photo;
     if (photo == null) return;
@@ -107,6 +114,21 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       _discardPhoto();
       setState(() {
         _error = tr('Анализ по фото доступен с 18 лет.');
+        _step = _Step.failed;
+      });
+      return;
+    }
+    // the photo leaves the phone only if the server said, explicitly, that it
+    // accepts photos; otherwise it is deleted here and nothing is sent
+    final allowed = await _photoAllowed(ai);
+    if (!mounted) return;
+    if (!allowed) {
+      final off = ai.status == AiStatus.online;
+      _discardPhoto();
+      setState(() {
+        _error = off
+            ? tr('Анализ по фото сейчас отключён.')
+            : tr('ИИ-сервер недоступен.');
         _step = _Step.failed;
       });
       return;
@@ -134,6 +156,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       await _finish(vision);
     } on AiException catch (e) {
       if (e is AiUnavailable || e is AiTimeout) ai.markOffline(e.message);
+      if (e is AiPhotoDisabled) ai.markPhotoDisabled();
       if (!mounted) return;
       setState(() {
         _error = _friendly(e);
@@ -157,6 +180,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       'ИИ перегружен или лимит исчерпан. Попробуйте позже.',
     ),
     AiNotAllowed() => tr('Анализ по фото доступен с 18 лет.'),
+    AiPhotoDisabled() => tr('Анализ по фото сейчас отключён.'),
     AiServerError() => tr('ИИ вернул ошибку. Попробуйте ещё раз позже.'),
     AiBadResponse() => tr('Не удалось разобрать ответ ИИ.'),
   };
@@ -317,7 +341,15 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
             ),
           ],
         ),
-        if (!ai.isConfigured || ai.status == AiStatus.offline) ...[
+        if (ai.photoAnalysisOff) ...[
+          const SizedBox(height: 10),
+          Text(
+            tr(
+              'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.',
+            ),
+            style: AppTextStyles.caption.copyWith(color: AppColors.sale),
+          ),
+        ] else if (!ai.isConfigured || ai.status == AiStatus.offline) ...[
           const SizedBox(height: 10),
           Text(
             tr(
@@ -327,19 +359,21 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           ),
         ],
         const SizedBox(height: 20),
-        CustomButton(
-          label: tr('Сделать фото'),
-          icon: Icons.photo_camera_outlined,
-          onPressed: () => _pick(ImageSource.camera),
-        ),
-        const SizedBox(height: 10),
-        CustomButton(
-          label: tr('Выбрать из галереи'),
-          icon: Icons.photo_library_outlined,
-          outlined: true,
-          onPressed: () => _pick(ImageSource.gallery),
-        ),
-        const SizedBox(height: 6),
+        if (!ai.photoAnalysisOff) ...[
+          CustomButton(
+            label: tr('Сделать фото'),
+            icon: Icons.photo_camera_outlined,
+            onPressed: () => _pick(ImageSource.camera),
+          ),
+          const SizedBox(height: 10),
+          CustomButton(
+            label: tr('Выбрать из галереи'),
+            icon: Icons.photo_library_outlined,
+            outlined: true,
+            onPressed: () => _pick(ImageSource.gallery),
+          ),
+          const SizedBox(height: 6),
+        ],
         if (_needsPhoto)
           TextButton(
             onPressed: _backToQuestions,

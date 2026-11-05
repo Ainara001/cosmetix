@@ -233,8 +233,16 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
               tr('Разрешить отправку фото в ИИ'),
               style: AppTextStyles.small,
             ),
+            subtitle: ai.photoAnalysisOff
+                ? Text(
+                    tr('Сервер отключил анализ по фото: фото не отправляются.'),
+                    style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                  )
+                : null,
             value: ai.sharePhotos,
-            onChanged: ai.ageAllowed || ai.sharePhotos
+            // a consent can always be withdrawn, but not given below the age
+            // limit or while the server refuses photos
+            onChanged: (ai.ageAllowed && !ai.photoAnalysisOff) || ai.sharePhotos
                 ? ai.setSharePhotos
                 : null,
           ),

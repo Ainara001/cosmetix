@@ -45,6 +45,8 @@ void main() {
     );
     ai.status = AiStatus.online; // no network in this test
     ai.ageSource = () => age;
+    ai.photoAnalysis =
+        true; // the server accepts photos: only the age is tested
     await t.pumpWidget(
       MultiProvider(
         providers: [

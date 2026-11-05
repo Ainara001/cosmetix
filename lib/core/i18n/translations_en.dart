@@ -1603,4 +1603,10 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Enter your year of birth in the profile. The test works without a photo too, from your answers.',
   'Тест работает и без фото, по вашим ответам.':
       'The test works without a photo too, from your answers.',
+  'Анализ по фото сейчас отключён.':
+      'Photo analysis is switched off right now.',
+  'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.':
+      'Photo analysis is switched off right now. The test works from your answers, no photo is needed.',
+  'Сервер отключил анализ по фото: фото не отправляются.':
+      'The server has switched photo analysis off: photos are not sent.',
 };
