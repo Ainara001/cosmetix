@@ -8,6 +8,7 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -211,6 +212,28 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
             style: AppTextStyles.caption.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 6),
+          Text(
+            tr(
+              'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.',
+            ),
+            style: AppTextStyles.caption.copyWith(color: pal.subtext),
+          ),
+          Text(
+            AiDisclosure.dataUse(ai.dataUse, tr),
+            style: AppTextStyles.caption.copyWith(color: pal.subtext),
+          ),
+          const SizedBox(height: 6),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            activeThumbColor: AppColors.primaryDark,
+            title: Text(
+              tr('Отправлять ИИ сообщения чата'),
+              style: AppTextStyles.small,
+            ),
+            value: ai.shareChat,
+            onChanged: ai.ageAllowed || ai.shareChat ? ai.setShareChat : null,
+          ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             dense: true,

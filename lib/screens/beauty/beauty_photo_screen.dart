@@ -15,6 +15,7 @@ import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/widgets/app_card.dart';
@@ -138,9 +139,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       final ok = await confirmDialog(
         context,
         title: tr('Отправить фото в ИИ?'),
-        message: tr(
-          'Фото будет отправлено на сервер ИИ только для анализа цветотипа и сразу удалено с телефона. Согласие можно отозвать в Настройках.',
-        ),
+        message: AiDisclosure.photoConsent(ai.dataUse, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!ok || !mounted) return;
@@ -334,7 +333,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
             Expanded(
               child: Text(
                 tr(
-                  'Ваше фото используется только для улучшения анализа бьюти-профиля и не сохраняется.',
+                  'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.',
                 ),
                 style: AppTextStyles.caption.copyWith(color: pal.subtext),
               ),
