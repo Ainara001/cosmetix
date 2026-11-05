@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 14;
+  static const dbVersion = 15;
 
   final String? path;
   Database? _db;
@@ -154,6 +154,15 @@ class DatabaseHelper {
       }
       await SeedData.applyCountries(db);
     },
+    // virtual try-on: how a shade of a catalog product looks on a face (colour
+    // with its source and trust level). A new table only; products, cart,
+    // favourites and the old `products.shade` are not touched.
+    15: (db) async {
+      for (final sql in _schemaV15) {
+        await db.execute(sql);
+      }
+      await SeedData.applyTryOn(db);
+    },
   };
 
   static Future<void> _addColumn(
@@ -199,6 +208,7 @@ class DatabaseHelper {
     'stores',
     'products',
     'product_prices',
+    'product_shades',
     'favorites',
     'cart_items',
     'orders',
@@ -214,6 +224,27 @@ class DatabaseHelper {
     'care_steps',
     'care_logs',
     'reaction_history',
+  ];
+
+  /// Schema version 15: the shade data of the virtual try-on. One row per
+  /// PRODUCT (every shade is a product of its own, with its own id, price, cart
+  /// line and favourite). `colour` is NULL when the colour is not known; a
+  /// colour always comes with its source and status (see `TryOnSeed`).
+  static const _schemaV15 = [
+    '''
+CREATE TABLE IF NOT EXISTS product_shades (
+  product_id INTEGER PRIMARY KEY REFERENCES products(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  line_key TEXT,
+  shade_code TEXT,
+  shade_name TEXT,
+  colour INTEGER,
+  colour_source TEXT,
+  colour_status TEXT NOT NULL DEFAULT 'missing',
+  finish TEXT,
+  finish_source TEXT,
+  note TEXT
+)''',
   ];
 
   /// Schema version 14: store categories the normalizer could not place with

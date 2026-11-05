@@ -1,5 +1,5 @@
 import 'package:cosmetix/core/i18n/tr.dart';
-import 'package:cosmetix/features/virtual_makeup/virtual_makeup.dart';
+import 'package:cosmetix/screens/product/try_on_entry.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cosmetix/models/cart_models.dart';
@@ -133,7 +133,7 @@ class AppRoutes {
       case palettes:
         page = PalettesScreen(highlight: a is ColorType ? a : null);
       case virtualMakeup:
-        page = const VirtualMakeupScreen();
+        page = TryOnEntry(productId: a is int ? a : null);
       case editProfile:
         page = const EditProfileScreen();
       case AppRoutes.settings:

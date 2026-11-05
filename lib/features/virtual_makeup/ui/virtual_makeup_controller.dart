@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../catalog/try_on_item.dart';
 import '../domain/face_quality.dart';
 import '../domain/makeup_look.dart';
 import '../engine/blemish_suggester.dart';
@@ -21,12 +22,16 @@ enum MakeupNotice { noFace, severalFaces, failed }
 
 enum CompareMode { result, original, split }
 
+/// Where the colours come from: products of the catalog, or hand-picked.
+enum ColourMode { catalog, manual }
+
 /// The state of the try-on screen. It holds ONE photo in memory (never saved,
 /// never sent) and re-renders it when the look or the protection changes.
 class VirtualMakeupController extends ChangeNotifier {
   VirtualMakeupController({
     required this.landmarks,
     this.ownsLandmarks = true,
+    this.catalog,
     this.backend = const ColorTransferBackend(),
     this.maxSide = 1280,
     this.debounce = const Duration(milliseconds: 60),
@@ -37,6 +42,9 @@ class VirtualMakeupController extends ChangeNotifier {
   /// Whether [dispose] also frees [landmarks]. False when the caller made the
   /// provider and keeps using it after this screen.
   final bool ownsLandmarks;
+
+  /// Products the try-on can show (null: only the hand-picked colours).
+  final TryOnCatalog? catalog;
   final MakeupBackend backend;
   final int maxSide;
   final Duration debounce;
@@ -53,6 +61,25 @@ class VirtualMakeupController extends ChangeNotifier {
 
   /// Set when a new photo was refused and the previous one stayed.
   MakeupNotice? notice;
+
+  // ---------------------------------------------------------- catalog mode
+
+  ColourMode colourMode = ColourMode.manual;
+
+  /// The product shown in each zone in [ColourMode.catalog] (one per kind).
+  final Map<MakeupZone, TryOnItem> items = {};
+
+  /// The product the user touched last: its shades and similar products are
+  /// offered below.
+  TryOnItem? current;
+  List<TryOnItem> lineShades = const [];
+  List<TryOnItem> similar = const [];
+
+  /// The kind whose products the list shows when nothing is selected yet.
+  MakeupZone browseKind = MakeupZone.lips;
+  List<TryOnItem> browseList = const [];
+  MakeupLook _manualLook = const MakeupLook();
+  int _neighboursSeq = 0;
 
   /// A small picture of the protected area and of the suggestion for drawing.
   ui.Image? protectionOverlay;
@@ -93,7 +120,11 @@ class VirtualMakeupController extends ChangeNotifier {
       final prepared = PreparedFace.from(rgba, faces.first);
       final fresh = ProtectionMask(rgba.width, rgba.height);
       original = await PhotoDecoder.toUiImage(rgba);
-      result = await _draw(prepared, const MakeupLook(), fresh);
+      // a product chosen before the photo stays on it (catalog mode)
+      final firstLook = colourMode == ColourMode.catalog
+          ? look
+          : const MakeupLook();
+      result = await _draw(prepared, firstLook, fresh);
       if (_superseded(seq)) return;
       // nothing below awaits: the swap is one step
       _timer?.cancel();
@@ -104,7 +135,7 @@ class VirtualMakeupController extends ChangeNotifier {
       originalImage = original;
       resultImage = result;
       adopted = true;
-      look = const MakeupLook();
+      look = firstLook;
       compare = CompareMode.result;
       _setStatus(MakeupStatus.ready);
     } catch (e) {
@@ -178,6 +209,117 @@ class VirtualMakeupController extends ChangeNotifier {
 
   void setSplit(double value) {
     split = value.clamp(0.02, 0.98);
+    _notify();
+  }
+
+  // ------------------------------------------------------ catalog products
+
+  /// Opens the try-on on a catalog product (e.g. from its page). The product
+  /// must have a colour; otherwise nothing is changed and false is returned.
+  Future<bool> startWith(int productId) async {
+    final c = catalog;
+    if (c == null) return false;
+    final item = await c.item(productId);
+    if (_disposed || item == null || !item.canTryOn) return false;
+    await applyItem(item);
+    return true;
+  }
+
+  /// Shows [item] in its zone (the other zones with a product stay; zones
+  /// without one are off). A product without a colour is refused.
+  Future<void> applyItem(TryOnItem item) async {
+    if (!item.canTryOn) return;
+    if (colourMode == ColourMode.manual) {
+      _manualLook = look;
+      colourMode = ColourMode.catalog;
+      // in catalog mode only the chosen products are on the face
+      for (final z in MakeupZone.values) {
+        look = look.withZone(z, look.of(z).copyWith(enabled: false));
+      }
+    }
+    items[item.kind] = item;
+    current = item;
+    browseKind = item.kind;
+    look = look.withZone(
+      item.kind,
+      ZoneLook(
+        color: item.colour!,
+        intensity: look.of(item.kind).intensity,
+        enabled: true,
+      ),
+    );
+    _scheduleRender();
+    _notify();
+    await _loadNeighbours(item);
+  }
+
+  /// Takes the product out of a zone.
+  void clearItem(MakeupZone zone) {
+    items.remove(zone);
+    look = look.withZone(zone, look.of(zone).copyWith(enabled: false));
+    if (current?.kind == zone) {
+      current = items.values.isEmpty ? null : items.values.last;
+      lineShades = const [];
+      similar = const [];
+    }
+    _scheduleRender();
+    _notify();
+  }
+
+  /// Back to the hand-picked colours (the products stay in memory).
+  void useManualColours() {
+    if (colourMode == ColourMode.manual) return;
+    colourMode = ColourMode.manual;
+    look = _manualLook;
+    _scheduleRender();
+    _notify();
+  }
+
+  /// To the products of the catalog again (what was chosen is shown again).
+  void useCatalogColours() {
+    if (colourMode == ColourMode.catalog || catalog == null) return;
+    colourMode = ColourMode.catalog;
+    _manualLook = look;
+    for (final z in MakeupZone.values) {
+      final it = items[z];
+      look = look.withZone(
+        z,
+        it == null
+            ? look.of(z).copyWith(enabled: false)
+            : ZoneLook(
+                color: it.colour!,
+                intensity: look.of(z).intensity,
+                enabled: true,
+              ),
+      );
+    }
+    _scheduleRender();
+    _notify();
+    unawaited(loadBrowse(browseKind));
+  }
+
+  /// The list of products of a kind (what the user can pick from).
+  Future<void> loadBrowse(MakeupZone kind) async {
+    final c = catalog;
+    if (c == null) return;
+    browseKind = kind;
+    final list = await c.all(kind);
+    if (_disposed || browseKind != kind) return;
+    browseList = list;
+    _notify();
+  }
+
+  Future<void> _loadNeighbours(TryOnItem item) async {
+    final c = catalog;
+    if (c == null) return;
+    final seq = ++_neighboursSeq;
+    final line = await c.sameLine(item);
+    final other = await c.otherProducts(item);
+    final all = await c.all(item.kind);
+    if (_disposed || seq != _neighboursSeq) return;
+    lineShades = line;
+    similar = other;
+    browseList = all;
     _notify();
   }
 
