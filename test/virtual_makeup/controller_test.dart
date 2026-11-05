@@ -143,8 +143,11 @@ void main() {
       final lm = GatedLandmarks();
       final c = make(lm);
       await real(t, () async {
-        final slow = c.loadPhoto(png); // call 0
-        final fast = c.loadPhoto(png); // call 1
+        final slow = c.loadPhoto(png); // detect call 0
+        // the second load starts only once the first is waiting for the finder,
+        // so the order of the calls is certain (decoding time varies)
+        await until(() => lm.gates.length == 1);
+        final fast = c.loadPhoto(png); // detect call 1
         await until(() => lm.gates.length == 2);
         lm.gates[1].complete([face.points]);
         await fast;
