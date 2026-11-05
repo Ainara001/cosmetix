@@ -143,12 +143,14 @@ void main() {
     );
     await _settle(t);
     expect(find.text('Фото (по желанию)'), findsOneWidget);
+    // the demo user has no year of birth, so the AI photo step is closed to
+    // them (Gemini API terms: 18+): the way on is "Continue without a photo"
     await t.scrollUntilVisible(
-      find.text('Пропустить'),
+      find.text('Продолжить без фото'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    await t.tap(find.text('Пропустить'));
+    await t.tap(find.text('Продолжить без фото'));
     await _settle(t);
 
     // the final Beauty Profile is shown, determined by the questionnaire only

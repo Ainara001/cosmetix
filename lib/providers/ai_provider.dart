@@ -14,7 +14,7 @@ enum AiStatus { unknown, checking, online, offline }
 class AiProvider extends ChangeNotifier {
   AiProvider(this._repo, {AiConfig? initial})
     : config = initial ?? AiConfig.fromEnvironment() {
-    client = AiClient(() => config);
+    client = AiClient(() => config, mayUseRemoteAi: () => ageAllowed);
   }
 
   final SettingsRepository _repo;
@@ -29,6 +29,34 @@ class AiProvider extends ChangeNotifier {
   /// `gemini`, `claude` or `mock` once the proxy answered the health check.
   String? mode;
   String? model;
+
+  // ---- age: the Gemini API terms ----
+
+  /// The Gemini API terms do not allow an application that is directed to, or
+  /// likely to be accessed by, people under 18. Cosmetix has no age check at
+  /// sign-up, so the remote AI (chat, photo, AI ranking, classification) is
+  /// available only to a user who has stated a year of birth that makes them
+  /// at least [minAge]. The age is the careful one (`AgeSafety.ageFromBirthYear`
+  /// rounds down), so a user is never let in a year early.
+  static const minAge = 18;
+
+  /// Where the user's age comes from. Wired in `app.dart`. Not set = nobody is
+  /// allowed (the safe default).
+  int? Function()? ageSource;
+
+  int? get userAge => ageSource?.call();
+
+  /// False for a minor and for a user whose age is not known.
+  bool get ageAllowed {
+    final a = userAge;
+    return a != null && a >= minAge;
+  }
+
+  /// The user has not given a year of birth (as opposed to being too young).
+  bool get ageUnknown => userAge == null;
+
+  /// Tells the screens that the age (the profile) changed.
+  void ageChanged() => notifyListeners();
 
   // ---- consent: nothing personal leaves the phone without it ----
 

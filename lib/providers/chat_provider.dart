@@ -6,7 +6,15 @@ import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 
 /// Why the AI could not answer (decides which message the chat shows).
-enum AiFailure { unavailable, notConfigured, timeout, rateLimited }
+enum AiFailure {
+  unavailable,
+  notConfigured,
+  timeout,
+  rateLimited,
+
+  /// The remote AI is not offered to this user (under 18 or age unknown).
+  ageRestricted,
+}
 
 class ChatProvider extends ChangeNotifier {
   ChatProvider(this._repo, this._assistant, {bool Function()? shareProfile})
@@ -97,6 +105,7 @@ class ChatProvider extends ChangeNotifier {
       aiUnavailable = true;
       aiError = e.message;
       aiFailure = switch (e) {
+        AiNotAllowed() => AiFailure.ageRestricted,
         AiRateLimited() => AiFailure.rateLimited,
         AiTimeout() => AiFailure.timeout,
         AiUnavailable(message: 'The AI server address is not set') =>

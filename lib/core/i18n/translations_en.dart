@@ -1579,4 +1579,28 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Примерить': 'Try on',
   'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
       'Try-on is not available: the catalog has no colour data for this shade.',
+  'ИИ-помощник доступен с 18 лет. Укажите год рождения в профиле.':
+      'The AI assistant is available from the age of 18. Enter your year of birth in the profile.',
+  'ИИ-помощник доступен с 18 лет.':
+      'The AI assistant is available from the age of 18.',
+  'ИИ-помощник доступен с 18 лет':
+      'The AI assistant is available from the age of 18',
+  'Укажите год рождения в профиле. Остальные функции работают.':
+      'Enter your year of birth in the profile. The other features work.',
+  'Уточнение с помощью ИИ доступно с 18 лет. Укажите год рождения в профиле.':
+      'AI refinement is available from the age of 18. Enter your year of birth in the profile.',
+  'Функции ИИ доступны с 18 лет. Укажите год рождения в профиле.':
+      'AI features are available from the age of 18. Enter your year of birth in the profile.',
+  'Функции ИИ доступны с 18 лет. Укажите год рождения в профиле, чтобы их включить.':
+      'AI features are available from the age of 18. Enter your year of birth in the profile to turn them on.',
+  'Функции ИИ доступны с 18 лет.':
+      'AI features are available from the age of 18.',
+  'Анализ по фото доступен с 18 лет.':
+      'Photo analysis is available from the age of 18.',
+  'Анализ по фото доступен с 18 лет':
+      'Photo analysis is available from the age of 18',
+  'Укажите год рождения в профиле. Тест работает и без фото, по вашим ответам.':
+      'Enter your year of birth in the profile. The test works without a photo too, from your answers.',
+  'Тест работает и без фото, по вашим ответам.':
+      'The test works without a photo too, from your answers.',
 };
