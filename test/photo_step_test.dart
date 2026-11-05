@@ -47,7 +47,10 @@ void main() {
   }
 
   Future<void> open(WidgetTester t, AiProvider ai) async {
-    t.view.physicalSize = const Size(1080, 2200);
+    t.view.physicalSize = const Size(
+      1080,
+      4200,
+    ); // tall: a lazy list builds everything
     t.view.devicePixelRatio = 3;
     addTearDown(t.view.reset);
     final helper = DatabaseHelper(path: inMemoryDatabasePath);
