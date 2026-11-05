@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/repositories/chat_repository.dart';
@@ -10,7 +11,9 @@ import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/ai_disclosure.dart';
+import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
@@ -224,4 +227,49 @@ void main() {
       expect(c.messages.last.text, 'Здравствуйте!');
     });
   });
+
+  group(
+    'the AI ranking carries the Beauty profile, so it needs that consent',
+    () {
+      late FakeAiProxy fake;
+      setUp(() async => fake = await FakeAiProxy.start());
+      tearDown(() => fake.stop());
+
+      test('without the profile consent nothing is sent', () async {
+        final ai = AiProvider(
+          SettingsRepository(DatabaseHelper(path: inMemoryDatabasePath)),
+          initial: AiConfig(baseUrl: fake.url),
+        )..ageSource = () => 30;
+        final refiner = RecommendationRefiner(
+          ai.client,
+          profileAllowed: () => ai.shareProfile,
+        );
+        await expectLater(
+          refiner.refine(profile: const BeautyProfile(), candidates: const []),
+          throwsA(isA<AiNotAllowed>()),
+        );
+        expect(fake.chatCalls, 0);
+      });
+
+      test('with the consent the request is allowed to start', () async {
+        final ai = AiProvider(
+          SettingsRepository(DatabaseHelper(path: inMemoryDatabasePath)),
+          initial: AiConfig(baseUrl: fake.url),
+        )..ageSource = () => 30;
+        ai.shareProfile = true;
+        final refiner = RecommendationRefiner(
+          ai.client,
+          profileAllowed: () => ai.shareProfile,
+        );
+        // fewer than two candidates need no AI at all: the point is that it does not throw
+        expect(
+          await refiner.refine(
+            profile: const BeautyProfile(),
+            candidates: const [],
+          ),
+          isEmpty,
+        );
+      });
+    },
+  );
 }

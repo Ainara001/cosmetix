@@ -1637,4 +1637,5 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Отправлять ИИ сообщения чата': 'Send chat messages to the AI',
   'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.':
       'Data goes to the Cosmetix server and to Google Gemini only after your consent.',
+  'Отправить профиль в ИИ?': 'Send the profile to the AI?',
 };
