@@ -395,7 +395,11 @@ void main() {
         'VM_METRIC controller: $checked protected pixels returned byte for byte',
       );
 
-      // 3. refused photos keep the first one (face, result, protection)
+      // 3. refused photos keep the first one (face, result, protection).
+      // The stroke above schedules a re-render (debounced); let it finish first,
+      // otherwise the picture would legitimately change after it is noted.
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      await t.pump();
       final firstFace = c.face, firstResult = c.resultImage;
       await c.loadPhoto(plainPng);
       await t.pump();
