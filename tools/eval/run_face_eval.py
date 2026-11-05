@@ -16,17 +16,19 @@ import sys
 import time
 
 import cv2
-import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import face_zones as fz
 import photo_quality as pq
+import viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUNS = 10
 
 
-def main(src, out):
+def main(src, out, runs=RUNS):
+    global RUNS
+    RUNS = runs
     os.makedirs(out, exist_ok=True)
     zoner = fz.FaceZoner()
     files = sorted(sum((glob.glob(os.path.join(src, e)) for e in ('*.jpg', '*.jpeg', '*.png')), []))
@@ -50,7 +52,7 @@ def main(src, out):
         mask_ms.append((time.perf_counter() - t) / RUNS * 1000)
         t = time.perf_counter()
         for _ in range(RUNS):
-            m = pq.measure(bgr, res.points)
+            m = pq.measure(bgr, res.points, masks)
         q_ms.append((time.perf_counter() - t) / RUNS * 1000)
         q = pq.judge(m, res.n_faces)
         face_area = int((fz.face_mask(res.points, bgr.shape) > 0).sum())
@@ -63,16 +65,7 @@ def main(src, out):
                           reasons=' | '.join(q.reasons)))
         vis = fz.draw_overlay(bgr, res.points, masks)
         cv2.imwrite(os.path.join(out, f'{name}_zones.jpg'), vis)
-        x0, y0 = res.points[:, :2].min(0).astype(int)
-        x1, y1 = res.points[:, :2].max(0).astype(int)
-        pad = int(0.15 * (x1 - x0))
-        crop = vis[max(0, y0 - pad):y1 + pad, max(0, x0 - pad):x1 + pad]
-        s = 360 / max(crop.shape[:2])
-        crop = cv2.resize(crop, None, fx=s, fy=s)
-        tile = np.full((380, 360, 3), 255, np.uint8)
-        tile[:crop.shape[0], :crop.shape[1]] = crop
-        cv2.putText(tile, name, (4, 374), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-        tiles.append(tile)
+        tiles.append(viz.make_tile(vis, res.points, name))
         print(name, q.verdict, '; '.join(q.reasons))
 
     def dump(path, rows):
@@ -85,14 +78,11 @@ def main(src, out):
             w.writerows(rows)
     dump(os.path.join(out, 'zones_stats.csv'), zrows)
     dump(os.path.join(out, 'quality.csv'), qrows)
-    for s in range(0, len(tiles), 12):
-        chunk = tiles[s:s + 12]
-        while len(chunk) % 4:
-            chunk.append(np.full((380, 360, 3), 255, np.uint8))
-        cv2.imwrite(os.path.join(out, f'sheet_{s // 12}.jpg'),
-                    np.vstack([np.hstack(chunk[i:i + 4]) for i in range(0, len(chunk), 4)]))
+    viz.save_sheets(tiles, out)
 
     def stat(xs):
+        if not xs:
+            return 'n/a (no face found)'
         xs = sorted(xs)
         return (f'mean {statistics.mean(xs):.1f}  median {statistics.median(xs):.1f}  '
                 f'p95 {xs[int(0.95 * (len(xs) - 1))]:.1f}  max {xs[-1]:.1f}')
@@ -110,4 +100,4 @@ def main(src, out):
 if __name__ == '__main__':
     src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'data', 'photos')
     out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, 'out', 'face')
-    main(src, out)
+    main(src, out, int(sys.argv[3]) if len(sys.argv) > 3 else RUNS)

@@ -8,10 +8,10 @@ import os
 import sys
 
 import cv2
-import numpy as np
 
 sys.path.insert(0, os.path.dirname(__file__))
 import face_zones as fz
+import viz
 
 
 def main(src, out_dir):
@@ -38,27 +38,13 @@ def main(src, out_dir):
             row[f'{z}_pct'] = round(float(100 * (m > 0).sum() / face_area), 1)
         rows.append(row)
         print(' '.join(f'{k}={v}' for k, v in row.items()))
-        x0, y0 = res.points[:, :2].min(0).astype(int)
-        x1, y1 = res.points[:, :2].max(0).astype(int)
-        pad = int(0.15 * (x1 - x0))
-        crop = vis[max(0, y0 - pad):y1 + pad, max(0, x0 - pad):x1 + pad]
-        s = 360 / max(crop.shape[:2])
-        crop = cv2.resize(crop, None, fx=s, fy=s)
-        tile = np.full((380, 360, 3), 255, np.uint8)
-        tile[:crop.shape[0], :crop.shape[1]] = crop
-        cv2.putText(tile, name, (4, 374), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-        tiles.append(tile)
+        tiles.append(viz.make_tile(vis, res.points, name))
     keys = sorted({k for r in rows for k in r})
     with open(os.path.join(out_dir, 'zones_stats.csv'), 'w', newline='') as fh:
         w = csv.DictWriter(fh, fieldnames=keys)
         w.writeheader()
         w.writerows(rows)
-    for s in range(0, len(tiles), 12):
-        chunk = tiles[s:s + 12]
-        while len(chunk) % 4:
-            chunk.append(np.full((380, 360, 3), 255, np.uint8))
-        sheet = np.vstack([np.hstack(chunk[i:i + 4]) for i in range(0, len(chunk), 4)])
-        cv2.imwrite(os.path.join(out_dir, f'sheet_{s // 12}.jpg'), sheet)
+    viz.save_sheets(tiles, out_dir)
 
 
 if __name__ == '__main__':
