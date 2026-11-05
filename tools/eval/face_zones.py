@@ -70,6 +70,7 @@ ZONE_COLORS = {'forehead': (0, 200, 255), 'cheek_right': (0, 220, 0), 'cheek_lef
 
 # how much to shrink each zone away from its edge, as a fraction of the face width
 ERODE_FRAC = 0.012
+MAX_FACES = 5   # more are not counted; the group-photo rule only needs 'more than one'
 
 
 @dataclass
@@ -91,7 +92,7 @@ class FaceZoner:
         self._mp = mp
         self._lm = vision.FaceLandmarker.create_from_options(
             vision.FaceLandmarkerOptions(base_options=mpt.BaseOptions(model_asset_path=model_path),
-                                         num_faces=2))
+                                         num_faces=MAX_FACES))
 
     def detect(self, bgr: np.ndarray) -> FaceResult | None:
         import time
@@ -103,8 +104,10 @@ class FaceZoner:
         ms = (time.perf_counter() - t) * 1000
         if not res.face_landmarks:
             return None
-        pts = np.array([[p.x * w, p.y * h, p.z * w] for p in res.face_landmarks[0]])
-        return FaceResult(pts, len(res.face_landmarks), ms)
+        faces = [np.array([[p.x * w, p.y * h, p.z * w] for p in f]) for f in res.face_landmarks]
+        # the detector's order is arbitrary: analyse the LARGEST face
+        pts = max(faces, key=lambda f: np.ptp(f[:, 0]) * np.ptp(f[:, 1]))
+        return FaceResult(pts, len(faces), ms)
 
 
 def zone_polygons(points: np.ndarray) -> dict[str, np.ndarray]:
@@ -138,15 +141,17 @@ def zone_masks(points: np.ndarray, shape, erode_frac: float = ERODE_FRAC) -> dic
 def head_pose(points: np.ndarray) -> dict[str, float]:
     """Rough head pose from the mesh, no solver.
 
-    yaw_offset: |nose tip position between the two cheek edges - 0.5|
+    roll_deg: tilt of the line through the outer eye corners (in-plane rotation).
+    yaw_offset: |nose tip position between the two cheek edges - 0.5| measured
+    ALONG the eye line, so a tilted but frontal head is not read as turned
     (0 = frontal, grows as the head turns; a profile is about 0.5).
-    roll_deg: tilt of the line through the outer eye corners.
     """
-    x234, x454 = points[234, 0], points[454, 0]
-    ratio = (points[4, 0] - x234) / (x454 - x234)
-    dx, dy = points[263, :2] - points[33, :2]
-    return {'yaw_offset': float(abs(ratio - 0.5)),
-            'roll_deg': float(np.degrees(np.arctan2(dy, dx)))}
+    eye = points[263, :2] - points[33, :2]
+    roll = float(np.degrees(np.arctan2(eye[1], eye[0])))
+    u = eye / np.linalg.norm(eye)
+    width = float((points[454, :2] - points[234, :2]) @ u)
+    ratio = float((points[4, :2] - points[234, :2]) @ u) / width
+    return {'yaw_offset': float(abs(ratio - 0.5)), 'roll_deg': roll}
 
 
 def face_mask(points: np.ndarray, shape) -> np.ndarray:
