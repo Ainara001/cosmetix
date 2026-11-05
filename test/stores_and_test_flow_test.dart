@@ -378,6 +378,8 @@ void main() {
       expect(withPhoto.profile.skinTone, SkinTone.light);
       expect(withPhoto.profile.skinType, SkinType.dry); // from the answers
       expect(withPhoto.photoUsed, isTrue);
+      // the model's self-reported number is not carried into the profile
+      expect(withPhoto.profile.confidence, isNull);
       // an unsure photo changes nothing
       final unsure = BeautyTestFlow.build(
         color: weak,

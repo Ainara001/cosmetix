@@ -796,7 +796,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'ЦВЕТОТИП': 'COLOR TYPE',
   'ПРОБЛЕМЫ КОЖИ': 'SKIN CONCERNS',
   'ОПРЕДЕЛЕНО ПО': 'DETERMINED USING',
-  'Уверенность анализа фото: {n}%': 'Photo analysis confidence: {n}%',
   'Пройти тест заново': 'Retake the test',
   'Выберите, как ведёт себя ваша кожа': 'Choose how your skin behaves',
   'Тест: ваша кожа': 'Test: your skin',

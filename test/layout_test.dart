@@ -80,7 +80,6 @@ void main() {
               confidence: 0.82,
             ),
             photoUsed: true,
-            observations: const ['Even skin tone', 'No strong makeup'],
           ),
         ),
         (AppRoutes.product, 3),
