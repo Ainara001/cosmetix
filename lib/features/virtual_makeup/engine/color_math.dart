@@ -76,4 +76,77 @@ class ColorMath {
 
   static Lab colorToLab(Color c) =>
       rgbToLab((c.r * 255).round(), (c.g * 255).round(), (c.b * 255).round());
+
+  /// The CIEDE2000 colour difference of two Lab colours (Sharma, Wu, Dalal 2005).
+  /// About 1 is the smallest difference an observer notices side by side; this
+  /// is a measure of two colours, not of how a product looks in real life.
+  static double deltaE2000(Lab c1, Lab c2) {
+    double rad(double d) => d * math.pi / 180;
+    double deg(double r) => r * 180 / math.pi;
+    final cab1 = math.sqrt(c1.a * c1.a + c1.b * c1.b);
+    final cab2 = math.sqrt(c2.a * c2.a + c2.b * c2.b);
+    final cabMean = (cab1 + cab2) / 2;
+    final g =
+        0.5 *
+        (1 -
+            math.sqrt(
+              math.pow(cabMean, 7) / (math.pow(cabMean, 7) + math.pow(25, 7)),
+            ));
+    final a1 = (1 + g) * c1.a, a2 = (1 + g) * c2.a;
+    final cp1 = math.sqrt(a1 * a1 + c1.b * c1.b);
+    final cp2 = math.sqrt(a2 * a2 + c2.b * c2.b);
+    double hue(double b, double a) {
+      if (a == 0 && b == 0) return 0;
+      final h = deg(math.atan2(b, a));
+      return h < 0 ? h + 360 : h;
+    }
+
+    final hp1 = hue(c1.b, a1), hp2 = hue(c2.b, a2);
+    final dl = c2.l - c1.l;
+    final dc = cp2 - cp1;
+    double dh;
+    if (cp1 * cp2 == 0) {
+      dh = 0;
+    } else if ((hp2 - hp1).abs() <= 180) {
+      dh = hp2 - hp1;
+    } else if (hp2 - hp1 > 180) {
+      dh = hp2 - hp1 - 360;
+    } else {
+      dh = hp2 - hp1 + 360;
+    }
+    final dH = 2 * math.sqrt(cp1 * cp2) * math.sin(rad(dh / 2));
+    final lMean = (c1.l + c2.l) / 2;
+    final cpMean = (cp1 + cp2) / 2;
+    double hMean;
+    if (cp1 * cp2 == 0) {
+      hMean = hp1 + hp2;
+    } else if ((hp1 - hp2).abs() <= 180) {
+      hMean = (hp1 + hp2) / 2;
+    } else if (hp1 + hp2 < 360) {
+      hMean = (hp1 + hp2 + 360) / 2;
+    } else {
+      hMean = (hp1 + hp2 - 360) / 2;
+    }
+    final t =
+        1 -
+        0.17 * math.cos(rad(hMean - 30)) +
+        0.24 * math.cos(rad(2 * hMean)) +
+        0.32 * math.cos(rad(3 * hMean + 6)) -
+        0.20 * math.cos(rad(4 * hMean - 63));
+    final dTheta = 30 * math.exp(-math.pow((hMean - 275) / 25, 2));
+    final rc =
+        2 *
+        math.sqrt(
+          math.pow(cpMean, 7) / (math.pow(cpMean, 7) + math.pow(25, 7)),
+        );
+    final sl =
+        1 +
+        (0.015 * math.pow(lMean - 50, 2)) /
+            math.sqrt(20 + math.pow(lMean - 50, 2));
+    final sc = 1 + 0.045 * cpMean;
+    final sh = 1 + 0.015 * cpMean * t;
+    final rt = -math.sin(rad(2 * dTheta)) * rc;
+    final x = dl / sl, y = dc / sc, z = dH / sh;
+    return math.sqrt(x * x + y * y + z * z + rt * y * z);
+  }
 }

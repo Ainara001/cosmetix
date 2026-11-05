@@ -94,6 +94,38 @@ void main() {
     });
   });
 
+  group('CIEDE2000 colour difference', () {
+    // pairs from the published test data of Sharma, Wu and Dalal (2005)
+    const pairs = [
+      ((50.0, 2.6772, -79.7751), (50.0, 0.0, -82.7485), 2.0425),
+      ((50.0, 3.1571, -77.2803), (50.0, 0.0, -82.7485), 2.8615),
+      ((50.0, 2.8361, -74.0200), (50.0, 0.0, -82.7485), 3.4412),
+      ((50.0, 2.5, 0.0), (50.0, 0.0, -2.5), 4.3065),
+      ((50.0, 2.5, 0.0), (73.0, 25.0, -18.0), 27.1492),
+      ((60.2574, -34.0099, 36.2677), (60.4626, -34.1751, 39.4387), 1.2644),
+    ];
+
+    test('it reproduces the published reference values', () {
+      for (final (a, b, want) in pairs) {
+        final got = ColorMath.deltaE2000(
+          Lab(a.$1, a.$2, a.$3),
+          Lab(b.$1, b.$2, b.$3),
+        );
+        expect(got, closeTo(want, 0.0001), reason: '$a vs $b');
+      }
+    });
+
+    test('it is zero for equal colours and the same both ways', () {
+      const c = Lab(60, 20, 10);
+      expect(ColorMath.deltaE2000(c, c), 0);
+      const d = Lab(55, 30, 5);
+      expect(
+        ColorMath.deltaE2000(c, d),
+        closeTo(ColorMath.deltaE2000(d, c), 1e-9),
+      );
+    });
+  });
+
   group('polygon raster', () {
     test('a square covers its area, edges are anti-aliased', () {
       final p = PolygonRaster.fill(
@@ -140,6 +172,54 @@ void main() {
       expect(m.at(240, 430), lessThan(0.1)); // the open mouth
       expect(m.at(240, 480), 0);
       expect(m.at(100, 430), 0);
+    });
+
+    test('no paint at all inside the open eyes and the open mouth', () {
+      // found on 24 real photos: with the cut made before the blur, 20-100 % of
+      // the pixels deep inside the eye were changed by eyeshadow
+      double paintIn(MaskPatch zone, List<int> polygon) {
+        final pts = f.points.pick(polygon);
+        final b = PolygonRaster.boundsOf(pts, f.image.width, f.image.height)!;
+        final hole = PolygonRaster.fill(pts, b.x0, b.y0, b.w, b.h);
+        var inside = 0.0;
+        for (var y = 0; y < hole.height; y++) {
+          for (var x = 0; x < hole.width; x++) {
+            // deep inside: 2 pixels from the edge in every direction (the cut
+            // has a one-pixel soft edge on purpose)
+            var deep = true;
+            for (final (dx, dy) in const [
+              (2, 0),
+              (-2, 0),
+              (0, 2),
+              (0, -2),
+              (0, 0),
+            ]) {
+              if (hole.at(hole.x0 + x + dx, hole.y0 + y + dy) < 0.99) {
+                deep = false;
+              }
+            }
+            if (!deep) continue;
+            inside += zone.at(hole.x0 + x, hole.y0 + y);
+          }
+        }
+        return inside;
+      }
+
+      // before the fix this was 20-100 % of the eye core; now only the rim of
+      // the soft cut-out edge is left (well under 1 % of the paint)
+      final shadow = face.masks.eyeshadow, lips = face.masks.lips;
+      expect(
+        paintIn(shadow, FaceIndices.eyeRight),
+        lessThan(0.005 * shadow.sum),
+      );
+      expect(
+        paintIn(shadow, FaceIndices.eyeLeft),
+        lessThan(0.005 * shadow.sum),
+      );
+      expect(paintIn(lips, FaceIndices.lipsInner), lessThan(0.005 * lips.sum));
+      // and the paint is still there around them
+      expect(face.masks.eyeshadow.sum, greaterThan(200));
+      expect(face.masks.lips.sum, greaterThan(200));
     });
 
     test('eyeshadow: on the lid, not on the eye, not on the brow', () {

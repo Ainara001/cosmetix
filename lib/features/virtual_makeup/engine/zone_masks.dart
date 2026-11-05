@@ -42,22 +42,30 @@ class ZoneMaskBuilder {
 
   static MaskPatch _empty() => MaskPatch(0, 0, 0, 0);
 
+  /// The soft edge of a cut-out (an open eye, the inside of a mouth): small, so
+  /// the cut stays where the landmarks put it.
+  static const _cutBlur = 1.0;
+
+  /// [mask] times (1 - [hole]): no paint inside the hole. The cut is made AFTER
+  /// the mask was blurred; cutting first and blurring after let the blur spill
+  /// paint back over the eyeball and the teeth.
+  static void _cut(MaskPatch mask, MaskPatch hole) {
+    PolygonRaster.blur(hole, _cutBlur);
+    for (var k = 0; k < mask.data.length; k++) {
+      mask.data[k] = mask.data[k] * (1 - hole.data[k]).clamp(0.0, 1.0);
+    }
+  }
+
   static MaskPatch _lips(FacePoints f, int w, int h, double fw) {
     final outer = f.pick(FaceIndices.lipsOuter);
     final b = PolygonRaster.boundsOf(outer, w, h, margin: 4);
     if (b == null) return _empty();
     final o = PolygonRaster.fill(outer, b.x0, b.y0, b.w, b.h);
-    final i = PolygonRaster.fill(
-      f.pick(FaceIndices.lipsInner),
-      b.x0,
-      b.y0,
-      b.w,
-      b.h,
-    );
-    for (var k = 0; k < o.data.length; k++) {
-      o.data[k] = math.max(0, o.data[k] - i.data[k]);
-    }
     PolygonRaster.blur(o, math.max(1, 0.004 * fw));
+    _cut(
+      o,
+      PolygonRaster.fill(f.pick(FaceIndices.lipsInner), b.x0, b.y0, b.w, b.h),
+    );
     return o;
   }
 
@@ -101,12 +109,12 @@ class ZoneMaskBuilder {
           out.data[k] += band.data[k] / scales.length;
         }
       }
-      final open = PolygonRaster.fill(e.open, b.x0, b.y0, b.w, b.h);
-      for (var k = 0; k < out.data.length; k++) {
-        out.data[k] = math.max(0, out.data[k] - open.data[k]);
-      }
     }
     PolygonRaster.blur(out, math.max(1, 0.012 * fw));
+    // the open eyes are cut out after the blur
+    for (final e in eyes) {
+      _cut(out, PolygonRaster.fill(e.open, b.x0, b.y0, b.w, b.h));
+    }
     return out;
   }
 
