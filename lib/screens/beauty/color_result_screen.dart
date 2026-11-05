@@ -142,11 +142,6 @@ class ColorResultScreen extends StatelessWidget {
                       }),
                       style: AppTextStyles.caption.copyWith(color: pal.subtext),
                     ),
-                  for (final o in result.observations)
-                    Text(
-                      '• $o',
-                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
-                    ),
                 ],
               ),
             ),
