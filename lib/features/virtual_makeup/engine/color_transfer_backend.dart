@@ -14,7 +14,7 @@ import 'rgba_image.dart';
 /// differences between neighbouring pixels, so the texture of the skin and of
 /// the lips (pores, scars, spots, redness variation) stays. No pixel is blurred
 /// or replaced; only the soft MASK is blurred.
-class ColorTransferBackend implements MakeupBackend {
+class ColorTransferBackend implements SyncMakeupBackend {
   const ColorTransferBackend();
 
   @override
@@ -42,6 +42,7 @@ class ColorTransferBackend implements MakeupBackend {
   @override
   Future<RgbaImage> render(MakeupRequest request) async => renderSync(request);
 
+  @override
   RgbaImage renderSync(MakeupRequest request) {
     if (request.reference != null) {
       throw UnsupportedError('$id cannot copy a look from a reference photo');

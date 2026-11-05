@@ -13,6 +13,7 @@ import 'package:cosmetix/features/virtual_makeup/domain/makeup_look.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/color_math.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/color_transfer_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/makeup_backend.dart';
+import 'package:cosmetix/features/virtual_makeup/engine/pigment_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/polygon_raster.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/protection_mask.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/rgba_image.dart';
@@ -28,6 +29,9 @@ import 'package:cosmetix/features/virtual_makeup/ui/photo_io.dart';
 ///     --dart-define=EVAL_DIR=/path/to/photos --dart-define=EVAL_OUT=/path/to/out
 const _dir = String.fromEnvironment('EVAL_DIR');
 const _out = String.fromEnvironment('EVAL_OUT');
+
+/// `transfer` (the first engine, colour shifts) or `pigment` (stage 2 engine).
+const _engine = String.fromEnvironment('EVAL_ENGINE', defaultValue: 'pigment');
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -84,12 +88,18 @@ void main() {
     );
 
     final provider = MediaPipeLandmarkProvider();
-    const backend = ColorTransferBackend();
+    final SyncMakeupBackend backend = _engine == 'transfer'
+        ? const ColorTransferBackend()
+        : const PigmentBackend();
     final rows = <Map<String, Object?>>[];
 
     for (final f in files) {
       final name = f.uri.pathSegments.last;
-      final row = <String, Object?>{'file': name, 'licence': licences[name]};
+      final row = <String, Object?>{
+        'file': name,
+        'licence': licences[name],
+        'engine': backend.id,
+      };
       rows.add(row);
       final image = await PhotoDecoder.decode(f.readAsBytesSync());
       row['size'] = '${image.width}x${image.height}';
@@ -138,6 +148,12 @@ void main() {
           : (skinL >= 50 ? 'medium' : 'dark');
 
       double area(MaskPatch m) => m.sum / (fw * fw) * 100;
+      final lb = face.masks.lips;
+      row['lips_box'] = '${lb.x0},${lb.y0},${lb.width},${lb.height}';
+      final bb = face.masks.blush;
+      row['blush_box'] = '${bb.x0},${bb.y0},${bb.width},${bb.height}';
+      final eb = face.masks.eyeshadow;
+      row['shadow_box'] = '${eb.x0},${eb.y0},${eb.width},${eb.height}';
       row['lips_area_pct_fw2'] = area(face.masks.lips);
       row['shadow_area_pct_fw2'] = area(face.masks.eyeshadow);
       row['blush_area_pct_fw2'] = area(face.masks.blush);
@@ -346,6 +362,10 @@ void main() {
           row['${p}_dE00_to_product'] = ColorMath.deltaE2000(after, target);
           row['${p}_dE00_change'] = ColorMath.deltaE2000(before, after);
           row['${p}_dL'] = after.l - before.l;
+          // how much of the product's chroma is left in the zone (grey = low)
+          final cTarget = math.sqrt(target.a * target.a + target.b * target.b);
+          final cAfter = math.sqrt(after.a * after.a + after.b * after.b);
+          row['${p}_chroma_pct'] = cTarget == 0 ? null : cAfter / cTarget * 100;
         }
         row['${tag}_dE00_start_to_product'] = ColorMath.deltaE2000(
           before,
@@ -362,6 +382,158 @@ void main() {
         MakeupZone.eyeshadow,
         face.masks.eyeshadow,
       );
+
+      // ---- stage 2 metrics (computed for every engine, to compare them)
+      // saturated test pigments: they are TEST INPUTS for the engine, not products
+      shade(
+        'shadow_teal',
+        const ui.Color(0xFF1F8A8A),
+        MakeupZone.eyeshadow,
+        face.masks.eyeshadow,
+      );
+      shade(
+        'shadow_violet',
+        const ui.Color(0xFF6A3FB5),
+        MakeupZone.eyeshadow,
+        face.masks.eyeshadow,
+      );
+      shade(
+        'shadow_peach',
+        const ui.Color(0xFFE0A07A),
+        MakeupZone.eyeshadow,
+        face.masks.eyeshadow,
+      );
+
+      double hueOf(Lab c) {
+        final h = math.atan2(c.b, c.a) * 180 / math.pi;
+        return h < 0 ? h + 360 : h;
+      }
+
+      double hueDiff(double a, double b) {
+        var d = (a - b) % 360;
+        if (d > 180) d -= 360;
+        if (d < -180) d += 360;
+        return d;
+      }
+
+      // blush at full intensity: is the cheek colour BETWEEN the skin and the
+      // pigment in hue (a mix), or past both of them (lilac cheeks)?
+      {
+        final bl = face.masks.blush;
+        final skin = zoneMean(bl, image, 0.5);
+        final pig = ColorMath.colorToLab(cheek);
+        final res = zoneMean(
+          bl,
+          backend.renderSync(
+            MakeupRequest(
+              face: face,
+              look: look(blush: cheek, k: 1),
+            ),
+          ),
+          0.5,
+        );
+        final hs = hueOf(skin), hp = hueOf(pig), hr = hueOf(res);
+        final span = hueDiff(hp, hs); // from skin to pigment
+        final at = hueDiff(hr, hs); // from skin to result
+        final inArc = span >= 0
+            ? (at >= -3 && at <= span + 3)
+            : (at <= 3 && at >= span - 3);
+        row['blush_skin_a'] = skin.a;
+        row['blush_skin_b'] = skin.b;
+        row['blush_result_a'] = res.a;
+        row['blush_result_b'] = res.b;
+        row['blush_hue_shift_deg'] = at;
+        row['blush_pigment_hue_gap_deg'] = span;
+        row['blush_hue_in_arc'] = inArc ? 1 : 0;
+      }
+
+      // the line between the lips: dark pixels of the lips mask must keep their
+      // hue (not turn blue); and paint on bright colourless pixels (teeth, a
+      // nail, a highlight) of the lips mask
+      {
+        final lm1 = face.masks.lips;
+        var dark = 0, darkBlue = 0, bright = 0, brightPainted = 0, inMask = 0;
+        for (var y = 0; y < lm1.height; y++) {
+          for (var x = 0; x < lm1.width; x++) {
+            if (lm1.data[y * lm1.width + x] < 0.5) continue;
+            inMask++;
+            final i = ((lm1.y0 + y) * image.width + lm1.x0 + x) * 4;
+            final b = ColorMath.rgbToLab(
+              image.pixels[i],
+              image.pixels[i + 1],
+              image.pixels[i + 2],
+            );
+            final r = ColorMath.rgbToLab(
+              out.pixels[i],
+              out.pixels[i + 1],
+              out.pixels[i + 2],
+            );
+            if (b.l < 20) {
+              dark++;
+              // became blue: it was not blue before
+              if (r.b < -3 && b.b > -1) darkBlue++;
+            }
+            if (b.l > 70 && math.sqrt(b.a * b.a + b.b * b.b) < 18) {
+              bright++;
+              final d =
+                  (out.pixels[i] - image.pixels[i]).abs() +
+                  (out.pixels[i + 1] - image.pixels[i + 1]).abs() +
+                  (out.pixels[i + 2] - image.pixels[i + 2]).abs();
+              if (d >= 24) brightPainted++;
+            }
+          }
+        }
+        row['lips_dark_px'] = dark;
+        row['lips_dark_turned_blue_pct'] = dark == 0
+            ? 0
+            : darkBlue * 100 / dark;
+        row['lips_bright_colourless_px'] = bright;
+        row['lips_bright_colourless_painted_pct'] = bright == 0
+            ? 0
+            : brightPainted * 100 / bright;
+        row['lips_mask_px'] = inMask;
+      }
+
+      // relative contrast kept: the detail of log luminance (Weber), next to the
+      // detail of L* used before
+      double detailLog(RgbaImage img, MaskPatch m) {
+        double lum(int x, int y) {
+          final o = (y * img.width + x) * 4;
+          final y1 =
+              0.2126729 * ColorMath.srgbByteToLinear(img.pixels[o]) +
+              0.7151522 * ColorMath.srgbByteToLinear(img.pixels[o + 1]) +
+              0.0721750 * ColorMath.srgbByteToLinear(img.pixels[o + 2]);
+          return math.log(y1 + 0.02);
+        }
+
+        var e = 0.0;
+        for (var y = 1; y < m.height - 1; y++) {
+          for (var x = 1; x < m.width - 1; x++) {
+            if (m.data[y * m.width + x] < 0.5) continue;
+            final px = m.x0 + x, py = m.y0 + y;
+            var s9 = 0.0;
+            for (var dy = -1; dy <= 1; dy++) {
+              for (var dx = -1; dx <= 1; dx++) {
+                s9 += lum(px + dx, py + dy);
+              }
+            }
+            final d = lum(px, py) - s9 / 9;
+            e += d * d;
+          }
+        }
+        return e;
+      }
+
+      for (final (tag, m) in [
+        ('lips', face.masks.lips),
+        ('blush', face.masks.blush),
+        ('shadow', face.masks.eyeshadow),
+      ]) {
+        final b = detailLog(image, m);
+        row['detaillog_${tag}_pct'] = b > 0
+            ? detailLog(out, m) / b * 100
+            : null;
+      }
 
       // ---- protection with several products worn together
       final prot = ProtectionMask(image.width, image.height);

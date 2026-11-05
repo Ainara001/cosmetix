@@ -8,6 +8,8 @@ export 'domain/face_geometry.dart';
 export 'domain/face_quality.dart';
 export 'domain/makeup_look.dart';
 export 'engine/color_transfer_backend.dart';
+export 'engine/pigment_backend.dart';
+export 'engine/pigment_params.dart';
 export 'engine/makeup_backend.dart';
 export 'engine/protection_mask.dart';
 export 'engine/rgba_image.dart';

@@ -224,7 +224,7 @@ void main() {
       final berry = (await real(t, () => repo.item(berryId())))!;
       final rose = (await real(t, () => repo.item(roseId())))!;
       final prepared = PreparedFace.from(face.image, face.points);
-      const backend = ColorTransferBackend();
+      const backend = PigmentBackend();
 
       Lab lipMean(Color colour) {
         final out = backend.renderSync(

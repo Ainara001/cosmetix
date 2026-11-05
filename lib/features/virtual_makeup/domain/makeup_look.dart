@@ -9,9 +9,17 @@ class ZoneLook {
     required this.color,
     this.intensity = 0.6,
     this.enabled = true,
+    this.opacity,
   });
 
   final Color color;
+
+  /// How much of the product colour a full layer shows through (0..1): a sheer
+  /// tint has a low value, a full-coverage lipstick a high one. Null: the engine
+  /// uses its default for the kind of product. It will come from the measured
+  /// opacity of a shade once that is in the catalog; today nothing measured
+  /// exists, so it is null.
+  final double? opacity;
 
   /// 0 = nothing is applied, 1 = the strongest this module applies.
   final double intensity;
@@ -20,12 +28,17 @@ class ZoneLook {
   /// True when this zone changes the photo at all.
   bool get active => enabled && intensity > 0;
 
-  ZoneLook copyWith({Color? color, double? intensity, bool? enabled}) =>
-      ZoneLook(
-        color: color ?? this.color,
-        intensity: intensity ?? this.intensity,
-        enabled: enabled ?? this.enabled,
-      );
+  ZoneLook copyWith({
+    Color? color,
+    double? intensity,
+    bool? enabled,
+    double? opacity,
+  }) => ZoneLook(
+    color: color ?? this.color,
+    intensity: intensity ?? this.intensity,
+    enabled: enabled ?? this.enabled,
+    opacity: opacity ?? this.opacity,
+  );
 }
 
 /// A complete virtual look: one [ZoneLook] per zone.

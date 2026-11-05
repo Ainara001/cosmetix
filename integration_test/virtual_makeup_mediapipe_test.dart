@@ -9,7 +9,7 @@ import 'package:cosmetix/features/virtual_makeup/domain/face_geometry.dart';
 import 'package:cosmetix/features/virtual_makeup/domain/makeup_look.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/blemish_suggester.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/color_math.dart';
-import 'package:cosmetix/features/virtual_makeup/engine/color_transfer_backend.dart';
+import 'package:cosmetix/features/virtual_makeup/engine/pigment_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/makeup_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/polygon_raster.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/protection_mask.dart';
@@ -102,7 +102,7 @@ void main() {
     );
 
     // the contract on a real photo
-    const backend = ColorTransferBackend();
+    const backend = PigmentBackend();
     const look = MakeupLook();
     final rt = <int>[];
     RgbaImage out = image;
@@ -195,7 +195,9 @@ void main() {
       debugPrint(
         'VM_METRIC detail kept in $name: ${(ratio * 100).toStringAsFixed(1)}%',
       );
-      expect(ratio, inInclusiveRange(0.9, 1.15), reason: name);
+      // the pigment engine keeps relative contrast and follows lightness in a
+      // limited way (PigmentParams.textureMin/Max)
+      expect(ratio, inInclusiveRange(0.8, 1.3), reason: name);
     }
 
     // protection on a real photo
@@ -375,7 +377,7 @@ void main() {
         reason: 'the protected area is drawn',
       );
       final keptCoverage = c.protection!.coverage;
-      final out = const ColorTransferBackend().renderSync(
+      final out = const PigmentBackend().renderSync(
         MakeupRequest(face: c.face!, look: c.look, protection: c.protection),
       );
       var checked = 0;
