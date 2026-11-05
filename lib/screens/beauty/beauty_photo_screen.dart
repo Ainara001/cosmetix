@@ -322,6 +322,43 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           ),
         ),
         const SizedBox(height: 10),
+        AppCard(
+          color: context.pal.pinkSoft,
+          borderColor: Colors.transparent,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tr('Что стоит знать об анализе по фото'),
+                style: AppTextStyles.subtitle,
+              ),
+              const SizedBox(height: 8),
+              for (final t in [
+                tr('Это подсказка по цвету, а не измерение и не диагноз.'),
+                tr(
+                  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.',
+                ),
+                tr('Приложение не определяет акне, рубцы или покраснения.'),
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: context.pal.accent,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(t, style: AppTextStyles.small)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
         Row(
           children: [
             Icon(Icons.lock_outline, size: 16, color: pal.subtext),
