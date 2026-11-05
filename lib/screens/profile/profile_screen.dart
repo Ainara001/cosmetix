@@ -159,6 +159,14 @@ class ProfileScreen extends StatelessWidget {
                             Navigator.pushNamed(context, AppRoutes.care),
                       ),
                       MenuTile(
+                        icon: Icons.face_retouching_natural,
+                        title: tr('Виртуальная примерка'),
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.virtualMakeup,
+                        ),
+                      ),
+                      MenuTile(
                         icon: Icons.document_scanner_outlined,
                         title: tr('Проверка состава'),
                         onTap: () =>

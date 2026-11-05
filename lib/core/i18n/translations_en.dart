@@ -1498,4 +1498,65 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Fragrance allergens (EU list): {v0}',
   'ЕС требует называть эти вещества в составе: они вызывали аллергию у людей. Если кожа склонна к реакциям, сначала проверьте средство на небольшом участке.':
       'The EU requires these substances to be named in the ingredients: they have caused allergies in people. If your skin is prone to reactions, test the product on a small area first.',
+  'Интенсивность: {v0}%': 'Intensity: {v0}%',
+  'Свой цвет': 'Custom colour',
+  'Оттенок': 'Hue',
+  'Насыщенность': 'Saturation',
+  'Яркость': 'Lightness',
+  'Виртуальная примерка: приблизительный результат, а не гарантия реального макияжа. Кожа не ретушируется: поры, прыщи, рубцы и покраснения остаются.':
+      'Virtual try-on: an approximate result, not a guarantee of real makeup. The skin is not retouched: pores, acne, scars and redness stay.',
+  'Розовый': 'Pink',
+  'Нюд': 'Nude',
+  'Мальва': 'Mauve',
+  'Серо-синий': 'Grey-blue',
+  'Шалфей': 'Sage',
+  'Дымчатый': 'Smoky',
+  'Терракотовый': 'Terracotta',
+  'Нежный': 'Soft',
+  'Помада': 'Lipstick',
+  'Тени': 'Eyeshadow',
+  'Закрасьте участки, которые должны остаться как на фото: прыщи, рубцы, покраснения, родинки. Здесь макияж не применяется вообще.':
+      'Paint over the areas that must stay as in the photo: acne, scars, redness, moles. No makeup is applied there at all.',
+  'Кисть': 'Brush',
+  'Ластик': 'Eraser',
+  'Размер кисти': 'Brush size',
+  'Вернуть': 'Redo',
+  'Защищено: {v0}% фото': 'Protected: {v0}% of the photo',
+  'Подсказка находит только мелкие красные или тёмные пятна и может ошибаться: проверьте и поправьте вручную.':
+      'The hint finds only small red or dark spots and can be wrong: check it and correct it by hand.',
+  'Подсказать участки': 'Suggest areas',
+  'Слишком много участков выделилось (свет или косметика). Подсказка не показана, отметьте участки вручную.':
+      'Too many areas were marked (light or cosmetics). The hint is not shown, mark the areas by hand.',
+  'Мелких пятен не найдено. Это не значит, что их нет: отметьте нужные участки вручную.':
+      'No small spots were found. That does not mean there are none: mark the areas you need by hand.',
+  'Найдено участков: {v0}. Проверьте их на фото (жёлтые).':
+      'Areas found: {v0}. Check them on the photo (yellow).',
+  'Защитить': 'Protect',
+  'Отклонить': 'Dismiss',
+  'Не удалось открыть фото': 'Could not open the photo',
+  'Виртуальная примерка': 'Virtual try-on',
+  'Ищем лицо…': 'Looking for the face…',
+  'Лицо не найдено. Выберите фото, где лицо хорошо видно и смотрит в камеру.':
+      'No face found. Choose a photo where the face is clearly visible and looks at the camera.',
+  'На фото несколько лиц. Выберите фото с одним лицом: иначе примерка была бы догадкой.':
+      'There are several faces in the photo. Choose a photo with one face: otherwise the try-on would be a guess.',
+  'Не удалось обработать фото. Попробуйте другое.':
+      'Could not process the photo. Try another one.',
+  'Оригинал': 'Original',
+  'Разделитель': 'Slider',
+  'Удерживайте фото, чтобы увидеть оригинал.':
+      'Hold the photo to see the original.',
+  'Защита кожи': 'Skin protection',
+  'Другое фото': 'Another photo',
+  'Голова повёрнута: губы, веки и румяна могут лечь неточно.':
+      'The head is turned: lips, eyelids and blush may be placed less precisely.',
+  'Голова наклонена: зоны могут лечь неточно.':
+      'The head is tilted: the zones may be placed less precisely.',
+  'Лицо на фото маленькое: зоны состоят из малого числа точек, результат грубее.':
+      'The face in the photo is small: the zones are made of few pixels, the result is rougher.',
+  'На фото несколько лиц.': 'There are several faces in the photo.',
+  'Примерьте макияж на своё фото': 'Try makeup on your own photo',
+  'Фото обрабатывается на телефоне: оно не отправляется на сервер и не сохраняется.':
+      'The photo is processed on the phone: it is not sent to a server and not saved.',
+  'Выбрать фото': 'Choose a photo',
 };
