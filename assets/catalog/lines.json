@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "comment": "Product lines and what is known about each variant of them (DB v16). Only facts with a source: a field that no source supports is null, never guessed. `confidence`: official_page (the manufacturer's page, read and checked by hand), official_page_unchecked (the manufacturer's page, read through a page-reading tool and NOT yet checked by hand), third_party (INCIDecoder, a retailer), unconfirmed (sources disagree or none was found). Colours of palette cells are NOT here: they come only from our own measurements (colour_status measured_swatch) and do not exist yet.",
+  "lines": [
+    {
+      "key": "Rom&nd|better than palette",
+      "slug": "romand-better-than-palette",
+      "brand": "Rom&nd",
+      "name": "Better Than Palette",
+      "kind": "eyeshadow_palette",
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "Official page, summarised by a page-reading tool: each palette has ten shades. Not read by hand yet; a repeat fetch on 2026-11-05 was refused with HTTP 429."
+    },
+    {
+      "key": "Peripera|ink mood glowy tint",
+      "slug": "peripera-ink-mood-glowy-tint",
+      "brand": "Peripera",
+      "name": "Ink Mood Glowy Tint",
+      "kind": "lips",
+      "source_url": "https://incidecoder.com/products/peripera-ink-mood-glowy-tint-30-happy-berry",
+      "checked_at": null,
+      "confidence": "third_party",
+      "note": "The line name is the one the catalog and INCIDecoder use. The official Peripera site could not be reached from our network; no check date was recorded for this entry."
+    },
+    {
+      "key": "Peripera|ink the velvet",
+      "slug": "peripera-ink-the-velvet",
+      "brand": "Peripera",
+      "name": "Ink The Velvet",
+      "kind": "lips",
+      "source_url": "https://incidecoder.com/products/peripera-ink-the-velvet-31-wine-nude",
+      "checked_at": null,
+      "confidence": "third_party",
+      "note": "The line name is the one the catalog and INCIDecoder use. The official Peripera site could not be reached from our network; no check date was recorded for this entry."
+    },
+    {
+      "key": "Rom&nd|juicy lasting tint",
+      "slug": "romand-juicy-lasting-tint",
+      "brand": "Rom&nd",
+      "name": "Juicy Lasting Tint",
+      "kind": "lips",
+      "source_url": "https://incidecoder.com/products/rom-nd-juicy-lasting-tint-new-01-pomelo-skin",
+      "checked_at": null,
+      "confidence": "third_party",
+      "note": "The line name is the one the catalog and INCIDecoder use. The official shop lists \"The Juicy Lasting Tint\"; no check date was recorded for this entry."
+    }
+  ],
+  "variants": [
+    {
+      "product": "Rom&nd|Better Than Palette 00 Light & Glitter Garden",
+      "pan_count": 10,
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "The count is the line statement \"each palette has ten shades\"; this variant is not named separately in the summary we have. The name says Glitter; the finish of the separate cells is unknown."
+    },
+    {
+      "product": "Rom&nd|Better Than Palette 01 Pampas Garden",
+      "pan_count": 10,
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "Named on the official page (summary by a page-reading tool). Cell names and finishes are not known."
+    },
+    {
+      "product": "Rom&nd|Better Than Palette 02 Mahogany Garden",
+      "pan_count": 10,
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "Named on the official page (summary by a page-reading tool). Cell names and finishes are not known. The catalog's own source_url for this product points to the Pampas Garden page: it does not prove this variant."
+    },
+    {
+      "product": "Rom&nd|Better Than Palette 03 Rosebud Garden",
+      "pan_count": 10,
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "The count is the line statement \"each palette has ten shades\"; this variant is not named separately in the summary we have. The catalog's own source_url points to the Pampas Garden page."
+    },
+    {
+      "product": "Rom&nd|Better Than Palette 05 Shade & Shadow Garden",
+      "pan_count": 10,
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "The count is the line statement \"each palette has ten shades\"; this variant is not named separately in the summary we have."
+    },
+    {
+      "product": "Rom&nd|Better Than Palette 07 Berry Fuchsia Garden",
+      "pan_count": 10,
+      "source_url": "https://romandbeauty.com/products/better-than-palette",
+      "checked_at": "2026-11-05",
+      "confidence": "official_page_unchecked",
+      "note": "The count is the line statement \"each palette has ten shades\"; this variant is not named separately in the summary we have. The catalog's own source_url points to the Pampas Garden page."
+    },
+    {
+      "product": "Rom&nd|Better Than Eyes",
+      "pan_count": null,
+      "source_url": "https://incidecoder.com/products/romand-better-than-eyes",
+      "checked_at": "2026-11-05",
+      "confidence": "unconfirmed",
+      "note": "No official page found. Retailers call it a quad, but their counts of colours disagree, so the number of cells and the variant are not established and no cells are created."
+    }
+  ]
+}

@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 15;
+  static const dbVersion = 16;
 
   final String? path;
   Database? _db;
@@ -163,6 +163,16 @@ class DatabaseHelper {
       }
       await SeedData.applyTryOn(db);
     },
+    // product lines, what is known about each variant of a line, and the
+    // separate cells (pans) of a palette. New tables only: products, their ids,
+    // prices, cart, favourites, `products.shade` and `product_shades` are not
+    // touched. The cells get no colour (it does not exist yet).
+    16: (db) async {
+      for (final sql in _schemaV16) {
+        await db.execute(sql);
+      }
+      await SeedData.applyCatalogStructure(db);
+    },
   };
 
   static Future<void> _addColumn(
@@ -209,6 +219,9 @@ class DatabaseHelper {
     'products',
     'product_prices',
     'product_shades',
+    'product_shade_pans',
+    'product_variant_facts',
+    'product_lines',
     'favorites',
     'cart_items',
     'orders',
@@ -224,6 +237,68 @@ class DatabaseHelper {
     'care_steps',
     'care_logs',
     'reaction_history',
+  ];
+
+  /// Schema version 16: the structure of cosmetic products.
+  ///
+  /// * `product_lines`: a line ("Better Than Palette") with the source of its
+  ///   name and the date it was looked at. `line_key` is the key that
+  ///   `product_shades.line_key` already uses.
+  /// * `product_variant_facts`: what is known about ONE catalog product (a
+  ///   variant such as palette 02): how many cells it has, the source, the date,
+  ///   how far it can be trusted. `pan_count` NULL = not established.
+  /// * `product_shade_pans`: the cells of a palette. One row per cell, with an
+  ///   id that does not depend on the row order (`pan_key`). The colour is NULL
+  ///   until a source gives it; `measured_swatch` needs a `measurement_ref`.
+  ///   The CHECKs make a colour without a source, a colour with the status
+  ///   `missing` and a status without a colour impossible.
+  static const _schemaV16 = [
+    '''
+CREATE TABLE IF NOT EXISTS product_lines (
+  line_key TEXT PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
+  brand TEXT NOT NULL,
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  source_url TEXT NOT NULL,
+  checked_at TEXT,
+  confidence TEXT NOT NULL CHECK (confidence IN
+    ('official_page', 'official_page_unchecked', 'third_party', 'unconfirmed')),
+  note TEXT
+)''',
+    '''
+CREATE TABLE IF NOT EXISTS product_variant_facts (
+  product_id INTEGER PRIMARY KEY REFERENCES products(id) ON DELETE CASCADE,
+  pan_count INTEGER CHECK (pan_count IS NULL OR (pan_count BETWEEN 1 AND 64)),
+  source_url TEXT NOT NULL,
+  checked_at TEXT,
+  confidence TEXT NOT NULL CHECK (confidence IN
+    ('official_page', 'official_page_unchecked', 'third_party', 'unconfirmed')),
+  note TEXT
+)''',
+    '''
+CREATE TABLE IF NOT EXISTS product_shade_pans (
+  pan_key TEXT PRIMARY KEY,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  position INTEGER NOT NULL CHECK (position >= 1),
+  name TEXT,
+  name_source TEXT,
+  finish TEXT CHECK (finish IS NULL OR finish IN
+    ('matte', 'satin', 'gloss', 'shimmer')),
+  finish_source TEXT,
+  colour INTEGER CHECK (colour IS NULL OR
+    (colour >= 4278190080 AND colour <= 4294967295)),
+  colour_source TEXT,
+  colour_status TEXT NOT NULL DEFAULT 'missing' CHECK (colour_status IN
+    ('manufacturer', 'swatch_sampled', 'legacy_estimate', 'measured_swatch',
+     'missing')),
+  measurement_ref TEXT,
+  UNIQUE (product_id, position),
+  CHECK ((colour IS NULL) = (colour_status = 'missing')),
+  CHECK (colour IS NULL OR colour_source IS NOT NULL),
+  CHECK (colour_status <> 'measured_swatch' OR measurement_ref IS NOT NULL)
+)''',
+    'CREATE INDEX IF NOT EXISTS idx_pans_product ON product_shade_pans(product_id)',
   ];
 
   /// Schema version 15: the shade data of the virtual try-on. One row per
