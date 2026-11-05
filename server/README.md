@@ -35,7 +35,7 @@ refused, so nothing looks like a real AI answer. `GET /health` shows
 
 ## API
 
-* `GET /health` → `{ ok, mode: "gemini" | "claude" | "mock", model }`
+* `GET /health` → `{ ok, mode: "gemini" | "claude" | "mock", model, photoAnalysis: boolean, dataUse: "paid" | "free" | "unknown" | "none" }` (the app shows the photo step only when `photoAnalysis` is `true`)
 * `POST /v1/chat` →
   `{ system?, messages: [{ role: "user" | "assistant", content, images?: [base64] }], json?, temperature?, maxTokens? }`
   returns `{ text, mock, usage: { inputTokens, outputTokens } }`
@@ -43,7 +43,7 @@ refused, so nothing looks like a real AI answer. `GET /health` shows
 Errors are JSON `{ error, message }`: `400 bad_request`, `401 unauthorized`,
 `413 too_long`, `415 bad_image`, `429 rate_limited | budget_exceeded |
 upstream_rate_limited` (with `Retry-After`), `502 upstream_auth |
-upstream_bad_response`, `503 upstream_unavailable | mock_no_structured`,
+upstream_bad_response`, `503 upstream_unavailable | mock_no_structured | photo_analysis_disabled`,
 `504 upstream_timeout`.
 
 ## Safety and cost control
@@ -58,6 +58,8 @@ upstream_bad_response`, `503 upstream_unavailable | mock_no_structured`,
 | `APP_TOKEN` | empty | if set, the app must send it as `x-app-token` |
 | `GEMINI_MODEL` | `gemini-3.1-flash-lite` | cheap and fast; model names change often, list yours with `GET /v1beta/models` |
 | `GEMINI_FALLBACK_MODEL` | `gemini-flash-lite-latest` | used when `GEMINI_MODEL` keeps answering 503; empty disables the fallback |
+| `GEMINI_BILLING` | empty (`unknown`) | operator's declaration: `paid` if the Gemini key belongs to a Cloud project with active billing, `free` otherwise. The server cannot check it. Free-quota terms ("Unpaid Services") let Google use and review what is sent and forbid personal data |
+| `PHOTO_ANALYSIS` | empty (auto) | `on` / `off`. Auto = on only for Gemini with `GEMINI_BILLING=paid`; off for every other case. With `off` a request that carries an image is answered `503 photo_analysis_disabled` before anything is sent to the AI provider. `on` without `paid` prints a warning at start |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | cheap and good enough; change freely |
 
 Input limits: 20 messages, 6 000 characters per message, 24 000 in total, 2 JPEG /

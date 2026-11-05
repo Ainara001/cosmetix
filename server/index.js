@@ -15,6 +15,12 @@ async function main() {
   }
 
   const { server, config, mock } = createApp({ db });
+  if (!mock && config.photoAnalysis && config.provider === 'gemini' && config.dataUse !== 'paid') {
+    console.warn(
+      'WARNING: photo analysis is ON but GEMINI_BILLING is not "paid". On the free Gemini quota Google may use and ' +
+        'review what is sent and personal data must not be sent (https://ai.google.dev/gemini-api/terms).',
+    );
+  }
   const port = Number.parseInt(process.env.PORT || '8787', 10);
   // 0.0.0.0 lets a real iPhone on the same Wi-Fi reach the proxy; use
   // HOST=127.0.0.1 when only the iOS Simulator on this Mac needs it
