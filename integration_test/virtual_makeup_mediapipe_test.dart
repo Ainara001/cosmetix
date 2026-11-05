@@ -16,6 +16,7 @@ import 'package:cosmetix/features/virtual_makeup/engine/protection_mask.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/rgba_image.dart';
 import 'package:cosmetix/features/virtual_makeup/landmarks/mediapipe_landmark_provider.dart';
 import 'package:cosmetix/features/virtual_makeup/ui/photo_io.dart';
+import 'package:cosmetix/features/virtual_makeup/ui/virtual_makeup_controller.dart';
 
 /// REAL MediaPipe on a REAL photo, on a simulator or a phone. The photo is not
 /// kept in the repository (it shows a real person): pass the path with
@@ -281,6 +282,191 @@ void main() {
     }
     await provider.dispose();
   }, timeout: const Timeout(Duration(minutes: 5)));
+
+  testWidgets(
+    'the controller with real MediaPipe: portrait, protection, refused photos, no leaks',
+    (t) async {
+      if (_photo.isEmpty) {
+        markTestSkipped('VM_PHOTO is not set');
+        return;
+      }
+      final portrait = File(_photo).readAsBytesSync();
+      final decoded = await PhotoDecoder.decode(portrait);
+      Future<Uint8List> pngBytes(RgbaImage img) async {
+        final i = await PhotoDecoder.toUiImage(img);
+        final d = await i.toByteData(format: ui.ImageByteFormat.png);
+        i.dispose();
+        return d!.buffer.asUint8List();
+      }
+
+      // a picture without any face: a smooth colour gradient
+      final plain = RgbaImage(400, 400, Uint8List(400 * 400 * 4));
+      for (var y = 0; y < 400; y++) {
+        for (var x = 0; x < 400; x++) {
+          final o = (y * 400 + x) * 4;
+          plain.pixels[o] = 40 + x ~/ 3;
+          plain.pixels[o + 1] = 90 + y ~/ 4;
+          plain.pixels[o + 2] = 150;
+          plain.pixels[o + 3] = 255;
+        }
+      }
+      // the same portrait twice, side by side: two faces
+      final w = decoded.width, h = decoded.height;
+      final twice = RgbaImage(w * 2, h, Uint8List(w * 2 * h * 4));
+      for (var y = 0; y < h; y++) {
+        twice.pixels.setRange(
+          y * w * 2 * 4,
+          y * w * 2 * 4 + w * 4,
+          decoded.pixels,
+          y * w * 4,
+        );
+        twice.pixels.setRange(
+          y * w * 2 * 4 + w * 4,
+          (y + 1) * w * 2 * 4,
+          decoded.pixels,
+          y * w * 4,
+        );
+      }
+      final plainPng = await pngBytes(plain);
+      final twicePng = await pngBytes(twice);
+
+      final provider = MediaPipeLandmarkProvider();
+      final c = VirtualMakeupController(landmarks: provider);
+      final errors = <Object>[];
+      final oldOnError = FlutterError.onError;
+      FlutterError.onError = (d) {
+        errors.add(d.exception);
+        oldOnError?.call(d);
+      };
+
+      // 1. the real portrait
+      await c.loadPhoto(portrait);
+      await t.pump();
+      expect(c.status, MakeupStatus.ready);
+      expect(c.notice, isNull);
+      expect(c.quality!.canRun, isTrue);
+      expect(c.face!.points.points.length, FaceIndices.meshSize);
+      expect(c.resultImage, isNotNull);
+      expect(c.originalImage, isNotNull);
+      debugPrint(
+        'VM_METRIC controller: portrait ready, ${c.face!.image.width}x${c.face!.image.height}',
+      );
+
+      // 2. protection by hand on the cheek, then the result keeps those pixels
+      final fw = c.face!.points.faceWidth;
+      final cheek = ZoneProbe.cheek(c.face!, right: true);
+      c.strokeStart(cheek, fw * 0.04, erase: false);
+      for (var i = 1; i <= 25; i++) {
+        c.strokeMove(
+          cheek + Offset(i * fw * 0.004, i * fw * 0.002),
+          fw * 0.04,
+          erase: false,
+        );
+      }
+      c.strokeEnd();
+      for (var i = 0; i < 40 && c.protectionOverlay == null; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 25));
+        await t.pump();
+      }
+      expect(c.protection!.isEmpty, isFalse);
+      expect(
+        c.protectionOverlay,
+        isNotNull,
+        reason: 'the protected area is drawn',
+      );
+      final keptCoverage = c.protection!.coverage;
+      final out = const ColorTransferBackend().renderSync(
+        MakeupRequest(face: c.face!, look: c.look, protection: c.protection),
+      );
+      var checked = 0;
+      for (var y = 0; y < out.height; y++) {
+        for (var x = 0; x < out.width; x++) {
+          if (c.protection!.at(x, y) < 1) continue;
+          checked++;
+          final o = (y * out.width + x) * 4;
+          expect(
+            out.pixels.sublist(o, o + 3),
+            orderedEquals(c.face!.image.pixels.sublist(o, o + 3)),
+          );
+        }
+      }
+      expect(checked, greaterThan(100));
+      debugPrint(
+        'VM_METRIC controller: $checked protected pixels returned byte for byte',
+      );
+
+      // 3. refused photos keep the first one (face, result, protection)
+      final firstFace = c.face, firstResult = c.resultImage;
+      await c.loadPhoto(plainPng);
+      await t.pump();
+      expect(c.status, MakeupStatus.ready);
+      expect(c.notice, MakeupNotice.noFace);
+      expect(identical(c.face, firstFace), isTrue);
+      expect(identical(c.resultImage, firstResult), isTrue);
+      expect(c.protection!.coverage, keptCoverage);
+
+      await c.loadPhoto(twicePng);
+      await t.pump();
+      expect(c.status, MakeupStatus.ready);
+      expect(c.notice, MakeupNotice.severalFaces);
+      expect(identical(c.face, firstFace), isTrue);
+
+      await c.loadPhoto(Uint8List.fromList([1, 2, 3, 4, 5]));
+      await t.pump();
+      expect(c.notice, MakeupNotice.failed);
+      expect(identical(c.face, firstFace), isTrue);
+      debugPrint(
+        'VM_METRIC controller: no face / two faces / broken file all kept the first photo',
+      );
+
+      // 4. the same portrait again clears the notice
+      await c.loadPhoto(portrait);
+      await t.pump();
+      expect(c.notice, isNull);
+      expect(identical(c.face, firstFace), isFalse);
+
+      // 5. many loads in a row: memory must not climb without limit
+      int rss() => ProcessInfo.currentRss;
+      for (var i = 0; i < 3; i++) {
+        await c.loadPhoto(portrait);
+        await t.pump();
+      }
+      final before = rss();
+      var peak = before;
+      for (var i = 0; i < 12; i++) {
+        await c.loadPhoto(portrait);
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 20));
+        c.strokeStart(const Offset(300, 300), 10, erase: false);
+        c.strokeMove(const Offset(340, 330), 10, erase: false);
+        c.strokeEnd();
+        if (rss() > peak) peak = rss();
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await t.pump();
+      final after = rss();
+      debugPrint(
+        'VM_METRIC memory over 12 loads: before ${(before / 1048576).toStringAsFixed(0)} MB, '
+        'after ${(after / 1048576).toStringAsFixed(0)} MB, peak ${(peak / 1048576).toStringAsFixed(0)} MB '
+        '(${kDebugMode ? 'DEBUG' : 'RELEASE'} build, simulator: an indication, not a device measurement)',
+      );
+      expect(
+        after - before,
+        lessThan(150 * 1048576),
+        reason: 'no runaway growth',
+      );
+
+      // 6. closing the screen frees what it owns, nothing throws afterwards
+      c.dispose();
+      await t.pump();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await t.pump();
+      FlutterError.onError = oldOnError;
+      expect(errors, isEmpty, reason: 'no framework errors during the run');
+      expect(t.takeException(), isNull);
+    },
+    timeout: const Timeout(Duration(minutes: 8)),
+  );
 }
 
 /// The centre of mass of a mask patch, in photo pixels.
