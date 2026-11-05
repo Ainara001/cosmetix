@@ -3,16 +3,21 @@ import 'package:cosmetix/core/constants/legal_texts.dart';
 // Russian source text -> translation (edit here; the old helper scripts are in tool/i18n_legacy).
 const Map<String, String> translationsEn = {
   LegalTexts.privacy: '''1. What data we store
-Cosmetix stores data only on your device in a local SQLite database: name, email, contact details, beauty profile, favorites, orders, reviews and reaction diary entries.
+Cosmetix stores data on your device in a local SQLite database: name, email, contact details, beauty profile, favorites, orders, reviews and reaction diary entries.
 
 2. What the data is used for
 The data is needed to pick cosmetics for your skin type and color type, warn about unwanted ingredients and show your purchase history.
 
-3. Sharing with third parties
-The app does not send your data to a server and does not share it with third parties.
+3. Optional AI features: what is sent and to whom
+The AI chat, photo analysis and AI refinement of the picks send data to the Cosmetix server and through it to the Google Gemini service. Nothing is sent without your consent, and the app works without AI. AI features are available only to users who have entered a year of birth and are 18 or older.
+• Chat: the text of your messages. Do not write personal data in the chat.
+• Beauty profile and blacklist: only if you allowed it separately. The AI refinement also sends the Beauty profile (skin type, tone, undertone, color type, skin concerns) and a list of products.
+• Photo: only at the "Photo" step of the beauty test and after your consent. The app does not keep the photo and deletes it from the phone after the analysis.
+The Cosmetix server does not record message texts or photos. How Google uses what is sent depends on the server's mode: on the free tier Google may use the data to improve its products and people may review it; on the paid tier Google does not use it for that but keeps requests for a limited time to detect abuse. The current mode is shown in Settings, in the AI assistant section.
+AI results are hints, not measurements and not a diagnosis.
 
 4. Managing data
-You can edit your profile data, delete diary entries, clear your search history and fully reset the app data in the Settings section.
+You can edit your profile data, delete diary entries, clear your search history and fully reset the app data in the Settings section. There you can also withdraw your consent to send messages, the profile and photos to the AI at any time.
 
 5. Password
 The password is stored as a hash and is never shown in plain text.''',
