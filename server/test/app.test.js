@@ -468,3 +468,89 @@ test('with photos allowed the photo goes to Gemini; with the switch off again it
   assert.equal(called, 1);
   await off.close();
 });
+
+// ---- a modified client cannot get a photo through while photos are off ----
+
+test('every way to attach an image is refused while photos are off, and Gemini is never called', async () => {
+  let called = 0;
+  const s = await start(geminiEnv, async () => {
+    called += 1;
+    return geminiReply('{}')();
+  });
+  const attempts = [
+    // image in an earlier message, not the last one
+    {
+      messages: [
+        { role: 'user', content: 'a', images: ['/9j/AAAA'] },
+        { role: 'assistant', content: 'b' },
+        { role: 'user', content: 'c' },
+      ],
+    },
+    // PNG and WebP, and two images
+    { messages: [{ role: 'user', content: 'a', images: ['iVBORw0KGgo='] }] },
+    { messages: [{ role: 'user', content: 'a', images: ['UklGRgAAAA=='] }] },
+    { messages: [{ role: 'user', content: 'a', images: ['/9j/AAAA', 'iVBORw0KGgo='] }] },
+    // with the JSON flag, a system prompt and a temperature, as the app sends it
+    { system: 'S', json: true, temperature: 0.2, messages: [{ role: 'user', content: 'a', images: ['/9j/AAAA'] }] },
+  ];
+  for (const body of attempts) {
+    const res = await s.chat(body);
+    assert.equal(res.status, 503, JSON.stringify(body).slice(0, 80));
+    assert.equal((await res.json()).error, 'photo_analysis_disabled');
+  }
+  assert.equal(called, 0);
+  await s.close();
+});
+
+test('a bad image is still 4xx while photos are off, never a way past the check', async () => {
+  const s = await start(geminiEnv, geminiReply('{}'));
+  for (const [body, status] of [
+    [{ messages: [{ role: 'user', content: 'a', images: ['not-an-image'] }] }, 415],
+    [{ messages: [{ role: 'user', content: 'a', images: ['/9j/A', '/9j/B', '/9j/C'] }] }, 413],
+    [{ messages: [{ role: 'assistant', content: 'a', images: ['/9j/AAAA'] }] }, 400],
+  ]) {
+    assert.equal((await s.chat(body)).status, status);
+  }
+  await s.close();
+});
+
+test('fields the proxy does not know are not forwarded as images', async () => {
+  let sent = null;
+  const s = await start(geminiEnv, async (url, init) => {
+    sent = JSON.parse(init.body);
+    return geminiReply('{}')();
+  });
+  const res = await s.chat({
+    image: '/9j/AAAA',
+    images: ['/9j/AAAA'],
+    attachments: [{ data: '/9j/AAAA' }],
+    messages: [{ role: 'user', content: 'Привет', image: '/9j/AAAA', attachments: ['/9j/AAAA'] }],
+  });
+  assert.equal(res.status, 200);
+  assert.ok(sent, 'the text request went to Gemini');
+  assert.equal(JSON.stringify(sent).includes('inlineData'), false, 'no image part was built from unknown fields');
+  assert.equal(JSON.stringify(sent).includes('/9j/AAAA'), false, 'the unknown fields were dropped');
+  await s.close();
+});
+
+test('an image smuggled into the text is sent as text, never as an image', async () => {
+  let sent = null;
+  const s = await start(geminiEnv, async (url, init) => {
+    sent = JSON.parse(init.body);
+    return geminiReply('{}')();
+  });
+  const res = await s.chat({ messages: [{ role: 'user', content: 'data:image/jpeg;base64,/9j/AAAA look at this' }] });
+  assert.equal(res.status, 200);
+  assert.equal(JSON.stringify(sent).includes('inlineData'), false);
+  await s.close();
+});
+
+test('the switch is checked on every request: turning it off applies at once', async () => {
+  // two servers stand for the same code with the operator's setting changed
+  const on = await start({ ...geminiEnv, GEMINI_BILLING: 'paid' }, geminiReply('{}'));
+  assert.equal((await on.chat({ messages: [{ role: 'user', content: 'a', images: ['/9j/AAAA'] }] })).status, 200);
+  await on.close();
+  const off = await start({ ...geminiEnv, GEMINI_BILLING: 'paid', PHOTO_ANALYSIS: 'off' }, geminiReply('{}'));
+  assert.equal((await off.chat({ messages: [{ role: 'user', content: 'a', images: ['/9j/AAAA'] }] })).status, 503);
+  await off.close();
+});

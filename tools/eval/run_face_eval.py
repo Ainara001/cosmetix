@@ -52,7 +52,7 @@ def main(src, out, runs=RUNS):
         mask_ms.append((time.perf_counter() - t) / RUNS * 1000)
         t = time.perf_counter()
         for _ in range(RUNS):
-            m = pq.measure(bgr, res.points, masks)
+            m = pq.measure(bgr, res.points, masks, res.other_widths)
         q_ms.append((time.perf_counter() - t) / RUNS * 1000)
         q = pq.judge(m, res.n_faces)
         face_area = int((fz.face_mask(res.points, bgr.shape) > 0).sum())

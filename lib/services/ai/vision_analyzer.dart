@@ -24,8 +24,7 @@ Answer with ONE JSON object and nothing else, using exactly these keys:
 {
   "skinTone": "very_light" | "light" | "medium" | "tan" | "deep",
   "undertone": "warm" | "cool" | "neutral",
-  "colorType": "spring" | "summer" | "autumn" | "winter",
-  "confidence": number from 0 to 1 (use a low value when there is no clear face, or the photo is dark, blurry, filtered or the face is turned or covered)
+  "colorType": "spring" | "summer" | "autumn" | "winter"
 }
 Write nothing else: no text, no description of the skin. Do not describe or comment on skin condition, texture, redness, spots, pigmentation or any disease. Do not guess the person's age, ethnicity or identity.''';
 

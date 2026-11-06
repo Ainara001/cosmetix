@@ -1,0 +1,238 @@
+{
+ "e000": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e001": {
+  "label": "U",
+  "why": "more than one face / crowd"
+ },
+ "e002": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e003": {
+  "label": "U",
+  "why": "costume, dark glasses, small"
+ },
+ "e004": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e005": {
+  "label": "U",
+  "why": "sunglasses (and hat)"
+ },
+ "e006": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e007": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e008": {
+  "label": "U",
+  "why": "back of the head, no face"
+ },
+ "e009": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e010": {
+  "label": "U",
+  "why": "mouth and nose covered by a biscuit"
+ },
+ "e011": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e013": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e014": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e015": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e016": {
+  "label": "U",
+  "why": "face hidden behind a camera, small"
+ },
+ "e017": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e018": {
+  "label": "U",
+  "why": "more than one face / crowd"
+ },
+ "e019": {
+  "label": "U",
+  "why": "no person (car, landscape, building)"
+ },
+ "e020": {
+  "label": "U",
+  "why": "sunglasses (and hat)"
+ },
+ "e021": {
+  "label": "U",
+  "why": "sunglasses (and hat)"
+ },
+ "e022": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e023": {
+  "label": "U",
+  "why": "sunglasses (and hat)"
+ },
+ "e024": {
+  "label": "M",
+  "why": "head turned about 35 degrees, heavy make-up"
+ },
+ "e025": {
+  "label": "U",
+  "why": "more than one face / crowd"
+ },
+ "e026": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e027": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e028": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e029": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e030": {
+  "label": "U",
+  "why": "silhouette, no skin visible"
+ },
+ "e031": {
+  "label": "M",
+  "why": "face tilted down, beard, small"
+ },
+ "e032": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e033": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e034": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e035": {
+  "label": "M",
+  "why": "frontal, clear glasses, face smallish"
+ },
+ "e036": {
+  "label": "U",
+  "why": "more than one face / crowd"
+ },
+ "e037": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e038": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e039": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e040": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e041": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e042": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e043": {
+  "label": "U",
+  "why": "no person (car, landscape, building)"
+ },
+ "e044": {
+  "label": "U",
+  "why": "no person (car, landscape, building)"
+ },
+ "e045": {
+  "label": "U",
+  "why": "no person (car, landscape, building)"
+ },
+ "e046": {
+  "label": "U",
+  "why": "no person (car, landscape, building)"
+ },
+ "e049": {
+  "label": "U",
+  "why": "profile view, head turned 90 degrees"
+ },
+ "e050": {
+  "label": "S",
+  "why": "one face, frontal enough, large, sharp, normal light"
+ },
+ "e051": {
+  "label": "U",
+  "why": "too dark, face in shadow"
+ },
+ "e052": {
+  "label": "U",
+  "why": "more than one face / crowd"
+ },
+ "e053": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e054": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e055": {
+  "label": "U",
+  "why": "face too small or historical group / far away"
+ },
+ "e057": {
+  "label": "U",
+  "why": "black and white / printed halftone"
+ },
+ "e059": {
+  "label": "U",
+  "why": "more than one face / crowd"
+ },
+ "e060": {
+  "label": "U",
+  "why": "black and white / printed halftone"
+ },
+ "e061": {
+  "label": "M",
+  "why": "frontal studio portrait, face smallish in a full-length frame"
+ },
+ "e062": {
+  "label": "M",
+  "why": "frontal studio portrait, face smallish in a full-length frame"
+ },
+ "e063": {
+  "label": "M",
+  "why": "frontal studio portrait, face smallish in a full-length frame"
+ }
+}

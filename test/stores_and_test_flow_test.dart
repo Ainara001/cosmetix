@@ -370,7 +370,6 @@ void main() {
           colorType: ColorType.winter,
           undertone: Undertone.cool,
           skinTone: SkinTone.light,
-          confidence: 0.8,
         ),
       );
       expect(withPhoto.profile.colorType, ColorType.winter);
@@ -380,17 +379,14 @@ void main() {
       expect(withPhoto.photoUsed, isTrue);
       // the model's self-reported number is not carried into the profile
       expect(withPhoto.profile.confidence, isNull);
-      // an unsure photo changes nothing
-      final unsure = BeautyTestFlow.build(
+      // no photo, no change
+      final none2 = BeautyTestFlow.build(
         color: weak,
         skinType: SkinType.dry,
         concerns: const {},
-        vision: const VisionAnalysis(
-          colorType: ColorType.winter,
-          confidence: 0.3,
-        ),
       );
-      expect(unsure.profile.colorType, isNull);
+      expect(none2.profile.colorType, isNull);
+      expect(none2.photoUsed, isFalse);
     });
 
     test('a solid questionnaire still wins over the photo', () {
@@ -406,7 +402,6 @@ void main() {
         vision: const VisionAnalysis(
           colorType: ColorType.autumn,
           undertone: Undertone.warm,
-          confidence: 0.9,
         ),
       );
       expect(m.profile.colorType, ColorType.summer);
@@ -420,7 +415,7 @@ void main() {
       );
       final m = BeautyProfileMerger.merge(
         q,
-        const VisionAnalysis(undertone: Undertone.warm, confidence: 0.9),
+        const VisionAnalysis(undertone: Undertone.warm),
       );
       expect(m.profile.undertone, Undertone.warm);
     });

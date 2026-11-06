@@ -1651,4 +1651,42 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'The result depends on light and camera; make-up, glasses and filters distort it.',
   'Приложение не определяет акне, рубцы или покраснения.':
       'The app does not detect acne, scars or redness.',
+  'Не удалось открыть фото. Файл повреждён или это не картинка.':
+      'Could not open the photo. The file is damaged or it is not a picture.',
+  'Не удалось проверить фото. Попробуйте другое.':
+      'Could not check the photo. Try another one.',
+  'На фото не нашли лицо. Снимите лицо анфас, крупным планом.':
+      'No face was found in the photo. Take a close-up of your face, looking straight at the camera.',
+  'На фото несколько лиц. Нужно фото одного человека.':
+      'There are several faces in the photo. A photo of one person is needed.',
+  'В кадре есть ещё одно, меньшее лицо. Лучше фото одного человека.':
+      'There is another, smaller face in the frame. A photo of one person is better.',
+  'Лицо слишком маленькое или далеко. Снимите ближе.':
+      'The face is too small or too far away. Take the photo closer.',
+  'Фото нечёткое. Снимите без движения и при хорошем свете.':
+      'The photo is blurry. Hold still and use good light.',
+  'Слишком темно. Встаньте к окну или включите свет.':
+      'It is too dark. Stand by a window or turn on a light.',
+  'Лицо пересвечено. Уйдите от прямого света или вспышки.':
+      'The face is overexposed. Move away from direct light or flash.',
+  'Чёрно-белое фото не подходит для определения цвета кожи.':
+      'A black-and-white photo cannot be used to judge skin colour.',
+  'Лицо повёрнуто. Смотрите прямо в камеру.':
+      'The face is turned. Look straight at the camera.',
+  'Глаза закрыты тёмными очками. Снимите очки.':
+      'The eyes are covered by dark glasses. Take them off.',
+  'Заметная часть лица закрыта волосами, бородой, маской или тенью.':
+      'A large part of the face is covered by hair, a beard, a mask or shadow.',
+  'Свет падает с одной стороны. Результат может быть неточным.':
+      'The light comes from one side. The result may be inaccurate.',
+  'Проверяем фото…': 'Checking the photo…',
+  'Проверка идёт на телефоне, фото никуда не отправляется.':
+      'The check runs on the phone; the photo is not sent anywhere.',
+  'Это фото не подходит': 'This photo will not do',
+  'Фото не отправлено и удалено с телефона.':
+      'The photo was not sent and has been deleted from the phone.',
+  'Выбрать другое фото': 'Choose another photo',
+  'Фото можно использовать, но результат может быть неточным':
+      'The photo can be used, but the result may be inaccurate',
+  'Использовать это фото': 'Use this photo',
 };

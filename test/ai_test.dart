@@ -380,7 +380,6 @@ void main() {
       expect(a.skinTone, SkinTone.light);
       expect(a.undertone, Undertone.cool);
       expect(a.colorType, ColorType.summer);
-      expect(a.confidence, 0.82);
     });
 
     test('JSON wrapped in a code fence and prose', () {
@@ -388,14 +387,13 @@ void main() {
       expect(a.colorType, ColorType.summer);
     });
 
-    test('unsupported values become null, confidence is clamped', () {
+    test('unsupported values become null', () {
       final a = VisionAnalysis.parse(
         '{"skinTone":"purple","undertone":"warm","colorType":"monsoon","confidence":7}',
       );
       expect(a.skinTone, isNull);
       expect(a.colorType, isNull);
       expect(a.undertone, Undertone.warm);
-      expect(a.confidence, 1.0);
     });
 
     test('invalid or empty answers throw AiBadResponse', () {
@@ -458,13 +456,11 @@ void main() {
       colorType: ColorType.spring,
       concerns: {SkinConcern.dryness},
     );
-    VisionAnalysis v({double c = 0.9, Undertone? u, ColorType? t}) =>
-        VisionAnalysis(
-          skinTone: SkinTone.medium,
-          undertone: u ?? Undertone.cool,
-          colorType: t ?? ColorType.summer,
-          confidence: c,
-        );
+    VisionAnalysis v({Undertone? u, ColorType? t}) => VisionAnalysis(
+      skinTone: SkinTone.medium,
+      undertone: u ?? Undertone.cool,
+      colorType: t ?? ColorType.summer,
+    );
 
     test('without a photo (skipped) the questionnaire is the profile', () {
       final m = BeautyProfileMerger.merge(q, null);
@@ -481,7 +477,7 @@ void main() {
       expect(m.profile.source, BeautySource.questionnairePhoto);
     });
 
-    test('a confident photo only fills a neutral undertone', () {
+    test('a photo only fills a neutral undertone', () {
       const neutral = BeautyProfile(
         skinType: SkinType.dry,
         undertone: Undertone.neutral,
@@ -491,16 +487,14 @@ void main() {
         BeautyProfileMerger.merge(neutral, v()).profile.undertone,
         Undertone.cool,
       );
-      expect(
-        BeautyProfileMerger.merge(neutral, v(c: 0.3)).profile.undertone,
-        Undertone.neutral,
-      );
     });
 
-    test('a low-confidence photo is not used at all', () {
-      final m = BeautyProfileMerger.merge(q, v(c: 0.2));
-      expect(m.photoUsed, isFalse);
-      expect(m.profile.source, BeautySource.questionnaire);
+    test('no decision by a number the model reports about itself', () {
+      // the old rule dropped a photo when the model said "0.2"; that number is
+      // gone from the answer and from the logic: whether a photo is good enough
+      // was decided on the phone before it was sent
+      final m = BeautyProfileMerger.merge(q, v());
+      expect(m.photoUsed, isTrue);
     });
   });
 

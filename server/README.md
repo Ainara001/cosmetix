@@ -58,7 +58,7 @@ upstream_bad_response`, `503 upstream_unavailable | mock_no_structured | photo_a
 | `APP_TOKEN` | empty | if set, the app must send it as `x-app-token` |
 | `GEMINI_MODEL` | `gemini-3.1-flash-lite` | cheap and fast; model names change often, list yours with `GET /v1beta/models` |
 | `GEMINI_FALLBACK_MODEL` | `gemini-flash-lite-latest` | used when `GEMINI_MODEL` keeps answering 503; empty disables the fallback |
-| `GEMINI_BILLING` | empty (`unknown`) | operator's declaration: `paid` if the Gemini key belongs to a Cloud project with active billing, `free` otherwise. The server cannot check it. Free-quota terms ("Unpaid Services") let Google use and review what is sent and forbid personal data |
+| `GEMINI_BILLING` | empty (`unknown`) | operator's declaration: `paid` if the Gemini key belongs to a Cloud project with active billing, `free` otherwise. The server cannot check it: set `paid` only after you have confirmed billing for this key in Google AI Studio (indirect signs in API answers are not proof), and never set `PHOTO_ANALYSIS=on` to get around the free tier's limits. Free-quota terms ("Unpaid Services") let Google use and review what is sent and forbid personal data |
 | `PHOTO_ANALYSIS` | empty (auto) | `on` / `off`. Auto = on only for Gemini with `GEMINI_BILLING=paid`; off for every other case. With `off` a request that carries an image is answered `503 photo_analysis_disabled` before anything is sent to the AI provider. `on` without `paid` prints a warning at start |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | cheap and good enough; change freely |
 

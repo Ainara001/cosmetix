@@ -37,24 +37,17 @@ String _norm(Object? v) => v is String
 
 /// Result of the optional photo analysis (a hint, never a diagnosis).
 ///
-/// Only the three codes (and the model's own self-report, see
-/// `BeautyProfileMerger.minConfidence`) are kept. Free text the model may add
-/// ("observations", "explanation") is dropped on purpose: nothing measured the
-/// statements it makes about the skin, so they are never carried or shown.
+/// Only the three codes are kept. Whatever else the model adds, free text about
+/// the skin ("observations", "explanation") or a "confidence" it reports about
+/// itself, is dropped on purpose: nothing measured those statements and the
+/// number is not a measurement. Whether the photo was good enough was decided
+/// on the phone before it was sent.
 class VisionAnalysis {
-  const VisionAnalysis({
-    this.skinTone,
-    this.undertone,
-    this.colorType,
-    required this.confidence,
-  });
+  const VisionAnalysis({this.skinTone, this.undertone, this.colorType});
 
   final SkinTone? skinTone;
   final Undertone? undertone;
   final ColorType? colorType;
-
-  /// 0..1
-  final double confidence;
 
   /// Parses and validates the model answer. Unsupported values become null;
   /// throws [AiBadResponse] when nothing usable is left.
@@ -78,7 +71,6 @@ class VisionAnalysis {
       skinTone: skinTone,
       undertone: undertone,
       colorType: colorType,
-      confidence: _confidence(j['confidence']),
     );
   }
 }
