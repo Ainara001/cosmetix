@@ -1,0 +1,358 @@
+{
+ "f000": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f001": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f002": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f003": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f004": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f005": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f006": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f007": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f008": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f009": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f010": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f011": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f012": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f013": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f014": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f015": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f016": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f017": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f018": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f019": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f020": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f021": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f022": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f023": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f024": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f025": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f026": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f027": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f028": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f029": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f031": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f032": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f034": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f035": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f036": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f037": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f038": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f039": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f040": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f041": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f042": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f043": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f044": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f045": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f046": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f047": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f048": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f049": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f051": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f052": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f053": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f054": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f056": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f057": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f058": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f059": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f060": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f061": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f062": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f063": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f064": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f065": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f066": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f067": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f068": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f069": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f070": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f071": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f072": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f073": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f074": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f076": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f079": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f081": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f082": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f083": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f084": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f085": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f086": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f087": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f088": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f089": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f090": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f091": {
+  "label": "W",
+  "why": "usable but not good: sunglasses/tinted lenses, small face, turned, hat, side light"
+ },
+ "f092": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f093": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f094": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ },
+ "f095": {
+  "label": "U",
+  "why": "must be refused: several faces, no face, too small, picture or sculpture of a face, black and white, strongly turned or covered"
+ },
+ "f096": {
+  "label": "S",
+  "why": "one real face, large enough, usable"
+ }
+}

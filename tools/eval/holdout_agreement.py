@@ -33,8 +33,10 @@ def main():
     cells, q, j = table(*(os.path.join(HERE, a) for a in args[:2]))
     print('| my judgement \\ gate | ok | warn | reject | total |')
     print('|---|---|---|---|---|')
-    names = {'S': 'suitable', 'M': 'marginal', 'U': 'unsuitable'}
-    for lab in 'SMU':
+    names = {'S': 'suitable', 'M': 'marginal', 'W': 'retake suggested', 'U': 'unsuitable'}
+    for lab in 'SMWU':
+        if not any(k[0] == lab for k in cells):
+            continue
         row = [cells[(lab, v)] for v in ('ok', 'warn', 'reject')]
         print(f'| {names[lab]} | {row[0]} | {row[1]} | {row[2]} | {sum(row)} |')
     s_ref = cells[('S', 'reject')]

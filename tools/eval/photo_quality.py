@@ -45,10 +45,13 @@ T = {
     'clipped_pct_max': (4.0, 12.0),
     'crushed_pct_max': (25.0, 50.0),
     'lr_asym_max': (0.35, float('inf')),   # side light: warn only, never reject
-    'yaw_offset_max': (0.15, 0.25),
-    # second face: any other face is a warning, one at least a quarter as wide as the main one rejects
-    'second_face_ratio_max': (0.0, 0.25),
-    # opaque dark lenses: eyes darker than the cheeks (below 0.8) AND flat (contrast below 0.07).
+    # warn from 0.15; reject from 0.30: on the development photos every suitable one is <= 0.196 and every
+    # turned one >= 0.333, so 0.30 sits in that gap, on the side of the refusal that hurts less
+    'yaw_offset_max': (0.15, 0.30),
+    # second face: the app takes one person: another face at least a tenth as wide as the main one (about
+    # 30 px on a 300 px face, a person who is recognisable) rejects; a smaller one is a warning
+    'second_face_ratio_max': (0.0, 0.10),
+    # dark lenses: a WARNING only (a squint in hard sun looks the same and cannot be told apart); eyes darker than the cheeks (below 0.8) AND flat (contrast below 0.07).
     # Open eyes keep a contrast of at least 0.10 on the 76 development photos (the only real pair
     # of dark glasses among them: 0.037); closed eyelids are as bright as the cheeks (about 1.0).
     # Chosen on the development photos and synthetic lenses, never on the evaluation set.
@@ -189,7 +192,7 @@ def judge(m: dict, n_faces: int = 1) -> Quality:
         flag('warn', f'a smaller face in the background ({ratio:.2f} of the main face width)')
     dark, flat = m.get('eye_dark_ratio', float('nan')), m.get('eye_contrast', float('nan'))
     if dark == dark and flat == flat and dark < T['eyes_covered'][0] and flat < T['eyes_covered'][1]:
-        flag('reject', f'eyes look covered by dark lenses (darkness {dark:.2f}, contrast {flat:.2f})')
+        flag('warn', f'eyes look covered by dark lenses (darkness {dark:.2f}, contrast {flat:.2f})')
     vis = m.get('skin_visible', float('nan'))
     if vis == vis and vis < T['skin_visible_min'][0]:
         flag('warn', f'little visible skin: {vis:.2f} of the cheeks, forehead and nose')

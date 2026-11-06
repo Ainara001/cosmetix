@@ -107,13 +107,24 @@ void main() {
       },
     );
 
-    test('a small face in the background is only a warning', () async {
-      final far = meshAt(const Offset(150, 150), 90);
+    test('a tiny face far in the background is only a warning', () async {
+      final far = meshAt(const Offset(150, 150), 30);
       final c = photo(good, lightSkin, edit: (c) => c.face(far, mediumSkin));
       final r = await check(c, [good, far]);
       expect(r.verdict.level, PhotoLevel.warn);
       expect(r.verdict.issues, contains(PhotoIssue.backgroundFace));
     });
+
+    test(
+      'a bystander who is recognisable (a tenth of the face or more) refuses',
+      () async {
+        final far = meshAt(const Offset(150, 150), 90);
+        final c = photo(good, lightSkin, edit: (c) => c.face(far, mediumSkin));
+        final r = await check(c, [good, far]);
+        expect(r.verdict.level, PhotoLevel.reject);
+        expect(r.verdict.issues, contains(PhotoIssue.severalFaces));
+      },
+    );
 
     test('a small, far face', () async {
       final tiny = meshAt(center, 80);
@@ -153,11 +164,18 @@ void main() {
     });
 
     test('a turned head', () async {
-      final turned = meshAt(center, 420, nose: 0.3);
+      final turned = meshAt(center, 420, nose: 0.4);
       final r = await check(photo(turned, lightSkin), [turned]);
       expect(r.verdict.level, PhotoLevel.reject);
       expect(r.verdict.issues, contains(PhotoIssue.turned));
-      expect(r.metrics!.yawOffset, closeTo(0.3, 0.03));
+      expect(r.metrics!.yawOffset, closeTo(0.4, 0.03));
+    });
+
+    test('a head turned a little only warns', () async {
+      final turned = meshAt(center, 420, nose: 0.2);
+      final r = await check(photo(turned, lightSkin), [turned]);
+      expect(r.verdict.level, PhotoLevel.warn);
+      expect(r.verdict.issues, contains(PhotoIssue.turned));
     });
 
     test('dark lenses over the eyes', () async {
@@ -165,7 +183,8 @@ void main() {
         photo(good, lightSkin, edit: (c) => c.lenses(good, 25)),
         [good],
       );
-      expect(r.verdict.level, PhotoLevel.reject);
+      // a squint cannot be told from dark lenses, so this asks, it never refuses
+      expect(r.verdict.level, PhotoLevel.warn);
       expect(r.verdict.issues, contains(PhotoIssue.eyesCovered));
     });
 
@@ -275,7 +294,7 @@ void main() {
                 'turn',
                 m(yaw: 0.149),
                 m(yaw: 0.151),
-                m(yaw: 0.251),
+                m(yaw: 0.301),
                 PhotoIssue.turned,
               ),
             ];
@@ -304,11 +323,11 @@ void main() {
     });
 
     test(
-      'eyes: dark and flat rejects; dark but alive, or flat but bright, does not',
+      'eyes: dark and flat warns; dark but alive, or flat but bright, does not',
       () {
         expect(
           PhotoThresholds.judge(m(eyeDark: 0.3, eyeContrast: 0.03)).level,
-          PhotoLevel.reject,
+          PhotoLevel.warn,
         );
         expect(
           PhotoThresholds.judge(m(eyeDark: 0.3, eyeContrast: 0.2)).level,
@@ -335,7 +354,7 @@ void main() {
     });
 
     test('the worst reason decides, the worst is listed first', () {
-      final v = PhotoThresholds.judge(m(sharp: 40, yaw: 0.3));
+      final v = PhotoThresholds.judge(m(sharp: 40, yaw: 0.35));
       expect(v.level, PhotoLevel.reject);
       expect(v.issues.first, PhotoIssue.turned);
       expect(v.issues, contains(PhotoIssue.blurry));

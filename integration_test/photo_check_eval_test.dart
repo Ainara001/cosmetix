@@ -81,7 +81,13 @@ void main() {
         'verdict': v.level.name,
         'issues': [for (final i in v.issues) i.name],
         'ms': sw.elapsedMilliseconds,
-        if (r.metrics != null) 'metrics': r.metrics!.toJson(),
+        if (r.metrics != null)
+          'metrics': {
+            for (final e in r.metrics!.toJson().entries)
+              e.key: (e.value is double && (e.value as double).isNaN)
+                  ? null
+                  : e.value,
+          },
       });
       debugPrint(
         'PC_ROW $name ${rows.last['verdict']} ${rows.last['issues']} ${sw.elapsedMilliseconds}ms',
@@ -121,7 +127,11 @@ void main() {
       expect(m, isNotNull, reason: '${e.key}: face not found (orientation?)');
       expect(m!.faceCount, 1, reason: e.key);
       // same face, same size and the same turn, whatever the stored orientation
-      expect(m.facePx, closeTo(base!.facePx, base.facePx * 0.08), reason: e.key);
+      expect(
+        m.facePx,
+        closeTo(base!.facePx, base.facePx * 0.08),
+        reason: e.key,
+      );
       expect(m.yawOffset, closeTo(base.yawOffset, 0.06), reason: e.key);
       expect(m.rollDeg.abs(), lessThan(8), reason: '${e.key}: upright face');
     }

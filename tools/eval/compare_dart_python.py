@@ -57,16 +57,22 @@ def main(argv):
             if n in dart:
                 cells[(v['label'], dart[n]['verdict'])] += 1
         print('\n| my judgement \\ Dart verdict | ok | warn | reject | total |\n|---|---|---|---|---|')
-        for lab, name in (('S', 'suitable'), ('M', 'marginal'), ('U', 'unsuitable')):
+        for lab, name in (('S', 'suitable'), ('M', 'marginal'), ('W', 'retake suggested'), ('U', 'unsuitable')):
+            if not any(k[0] == lab for k in cells):
+                continue
             row = [cells[(lab, v)] for v in ('ok', 'warn', 'reject')]
             print(f'| {name} | {row[0]} | {row[1]} | {row[2]} | {sum(row)} |')
         for n, v in sorted(j.items()):
             if n not in dart:
                 continue
             if v['label'] == 'S' and dart[n]['verdict'] == 'reject':
-                print('  false refusal:', n, v['why'], dart[n]['issues'])
+                print('  false refusal:', n, v['why'][:40], dart[n]['issues'])
             if v['label'] == 'U' and dart[n]['verdict'] != 'reject':
-                print('  let through:', n, dart[n]['verdict'], v['why'], dart[n]['issues'])
+                print('  let through:', n, dart[n]['verdict'], v['why'][:40], dart[n]['issues'])
+            if v['label'] == 'W' and dart[n]['verdict'] == 'reject':
+                print('  refused, should only warn:', n, dart[n]['issues'])
+            if v['label'] == 'W' and dart[n]['verdict'] == 'ok':
+                print('  not even a warning:', n)
 
 
 if __name__ == '__main__':

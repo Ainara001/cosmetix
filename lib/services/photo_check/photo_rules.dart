@@ -157,13 +157,13 @@ class PhotoThresholds {
   static const skinChromaMin = (3.0, 2.0);
   static const clippedPctMax = (4.0, 12.0);
   static const crushedPctMax = (25.0, 50.0);
-  static const yawOffsetMax = (0.15, 0.25);
+  static const yawOffsetMax = (0.15, 0.30);
 
   /// Side light is only ever a warning.
   static const lrAsymWarn = 0.35;
 
-  /// Another face: any is a warning, one this much of the main face's width rejects.
-  static const secondFaceReject = 0.25;
+  /// Another face: a smaller one is a warning, one this much of the main face's width rejects.
+  static const secondFaceReject = 0.10;
 
   /// Eyes darker than the cheeks and flat: opaque dark lenses.
   static const eyeDarkMax = 0.8;
@@ -215,7 +215,7 @@ class PhotoThresholds {
         m.eyeDarkRatio < eyeDarkMax &&
         m.eyeContrast < eyeContrastMax) {
       r.add(
-        PhotoReason(PhotoIssue.eyesCovered, PhotoLevel.reject, m.eyeContrast),
+        PhotoReason(PhotoIssue.eyesCovered, PhotoLevel.warn, m.eyeContrast),
       );
     }
     if (!m.skinVisible.isNaN && m.skinVisible < skinVisibleWarn) {

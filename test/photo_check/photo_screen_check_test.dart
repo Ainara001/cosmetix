@@ -243,8 +243,8 @@ void main() {
           (
             'turned',
             Canvas8(w, h)
-              ..face(meshAt(Offset(w / 2, h / 2), 420, nose: 0.3), lightSkin),
-            [meshAt(Offset(w / 2, h / 2), 420, nose: 0.3)],
+              ..face(meshAt(Offset(w / 2, h / 2), 420, nose: 0.4), lightSkin),
+            [meshAt(Offset(w / 2, h / 2), 420, nose: 0.4)],
             'повёрнуто',
           ),
           (
@@ -256,12 +256,12 @@ void main() {
             'Слишком темно',
           ),
           (
-            'glasses',
+            'a recognisable bystander',
             Canvas8(w, h)
               ..face(good, lightSkin)
-              ..lenses(good, 25),
-            [good],
-            'тёмными очками',
+              ..face(meshAt(const Offset(150, 150), 90), mediumSkin),
+            [good, meshAt(const Offset(150, 150), 90)],
+            'несколько лиц',
           ),
         ];
         for (final (name, canvas, faces, text) in cases) {
@@ -318,17 +318,16 @@ void main() {
   testWidgets('a warning lets the user choose; nothing is sent until they do', (
     t,
   ) async {
-    final far = meshAt(const Offset(150, 150), 90);
     final file = await writePng(
       t,
       Canvas8(w, h)
         ..face(good, lightSkin)
-        ..face(far, mediumSkin),
+        ..lenses(good, 25),
     );
-    final o = await open(t, file, FakeFinder([good, far]));
+    final o = await open(t, file, FakeFinder([good]));
     await pickAndUse(t);
     expect(find.textContaining('можно использовать'), findsOneWidget);
-    expect(find.textContaining('меньшее лицо'), findsOneWidget);
+    expect(find.textContaining('тёмными очками'), findsOneWidget);
     expect(o.analyzer.calls, 0, reason: 'not yet: the user has not chosen');
     expect(file.existsSync(), isTrue);
     await t.tap(find.text('Использовать это фото'));
@@ -341,6 +340,109 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets(
+    'a refusal has no "use this photo" button: it cannot be confirmed',
+    (t) async {
+      final file = await writePng(
+        t,
+        Canvas8(w, h)
+          ..face(good, lightSkin)
+          ..face(meshAt(const Offset(150, 150), 90), mediumSkin),
+      );
+      final o = await open(
+        t,
+        file,
+        FakeFinder([good, meshAt(const Offset(150, 150), 90)]),
+      );
+      await pickAndUse(t);
+      expect(find.text('Это фото не подходит'), findsOneWidget);
+      expect(find.text('Использовать это фото'), findsNothing);
+      expect(find.text('Выбрать другое фото'), findsOneWidget);
+      expect(o.analyzer.calls, 0);
+      expect(file.existsSync(), isFalse);
+    },
+  );
+
+  group(
+    'a GOOD photo still goes nowhere unless every other requirement holds',
+    () {
+      Future<void> run(
+        WidgetTester t,
+        void Function(AiProvider ai) setup,
+        String expectedText, {
+        int healthChecks = 0,
+      }) async {
+        final spy = _NetSpy();
+        await HttpOverrides.runWithHttpOverrides(() async {
+          final file = await writePng(t, Canvas8(w, h)..face(good, mediumSkin));
+          final o = await open(t, file, FakeFinder([good]), spy: spy);
+          setup(o.ai);
+          final before = o.auth.user!.beautyProfile.signature;
+          await pickAndUse(t);
+          expect(find.textContaining(expectedText), findsOneWidget);
+          expect(o.analyzer.calls, 0);
+          expect(o.ai.sharePhotos, isFalse);
+          expect(file.existsSync(), isFalse);
+          expect(o.auth.user!.beautyProfile.signature, before);
+        }, spy);
+        // the only network use allowed is the body-less /health ping when the server state
+        // is unknown; the analyzer (the only sender of a photo) is never called
+        expect(spy.clients, healthChecks);
+      }
+
+      testWidgets(
+        'a minor (17): remote analysis is closed, the photo is deleted',
+        (t) => run(t, (ai) => ai.ageSource = () => 17, 'доступен с 18 лет'),
+      );
+
+      testWidgets('an unknown age is treated like a minor', (t) {
+        return run(t, (ai) => ai.ageSource = () => null, 'доступен с 18 лет');
+      });
+
+      testWidgets(
+        'the server switch is off (or the free tier): nothing is sent',
+        (t) {
+          return run(t, (ai) => ai.photoAnalysis = false, 'сейчас отключён');
+        },
+      );
+
+      testWidgets('the server is not reachable: nothing is sent', (t) {
+        return run(
+          t,
+          (ai) {
+            ai.status = AiStatus.offline;
+            ai.photoAnalysis = null;
+          },
+          'недоступен',
+          healthChecks: 1,
+        );
+      });
+
+      testWidgets(
+        'no consent: the dialog comes first and "cancel" sends nothing',
+        (t) async {
+          final spy = _NetSpy();
+          await HttpOverrides.runWithHttpOverrides(() async {
+            final file = await writePng(
+              t,
+              Canvas8(w, h)..face(good, mediumSkin),
+            );
+            final o = await open(t, file, FakeFinder([good]), spy: spy);
+            o.ai.sharePhotos = false;
+            await pickAndUse(t);
+            expect(find.byType(AlertDialog), findsOneWidget);
+            expect(o.analyzer.calls, 0, reason: 'asked, not yet sent');
+            await t.tap(find.text('Отмена'));
+            await settle(t);
+            expect(o.analyzer.calls, 0);
+            expect(o.ai.sharePhotos, isFalse);
+          }, spy);
+          expect(spy.clients, 0);
+        },
+      );
+    },
+  );
 
   testWidgets('a good photo goes on to the analyzer (when consent is given)', (
     t,

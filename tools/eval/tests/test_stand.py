@@ -60,7 +60,7 @@ class GateTests(unittest.TestCase):
                                  ('face_px', 90.0, 'reject'), ('face_px', 130.0, 'warn'),
                                  ('face_p95_luma', 70.0, 'reject'), ('face_p95_luma', 100.0, 'warn'),
                                  ('clipped_pct', 20.0, 'reject'), ('clipped_pct', 6.0, 'warn'),
-                                 ('yaw_offset', 0.3, 'reject'), ('yaw_offset', 0.2, 'warn'),
+                                 ('yaw_offset', 0.35, 'reject'), ('yaw_offset', 0.2, 'warn'),
                                  ('skin_chroma', 0.0, 'reject'), ('skin_chroma', 2.5, 'warn'),
                                  ('lr_asym', 5.0, 'warn')]:
             m = good()
@@ -79,7 +79,7 @@ class GateTests(unittest.TestCase):
         self.assertEqual(pq.judge(good(), n_faces=2).verdict, 'warn')
 
     def test_another_face_rejects_a_small_one_only_warns(self):
-        for ratio, expect in [(0.0, 'ok'), (0.1, 'warn'), (0.25, 'reject'), (0.9, 'reject')]:
+        for ratio, expect in [(0.0, 'ok'), (0.05, 'warn'), (0.10, 'reject'), (0.9, 'reject')]:
             m = good()
             m['second_face_ratio'] = ratio
             self.assertEqual(pq.judge(m).verdict, expect, ratio)
@@ -87,8 +87,8 @@ class GateTests(unittest.TestCase):
         m['second_face_ratio'] = 0.9
         self.assertEqual(pq.judge(m, n_faces=2).reasons.count('warn: 2 faces in the frame, only the first is analysed'), 0)
 
-    def test_dark_flat_eyes_reject_but_open_or_closed_eyes_do_not(self):
-        for dark, flat, expect in [(0.3, 0.04, 'reject'),      # opaque lenses
+    def test_dark_flat_eyes_warn_but_open_or_closed_eyes_do_not(self):
+        for dark, flat, expect in [(0.3, 0.04, 'warn'),        # dark lenses or a squint: a warning, never a refusal
                                    (0.3, 0.12, 'ok'),          # dark but with a visible eye
                                    (0.95, 0.03, 'ok'),         # closed lids: as bright as the cheeks
                                    (float('nan'), float('nan'), 'ok')]:
@@ -105,7 +105,7 @@ class GateTests(unittest.TestCase):
 
     def test_worst_verdict_wins(self):
         m = good()
-        m['sharpness'], m['yaw_offset'] = 40.0, 0.3
+        m['sharpness'], m['yaw_offset'] = 40.0, 0.35
         q = pq.judge(m)
         self.assertEqual(q.verdict, 'reject')
         self.assertEqual(len(q.reasons), 2)

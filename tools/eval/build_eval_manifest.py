@@ -38,15 +38,17 @@ PLAN = [
 ] + [('portrait', f'Portrait photographs of {c}', 3) for c in COUNTRIES]
 
 
-def main():
-    b.SEED = SEED
-    b.PLAN = PLAN
+def main(seed=SEED, plan=None, prefix='e', out_name='photos_eval_manifest.json',
+         skip=('photos_manifest.json', 'photos_holdout_manifest.json')):
+    plan = plan or PLAN
+    b.SEED = seed
+    b.PLAN = plan
     seen = set()
-    for name in ('photos_manifest.json', 'photos_holdout_manifest.json'):
+    for name in skip:
         seen |= {x['commons_title'] for x in json.load(open(os.path.join(HERE, name), encoding='utf-8'))}
-    rng = random.Random(SEED)
+    rng = random.Random(seed)
     out, taken = [], set(seen)
-    for tag, cat, n in PLAN:
+    for tag, cat, n in plan:
         files = b.members(cat)
         rng.shuffle(files)
         got = 0
@@ -64,12 +66,12 @@ def main():
                     continue
                 taken.add(pg['title'])
                 artist = b.re.sub(r'\s+', ' ', b.re.sub('<[^>]+>', '', ii['extmetadata'].get('Artist', {}).get('value', ''))).strip()
-                out.append(dict(file=f'e{len(out):03d}.jpg', tag=tag, commons_category=cat,
+                out.append(dict(file=f'{prefix}{len(out):03d}.jpg', tag=tag, commons_category=cat,
                                 commons_title=pg['title'], license=lic, author=artist[:120],
                                 page='https://commons.wikimedia.org/wiki/' + b.urllib.parse.quote(pg['title'].replace(' ', '_'))))
                 got += 1
         print(tag, cat, got, 'of', n)
-    json.dump(out, open(os.path.join(HERE, 'photos_eval_manifest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    json.dump(out, open(os.path.join(HERE, out_name), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('written', len(out))
 
 
