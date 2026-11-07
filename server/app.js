@@ -48,6 +48,26 @@ function msEnv(env, name, fallback) {
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
+/**
+ * Photos of people go to the AI provider only when the operator allows it.
+ *
+ * Google's Gemini API terms treat the free quota as "Unpaid Services": the content
+ * sent is used to improve Google products, may be read by human reviewers, and
+ * personal information must not be sent. So for Gemini the default is OFF unless
+ * the operator declares a paid (billed) project with GEMINI_BILLING=paid. An explicit
+ * PHOTO_ANALYSIS=on|off always wins (and `on` without `paid` is the operator's own
+ * risk, the server prints a warning at start). Other providers: default OFF too,
+ * their terms were not checked.
+ */
+function readPhotoPolicy(env, provider) {
+  const billingRaw = (env.GEMINI_BILLING || '').trim().toLowerCase();
+  const billing = billingRaw === 'paid' || billingRaw === 'free' ? billingRaw : 'unknown';
+  const explicit = (env.PHOTO_ANALYSIS || '').trim().toLowerCase();
+  const photoAnalysis =
+    explicit === 'on' ? true : explicit === 'off' ? false : provider === 'gemini' && billing === 'paid';
+  return { photoAnalysis, dataUse: provider === 'gemini' ? billing : 'unknown' };
+}
+
 function readConfig(env) {
   const provider = pickProvider(env);
   const claudeModel = (env.CLAUDE_MODEL || 'claude-haiku-5-5').trim();
@@ -67,6 +87,7 @@ function readConfig(env) {
     upstreamTimeoutMs: intEnv(env, 'UPSTREAM_TIMEOUT_MS', 45000),
     retryDelayMs: msEnv(env, 'UPSTREAM_RETRY_MS', 800),
     forceMock: env.MOCK === '1',
+    ...readPhotoPolicy(env, provider),
   };
 }
 
@@ -469,6 +490,10 @@ function createApp({
           ok: true,
           mode: mock ? 'mock' : config.provider,
           model: mock ? null : config.model,
+          // the app shows the photo step only when this is true
+          photoAnalysis: mock ? false : config.photoAnalysis,
+          // how the AI provider may use what is sent: paid | free | unknown | none (mock)
+          dataUse: mock ? 'none' : config.dataUse,
         });
       }
       if (req.method === 'POST' && url.pathname === '/v1/chat') {
@@ -476,6 +501,14 @@ function createApp({
         checkRate(req.socket.remoteAddress || 'unknown');
         checkBudget();
         const clean = validateChatBody(await readBody(req), config);
+        if (!mock && !config.photoAnalysis && clean.messages.some((m) => m.images.length > 0)) {
+          // refused here, before anything reaches the AI provider
+          throw new HttpError(
+            503,
+            'photo_analysis_disabled',
+            'Photo analysis is switched off on this server',
+          );
+        }
         const result = mock
           ? mockAnswer(clean)
           : config.provider === 'gemini'

@@ -18,6 +18,14 @@ class AiConfig {
   static const defaultBaseUrl = String.fromEnvironment('AI_BASE_URL');
   static const defaultAppToken = String.fromEnvironment('AI_APP_TOKEN');
 
+  /// Build-time kill switch for sending photos to the AI:
+  /// `--dart-define=PHOTO_ANALYSIS=false` removes the photo step from the app
+  /// whatever the server says. The server has its own switch (`PHOTO_ANALYSIS`).
+  static const photoAnalysisAtBuild = bool.fromEnvironment(
+    'PHOTO_ANALYSIS',
+    defaultValue: true,
+  );
+
   factory AiConfig.fromEnvironment() =>
       const AiConfig(baseUrl: defaultBaseUrl, appToken: defaultAppToken);
 

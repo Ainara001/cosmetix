@@ -3,16 +3,21 @@ import 'package:cosmetix/core/constants/legal_texts.dart';
 // Russian source text -> translation (edit here; the old helper scripts are in tool/i18n_legacy).
 const Map<String, String> translationsEn = {
   LegalTexts.privacy: '''1. What data we store
-Cosmetix stores data only on your device in a local SQLite database: name, email, contact details, beauty profile, favorites, orders, reviews and reaction diary entries.
+Cosmetix stores data on your device in a local SQLite database: name, email, contact details, beauty profile, favorites, orders, reviews and reaction diary entries.
 
 2. What the data is used for
 The data is needed to pick cosmetics for your skin type and color type, warn about unwanted ingredients and show your purchase history.
 
-3. Sharing with third parties
-The app does not send your data to a server and does not share it with third parties.
+3. Optional AI features: what is sent and to whom
+The AI chat, photo analysis and AI refinement of the picks send data to the Cosmetix server and through it to the Google Gemini service. Nothing is sent without your consent, and the app works without AI. AI features are available only to users who have entered a year of birth and are 18 or older.
+• Chat: the text of your messages. Do not write personal data in the chat.
+• Beauty profile and blacklist: only if you allowed it separately. The AI refinement also sends the Beauty profile (skin type, tone, undertone, color type, skin concerns) and a list of products.
+• Photo: only at the "Photo" step of the beauty test and after your consent. The app does not keep the photo and deletes it from the phone after the analysis.
+The Cosmetix server does not record message texts or photos. How Google uses what is sent depends on the server's mode: on the free tier Google may use the data to improve its products and people may review it; on the paid tier Google does not use it for that but keeps requests for a limited time to detect abuse. The current mode is shown in Settings, in the AI assistant section.
+AI results are hints, not measurements and not a diagnosis.
 
 4. Managing data
-You can edit your profile data, delete diary entries, clear your search history and fully reset the app data in the Settings section.
+You can edit your profile data, delete diary entries, clear your search history and fully reset the app data in the Settings section. There you can also withdraw your consent to send messages, the profile and photos to the AI at any time.
 
 5. Password
 The password is stored as a hash and is never shown in plain text.''',
@@ -791,7 +796,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'ЦВЕТОТИП': 'COLOR TYPE',
   'ПРОБЛЕМЫ КОЖИ': 'SKIN CONCERNS',
   'ОПРЕДЕЛЕНО ПО': 'DETERMINED USING',
-  'Уверенность анализа фото: {n}%': 'Photo analysis confidence: {n}%',
   'Пройти тест заново': 'Retake the test',
   'Выберите, как ведёт себя ваша кожа': 'Choose how your skin behaves',
   'Тест: ваша кожа': 'Test: your skin',
@@ -1589,4 +1593,72 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Посмотреть товар в магазине': 'View the product in the shop',
   'Поиск в магазине': 'Search in the shop',
   'Цена на {d}': 'Price on {d}',
+  'Это подсказка для подбора косметики, а не измерение и не диагноз. Цветотип по фото ориентировочный: если ответы анкеты и фото расходятся, решайте сами.':
+      'This is a hint for choosing cosmetics, not a measurement and not a diagnosis. The colour type from a photo is approximate: if your answers and the photo disagree, decide for yourself.',
+  'Что стоит знать об анализе по фото': 'What to know about photo analysis',
+  'Это подсказка по цвету, а не измерение и не диагноз.':
+      'This is a colour hint, not a measurement and not a diagnosis.',
+  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.':
+      'The result depends on light and camera; make-up, glasses and filters distort it.',
+  'Приложение не определяет акне, рубцы или покраснения.':
+      'The app does not detect acne, scars or redness.',
+  'ИИ-помощник доступен с 18 лет. Укажите год рождения в профиле.':
+      'The AI assistant is available from the age of 18. Enter your year of birth in the profile.',
+  'ИИ-помощник доступен с 18 лет.':
+      'The AI assistant is available from the age of 18.',
+  'ИИ-помощник доступен с 18 лет':
+      'The AI assistant is available from the age of 18',
+  'Укажите год рождения в профиле. Остальные функции работают.':
+      'Enter your year of birth in the profile. The other features work.',
+  'Уточнение с помощью ИИ доступно с 18 лет. Укажите год рождения в профиле.':
+      'AI refinement is available from the age of 18. Enter your year of birth in the profile.',
+  'Функции ИИ доступны с 18 лет. Укажите год рождения в профиле.':
+      'AI features are available from the age of 18. Enter your year of birth in the profile.',
+  'Функции ИИ доступны с 18 лет. Укажите год рождения в профиле, чтобы их включить.':
+      'AI features are available from the age of 18. Enter your year of birth in the profile to turn them on.',
+  'Функции ИИ доступны с 18 лет.':
+      'AI features are available from the age of 18.',
+  'Анализ по фото доступен с 18 лет.':
+      'Photo analysis is available from the age of 18.',
+  'Анализ по фото доступен с 18 лет':
+      'Photo analysis is available from the age of 18',
+  'Укажите год рождения в профиле. Тест работает и без фото, по вашим ответам.':
+      'Enter your year of birth in the profile. The test works without a photo too, from your answers.',
+  'Тест работает и без фото, по вашим ответам.':
+      'The test works without a photo too, from your answers.',
+  'Анализ по фото сейчас отключён.':
+      'Photo analysis is switched off right now.',
+  'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.':
+      'Photo analysis is switched off right now. The test works from your answers, no photo is needed.',
+  'Сервер отключил анализ по фото: фото не отправляются.':
+      'The server has switched photo analysis off: photos are not sent.',
+  'Google не использует отправленное для улучшения своих продуктов; запросы хранятся ограниченное время только для выявления нарушений.':
+      'Google does not use what is sent to improve its products; requests are kept for a limited time only to detect abuse.',
+  'Сейчас сервер работает на бесплатном тарифе Google: Google может использовать отправленное для улучшения своих продуктов, и это могут просматривать люди.':
+      'The server currently runs on Google\'s free tier: Google may use what is sent to improve its products, and people may review it.',
+  'Как Google использует отправленное, сервер не сообщил: считайте, что это может быть использовано и просмотрено людьми.':
+      'The server did not say how Google uses what is sent: assume it may be used and reviewed by people.',
+  'Фото будет отправлено на сервер Cosmetix и через него в сервис Google Gemini, чтобы оценить цвет кожи. Приложение не сохраняет фото и удаляет его с телефона после анализа.':
+      'The photo will be sent to the Cosmetix server and through it to Google Gemini to estimate your skin colour. The app does not keep the photo and deletes it from the phone after the analysis.',
+  'Результат это подсказка, а не измерение и не диагноз. Согласие можно отозвать в Настройках.':
+      'The result is a hint, not a measurement or a diagnosis. You can withdraw your consent in Settings.',
+  'Ваши сообщения в чате будут отправляться на сервер Cosmetix и через него в сервис Google Gemini. Не пишите там личные данные.':
+      'Your chat messages will be sent to the Cosmetix server and through it to Google Gemini. Do not write personal data there.',
+  'Согласие можно отозвать в Настройках.':
+      'You can withdraw your consent in Settings.',
+  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер Cosmetix и в Google Gemini. Фото и контакты не отправляются. Это можно изменить в Настройках.':
+      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the Cosmetix server and to Google Gemini. Photos and contacts are not sent. You can change this in Settings.',
+  'Отправлять сообщения в ИИ?': 'Send messages to the AI?',
+  'Без согласия на отправку сообщений ИИ-чат не отвечает. Включить можно в Настройках.':
+      'Without consent to send messages the AI chat does not answer. You can turn it on in Settings.',
+  'Нужно согласие на отправку сообщений в ИИ':
+      'Consent to send messages to the AI is needed',
+  'Включите его в Кабинет → Настройки → ИИ-ассистент.':
+      'Turn it on in Profile → Settings → AI assistant.',
+  'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.':
+      'The photo goes to the AI server only after your consent. Cosmetix does not keep it.',
+  'Отправлять ИИ сообщения чата': 'Send chat messages to the AI',
+  'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.':
+      'Data goes to the Cosmetix server and to Google Gemini only after your consent.',
+  'Отправить профиль в ИИ?': 'Send the profile to the AI?',
 };

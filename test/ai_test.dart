@@ -39,6 +39,10 @@ class FakeAiProxy {
   String? chatAnswer = '{}';
   bool mock = false;
   String mode = 'claude';
+
+  /// What /health says about photos (`null` = the field is absent, like an old proxy).
+  bool? photoAnalysis;
+  String? dataUse;
   Duration delay = Duration.zero;
   int chatCalls = 0;
 
@@ -64,6 +68,8 @@ class FakeAiProxy {
               'ok': true,
               'mode': fake.mode,
               'model': fake.mode == 'mock' ? null : 'claude-haiku-5-5',
+              'photoAnalysis': ?fake.photoAnalysis,
+              'dataUse': ?fake.dataUse,
             }),
           );
         } else if (req.uri.path == '/v1/chat') {
@@ -126,6 +132,53 @@ void main() {
       expect(test.isMock, isTrue);
       expect(test.model, isNull);
     });
+
+    test(
+      'health carries the photo switch and the data-use mode, old proxies say nothing',
+      () async {
+        final old = await client.health();
+        expect(old.photoAnalysis, isNull);
+        expect(old.dataUse, isNull);
+        fake
+          ..photoAnalysis = true
+          ..dataUse = 'paid';
+        final paid = await client.health();
+        expect(paid.photoAnalysis, isTrue);
+        expect(paid.dataUse, 'paid');
+        fake
+          ..photoAnalysis = false
+          ..dataUse = 'free';
+        final off = await client.health();
+        expect(off.photoAnalysis, isFalse);
+        expect(off.dataUse, 'free');
+      },
+    );
+
+    test(
+      '503 photo_analysis_disabled is its own error, other 503 stay AiUnavailable',
+      () async {
+        fake
+          ..chatAnswer = null
+          ..errorStatus = 503
+          ..errorBody = {
+            'error': 'photo_analysis_disabled',
+            'message': 'Photo analysis is switched off on this server',
+          };
+        await expectLater(
+          client.chat(
+            messages: const [
+              AiMessage('user', 'x', images: ['/9j/AAAA']),
+            ],
+          ),
+          throwsA(isA<AiPhotoDisabled>()),
+        );
+        fake.errorBody = {'error': 'upstream_unavailable', 'message': 'down'};
+        await expectLater(
+          client.chat(messages: const [AiMessage('user', 'x')]),
+          throwsA(isA<AiUnavailable>()),
+        );
+      },
+    );
 
     test('something that is not the proxy is AiBadResponse', () async {
       final other = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);

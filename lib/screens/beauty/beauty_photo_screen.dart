@@ -14,6 +14,8 @@ import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/routes/route_args.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
+import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/widgets/app_card.dart';
@@ -97,18 +99,47 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     }
   }
 
+  Future<bool> _photoAllowed(AiProvider ai) async {
+    if (!AiConfig.photoAnalysisAtBuild) return false;
+    if (ai.status != AiStatus.online) await ai.testConnection();
+    return ai.photoAnalysisAllowed;
+  }
+
   Future<void> _analyze() async {
     final photo = _photo;
     if (photo == null) return;
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      // the Gemini API terms: no remote AI for under-18s or an unknown age;
+      // the photo is deleted, nothing is sent
+      _discardPhoto();
+      setState(() {
+        _error = tr('Анализ по фото доступен с 18 лет.');
+        _step = _Step.failed;
+      });
+      return;
+    }
+    // the photo leaves the phone only if the server said, explicitly, that it
+    // accepts photos; otherwise it is deleted here and nothing is sent
+    final allowed = await _photoAllowed(ai);
+    if (!mounted) return;
+    if (!allowed) {
+      final off = ai.status == AiStatus.online;
+      _discardPhoto();
+      setState(() {
+        _error = off
+            ? tr('Анализ по фото сейчас отключён.')
+            : tr('ИИ-сервер недоступен.');
+        _step = _Step.failed;
+      });
+      return;
+    }
     if (!ai.sharePhotos) {
       // privacy: the photo goes to the AI only with the user's agreement
       final ok = await confirmDialog(
         context,
         title: tr('Отправить фото в ИИ?'),
-        message: tr(
-          'Фото будет отправлено на сервер ИИ только для анализа цветотипа и сразу удалено с телефона. Согласие можно отозвать в Настройках.',
-        ),
+        message: AiDisclosure.photoConsent(ai.dataUse, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!ok || !mounted) return;
@@ -124,6 +155,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       await _finish(vision);
     } on AiException catch (e) {
       if (e is AiUnavailable || e is AiTimeout) ai.markOffline(e.message);
+      if (e is AiPhotoDisabled) ai.markPhotoDisabled();
       if (!mounted) return;
       setState(() {
         _error = _friendly(e);
@@ -146,6 +178,8 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     AiRateLimited() => tr(
       'ИИ перегружен или лимит исчерпан. Попробуйте позже.',
     ),
+    AiNotAllowed() => tr('Анализ по фото доступен с 18 лет.'),
+    AiPhotoDisabled() => tr('Анализ по фото сейчас отключён.'),
     AiServerError() => tr('ИИ вернул ошибку. Попробуйте ещё раз позже.'),
     AiBadResponse() => tr('Не удалось разобрать ответ ИИ.'),
   };
@@ -191,19 +225,15 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
         colorType: p.colorType?.label,
         skinConcerns: [for (final c in p.concerns) c.label],
         source: p.source.code,
-        confidence: merged.photoUsed ? p.confidence : null,
-        clearConfidence: !merged.photoUsed,
+        // the model's self-reported number is not a measurement: not stored
+        clearConfidence: true,
         markCompleted: true,
       );
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
         AppRoutes.colorResult,
-        arguments: BeautyResultArgs(
-          profile: p,
-          photoUsed: merged.photoUsed,
-          observations: merged.vision?.observations ?? const [],
-        ),
+        arguments: BeautyResultArgs(profile: p, photoUsed: merged.photoUsed),
       );
     } catch (_) {
       _saving = false;
@@ -233,6 +263,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   Widget _intro(BuildContext context) {
     final pal = context.pal;
     final ai = context.watch<AiProvider>();
+    if (!ai.ageAllowed) return _ageBlocked(context, ai);
     final tips = [
       tr('Естественное или нейтральное освещение'),
       tr('Лицо хорошо видно, без фильтров'),
@@ -291,6 +322,43 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           ),
         ),
         const SizedBox(height: 10),
+        AppCard(
+          color: context.pal.pinkSoft,
+          borderColor: Colors.transparent,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tr('Что стоит знать об анализе по фото'),
+                style: AppTextStyles.subtitle,
+              ),
+              const SizedBox(height: 8),
+              for (final t in [
+                tr('Это подсказка по цвету, а не измерение и не диагноз.'),
+                tr(
+                  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.',
+                ),
+                tr('Приложение не определяет акне, рубцы или покраснения.'),
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: context.pal.accent,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(t, style: AppTextStyles.small)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
         Row(
           children: [
             Icon(Icons.lock_outline, size: 16, color: pal.subtext),
@@ -298,14 +366,22 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
             Expanded(
               child: Text(
                 tr(
-                  'Ваше фото используется только для улучшения анализа бьюти-профиля и не сохраняется.',
+                  'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.',
                 ),
                 style: AppTextStyles.caption.copyWith(color: pal.subtext),
               ),
             ),
           ],
         ),
-        if (!ai.isConfigured || ai.status == AiStatus.offline) ...[
+        if (ai.photoAnalysisOff) ...[
+          const SizedBox(height: 10),
+          Text(
+            tr(
+              'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.',
+            ),
+            style: AppTextStyles.caption.copyWith(color: AppColors.sale),
+          ),
+        ] else if (!ai.isConfigured || ai.status == AiStatus.offline) ...[
           const SizedBox(height: 10),
           Text(
             tr(
@@ -315,19 +391,21 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           ),
         ],
         const SizedBox(height: 20),
-        CustomButton(
-          label: tr('Сделать фото'),
-          icon: Icons.photo_camera_outlined,
-          onPressed: () => _pick(ImageSource.camera),
-        ),
-        const SizedBox(height: 10),
-        CustomButton(
-          label: tr('Выбрать из галереи'),
-          icon: Icons.photo_library_outlined,
-          outlined: true,
-          onPressed: () => _pick(ImageSource.gallery),
-        ),
-        const SizedBox(height: 6),
+        if (!ai.photoAnalysisOff) ...[
+          CustomButton(
+            label: tr('Сделать фото'),
+            icon: Icons.photo_camera_outlined,
+            onPressed: () => _pick(ImageSource.camera),
+          ),
+          const SizedBox(height: 10),
+          CustomButton(
+            label: tr('Выбрать из галереи'),
+            icon: Icons.photo_library_outlined,
+            outlined: true,
+            onPressed: () => _pick(ImageSource.gallery),
+          ),
+          const SizedBox(height: 6),
+        ],
         if (_needsPhoto)
           TextButton(
             onPressed: _backToQuestions,
@@ -335,6 +413,41 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           )
         else
           TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
+      ],
+    );
+  }
+
+  /// Under 18 or age not given: the photo step is not offered at all.
+  Widget _ageBlocked(BuildContext context, AiProvider ai) {
+    final pal = context.pal;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+      children: [
+        Icon(Icons.lock_outline, size: 48, color: pal.accent),
+        const SizedBox(height: 12),
+        Text(
+          tr('Анализ по фото доступен с 18 лет'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.title,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          ai.ageUnknown
+              ? tr(
+                  'Укажите год рождения в профиле. Тест работает и без фото, по вашим ответам.',
+                )
+              : tr('Тест работает и без фото, по вашим ответам.'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.small.copyWith(color: pal.subtext),
+        ),
+        const SizedBox(height: 20),
+        if (_needsPhoto)
+          CustomButton(
+            label: tr('Вернуться к вопросам'),
+            onPressed: _backToQuestions,
+          )
+        else
+          CustomButton(label: tr('Продолжить без фото'), onPressed: _skip),
       ],
     );
   }
