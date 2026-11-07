@@ -38,6 +38,12 @@ class AiServerError extends AiException {
   final int? statusCode;
 }
 
+/// The app itself refused to call the remote AI (for example: the Gemini API
+/// terms do not allow an app that may be used by people under 18). Nothing was sent.
+class AiNotAllowed extends AiException {
+  const AiNotAllowed(super.message);
+}
+
 /// The proxy has switched photo analysis off (HTTP 503 `photo_analysis_disabled`):
 /// the photo was NOT sent to the AI provider.
 class AiPhotoDisabled extends AiException {
@@ -94,10 +100,16 @@ class AiHealth {
 /// Client of the Cosmetix AI proxy (see `server/`). The proxy owns the AI
 /// API key; this app never sees one. Plain `dart:io`, no extra packages.
 class AiClient {
-  AiClient(this._config);
+  AiClient(this._config, {this.mayUseRemoteAi});
 
   /// Read on every call so Settings changes apply immediately.
   final AiConfig Function() _config;
+
+  /// The one gate every request that carries user content goes through
+  /// (chat, photo, AI ranking, product classification). When it says no,
+  /// [chat] throws [AiNotAllowed] BEFORE anything is sent. The health check
+  /// carries no user content and is not gated. `null` = no gate (tests).
+  final bool Function()? mayUseRemoteAi;
 
   static const healthTimeout = Duration(seconds: 4);
   static const chatTimeout = Duration(seconds: 60);
@@ -133,6 +145,9 @@ class AiClient {
     double? temperature,
     int? maxTokens,
   }) async {
+    if (mayUseRemoteAi != null && !mayUseRemoteAi!()) {
+      throw const AiNotAllowed('The remote AI is not available for this user');
+    }
     final system = messages
         .where((m) => m.role == 'system')
         .map((m) => _cut(m.content))

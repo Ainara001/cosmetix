@@ -90,6 +90,14 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
 
   Future<void> _classify() async {
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      showMessage(
+        context,
+        tr('Функции ИИ доступны с 18 лет. Укажите год рождения в профиле.'),
+        type: MessageType.info,
+      );
+      return;
+    }
     final classifier = context.read<ProductClassifier>();
     final catalog = context.read<CatalogProvider>();
     final userId = context.read<AuthProvider>().userId;
@@ -185,6 +193,17 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
               style: AppTextStyles.caption.copyWith(color: pal.subtext),
             ),
           const SizedBox(height: 10),
+          if (!ai.ageAllowed) ...[
+            Text(
+              ai.ageUnknown
+                  ? tr(
+                      'Функции ИИ доступны с 18 лет. Укажите год рождения в профиле, чтобы их включить.',
+                    )
+                  : tr('Функции ИИ доступны с 18 лет.'),
+              style: AppTextStyles.caption.copyWith(color: AppColors.sale),
+            ),
+            const SizedBox(height: 6),
+          ],
           Text(
             tr(
               'Без ИИ работают тест, каталог, чёрный список и рекомендации. ИИ нужен для чата, анализа фото и уточнения подбора.',
@@ -201,7 +220,10 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
               style: AppTextStyles.small,
             ),
             value: ai.shareProfile,
-            onChanged: ai.setShareProfile,
+            // a consent can always be withdrawn, but not given below the age limit
+            onChanged: ai.ageAllowed || ai.shareProfile
+                ? ai.setShareProfile
+                : null,
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
@@ -218,11 +240,11 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
                   )
                 : null,
             value: ai.sharePhotos,
-            // the consent can always be withdrawn; it can be given only while
-            // the server accepts photos
-            onChanged: ai.photoAnalysisOff && !ai.sharePhotos
-                ? null
-                : ai.setSharePhotos,
+            // a consent can always be withdrawn, but not given below the age
+            // limit or while the server refuses photos
+            onChanged: (ai.ageAllowed && !ai.photoAnalysisOff) || ai.sharePhotos
+                ? ai.setSharePhotos
+                : null,
           ),
           const SizedBox(height: 6),
           CustomButton(

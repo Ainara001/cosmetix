@@ -62,6 +62,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
   /// catalog works the same without it.
   Future<void> _refineWithAi(CatalogProvider catalog) async {
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      showMessage(
+        context,
+        tr(
+          'Уточнение с помощью ИИ доступно с 18 лет. Укажите год рождения в профиле.',
+        ),
+        type: MessageType.info,
+      );
+      return;
+    }
     final refiner = context.read<RecommendationRefiner>();
     setState(() => _aiBusy = true);
     final ok = await catalog.refineWithAi(refiner);

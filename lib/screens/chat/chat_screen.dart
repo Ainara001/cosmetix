@@ -76,6 +76,21 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      // the Gemini API terms: no remote AI for under-18s or an unknown age;
+      // nothing is typed away and nothing is sent
+      FocusManager.instance.primaryFocus?.unfocus();
+      showMessage(
+        context,
+        ai.ageUnknown
+            ? tr(
+                'ИИ-помощник доступен с 18 лет. Укажите год рождения в профиле.',
+              )
+            : tr('ИИ-помощник доступен с 18 лет.'),
+        type: MessageType.warning,
+      );
+      return;
+    }
     if (!ai.profileAsked) {
       // privacy: the Beauty profile and blacklist leave the phone only if the
       // user agrees (asked once, can be changed in Settings)
@@ -414,6 +429,7 @@ class _OfflineBanner extends StatelessWidget {
     AiFailure.timeout => tr('ИИ-помощник не успел ответить'),
     AiFailure.notConfigured => tr('Адрес сервера ИИ не задан'),
     AiFailure.unavailable => tr('ИИ-помощник сейчас недоступен'),
+    AiFailure.ageRestricted => tr('ИИ-помощник доступен с 18 лет'),
   };
 
   String get _hint => switch (failure) {
@@ -423,6 +439,9 @@ class _OfflineBanner extends StatelessWidget {
           : trf('Попробуйте через {n} с.', {'n': retryAfter}),
     AiFailure.notConfigured => tr(
       'Укажите его в Кабинет → Настройки → ИИ-ассистент.',
+    ),
+    AiFailure.ageRestricted => tr(
+      'Укажите год рождения в профиле. Остальные функции работают.',
     ),
     _ => tr('Остальные функции приложения работают.'),
   };
@@ -459,7 +478,8 @@ class _OfflineBanner extends StatelessWidget {
               ],
             ),
           ),
-          if (failure != AiFailure.notConfigured)
+          if (failure != AiFailure.notConfigured &&
+              failure != AiFailure.ageRestricted)
             TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
         ],
       ),

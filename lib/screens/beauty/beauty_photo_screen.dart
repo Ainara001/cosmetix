@@ -108,6 +108,16 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     final photo = _photo;
     if (photo == null) return;
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      // the Gemini API terms: no remote AI for under-18s or an unknown age;
+      // the photo is deleted, nothing is sent
+      _discardPhoto();
+      setState(() {
+        _error = tr('Анализ по фото доступен с 18 лет.');
+        _step = _Step.failed;
+      });
+      return;
+    }
     // the photo leaves the phone only if the server said, explicitly, that it
     // accepts photos; otherwise it is deleted here and nothing is sent
     final allowed = await _photoAllowed(ai);
@@ -169,6 +179,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
     AiRateLimited() => tr(
       'ИИ перегружен или лимит исчерпан. Попробуйте позже.',
     ),
+    AiNotAllowed() => tr('Анализ по фото доступен с 18 лет.'),
     AiPhotoDisabled() => tr('Анализ по фото сейчас отключён.'),
     AiServerError() => tr('ИИ вернул ошибку. Попробуйте ещё раз позже.'),
     AiBadResponse() => tr('Не удалось разобрать ответ ИИ.'),
@@ -257,6 +268,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   Widget _intro(BuildContext context) {
     final pal = context.pal;
     final ai = context.watch<AiProvider>();
+    if (!ai.ageAllowed) return _ageBlocked(context, ai);
     final tips = [
       tr('Естественное или нейтральное освещение'),
       tr('Лицо хорошо видно, без фильтров'),
@@ -369,6 +381,41 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
           )
         else
           TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
+      ],
+    );
+  }
+
+  /// Under 18 or age not given: the photo step is not offered at all.
+  Widget _ageBlocked(BuildContext context, AiProvider ai) {
+    final pal = context.pal;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+      children: [
+        Icon(Icons.lock_outline, size: 48, color: pal.accent),
+        const SizedBox(height: 12),
+        Text(
+          tr('Анализ по фото доступен с 18 лет'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.title,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          ai.ageUnknown
+              ? tr(
+                  'Укажите год рождения в профиле. Тест работает и без фото, по вашим ответам.',
+                )
+              : tr('Тест работает и без фото, по вашим ответам.'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.small.copyWith(color: pal.subtext),
+        ),
+        const SizedBox(height: 20),
+        if (_needsPhoto)
+          CustomButton(
+            label: tr('Вернуться к вопросам'),
+            onPressed: _backToQuestions,
+          )
+        else
+          CustomButton(label: tr('Продолжить без фото'), onPressed: _skip),
       ],
     );
   }

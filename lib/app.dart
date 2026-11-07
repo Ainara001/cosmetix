@@ -87,6 +87,9 @@ class _CosmetixAppState extends State<CosmetixApp> {
     _safetyProvider = SafetyProvider(_safety);
     _reco = RecommendationService(_products, _safety, users, CareRepository(h));
     _ai = AiProvider(SettingsRepository(h));
+    // the Gemini API terms: no remote AI for under-18s or for an unknown age
+    _ai.ageSource = () => _auth.user?.age;
+    _auth.addListener(_ai.ageChanged);
     _location = LocationProvider(fetcher: widget.locationFetcher);
     _catalogProvider = CatalogProvider(_products, _reco);
     // re-personalize when the Beauty Profile or the blacklist changes

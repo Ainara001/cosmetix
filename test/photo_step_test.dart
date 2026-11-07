@@ -41,6 +41,8 @@ void main() {
     );
     ai.status = AiStatus.online; // so initState does not call the network
     ai.photoAnalysis = photos;
+    ai.ageSource = () =>
+        30; // an adult: the age gate is not what is tested here
     return ai;
   }
 
