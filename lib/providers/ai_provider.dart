@@ -30,6 +30,11 @@ class AiProvider extends ChangeNotifier {
   String? mode;
   String? model;
 
+  /// What the proxy said about photos in its health check (`null` = not known
+  /// yet or an older proxy) and how the AI provider may use what is sent.
+  bool? photoAnalysis;
+  String? dataUse;
+
   // ---- consent: nothing personal leaves the phone without it ----
 
   /// The Beauty profile and the blacklist may be sent to the AI as context.
@@ -46,6 +51,24 @@ class AiProvider extends ChangeNotifier {
   static const _kShareProfile = 'ai_share_profile';
   static const _kSharePhotos = 'ai_share_photos';
   static const _kProfileAsked = 'ai_profile_asked';
+
+  /// Photos may be sent only when the build allows it AND the proxy said so
+  /// explicitly. Unknown means no: the photo is never sent "just in case".
+  bool get photoAnalysisAllowed =>
+      AiConfig.photoAnalysisAtBuild && photoAnalysis == true;
+
+  /// The server (or the build) is known to refuse photos: the photo step is
+  /// replaced by an explanation. False while the answer is still unknown.
+  bool get photoAnalysisOff =>
+      !AiConfig.photoAnalysisAtBuild ||
+      (status == AiStatus.online && photoAnalysis != true);
+
+  /// Remember that the proxy refused a photo although the health check had
+  /// said yes (the operator switched it off in between).
+  void markPhotoDisabled() {
+    photoAnalysis = false;
+    notifyListeners();
+  }
 
   bool get isConfigured => config.isConfigured;
   bool get isOnline => status == AiStatus.online;
@@ -80,6 +103,8 @@ class AiProvider extends ChangeNotifier {
     detail = null;
     mode = null;
     model = null;
+    photoAnalysis = null;
+    dataUse = null;
     shareProfile = false;
     sharePhotos = false;
     profileAsked = false;
@@ -94,6 +119,8 @@ class AiProvider extends ChangeNotifier {
     status = AiStatus.unknown;
     mode = null;
     model = null;
+    photoAnalysis = null;
+    dataUse = null;
     notifyListeners();
     if (baseUrl != null) await _repo.set(_kUrl, config.baseUrl);
     if (appToken != null) await _repo.set(_kToken, config.appToken);
@@ -120,6 +147,8 @@ class AiProvider extends ChangeNotifier {
       detail = null;
       mode = null;
       model = null;
+      photoAnalysis = null;
+      dataUse = null;
       notifyListeners();
       return;
     }
@@ -129,6 +158,8 @@ class AiProvider extends ChangeNotifier {
       final h = await client.health();
       mode = h.mode;
       model = h.model;
+      photoAnalysis = h.photoAnalysis;
+      dataUse = h.dataUse;
       status = AiStatus.online;
       detail = null;
     } on AiException catch (e) {
@@ -136,11 +167,15 @@ class AiProvider extends ChangeNotifier {
       detail = e.message;
       mode = null;
       model = null;
+      photoAnalysis = null;
+      dataUse = null;
     } catch (e) {
       status = AiStatus.offline;
       detail = 'Unexpected error';
       mode = null;
       model = null;
+      photoAnalysis = null;
+      dataUse = null;
     }
     notifyListeners();
   }

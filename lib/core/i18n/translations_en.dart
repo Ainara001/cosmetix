@@ -1579,4 +1579,10 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Примерить': 'Try on',
   'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
       'Try-on is not available: the catalog has no colour data for this shade.',
+  'Анализ по фото сейчас отключён.':
+      'Photo analysis is switched off right now.',
+  'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.':
+      'Photo analysis is switched off right now. The test works from your answers, no photo is needed.',
+  'Сервер отключил анализ по фото: фото не отправляются.':
+      'The server has switched photo analysis off: photos are not sent.',
 };
