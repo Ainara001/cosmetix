@@ -231,11 +231,17 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Text(
                           fmt(price),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: sale ? AppColors.sale : pal.text,
-                          ),
+                          style: price <= 0
+                              ? TextStyle(
+                                  fontSize: 11,
+                                  height: 1.2,
+                                  color: pal.subtext,
+                                )
+                              : TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: sale ? AppColors.sale : pal.text,
+                                ),
                         ),
                         if (sale)
                           Text(

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "comment": "What the app may do with each shop, by the shop's published conditions (docs/data-sources-terms.md, checked 2026-11-07). links: 'allowed' shows a 'View in the shop' link that a person entered by hand; anything else shows no link. auto_collection: 'allowed' would permit a scheduled collector; no shop has it. Both are 'unconfirmed' for every shop until a written basis (the shop's terms, an API or feed with explicit conditions) is recorded in `basis`.",
+  "default": {"links": "unconfirmed", "auto_collection": "unconfirmed"},
+  "shops": {
+    "Золотое Яблоко": {"links": "unconfirmed", "auto_collection": "forbidden_by_robots", "basis": "robots.txt disallows product pages and /rest/; terms unreadable (bot check)"},
+    "Kaspi": {"links": "unconfirmed", "auto_collection": "unconfirmed", "basis": "terms of the marketplace not readable; seller API only"},
+    "Europharma": {"links": "unconfirmed", "auto_collection": "unconfirmed", "basis": "public offer clause 6.2 forbids reproduction of content without permission"},
+    "Sadykhan": {"links": "unconfirmed", "auto_collection": "unconfirmed", "basis": "no terms found"}
+  }
+}

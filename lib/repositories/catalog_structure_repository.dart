@@ -114,7 +114,13 @@ WHERE s.product_id = ?''',
     final db = await _helper.database;
     final rows = await db.rawQuery(
       '''
-SELECT p.id, p.price, p.in_stock, s.shade_code, s.shade_name, f.pan_count
+SELECT p.id,
+       COALESCE((SELECT MIN(o.price) FROM store_offers o
+         WHERE o.product_id = p.id AND o.verification = 'verified'
+           AND o.price IS NOT NULL), 0) AS price,
+       NOT EXISTS (SELECT 1 FROM store_offers o WHERE o.product_id = p.id
+         AND o.verification = 'verified' AND o.availability = 'out_of_stock') AS in_stock,
+       s.shade_code, s.shade_name, f.pan_count
 FROM product_shades s
 JOIN products p ON p.id = s.product_id
 LEFT JOIN product_variant_facts f ON f.product_id = s.product_id

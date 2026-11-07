@@ -12,7 +12,12 @@ class TryOnRepository implements TryOnCatalog {
   final DatabaseHelper _helper;
 
   static const _select = '''
-SELECT p.id AS product_id, p.brand, p.name, p.art, p.price, p.in_stock,
+SELECT p.id AS product_id, p.brand, p.name, p.art,
+       COALESCE((SELECT MIN(o.price) FROM store_offers o
+         WHERE o.product_id = p.id AND o.verification = 'verified'
+           AND o.price IS NOT NULL), 0) AS price,
+       NOT EXISTS (SELECT 1 FROM store_offers o WHERE o.product_id = p.id
+         AND o.verification = 'verified' AND o.availability = 'out_of_stock') AS in_stock,
        s.kind, s.line_key, s.shade_code, s.shade_name, s.colour,
        s.colour_source, s.colour_status, s.finish
 FROM product_shades s JOIN products p ON p.id = s.product_id''';

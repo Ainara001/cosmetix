@@ -173,10 +173,10 @@ void main() {
         final h = DatabaseHelper(path: '${tmp.path}/new.db');
         addTearDown(h.close);
         final db = await h.database;
-        expect(DatabaseHelper.dbVersion, 16);
+        expect(DatabaseHelper.dbVersion, 17);
         expect(
           (await db.rawQuery('PRAGMA user_version')).single['user_version'],
-          16,
+          DatabaseHelper.dbVersion,
         );
         expect(await db.query('product_lines'), hasLength(4));
         expect(await db.query('product_variant_facts'), hasLength(7));
@@ -240,7 +240,7 @@ void main() {
       db = await h2.database;
       expect(
         (await db.rawQuery('PRAGMA user_version')).single['user_version'],
-        16,
+        DatabaseHelper.dbVersion,
       );
       for (final t in tables) {
         expect(await db.query(t), before[t], reason: '$t is unchanged');
@@ -498,18 +498,12 @@ void main() {
         final v = await repo.variantsOfLine('Rom&nd|better than palette');
         expect(v.map((e) => e.code), ['00', '01', '02', '03', '05', '07']);
         expect(v.every((e) => e.panCount == 10), isTrue);
-        // each variant keeps the price of its own catalog row
+        // a price is only a verified shop price (here: the test fixture's)
         expect(
-          {for (final e in v) e.code!: e.price},
-          {
-            '00': 5200,
-            '01': 5200,
-            '02': 5200,
-            '03': 5200,
-            '05': 4800,
-            '07': 5200,
-          },
+          {for (final e in v) e.code!},
+          {'00', '01', '02', '03', '05', '07'},
         );
+        expect(v.every((e) => e.price > 0), isTrue);
       });
 
       test('reads a palette with its ten colourless cells', () async {

@@ -7,6 +7,8 @@ import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/models/store_offer.dart';
+import 'package:cosmetix/widgets/offer_widgets.dart';
 import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/screens/product/palette_section.dart';
@@ -375,12 +377,19 @@ class _ProductBodyState extends State<_ProductBody> {
                               left: 10,
                               top: 10,
                               child: _Badge(
-                                text: product.inStock
-                                    ? tr('В НАЛИЧИИ')
-                                    : tr('НЕТ В НАЛИЧИИ'),
-                                color: product.inStock
-                                    ? AppColors.success
-                                    : const Color(0xFF8E8689),
+                                text: switch (product.availability) {
+                                  Availability.inStock => tr('В НАЛИЧИИ'),
+                                  Availability.outOfStock => tr(
+                                    'НЕТ В НАЛИЧИИ',
+                                  ),
+                                  Availability.unknown => tr(
+                                    'НАЛИЧИЕ НЕ ПРОВЕРЕНО',
+                                  ),
+                                },
+                                color: switch (product.availability) {
+                                  Availability.inStock => AppColors.success,
+                                  _ => const Color(0xFF8E8689),
+                                },
                               ),
                             ),
                             if (product.hasDiscount)
@@ -408,48 +417,9 @@ class _ProductBodyState extends State<_ProductBody> {
                       PaletteSection(productId: product.id),
                       TryOnButton(productId: product.id),
                       const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: product.inStock
-                                  ? context.pal.greenSoft
-                                  : pal.field,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              product.inStock
-                                  ? tr('В наличии')
-                                  : tr('Нет в наличии'),
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: product.inStock
-                                    ? AppColors.success
-                                    : pal.subtext,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            trf('Доступна в {available} {v0}', {
-                              'available': available,
-                              'v0': Formatters.plural(
-                                available,
-                                'магазине',
-                                'магазинах',
-                                'магазинах',
-                              ),
-                            }),
-                            style: AppTextStyles.small.copyWith(
-                              color: pal.subtext,
-                            ),
-                          ),
-                        ],
+                      _StockSummary(
+                        availability: product.availability,
+                        inStockShops: available,
                       ),
                       if (product.description.isNotEmpty) ...[
                         const SizedBox(height: 10),
@@ -478,6 +448,7 @@ class _ProductBodyState extends State<_ProductBody> {
                           ),
                         ),
                       ),
+                      if (prices.isEmpty) const _NoOffers(),
                       for (var i = 0; i < prices.length && i < 4; i++)
                         _StoreRow(
                           index: i + 1,
@@ -719,14 +690,39 @@ class _ProductBodyState extends State<_ProductBody> {
                               color: pal.subtext,
                             ),
                           ),
-                          Text(
-                            fmt(price),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.sale,
+                          if (price > 0)
+                            Text(
+                              fmt(price),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.sale,
+                              ),
+                            )
+                          else
+                            // no verified shop price: a short, quiet words, not
+                            // a number
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 110),
+                              child: Text(
+                                tr('Цена не подтверждена'),
+                                key: const Key('price-unconfirmed'),
+                                style: AppTextStyles.small.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: pal.subtext,
+                                ),
+                              ),
                             ),
-                          ),
+                          if (price > 0)
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 110),
+                              child: OfferCheckedText(
+                                compact: true,
+                                checkedAt:
+                                    selected?.updatedAt ??
+                                    product.priceCheckedAt,
+                              ),
+                            ),
                         ],
                       ),
                       const SizedBox(width: 16),
@@ -1007,6 +1003,8 @@ class _StoreRow extends StatelessWidget {
                     }),
                     style: AppTextStyles.caption.copyWith(color: pal.subtext),
                   ),
+                  OfferCheckedText(checkedAt: price.updatedAt),
+                  OfferLink(offer: price),
                 ],
               ),
             ),
@@ -1031,6 +1029,7 @@ class _StoreRow extends StatelessWidget {
                       StockLevel.inStock => context.pal.greenSoft,
                       StockLevel.low => const Color(0xFFFBF0D9),
                       StockLevel.out => pal.field,
+                      StockLevel.unknown => pal.field,
                     },
                     borderRadius: BorderRadius.circular(5),
                   ),
@@ -1039,6 +1038,7 @@ class _StoreRow extends StatelessWidget {
                       StockLevel.inStock => tr('В наличии'),
                       StockLevel.low => tr('Мало'),
                       StockLevel.out => tr('Нет'),
+                      StockLevel.unknown => tr('Не проверено'),
                     },
                     style: TextStyle(
                       fontSize: 9,
@@ -1046,11 +1046,96 @@ class _StoreRow extends StatelessWidget {
                         StockLevel.inStock => AppColors.success,
                         StockLevel.low => const Color(0xFF9A6A12),
                         StockLevel.out => pal.subtext,
+                        StockLevel.unknown => pal.subtext,
                       },
                     ),
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One line about stock: what the verified offers say, or that nothing was
+/// checked ("unknown" is never shown as "out of stock").
+class _StockSummary extends StatelessWidget {
+  const _StockSummary({required this.availability, required this.inStockShops});
+
+  final Availability availability;
+  final int inStockShops;
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.pal;
+    final known = availability != Availability.unknown;
+    final inStock = availability == Availability.inStock;
+    return Wrap(
+      spacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: inStock ? pal.greenSoft : pal.field,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            !known
+                ? tr('Наличие не проверено')
+                : inStock
+                ? tr('В наличии')
+                : tr('Нет в наличии'),
+            key: const Key('stock-summary'),
+            style: TextStyle(
+              fontSize: 11,
+              color: inStock ? AppColors.success : pal.subtext,
+            ),
+          ),
+        ),
+        if (inStock)
+          Text(
+            trf('Доступна в {available} {v0}', {
+              'available': inStockShops,
+              'v0': Formatters.plural(
+                inStockShops,
+                'магазине',
+                'магазинах',
+                'магазинах',
+              ),
+            }),
+            style: AppTextStyles.small.copyWith(color: pal.subtext),
+          ),
+      ],
+    );
+  }
+}
+
+/// No verified offer yet: say so plainly instead of showing a made-up price.
+class _NoOffers extends StatelessWidget {
+  const _NoOffers();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppCard(
+        key: const Key('no-offers'),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.info_outline, size: 18, color: context.pal.subtext),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                tr(
+                  'Проверенных цен в магазинах пока нет. Мы показываем только цены, которые проверены вручную, с датой проверки.',
+                ),
+                style: AppTextStyles.small.copyWith(color: context.pal.subtext),
+              ),
             ),
           ],
         ),
