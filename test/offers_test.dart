@@ -108,7 +108,7 @@ void main() {
 
     test('a fresh install has no offer at all', () async {
       expect(await (await h.database).query('store_offers'), isEmpty);
-      expect(DatabaseHelper.dbVersion, 17);
+      expect(DatabaseHelper.dbVersion, 18);
     });
 
     test(

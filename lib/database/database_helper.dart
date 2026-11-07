@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 17;
+  static const dbVersion = 18;
 
   final String? path;
   Database? _db;
@@ -187,6 +187,13 @@ class DatabaseHelper {
       for (final sql in _schemaV17) {
         await db.execute(sql);
       }
+    },
+    // offers copied from the server: where a row came from (`local` = entered
+    // here, `server` = the last snapshot of the public catalog) and when it was
+    // copied. A new snapshot replaces only the `server` rows.
+    18: (db) async {
+      await _addColumn(db, 'store_offers', 'origin', "TEXT NOT NULL DEFAULT 'local'");
+      await _addColumn(db, 'store_offers', 'synced_at', 'INTEGER');
     },
   };
 

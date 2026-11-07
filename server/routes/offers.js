@@ -120,6 +120,35 @@ function registerOffers(router, { now = () => Date.now() } = {}) {
     return { items: rows.rows.map(offerJson) };
   });
 
+  // The whole public snapshot for the app: every VERIFIED offer, each with the
+  // brand and name of its product and the name and address of its shop (the app
+  // matches by these, not by database ids). A withdrawn or unverified offer is
+  // simply not in it, so the app that replaces its copy by this list drops it.
+  // Nothing about users is read or written here.
+  router.add('GET', '/v1/catalog/offers', async ({ db }) => {
+    const rows = await db.query(
+      `SELECT o.*, b.name AS brand, p.name AS product_name,
+              s.name AS store_name, s.chain AS chain, s.address AS store_address
+         FROM store_offers o
+         JOIN products p ON p.id = o.product_id
+         JOIN brands b ON b.id = p.brand_id
+         JOIN stores s ON s.id = o.store_id
+        WHERE o.verification = 'verified'
+        ORDER BY o.product_id, o.price NULLS LAST, o.id
+        LIMIT 5000`,
+    );
+    return {
+      generatedAt: new Date(now()).toISOString(),
+      items: rows.rows.map((r) => ({
+        ...offerJson(r),
+        brand: r.brand,
+        productName: r.product_name,
+        storeAddress: r.store_address,
+        updatedAt: r.updated_at,
+      })),
+    };
+  });
+
   router.add('GET', '/admin/api/stores', async ({ db, req }) => {
     await requireAdmin(db, req);
     const r = await db.query('SELECT id, name, chain, address FROM stores ORDER BY id');
