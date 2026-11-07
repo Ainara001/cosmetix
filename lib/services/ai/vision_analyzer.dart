@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/models/ai_models.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 
@@ -26,12 +25,9 @@ Answer with ONE JSON object and nothing else, using exactly these keys:
   "skinTone": "very_light" | "light" | "medium" | "tan" | "deep",
   "undertone": "warm" | "cool" | "neutral",
   "colorType": "spring" | "summer" | "autumn" | "winter",
-  "observations": [short strings about visible cosmetic characteristics, max 4],
-  "confidence": number from 0 to 1 (use a low value for dark, blurry or filtered photos),
-  "explanation": "one or two sentences"
+  "confidence": number from 0 to 1 (use a low value when there is no clear face, or the photo is dark, blurry, filtered or the face is turned or covered)
 }
-Do not describe diseases or skin conditions. Do not guess the person's age, ethnicity or identity.
-Write "observations" and "explanation" in the requested language (the JSON keys and values of skinTone, undertone and colorType stay exactly as listed above).''';
+Write nothing else: no text, no description of the skin. Do not describe or comment on skin condition, texture, redness, spots, pigmentation or any disease. Do not guess the person's age, ethnicity or identity.''';
 
   /// [photoBytes] is a resized JPEG. Throws [AiException] subclasses.
   Future<VisionAnalysis> analyze(Uint8List photoBytes) async {
@@ -45,7 +41,7 @@ Write "observations" and "explanation" in the requested language (the JSON keys 
       messages: [
         AiMessage(
           'user',
-          '$prompt\nRequested language: ${currentLang.englishName}.',
+          prompt, // no text is requested, so there is no language to ask for
           images: [base64Encode(photoBytes)], // never logged
         ),
       ],

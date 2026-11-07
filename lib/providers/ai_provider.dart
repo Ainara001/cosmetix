@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 
 enum AiStatus { unknown, checking, online, offline }
 
@@ -14,7 +15,7 @@ enum AiStatus { unknown, checking, online, offline }
 class AiProvider extends ChangeNotifier {
   AiProvider(this._repo, {AiConfig? initial})
     : config = initial ?? AiConfig.fromEnvironment() {
-    client = AiClient(() => config);
+    client = AiClient(() => config, mayUseRemoteAi: () => ageAllowed);
   }
 
   final SettingsRepository _repo;
@@ -30,6 +31,39 @@ class AiProvider extends ChangeNotifier {
   String? mode;
   String? model;
 
+  // ---- age: the Gemini API terms ----
+
+  /// The Gemini API terms do not allow an application that is directed to, or
+  /// likely to be accessed by, people under 18. Cosmetix has no age check at
+  /// sign-up, so the remote AI (chat, photo, AI ranking, classification) is
+  /// available only to a user who has stated a year of birth that makes them
+  /// at least [minAge]. The age is the careful one (`AgeSafety.ageFromBirthYear`
+  /// rounds down), so a user is never let in a year early.
+  static const minAge = 18;
+
+  /// Where the user's age comes from. Wired in `app.dart`. Not set = nobody is
+  /// allowed (the safe default).
+  int? Function()? ageSource;
+
+  int? get userAge => ageSource?.call();
+
+  /// False for a minor and for a user whose age is not known.
+  bool get ageAllowed {
+    final a = userAge;
+    return a != null && a >= minAge;
+  }
+
+  /// The user has not given a year of birth (as opposed to being too young).
+  bool get ageUnknown => userAge == null;
+
+  /// Tells the screens that the age (the profile) changed.
+  void ageChanged() => notifyListeners();
+
+  /// What the proxy said about photos in its health check (`null` = not known
+  /// yet or an older proxy) and how the AI provider may use what is sent.
+  bool? photoAnalysis;
+  String? dataUse;
+
   // ---- consent: nothing personal leaves the phone without it ----
 
   /// The Beauty profile and the blacklist may be sent to the AI as context.
@@ -41,11 +75,39 @@ class AiProvider extends ChangeNotifier {
   /// The user has been asked about [shareProfile] once (first chat message).
   bool profileAsked = false;
 
+  /// The text of chat messages may be sent to the AI (Google Gemini). Asked
+  /// before the first message; without it the chat sends nothing.
+  bool shareChat = false;
+
+  /// The user has been asked about [shareChat].
+  bool chatAsked = false;
+
   static const _kUrl = 'ai_base_url';
   static const _kToken = 'ai_app_token';
   static const _kShareProfile = 'ai_share_profile';
   static const _kSharePhotos = 'ai_share_photos';
   static const _kProfileAsked = 'ai_profile_asked';
+  static const _kShareChat = 'ai_share_chat';
+  static const _kChatAsked = 'ai_chat_asked';
+  static const _kConsentVersion = 'ai_consent_version';
+
+  /// Photos may be sent only when the build allows it AND the proxy said so
+  /// explicitly. Unknown means no: the photo is never sent "just in case".
+  bool get photoAnalysisAllowed =>
+      AiConfig.photoAnalysisAtBuild && photoAnalysis == true;
+
+  /// The server (or the build) is known to refuse photos: the photo step is
+  /// replaced by an explanation. False while the answer is still unknown.
+  bool get photoAnalysisOff =>
+      !AiConfig.photoAnalysisAtBuild ||
+      (status == AiStatus.online && photoAnalysis != true);
+
+  /// Remember that the proxy refused a photo although the health check had
+  /// said yes (the operator switched it off in between).
+  void markPhotoDisabled() {
+    photoAnalysis = false;
+    notifyListeners();
+  }
 
   bool get isConfigured => config.isConfigured;
   bool get isOnline => status == AiStatus.online;
@@ -67,6 +129,25 @@ class AiProvider extends ChangeNotifier {
       shareProfile = saved[_kShareProfile] == '1';
       sharePhotos = saved[_kSharePhotos] == '1';
       profileAsked = saved[_kProfileAsked] == '1';
+      shareChat = saved[_kShareChat] == '1';
+      chatAsked = saved[_kChatAsked] == '1';
+      // the wording or the recipients changed since the user agreed: the old
+      // consent no longer counts, everyone is asked again
+      if (int.tryParse(saved[_kConsentVersion] ?? '') !=
+          AiDisclosure.consentVersion) {
+        shareProfile = sharePhotos = profileAsked = false;
+        shareChat = chatAsked = false;
+        for (final k in [
+          _kShareProfile,
+          _kSharePhotos,
+          _kProfileAsked,
+          _kShareChat,
+          _kChatAsked,
+        ]) {
+          await _repo.set(k, '0');
+        }
+        await _repo.set(_kConsentVersion, '${AiDisclosure.consentVersion}');
+      }
     } catch (e) {
       debugPrint('ai settings load failed: $e');
     }
@@ -80,9 +161,13 @@ class AiProvider extends ChangeNotifier {
     detail = null;
     mode = null;
     model = null;
+    photoAnalysis = null;
+    dataUse = null;
     shareProfile = false;
     sharePhotos = false;
     profileAsked = false;
+    shareChat = false;
+    chatAsked = false;
     notifyListeners();
   }
 
@@ -94,6 +179,8 @@ class AiProvider extends ChangeNotifier {
     status = AiStatus.unknown;
     mode = null;
     model = null;
+    photoAnalysis = null;
+    dataUse = null;
     notifyListeners();
     if (baseUrl != null) await _repo.set(_kUrl, config.baseUrl);
     if (appToken != null) await _repo.set(_kToken, config.appToken);
@@ -105,6 +192,15 @@ class AiProvider extends ChangeNotifier {
     notifyListeners();
     await _repo.set(_kShareProfile, value ? '1' : '0');
     await _repo.set(_kProfileAsked, '1');
+  }
+
+  Future<void> setShareChat(bool value) async {
+    shareChat = value;
+    chatAsked = true;
+    notifyListeners();
+    await _repo.set(_kShareChat, value ? '1' : '0');
+    await _repo.set(_kChatAsked, '1');
+    await _repo.set(_kConsentVersion, '${AiDisclosure.consentVersion}');
   }
 
   Future<void> setSharePhotos(bool value) async {
@@ -120,6 +216,8 @@ class AiProvider extends ChangeNotifier {
       detail = null;
       mode = null;
       model = null;
+      photoAnalysis = null;
+      dataUse = null;
       notifyListeners();
       return;
     }
@@ -129,6 +227,8 @@ class AiProvider extends ChangeNotifier {
       final h = await client.health();
       mode = h.mode;
       model = h.model;
+      photoAnalysis = h.photoAnalysis;
+      dataUse = h.dataUse;
       status = AiStatus.online;
       detail = null;
     } on AiException catch (e) {
@@ -136,11 +236,15 @@ class AiProvider extends ChangeNotifier {
       detail = e.message;
       mode = null;
       model = null;
+      photoAnalysis = null;
+      dataUse = null;
     } catch (e) {
       status = AiStatus.offline;
       detail = 'Unexpected error';
       mode = null;
       model = null;
+      photoAnalysis = null;
+      dataUse = null;
     }
     notifyListeners();
   }

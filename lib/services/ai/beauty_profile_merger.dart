@@ -24,6 +24,11 @@ class MergedBeauty {
 class BeautyProfileMerger {
   BeautyProfileMerger._();
 
+  /// The model's own "I cannot judge this photo" brake. It is not shown, not
+  /// stored and never makes a photo count MORE: it can only make a photo count
+  /// for nothing. The number is the model's self-report, not a measurement
+  /// (on bad photos it still says 0.6-0.9), so it is no proof that a photo is
+  /// good; the proper check is local and happens before sending.
   static const minConfidence = 0.6;
 
   static MergedBeauty merge(
@@ -50,7 +55,6 @@ class BeautyProfileMerger {
         colorType: questionnaire.colorType ?? vision.colorType,
         concerns: questionnaire.concerns,
         source: BeautySource.questionnairePhoto,
-        confidence: vision.confidence,
       ),
       vision: vision,
       photoUsed: true,

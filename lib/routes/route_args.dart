@@ -87,17 +87,12 @@ class BeautyPhotoArgs {
 
 /// What the final Beauty Profile screen shows.
 class BeautyResultArgs {
-  const BeautyResultArgs({
-    required this.profile,
-    this.photoUsed = false,
-    this.observations = const [],
-  });
+  const BeautyResultArgs({required this.profile, this.photoUsed = false});
 
   final BeautyProfile profile;
 
   /// True when a valid photo analysis took part.
   final bool photoUsed;
-  final List<String> observations;
 }
 
 /// Cosmetic bag form: edit an existing item ([id]) or add a new one, optionally

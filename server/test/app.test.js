@@ -40,7 +40,7 @@ function claudeReply(text = 'Здравствуйте!', usage = { input_tokens:
 test('health reports mock mode without a key', async () => {
   const s = await start({}, claudeReply());
   const r = await (await s.call('/health')).json();
-  assert.deepEqual(r, { ok: true, mode: 'mock', model: null });
+  assert.deepEqual(r, { ok: true, mode: 'mock', model: null, photoAnalysis: false, dataUse: 'none' });
   await s.close();
 });
 
@@ -263,7 +263,7 @@ test('provider: Gemini key alone selects Gemini, Claude wins when both are set u
 test('health reports the Gemini provider and model', async () => {
   const s = await start(geminiEnv, geminiReply());
   const r = await (await s.call('/health')).json();
-  assert.deepEqual(r, { ok: true, mode: 'gemini', model: 'gemini-2.5-flash' });
+  assert.deepEqual(r, { ok: true, mode: 'gemini', model: 'gemini-2.5-flash', photoAnalysis: false, dataUse: 'unknown' });
   await s.close();
 });
 
@@ -381,4 +381,90 @@ test('Gemini "high demand" (503): retry, then the fallback model, then report', 
   assert.equal((await s3.chat(ask())).status, 503);
   assert.equal(single, 3);
   await s3.close();
+});
+
+// ---- photos of people: switched on only by the operator (free Gemini quota = Unpaid Services) ----
+
+const photoAsk = () => ({
+  json: true,
+  messages: [{ role: 'user', content: 'look', images: ['/9j/AAAA'] }],
+});
+
+test('photo policy: Gemini without a declared paid project keeps photos OFF', () => {
+  const c = readConfig(geminiEnv);
+  assert.equal(c.photoAnalysis, false);
+  assert.equal(c.dataUse, 'unknown');
+  assert.equal(readConfig({ ...geminiEnv, GEMINI_BILLING: 'free' }).photoAnalysis, false);
+  assert.equal(readConfig({ ...geminiEnv, GEMINI_BILLING: 'free' }).dataUse, 'free');
+  assert.equal(readConfig({ ...geminiEnv, GEMINI_BILLING: 'nonsense' }).dataUse, 'unknown');
+});
+
+test('photo policy: a declared paid Gemini project turns photos on, an explicit switch always wins', () => {
+  assert.equal(readConfig({ ...geminiEnv, GEMINI_BILLING: 'paid' }).photoAnalysis, true);
+  assert.equal(readConfig({ ...geminiEnv, GEMINI_BILLING: 'PAID ' }).dataUse, 'paid');
+  assert.equal(readConfig({ ...geminiEnv, GEMINI_BILLING: 'paid', PHOTO_ANALYSIS: 'off' }).photoAnalysis, false);
+  assert.equal(readConfig({ ...geminiEnv, PHOTO_ANALYSIS: 'on' }).photoAnalysis, true);
+});
+
+test('photo policy: other providers default to OFF (their terms were not checked)', () => {
+  const c = readConfig({ ANTHROPIC_API_KEY: 'sk' });
+  assert.equal(c.provider, 'claude');
+  assert.equal(c.photoAnalysis, false);
+  assert.equal(c.dataUse, 'unknown');
+  assert.equal(readConfig({ ANTHROPIC_API_KEY: 'sk', PHOTO_ANALYSIS: 'on' }).photoAnalysis, true);
+});
+
+test('a photo is refused with 503 photo_analysis_disabled and never reaches Gemini', async () => {
+  let called = 0;
+  const s = await start(geminiEnv, async () => {
+    called += 1;
+    return geminiReply('{}')();
+  });
+  const res = await s.chat(photoAsk());
+  const body = await res.json();
+  assert.equal(res.status, 503);
+  assert.equal(body.error, 'photo_analysis_disabled');
+  assert.equal(called, 0);
+  await s.close();
+});
+
+test('text-only chat still works while photos are off', async () => {
+  const s = await start(geminiEnv, geminiReply('Привет'));
+  const res = await s.chat(ask('Подойдёт ли мне крем?'));
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).text, 'Привет');
+  await s.close();
+});
+
+test('health tells the app whether photos are allowed and how the provider may use data', async () => {
+  const off = await start(geminiEnv, geminiReply());
+  assert.deepEqual(await (await off.call('/health')).json(), {
+    ok: true,
+    mode: 'gemini',
+    model: 'gemini-2.5-flash',
+    photoAnalysis: false,
+    dataUse: 'unknown',
+  });
+  await off.close();
+  const on = await start({ ...geminiEnv, GEMINI_BILLING: 'paid' }, geminiReply());
+  const h = await (await on.call('/health')).json();
+  assert.equal(h.photoAnalysis, true);
+  assert.equal(h.dataUse, 'paid');
+  await on.close();
+});
+
+test('with photos allowed the photo goes to Gemini; with the switch off again it does not', async () => {
+  let called = 0;
+  const fetchImpl = async () => {
+    called += 1;
+    return geminiReply('{"skinTone":"light"}')();
+  };
+  const on = await start({ ...geminiEnv, GEMINI_BILLING: 'paid' }, fetchImpl);
+  assert.equal((await on.chat(photoAsk())).status, 200);
+  assert.equal(called, 1);
+  await on.close();
+  const off = await start({ ...geminiEnv, GEMINI_BILLING: 'paid', PHOTO_ANALYSIS: 'off' }, fetchImpl);
+  assert.equal((await off.chat(photoAsk())).status, 503);
+  assert.equal(called, 1);
+  await off.close();
 });

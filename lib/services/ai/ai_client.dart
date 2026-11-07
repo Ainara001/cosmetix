@@ -38,6 +38,18 @@ class AiServerError extends AiException {
   final int? statusCode;
 }
 
+/// The app itself refused to call the remote AI (for example: the Gemini API
+/// terms do not allow an app that may be used by people under 18). Nothing was sent.
+class AiNotAllowed extends AiException {
+  const AiNotAllowed(super.message);
+}
+
+/// The proxy has switched photo analysis off (HTTP 503 `photo_analysis_disabled`):
+/// the photo was NOT sent to the AI provider.
+class AiPhotoDisabled extends AiException {
+  const AiPhotoDisabled(super.message);
+}
+
 /// The model answered, but not with usable data (invalid/incomplete JSON).
 class AiBadResponse extends AiException {
   const AiBadResponse(super.message);
@@ -63,11 +75,24 @@ class AiReply {
 }
 
 class AiHealth {
-  const AiHealth({required this.mode, this.model});
+  const AiHealth({
+    required this.mode,
+    this.model,
+    this.photoAnalysis,
+    this.dataUse,
+  });
 
   /// `gemini` or `claude` (real answers) or `mock` (test mode, answers are marked).
   final String mode;
   final String? model;
+
+  /// Whether the proxy accepts photos. `null` = an older proxy that does not
+  /// say; the app treats that as NOT allowed (photos only on an explicit yes).
+  final bool? photoAnalysis;
+
+  /// How the AI provider may use what is sent: `paid`, `free`, `unknown` or
+  /// `none` (test mode). `null` = the proxy does not say.
+  final String? dataUse;
 
   bool get isMock => mode == 'mock';
 }
@@ -75,10 +100,16 @@ class AiHealth {
 /// Client of the Cosmetix AI proxy (see `server/`). The proxy owns the AI
 /// API key; this app never sees one. Plain `dart:io`, no extra packages.
 class AiClient {
-  AiClient(this._config);
+  AiClient(this._config, {this.mayUseRemoteAi});
 
   /// Read on every call so Settings changes apply immediately.
   final AiConfig Function() _config;
+
+  /// The one gate every request that carries user content goes through
+  /// (chat, photo, AI ranking, product classification). When it says no,
+  /// [chat] throws [AiNotAllowed] BEFORE anything is sent. The health check
+  /// carries no user content and is not gated. `null` = no gate (tests).
+  final bool Function()? mayUseRemoteAi;
 
   static const healthTimeout = Duration(seconds: 4);
   static const chatTimeout = Duration(seconds: 60);
@@ -95,7 +126,14 @@ class AiClient {
     final mode = data['mode'];
     if (mode is! String) throw const AiBadResponse('Not a Cosmetix AI proxy');
     final model = data['model'];
-    return AiHealth(mode: mode, model: model is String ? model : null);
+    final photo = data['photoAnalysis'];
+    final use = data['dataUse'];
+    return AiHealth(
+      mode: mode,
+      model: model is String ? model : null,
+      photoAnalysis: photo is bool ? photo : null,
+      dataUse: use is String ? use : null,
+    );
   }
 
   /// POST /v1/chat. System messages become the proxy's `system` field.
@@ -107,6 +145,9 @@ class AiClient {
     double? temperature,
     int? maxTokens,
   }) async {
+    if (mayUseRemoteAi != null && !mayUseRemoteAi!()) {
+      throw const AiNotAllowed('The remote AI is not available for this user');
+    }
     final system = messages
         .where((m) => m.role == 'system')
         .map((m) => _cut(m.content))
@@ -222,6 +263,7 @@ class AiClient {
       case 504:
         return AiTimeout(message);
       case 503:
+        if (code == 'photo_analysis_disabled') return AiPhotoDisabled(message);
         return AiUnavailable(message);
       default:
         return AiServerError(

@@ -8,6 +8,7 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -90,6 +91,14 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
 
   Future<void> _classify() async {
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      showMessage(
+        context,
+        tr('Функции ИИ доступны с 18 лет. Укажите год рождения в профиле.'),
+        type: MessageType.info,
+      );
+      return;
+    }
     final classifier = context.read<ProductClassifier>();
     final catalog = context.read<CatalogProvider>();
     final userId = context.read<AuthProvider>().userId;
@@ -185,6 +194,17 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
               style: AppTextStyles.caption.copyWith(color: pal.subtext),
             ),
           const SizedBox(height: 10),
+          if (!ai.ageAllowed) ...[
+            Text(
+              ai.ageUnknown
+                  ? tr(
+                      'Функции ИИ доступны с 18 лет. Укажите год рождения в профиле, чтобы их включить.',
+                    )
+                  : tr('Функции ИИ доступны с 18 лет.'),
+              style: AppTextStyles.caption.copyWith(color: AppColors.sale),
+            ),
+            const SizedBox(height: 6),
+          ],
           Text(
             tr(
               'Без ИИ работают тест, каталог, чёрный список и рекомендации. ИИ нужен для чата, анализа фото и уточнения подбора.',
@@ -192,6 +212,28 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
             style: AppTextStyles.caption.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 6),
+          Text(
+            tr(
+              'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.',
+            ),
+            style: AppTextStyles.caption.copyWith(color: pal.subtext),
+          ),
+          Text(
+            AiDisclosure.dataUse(ai.dataUse, tr),
+            style: AppTextStyles.caption.copyWith(color: pal.subtext),
+          ),
+          const SizedBox(height: 6),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            activeThumbColor: AppColors.primaryDark,
+            title: Text(
+              tr('Отправлять ИИ сообщения чата'),
+              style: AppTextStyles.small,
+            ),
+            value: ai.shareChat,
+            onChanged: ai.ageAllowed || ai.shareChat ? ai.setShareChat : null,
+          ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             dense: true,
@@ -201,7 +243,10 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
               style: AppTextStyles.small,
             ),
             value: ai.shareProfile,
-            onChanged: ai.setShareProfile,
+            // a consent can always be withdrawn, but not given below the age limit
+            onChanged: ai.ageAllowed || ai.shareProfile
+                ? ai.setShareProfile
+                : null,
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
@@ -211,8 +256,18 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
               tr('Разрешить отправку фото в ИИ'),
               style: AppTextStyles.small,
             ),
+            subtitle: ai.photoAnalysisOff
+                ? Text(
+                    tr('Сервер отключил анализ по фото: фото не отправляются.'),
+                    style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                  )
+                : null,
             value: ai.sharePhotos,
-            onChanged: ai.setSharePhotos,
+            // a consent can always be withdrawn, but not given below the age
+            // limit or while the server refuses photos
+            onChanged: (ai.ageAllowed && !ai.photoAnalysisOff) || ai.sharePhotos
+                ? ai.setSharePhotos
+                : null,
           ),
           const SizedBox(height: 6),
           CustomButton(
