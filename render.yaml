@@ -1,0 +1,49 @@
+# Render Blueprint for the Cosmetix server (AI proxy + catalog API + admin panel).
+# NOTHING IS CREATED until the owner connects the repository to Render and applies
+# this file herself. No secret is stored here: values marked `sync: false` are typed
+# into the Render dashboard.
+#
+# Check the current plans and limits on render.com before applying: this file does
+# not assume any price or free-tier rule.
+databases:
+  - name: cosmetix-db
+    databaseName: cosmetix
+    plan: free # change if the plan is not offered or too small for you
+
+services:
+  - type: web
+    name: cosmetix-server
+    runtime: node
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    startCommand: node index.js
+    healthCheckPath: /health
+    plan: free # a free web service sleeps when idle: the first request is slow
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cosmetix-db
+          property: connectionString
+      # migrations run at start (001_init, 002_store_offers)
+      - key: AUTO_MIGRATE
+        value: "1"
+      # the app sends this as x-app-token; the same value goes into the build
+      # (--dart-define=AI_APP_TOKEN=...). Not a user secret: it only reduces noise.
+      - key: APP_TOKEN
+        sync: false
+      # AI is optional: without a key the server answers in MOCK mode.
+      - key: GEMINI_API_KEY
+        sync: false
+      # personal photos are NOT sent to Gemini unless the key belongs to a paid
+      # project and the owner says so: leave both lines as they are.
+      - key: GEMINI_BILLING
+        value: free
+      - key: PHOTO_ANALYSIS
+        value: "off"
+      # The admin panel stays LOCAL-ONLY (default): the server speaks plain HTTP
+      # behind Render's proxy and /admin must not be open to the internet. To enter
+      # offers, run the panel locally against this database (see
+      # docs/deploy-render.md). Only if you deliberately want it online, add
+      # ADMIN_ALLOW_REMOTE=1, ADMIN_COOKIE_SECURE=1, ADMIN_ALLOWED_HOSTS=<your host>.
