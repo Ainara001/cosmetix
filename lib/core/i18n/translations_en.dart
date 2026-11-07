@@ -1583,6 +1583,15 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Примерить': 'Try on',
   'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
       'Try-on is not available: the catalog has no colour data for this shade.',
+  'Это подсказка для подбора косметики, а не измерение и не диагноз. Цветотип по фото ориентировочный: если ответы анкеты и фото расходятся, решайте сами.':
+      'This is a hint for choosing cosmetics, not a measurement and not a diagnosis. The colour type from a photo is approximate: if your answers and the photo disagree, decide for yourself.',
+  'Что стоит знать об анализе по фото': 'What to know about photo analysis',
+  'Это подсказка по цвету, а не измерение и не диагноз.':
+      'This is a colour hint, not a measurement and not a diagnosis.',
+  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.':
+      'The result depends on light and camera; make-up, glasses and filters distort it.',
+  'Приложение не определяет акне, рубцы или покраснения.':
+      'The app does not detect acne, scars or redness.',
   'ИИ-помощник доступен с 18 лет. Укажите год рождения в профиле.':
       'The AI assistant is available from the age of 18. Enter your year of birth in the profile.',
   'ИИ-помощник доступен с 18 лет.':
