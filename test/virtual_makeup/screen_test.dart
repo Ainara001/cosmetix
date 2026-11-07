@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:cosmetix/widgets/pill_segments.dart';
 import 'package:cosmetix/core/theme/app_theme.dart';
 import 'package:cosmetix/features/virtual_makeup/domain/face_geometry.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/rgba_image.dart';
@@ -261,19 +262,18 @@ void main() {
     (t) async {
       await open(t);
       await pickPhoto(t);
-      SegmentedButton<CompareMode> sb() =>
-          t.widget<SegmentedButton<CompareMode>>(
-            find.byKey(const Key('vm-compare')),
-          );
-      expect(sb().selected, {CompareMode.result});
+      PillSegments<CompareMode> sb() => t.widget<PillSegments<CompareMode>>(
+        find.byKey(const Key('vm-compare')),
+      );
+      expect(sb().selected, CompareMode.result);
       await t.drag(find.byType(Scrollable).first, const Offset(0, 2000));
       await t.pump();
       await t.tap(find.text('Оригинал'));
       await t.pump();
-      expect(sb().selected, {CompareMode.original});
+      expect(sb().selected, CompareMode.original);
       await t.tap(find.text('Разделитель'));
       await t.pump();
-      expect(sb().selected, {CompareMode.split});
+      expect(sb().selected, CompareMode.split);
       expect(find.textContaining('Удерживайте фото'), findsOneWidget);
     },
   );

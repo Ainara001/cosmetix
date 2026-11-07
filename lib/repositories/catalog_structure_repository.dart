@@ -36,6 +36,32 @@ class CatalogStructureRepository {
     );
   }
 
+  /// One summary per product that has a try-on / structure record (id -> summary),
+  /// in a single query, for the product lists.
+  Future<Map<int, VariantSummary>> summaries() async {
+    final db = await _helper.database;
+    final rows = await db.rawQuery('''
+SELECT s.product_id, s.kind AS product_kind, s.line_key, s.shade_code,
+       s.shade_name, l.name AS line_name, l.kind AS line_kind, f.pan_count
+FROM product_shades s
+LEFT JOIN product_lines l ON l.line_key = s.line_key
+LEFT JOIN product_variant_facts f ON f.product_id = s.product_id''');
+    return {
+      for (final r in rows)
+        r['product_id']! as int: VariantSummary(
+          productId: r['product_id']! as int,
+          lineKey: r['line_key'] as String?,
+          lineName: r['line_name'] as String?,
+          // a palette is one whose line says so; the product kind of a palette
+          // is `eyeshadow`, which a single eyeshadow shares
+          kind: (r['line_kind'] as String?) ?? r['product_kind']! as String,
+          code: r['shade_code'] as String?,
+          name: r['shade_name'] as String?,
+          panCount: r['pan_count'] as int?,
+        ),
+    };
+  }
+
   /// The line with this key (null: there is none).
   Future<ProductLine?> line(String key) async {
     final db = await _helper.database;

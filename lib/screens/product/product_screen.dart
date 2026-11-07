@@ -11,6 +11,7 @@ import 'package:cosmetix/models/store_offer.dart';
 import 'package:cosmetix/widgets/offer_widgets.dart';
 import 'package:cosmetix/models/safety_models.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
+import 'package:cosmetix/screens/product/palette_section.dart';
 import 'package:cosmetix/screens/product/try_on_button.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
@@ -213,7 +214,8 @@ class _ProductBodyState extends State<_ProductBody> {
   List<Widget> _shadePicker(BuildContext context, Product product) {
     final catalog = context.read<CatalogProvider>();
     final shades = catalog.shadesOf(product);
-    if (shades.isEmpty) return const [];
+    // a palette has its own section: variants as pills, the cells inside
+    if (shades.isEmpty || catalog.isPalette(product)) return const [];
     return [
       const SizedBox(height: 10),
       Text(
@@ -412,6 +414,7 @@ class _ProductBodyState extends State<_ProductBody> {
                         style: AppTextStyles.h2,
                       ),
                       ..._shadePicker(context, product),
+                      PaletteSection(productId: product.id),
                       TryOnButton(productId: product.id),
                       const SizedBox(height: 8),
                       _StockSummary(

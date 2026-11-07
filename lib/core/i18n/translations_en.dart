@@ -1583,6 +1583,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Примерить': 'Try on',
   'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
       'Try-on is not available: the catalog has no colour data for this shade.',
+  'Цвета палетки': 'Palette colours',
+  'Ячейка {n}': 'Cell {n}',
   'Цена не подтверждена': 'Price not confirmed',
   'НАЛИЧИЕ НЕ ПРОВЕРЕНО': 'STOCK NOT CHECKED',
   'Наличие не проверено': 'Stock not checked',

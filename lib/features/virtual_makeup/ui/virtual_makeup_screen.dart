@@ -5,7 +5,9 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/widgets/app_card.dart';
+import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/pill_segments.dart';
 import 'package:flutter/material.dart';
 
 import '../catalog/try_on_item.dart';
@@ -179,26 +181,15 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
             onDrawing: (v) => setState(() => _drawing = v),
           ),
           const SizedBox(height: 10),
-          SegmentedButton<CompareMode>(
+          PillSegments<CompareMode>(
             key: const Key('vm-compare'),
-            // three short words in one row: no room for the tick
-            showSelectedIcon: false,
             segments: [
-              ButtonSegment(
-                value: CompareMode.result,
-                label: Text(tr('Результат')),
-              ),
-              ButtonSegment(
-                value: CompareMode.original,
-                label: Text(tr('Оригинал')),
-              ),
-              ButtonSegment(
-                value: CompareMode.split,
-                label: Text(tr('Разделитель')),
-              ),
+              PillSegment(value: CompareMode.result, label: tr('Результат')),
+              PillSegment(value: CompareMode.original, label: tr('Оригинал')),
+              PillSegment(value: CompareMode.split, label: tr('Разделитель')),
             ],
-            selected: {_c.compare},
-            onSelectionChanged: (v) => _c.setCompare(v.first),
+            selected: _c.compare,
+            onChanged: _c.setCompare,
           ),
           const SizedBox(height: 4),
           Text(
@@ -207,22 +198,22 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
           ),
           for (final issue in q.issues) _issue(issue),
           const SizedBox(height: 10),
-          SegmentedButton<_Tab>(
+          PillSegments<_Tab>(
             key: const Key('vm-tabs'),
             segments: [
-              ButtonSegment(
+              PillSegment(
                 value: _Tab.makeup,
-                icon: const Icon(Icons.brush),
-                label: Text(tr('Макияж')),
+                icon: Icons.brush,
+                label: tr('Макияж'),
               ),
-              ButtonSegment(
+              PillSegment(
                 value: _Tab.protection,
-                icon: const Icon(Icons.shield_outlined),
-                label: Text(tr('Защита кожи')),
+                icon: Icons.shield_outlined,
+                label: tr('Защита кожи'),
               ),
             ],
-            selected: {_tab},
-            onSelectionChanged: (v) => setState(() => _tab = v.first),
+            selected: _tab,
+            onChanged: (v) => setState(() => _tab = v),
           ),
           const SizedBox(height: 10),
           if (_tab == _Tab.makeup)
@@ -246,11 +237,12 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
               onBrushRadius: (v) => setState(() => _brush = v),
             ),
           const SizedBox(height: 8),
-          OutlinedButton.icon(
+          CustomButton(
             key: const Key('vm-other-photo'),
             onPressed: () => _pick(false),
-            icon: const Icon(Icons.photo_outlined),
-            label: Text(tr('Другое фото')),
+            icon: Icons.photo_outlined,
+            label: tr('Другое фото'),
+            outlined: true,
           ),
         ];
     }
@@ -344,24 +336,19 @@ class _VirtualMakeupScreenState extends State<VirtualMakeupScreen> {
             style: AppTextStyles.small.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              key: const Key('vm-gallery'),
-              onPressed: () => _pick(false),
-              icon: const Icon(Icons.photo_library_outlined),
-              label: Text(tr('Выбрать фото')),
-            ),
+          CustomButton(
+            key: const Key('vm-gallery'),
+            onPressed: () => _pick(false),
+            icon: Icons.photo_library_outlined,
+            label: tr('Выбрать фото'),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              key: const Key('vm-camera'),
-              onPressed: () => _pick(true),
-              icon: const Icon(Icons.photo_camera_outlined),
-              label: Text(tr('Сделать снимок')),
-            ),
+          CustomButton(
+            key: const Key('vm-camera'),
+            onPressed: () => _pick(true),
+            icon: Icons.photo_camera_outlined,
+            label: tr('Сделать снимок'),
+            outlined: true,
           ),
         ],
       ),

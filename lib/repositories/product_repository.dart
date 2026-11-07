@@ -6,7 +6,9 @@ import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/models/safety_models.dart';
 
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/models/palette_models.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/repositories/catalog_structure_repository.dart';
 import 'package:cosmetix/repositories/offer_sql.dart';
 
 class ProductRepository {
@@ -27,6 +29,10 @@ SELECT p.*, EXISTS(
     );
     return rows.map(Product.fromMap).toList();
   }
+
+  /// Line / variant / palette facts of every product that has them (DB v16).
+  Future<Map<int, VariantSummary>> structure() =>
+      CatalogStructureRepository(_helper).summaries();
 
   Future<Product?> getById(int id, int userId) async {
     final db = await _helper.database;

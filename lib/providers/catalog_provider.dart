@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
 
+import 'package:cosmetix/models/palette_models.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
@@ -25,6 +26,11 @@ class CatalogProvider extends ChangeNotifier {
   String Function()? _signatureOf;
 
   List<Product> products = [];
+
+  /// Line / variant / palette facts of the products that have them (DB v16),
+  /// by product id. Empty when they could not be read: the lists then simply
+  /// show the products without them.
+  Map<int, VariantSummary> structure = {};
   List<String> history = [];
   bool loading = false;
   String? error;
@@ -37,6 +43,12 @@ class CatalogProvider extends ChangeNotifier {
     notifyListeners();
     try {
       products = await _repo.getAll(userId);
+      try {
+        structure = await _repo.structure();
+      } catch (e) {
+        structure = {};
+        debugPrint('catalog structure failed: $e');
+      }
       history = await _repo.getHistory(userId);
       await _loadPersonalization(userId);
     } catch (e) {
@@ -50,6 +62,7 @@ class CatalogProvider extends ChangeNotifier {
 
   void reset() {
     products = [];
+    structure = {};
     history = [];
     _userId = null;
     _ctx = const PersonalizationContext.empty();
@@ -222,6 +235,12 @@ class CatalogProvider extends ChangeNotifier {
     }
     return null;
   }
+
+  /// What is known about the product's line and variant (null: nothing).
+  VariantSummary? structureOf(Product p) => structure[p.id];
+
+  /// True for a palette variant: its cells, not a colour dot, tell its colours.
+  bool isPalette(Product p) => structure[p.id]?.isPalette ?? false;
 
   /// All shades of the line the product belongs to (itself included), by
   /// shade number: the palettes 00, 01, 02... of one series. Empty when the
