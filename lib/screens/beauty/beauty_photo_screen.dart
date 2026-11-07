@@ -233,11 +233,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       Navigator.pushReplacementNamed(
         context,
         AppRoutes.colorResult,
-        arguments: BeautyResultArgs(
-          profile: p,
-          photoUsed: merged.photoUsed,
-          observations: merged.vision?.observations ?? const [],
-        ),
+        arguments: BeautyResultArgs(profile: p, photoUsed: merged.photoUsed),
       );
     } catch (_) {
       _saving = false;

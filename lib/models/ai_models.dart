@@ -36,24 +36,25 @@ String _norm(Object? v) => v is String
     : '';
 
 /// Result of the optional photo analysis (a hint, never a diagnosis).
+///
+/// Only the three codes (and the model's own self-report, see
+/// `BeautyProfileMerger.minConfidence`) are kept. Free text the model may add
+/// ("observations", "explanation") is dropped on purpose: nothing measured the
+/// statements it makes about the skin, so they are never carried or shown.
 class VisionAnalysis {
   const VisionAnalysis({
     this.skinTone,
     this.undertone,
     this.colorType,
-    this.observations = const [],
     required this.confidence,
-    this.explanation = '',
   });
 
   final SkinTone? skinTone;
   final Undertone? undertone;
   final ColorType? colorType;
-  final List<String> observations;
 
   /// 0..1
   final double confidence;
-  final String explanation;
 
   /// Parses and validates the model answer. Unsupported values become null;
   /// throws [AiBadResponse] when nothing usable is left.
@@ -73,18 +74,11 @@ class VisionAnalysis {
     if (skinTone == null && undertone == null && colorType == null) {
       throw const AiBadResponse('The analysis has no supported values');
     }
-    final obs = j['observations'];
     return VisionAnalysis(
       skinTone: skinTone,
       undertone: undertone,
       colorType: colorType,
-      observations: [
-        if (obs is List)
-          for (final o in obs.take(6))
-            if (o is String && o.trim().isNotEmpty) _text(o, 120),
-      ],
       confidence: _confidence(j['confidence']),
-      explanation: _text(j['explanation'], 400),
     );
   }
 }

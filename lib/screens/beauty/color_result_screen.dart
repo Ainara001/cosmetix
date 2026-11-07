@@ -135,11 +135,6 @@ class ColorResultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(photoLine, style: AppTextStyles.subtitle),
-                  for (final o in result.observations)
-                    Text(
-                      '• $o',
-                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
-                    ),
                 ],
               ),
             ),
