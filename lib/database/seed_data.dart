@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 import 'package:cosmetix/database/catalog_data.dart';
+import 'package:cosmetix/database/catalog_structure_data.dart';
 import 'package:cosmetix/database/store_data.dart';
 
 import 'package:cosmetix/core/utils/password_hasher.dart';
@@ -78,6 +79,7 @@ class SeedData {
     await batch.commit(noResult: true);
 
     await applyTryOn(db, catalog);
+    await applyCatalogStructure(db, catalog);
     await insertUserDefaults(db, 1, demo: true);
     await _insertReviews(db, now);
   }
@@ -347,6 +349,81 @@ class SeedData {
         'finish_source': t.finishSource,
         'note': t.note,
       }, conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    await batch.commit(noResult: true);
+  }
+
+  /// Migration step (DB v16): the product lines, what is known about each
+  /// variant of them and the (still colourless) cells of the palettes whose
+  /// number of cells a source confirms (`assets/catalog/lines.json`).
+  ///
+  /// Safe to run again: lines and variant facts are written again (nothing
+  /// refers to them with a cascade), cells are only ADDED when missing, so a
+  /// colour that was measured and stored later is never overwritten. Products,
+  /// ids, prices, cart, favourites and `products.shade` are not touched.
+  static Future<void> applyCatalogStructure(
+    DatabaseExecutor db, [
+    CatalogData? from,
+    CatalogStructure? structure,
+  ]) async {
+    final catalog = from ?? await CatalogData.load();
+    final data = structure ?? await CatalogStructure.load();
+    data.validateAgainst(catalog);
+    final ids = {
+      for (final r in await db.query(
+        'products',
+        columns: ['id', 'brand', 'name'],
+      ))
+        '${r['brand']}|${r['name']}': r['id']! as int,
+    };
+    final slugOf = {for (final l in data.lines) l.key: l.slug};
+    final batch = db.batch();
+    for (final l in data.lines) {
+      batch.insert('product_lines', {
+        'line_key': l.key,
+        'slug': l.slug,
+        'brand': l.brand,
+        'name': l.name,
+        'kind': l.kind,
+        'source_url': l.sourceUrl,
+        'checked_at': l.checkedAt,
+        'confidence': l.confidence,
+        'note': l.note,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    final byKey = catalog.byKey;
+    for (final v in data.variants) {
+      final id = ids[v.productKey];
+      if (id == null) {
+        // a fresh install fills the table after the products exist
+        continue;
+      }
+      batch.insert('product_variant_facts', {
+        'product_id': id,
+        'pan_count': v.panCount,
+        'source_url': v.sourceUrl,
+        'checked_at': v.checkedAt,
+        'confidence': v.confidence,
+        'note': v.note,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      final n = v.panCount;
+      if (n == null) continue;
+      final t = byKey[v.productKey]!.tryOn;
+      final slug = slugOf[t?.line];
+      final code = t?.shadeCode;
+      if (slug == null || code == null) {
+        throw FormatException(
+          'lines.json: ${v.productKey} has cells but no line or variant code',
+        );
+      }
+      for (var pos = 1; pos <= n; pos++) {
+        batch.insert('product_shade_pans', {
+          'pan_key': panKeyOf(slug, code, pos),
+          'product_id': id,
+          'position': pos,
+          'colour_status': PanColourStatus.missing,
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      }
     }
     await batch.commit(noResult: true);
   }
