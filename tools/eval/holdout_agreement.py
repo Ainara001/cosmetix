@@ -6,10 +6,12 @@ gate numbers of that photo: S = suitable for analysis, M = marginal, U = unsuita
 sunglasses plus dark, not a real face). It is not an independent ground truth.
 
     tools/.venv/bin/python tools/eval/holdout_agreement.py
+    tools/.venv/bin/python tools/eval/holdout_agreement.py out/eval/quality.csv eval_judgement.json
 """
 import csv
 import json
 import os
+import sys
 from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -27,11 +29,14 @@ def table(quality_csv=None, judgement=None):
 
 
 def main():
-    cells, q, j = table()
+    args = sys.argv[1:]
+    cells, q, j = table(*(os.path.join(HERE, a) for a in args[:2]))
     print('| my judgement \\ gate | ok | warn | reject | total |')
     print('|---|---|---|---|---|')
-    names = {'S': 'suitable', 'M': 'marginal', 'U': 'unsuitable'}
-    for lab in 'SMU':
+    names = {'S': 'suitable', 'M': 'marginal', 'W': 'retake suggested', 'U': 'unsuitable'}
+    for lab in 'SMWU':
+        if not any(k[0] == lab for k in cells):
+            continue
         row = [cells[(lab, v)] for v in ('ok', 'warn', 'reject')]
         print(f'| {names[lab]} | {row[0]} | {row[1]} | {row[2]} | {sum(row)} |')
     s_ref = cells[('S', 'reject')]

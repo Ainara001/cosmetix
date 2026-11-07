@@ -23,15 +23,18 @@ void main() {
   group('the request', () {
     const p = VisionAnalyzer.prompt;
 
-    test('asks for exactly the three codes and the self-report, no text', () {
-      expect(p, contains('"skinTone"'));
-      expect(p, contains('"undertone"'));
-      expect(p, contains('"colorType"'));
-      expect(p, contains('"confidence"'));
-      expect(p, isNot(contains('"observations"')));
-      expect(p, isNot(contains('"explanation"')));
-      expect(p, contains('Write nothing else'));
-    });
+    test(
+      'asks for exactly the three codes, no text and no self-assessment',
+      () {
+        expect(p, contains('"skinTone"'));
+        expect(p, contains('"undertone"'));
+        expect(p, contains('"colorType"'));
+        expect(p, isNot(contains('confidence')));
+        expect(p, isNot(contains('"observations"')));
+        expect(p, isNot(contains('"explanation"')));
+        expect(p, contains('Write nothing else'));
+      },
+    );
 
     test('forbids comments about the skin', () {
       for (final word in [
@@ -78,7 +81,6 @@ void main() {
       expect(a.skinTone, SkinTone.deep);
       expect(a.undertone, Undertone.warm);
       expect(a.colorType, ColorType.autumn);
-      expect(a.confidence, 0.85);
     });
 
     test('the free text a model adds anyway is dropped, not carried', () {

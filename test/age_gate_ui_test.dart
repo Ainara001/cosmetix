@@ -34,7 +34,7 @@ void main() {
   );
 
   Future<void> open(WidgetTester t, int? age) async {
-    t.view.physicalSize = const Size(1080, 2200);
+    t.view.physicalSize = const Size(1080, 4200);
     t.view.devicePixelRatio = 3;
     addTearDown(t.view.reset);
     final helper = DatabaseHelper(path: inMemoryDatabasePath);

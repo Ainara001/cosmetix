@@ -22,7 +22,7 @@ void main() {
   currentLang = AppLang.ru;
 
   Future<DatabaseHelper> boot(WidgetTester t) async {
-    t.view.physicalSize = const Size(1080, 2600);
+    t.view.physicalSize = const Size(1080, 4200);
     t.view.devicePixelRatio = 3;
     addTearDown(t.view.reset);
     final helper = DatabaseHelper(path: inMemoryDatabasePath);
@@ -33,6 +33,16 @@ void main() {
         firstName: 'Новая',
         email: 'new@test.kz',
         password: 'Passw0rd1',
+      );
+      // an adult: the AI photo step is closed to under-18s and to an unknown age
+      await users.updateProfile(
+        id: u.id,
+        firstName: 'Новая',
+        lastName: '',
+        email: 'new@test.kz',
+        phone: '',
+        city: '',
+        birthYear: 1990,
       );
       await users.setCurrentUser(u.id);
       // an adult: since the age gate (PR #28) a user of unknown age gets an

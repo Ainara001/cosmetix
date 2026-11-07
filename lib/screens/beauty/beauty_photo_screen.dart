@@ -18,18 +18,25 @@ import 'package:cosmetix/services/ai/ai_config.dart';
 import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
+import 'package:cosmetix/screens/beauty/photo_issue_text.dart';
+import 'package:cosmetix/services/photo_check/photo_check.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 
-enum _Step { intro, preview, analyzing, failed }
+enum _Step { intro, preview, checking, rejected, warned, analyzing, failed }
 
 /// Beauty Test, last step (OPTIONAL): a photo can improve the result. The
 /// test always finishes without it.
 class BeautyPhotoScreen extends StatefulWidget {
-  const BeautyPhotoScreen({super.key, required this.args});
+  const BeautyPhotoScreen({super.key, required this.args, this.picker});
 
   final BeautyPhotoArgs args;
+
+  /// Where the photo comes from: the path of the picked file, or null when the
+  /// user cancelled. Null = the phone's camera / gallery (image_picker); tests
+  /// pass a fake.
+  final Future<String?> Function(ImageSource source)? picker;
 
   @override
   State<BeautyPhotoScreen> createState() => _BeautyPhotoScreenState();
@@ -42,6 +49,9 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   bool get _needsPhoto => widget.args.color.isWeak;
   File? _photo;
   String? _error;
+
+  /// Why the local check refused (or warned about) the photo.
+  List<PhotoIssue> _issues = const [];
   bool _saving = false;
 
   @override
@@ -75,17 +85,23 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   Future<void> _pick(ImageSource source) async {
     try {
       // the picker downsizes: we never send a 10-20 MB original
-      final x = await ImagePicker().pickImage(
-        source: source,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 80,
-        preferredCameraDevice: CameraDevice.front,
-      );
-      if (x == null || !mounted) return;
+      final String? path;
+      if (widget.picker != null) {
+        path = await widget.picker!(source);
+      } else {
+        final x = await ImagePicker().pickImage(
+          source: source,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          imageQuality: 80,
+          preferredCameraDevice: CameraDevice.front,
+        );
+        path = x?.path;
+      }
+      if (path == null || !mounted) return;
       _discardPhoto();
       setState(() {
-        _photo = File(x.path);
+        _photo = File(path!);
         _step = _Step.preview;
       });
     } catch (_) {
@@ -119,6 +135,40 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       });
       return;
     }
+    // 1. the local check: on the phone, before ANY call to a server. A photo that
+    //    does not pass it is deleted here and nothing is sent or changed.
+    setState(() => _step = _Step.checking);
+    PhotoCheckResult checked;
+    try {
+      checked = await context.read<PhotoCheck>().run(await photo.readAsBytes());
+    } catch (_) {
+      checked = PhotoCheckResult(
+        const PhotoVerdict.reject(PhotoIssue.unreadable),
+      );
+    }
+    if (!mounted) return;
+    if (!checked.verdict.accepted) {
+      _discardPhoto();
+      setState(() {
+        _issues = checked.verdict.issues;
+        _step = _Step.rejected;
+      });
+      return;
+    }
+    if (checked.verdict.level == PhotoLevel.warn) {
+      // usable, but not good: the user decides, with the reasons in front of them
+      setState(() {
+        _issues = checked.verdict.issues;
+        _step = _Step.warned;
+      });
+      return;
+    }
+    await _send(photo, ai);
+  }
+
+  /// The photo passed the local check: only now may it go further (server
+  /// switch, consent, the AI).
+  Future<void> _send(File photo, AiProvider ai) async {
     // the photo leaves the phone only if the server said, explicitly, that it
     // accepts photos; otherwise it is deleted here and nothing is sent
     final allowed = await _photoAllowed(ai);
@@ -254,6 +304,9 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       child: switch (_step) {
         _Step.intro => _intro(context),
         _Step.preview => _preview(context),
+        _Step.checking => _checking(context),
+        _Step.rejected => _rejected(context),
+        _Step.warned => _warned(context),
         _Step.analyzing => _analyzing(context),
         _Step.failed => _failed(context),
       },
@@ -479,6 +532,128 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
         const SizedBox(height: 6),
         if (!_needsPhoto)
           TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
+      ],
+    );
+  }
+
+  Widget _checking(BuildContext context) {
+    final pal = context.pal;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 18),
+            Text(
+              tr('Проверяем фото…'),
+              style: AppTextStyles.title,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              tr('Проверка идёт на телефоне, фото никуда не отправляется.'),
+              style: AppTextStyles.small.copyWith(color: pal.subtext),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The photo was refused: why, and the way to another photo.
+  Widget _rejected(BuildContext context) {
+    final pal = context.pal;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+      children: [
+        Icon(Icons.photo_camera_back_outlined, size: 48, color: pal.accent),
+        const SizedBox(height: 12),
+        Text(
+          tr('Это фото не подходит'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.title,
+        ),
+        const SizedBox(height: 10),
+        for (final i in _issues)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              photoIssueText(i),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.body,
+            ),
+          ),
+        const SizedBox(height: 6),
+        Text(
+          tr('Фото не отправлено и удалено с телефона.'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.small.copyWith(color: pal.subtext),
+        ),
+        const SizedBox(height: 20),
+        CustomButton(
+          label: tr('Выбрать другое фото'),
+          onPressed: () => setState(() => _step = _Step.intro),
+        ),
+        const SizedBox(height: 10),
+        if (_needsPhoto)
+          CustomButton(
+            label: tr('Вернуться к вопросам'),
+            outlined: true,
+            onPressed: _backToQuestions,
+          )
+        else
+          CustomButton(
+            label: tr('Продолжить без фото'),
+            outlined: true,
+            onPressed: _skip,
+          ),
+      ],
+    );
+  }
+
+  /// The photo is usable but not good: the user decides.
+  Widget _warned(BuildContext context) {
+    final pal = context.pal;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+      children: [
+        Icon(Icons.info_outline, size: 48, color: pal.accent),
+        const SizedBox(height: 12),
+        Text(
+          tr('Фото можно использовать, но результат может быть неточным'),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.title,
+        ),
+        const SizedBox(height: 10),
+        for (final i in _issues)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              photoIssueText(i),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.body,
+            ),
+          ),
+        const SizedBox(height: 20),
+        CustomButton(
+          label: tr('Использовать это фото'),
+          onPressed: () {
+            final photo = _photo;
+            if (photo != null) _send(photo, context.read<AiProvider>());
+          },
+        ),
+        const SizedBox(height: 10),
+        CustomButton(
+          label: tr('Выбрать другое фото'),
+          outlined: true,
+          onPressed: () {
+            _discardPhoto();
+            setState(() => _step = _Step.intro);
+          },
+        ),
       ],
     );
   }

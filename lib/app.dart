@@ -34,6 +34,7 @@ import 'package:cosmetix/services/age_safety.dart';
 import 'package:cosmetix/services/ai/product_classifier.dart';
 import 'package:cosmetix/services/ai/recommendation_refiner.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
+import 'package:cosmetix/services/photo_check/photo_check.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/services/ingredient_scan/ingredient_ocr.dart';
 import 'package:cosmetix/services/avatar_service.dart';
@@ -202,6 +203,11 @@ class _CosmetixAppState extends State<CosmetixApp> {
             Provider<AvatarService>(create: (_) => AvatarService()),
             Provider<IngredientOcr>.value(value: widget.ocr),
             Provider<ScanPhotoSource>.value(value: widget.photoSource),
+            // the local photo check: on the phone, before any server call
+            Provider<PhotoCheck>(
+              create: (_) => PhotoCheck(MediaPipePhotoFaceFinder()),
+              dispose: (_, check) => check.dispose(),
+            ),
             Provider<VisionAnalyzer>(create: (_) => VisionAnalyzer(_ai.client)),
             Provider<ProductClassifier>(
               create: (_) => ProductClassifier(_ai.client, _products, _safety),

@@ -45,7 +45,20 @@ T = {
     'clipped_pct_max': (4.0, 12.0),
     'crushed_pct_max': (25.0, 50.0),
     'lr_asym_max': (0.35, float('inf')),   # side light: warn only, never reject
-    'yaw_offset_max': (0.15, 0.25),
+    # warn from 0.15; reject from 0.30: on the development photos every suitable one is <= 0.196 and every
+    # turned one >= 0.333, so 0.30 sits in that gap, on the side of the refusal that hurts less
+    'yaw_offset_max': (0.15, 0.30),
+    # second face: the app takes one person: another face at least a tenth as wide as the main one (about
+    # 30 px on a 300 px face, a person who is recognisable) rejects; a smaller one is a warning
+    'second_face_ratio_max': (0.0, 0.10),
+    # dark lenses: a WARNING only (a squint in hard sun looks the same and cannot be told apart); eyes darker than the cheeks (below 0.8) AND flat (contrast below 0.07).
+    # Open eyes keep a contrast of at least 0.10 on the 76 development photos (the only real pair
+    # of dark glasses among them: 0.037); closed eyelids are as bright as the cheeks (about 1.0).
+    # Chosen on the development photos and synthetic lenses, never on the evaluation set.
+    'eyes_covered': (0.8, 0.07),
+    # share of the cheeks/forehead/nose that is the colour of this face's skin; warn only: a beard,
+    # hair or a deep shadow lowers it and a bearded face is a valid photo
+    'skin_visible_min': (0.5, None),
 }
 
 
@@ -56,7 +69,44 @@ class Quality:
     reasons: list = field(default_factory=list)
 
 
-def measure(bgr: np.ndarray, points: np.ndarray, masks: dict | None = None) -> dict:
+SKIN_DELTA_E = 20.0     # a zone pixel counts as "skin of this face" within this CIELAB distance
+
+
+def eye_cover(luma: np.ndarray, masks: dict, points: np.ndarray) -> tuple[float, float]:
+    """(darkness, contrast) of the eye openings relative to the cheeks.
+
+    darkness = median luma inside the eye polygons / median luma of the cheeks;
+    contrast = std of luma inside them / the same cheek median. Dark lenses give a
+    LOW darkness and a LOW contrast (uniform dark); open eyes (even dark irises on
+    dark skin) keep both higher. Relative to the person's own cheeks, so a dark skin
+    tone does not look like a cover."""
+    eyes = np.zeros(luma.shape, np.uint8)
+    for loop in (fz.EYE_RIGHT, fz.EYE_LEFT):
+        cv2.fillPoly(eyes, [np.round(points[loop, :2]).astype(np.int32)], 255)
+    cheeks = (masks['cheek_left'] > 0) | (masks['cheek_right'] > 0)
+    if eyes.sum() == 0 or cheeks.sum() < 50:
+        return float('nan'), float('nan')
+    ref = max(1.0, float(np.median(luma[cheeks])))
+    e = luma[eyes > 0].astype(np.float32)
+    return float(np.median(e)) / ref, float(e.std()) / ref
+
+
+def visible_skin(lab: np.ndarray, masks: dict) -> float:
+    """Share of the cheek, forehead and nose zones that is the colour of THIS face's skin.
+
+    Reference = the median CIELAB colour of those zones; a pixel counts when it is within
+    SKIN_DELTA_E of it. A mask, a scarf, heavy hair or a big shadow lowers it. It cannot see
+    a hand (same colour as the face) and it also lowers for beards over the cheeks."""
+    z = (masks['cheek_left'] > 0) | (masks['cheek_right'] > 0) | (masks['forehead'] > 0) | (masks['nose'] > 0)
+    if z.sum() < 100:
+        return float('nan')
+    px = np.stack([lab[:, :, 0][z] * (100.0 / 255.0), lab[:, :, 1][z] - 128.0, lab[:, :, 2][z] - 128.0], 1)
+    ref = np.median(px, 0)
+    return float((np.linalg.norm(px - ref, axis=1) <= SKIN_DELTA_E).mean())
+
+
+def measure(bgr: np.ndarray, points: np.ndarray, masks: dict | None = None,
+            other_widths: tuple = ()) -> dict:
     """masks: pass the result of fz.zone_masks if you already have it (saves a recompute)."""
     if masks is None:
         masks = fz.zone_masks(points, bgr.shape)
@@ -88,7 +138,12 @@ def measure(bgr: np.ndarray, points: np.ndarray, masks: dict | None = None) -> d
         a, b = float(L[cl].mean()), float(L[cr].mean())
         lr = abs(a - b) / max(1e-6, (a + b) / 2)
     pose = fz.head_pose(points)
+    dark, contrast = eye_cover(luma, masks, points)
     return {
+        'second_face_ratio': round(max(other_widths) / face_w, 3) if other_widths else 0.0,
+        'eye_dark_ratio': round(dark, 3) if dark == dark else float('nan'),
+        'eye_contrast': round(contrast, 3) if contrast == contrast else float('nan'),
+        'skin_visible': round(visible_skin(lab, masks), 3),
         'face_px': round(face_w, 1),
         'sharpness': round(sharp, 1),
         'skin_L_mean': round(float(L[sk].mean()), 1) if sk.any() else float('nan'),
@@ -111,7 +166,7 @@ def judge(m: dict, n_faces: int = 1) -> Quality:
         if sev[level] > sev[q.verdict]:
             q.verdict = level
 
-    if n_faces > 1:
+    if n_faces > 1 and 'second_face_ratio' not in m:    # metrics without face widths: just warn
         flag('warn', f'{n_faces} faces in the frame, only the first is analysed')
 
     def low(key, label, val):
@@ -130,6 +185,17 @@ def judge(m: dict, n_faces: int = 1) -> Quality:
         elif val > w:
             flag('warn', f'{label} {val} > {w}')
 
+    ratio = m.get('second_face_ratio', 0.0)
+    if ratio >= T['second_face_ratio_max'][1]:
+        flag('reject', f'another face in the frame ({ratio:.2f} of the main face width)')
+    elif ratio > T['second_face_ratio_max'][0]:
+        flag('warn', f'a smaller face in the background ({ratio:.2f} of the main face width)')
+    dark, flat = m.get('eye_dark_ratio', float('nan')), m.get('eye_contrast', float('nan'))
+    if dark == dark and flat == flat and dark < T['eyes_covered'][0] and flat < T['eyes_covered'][1]:
+        flag('warn', f'eyes look covered by dark lenses (darkness {dark:.2f}, contrast {flat:.2f})')
+    vis = m.get('skin_visible', float('nan'))
+    if vis == vis and vis < T['skin_visible_min'][0]:
+        flag('warn', f'little visible skin: {vis:.2f} of the cheeks, forehead and nose')
     low('face_px_min', 'face width px', m['face_px'])
     low('sharpness_min', 'blur (sharpness)', m['sharpness'])
     low('skin_chroma_min', 'grayscale photo (skin colour chroma)', m['skin_chroma'])
@@ -146,4 +212,4 @@ def assess(bgr: np.ndarray, zoner: 'fz.FaceZoner') -> Quality:
     res = zoner.detect(bgr)
     if res is None:
         return Quality({}, 'reject', ['reject: no face found'])
-    return judge(measure(bgr, res.points), res.n_faces)
+    return judge(measure(bgr, res.points, None, res.other_widths), res.n_faces)

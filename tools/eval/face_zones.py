@@ -78,6 +78,7 @@ class FaceResult:
     points: np.ndarray       # (478, 3): x, y in pixels, z in pixels (relative depth)
     n_faces: int
     inference_ms: float
+    other_widths: tuple = ()  # widths (px) of the other faces found, 234-454 distance
 
 
 class FaceZoner:
@@ -107,7 +108,8 @@ class FaceZoner:
         faces = [np.array([[p.x * w, p.y * h, p.z * w] for p in f]) for f in res.face_landmarks]
         # the detector's order is arbitrary: analyse the LARGEST face
         pts = max(faces, key=lambda f: np.ptp(f[:, 0]) * np.ptp(f[:, 1]))
-        return FaceResult(pts, len(faces), ms)
+        others = tuple(float(np.linalg.norm(f[454, :2] - f[234, :2])) for f in faces if f is not pts)
+        return FaceResult(pts, len(faces), ms, others)
 
 
 def zone_polygons(points: np.ndarray) -> dict[str, np.ndarray]:
