@@ -225,17 +225,21 @@ test('admin API protection', { skip: SKIP }, async (t) => {
     assert.deepEqual(
       adminRoutes.map((r) => `${r.method} ${r.pattern}`).sort(),
       [
+        'DELETE /admin/api/offers/:id',
         'GET /admin/api/audit',
         'GET /admin/api/categories',
         'GET /admin/api/events',
         'GET /admin/api/me',
+        'GET /admin/api/offers',
         'GET /admin/api/products',
         'GET /admin/api/products/:id',
         'GET /admin/api/stats',
+        'GET /admin/api/stores',
         'GET /admin/api/users',
         'PATCH /admin/api/products/:id',
         'POST /admin/api/login',
         'POST /admin/api/logout',
+        'PUT /admin/api/offers',
       ],
     );
   });

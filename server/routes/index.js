@@ -9,6 +9,7 @@ const { createLimiter } = require('../ratelimit');
 const { registerCatalog } = require('./catalog');
 const { registerAppUser } = require('./app-user');
 const { registerAdmin } = require('./admin');
+const { registerOffers } = require('./offers');
 const { checkAdminAccess } = require('./admin-guard');
 
 const ADMIN_DIR = path.join(__dirname, '..', 'admin');
@@ -47,6 +48,8 @@ function createApi({ db, env = process.env, now = () => Date.now() }) {
     loginLimiter: createLimiter({ limit: 10, windowMs: 15 * 60 * 1000, now }),
     cookieSecure,
   });
+
+  registerOffers(router, { now });
 
   const files = new Map();
   function staticFile(name) {
