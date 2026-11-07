@@ -225,8 +225,8 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
         colorType: p.colorType?.label,
         skinConcerns: [for (final c in p.concerns) c.label],
         source: p.source.code,
-        confidence: merged.photoUsed ? p.confidence : null,
-        clearConfidence: !merged.photoUsed,
+        // the model's self-reported number is not a measurement: not stored
+        clearConfidence: true,
         markCompleted: true,
       );
       if (!mounted) return;
