@@ -1,0 +1,299 @@
+{
+ "comment": "Hand labels of the 37 real products of the catalog, made by the developer from product knowledge, NOT by a dermatologist or the manufacturer. They are the reference for the precision/recall of the classifier, not a proof of correctness: a specialist must review them. purposes = acceptable MAIN purposes (empty: outside the taxonomy, the classifier should send the product to review, or it is not skincare). key_actives = ingredient groups the product is known for.",
+ "products": {
+  "Super Slim Waterproof Mascara": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Better Than Palette 05 Shade & Shadow Garden": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Heart Jam Glow Lip": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Better Than Eyes": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Advanced Snail 96 Mucin Power Essence": {
+   "form": "essence",
+   "rinse_off": false,
+   "purposes": [
+    "hydration"
+   ],
+   "key_actives": [
+    "snail"
+   ]
+  },
+  "Replica Lazy Sunday Morning": {
+   "form": "perfume",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Ink The Velvet 31 Wine Nude": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Ink Mood Glowy Tint 30 Happy Berry": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Glasting Color Gloss": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Magic Cushion Moist Up": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Relief Sun: Rice + Probiotics SPF50+": {
+   "form": "sunscreen",
+   "rinse_off": false,
+   "purposes": [
+    "sunProtection"
+   ],
+   "key_actives": [
+    "uv_filter"
+   ]
+  },
+  "Niacinamide 10% + Zinc 1%": {
+   "form": "serum",
+   "rinse_off": false,
+   "purposes": [
+    "oilControl",
+    "acneCare"
+   ],
+   "key_actives": [
+    "niacinamide",
+    "zinc"
+   ]
+  },
+  "Better Than Cheek": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Moisturizing Cream": {
+   "form": "cream",
+   "rinse_off": false,
+   "purposes": [
+    "barrierRepair",
+    "hydration"
+   ],
+   "key_actives": [
+    "ceramide",
+    "hyaluronic"
+   ]
+  },
+  "Soft Moisturizing Creme": {
+   "form": "cream",
+   "rinse_off": false,
+   "purposes": [
+    "hydration"
+   ],
+   "key_actives": [
+    "glycerin"
+   ]
+  },
+  "Perfect Serum Shampoo": {
+   "form": "shampoo",
+   "rinse_off": true,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Heartleaf 77% Soothing Toner": {
+   "form": "toner",
+   "rinse_off": false,
+   "purposes": [
+    "soothing"
+   ],
+   "key_actives": [
+    "houttuynia"
+   ]
+  },
+  "Glycolic Acid 7% Toning Solution": {
+   "form": "toner",
+   "rinse_off": false,
+   "purposes": [
+    "exfoliation"
+   ],
+   "key_actives": [
+    "glycolic"
+   ]
+  },
+  "Retinol 0.5% in Squalane": {
+   "form": "serum",
+   "rinse_off": false,
+   "purposes": [],
+   "key_actives": [
+    "retinoid"
+   ]
+  },
+  "BHA Blackhead Power Liquid": {
+   "form": "peeling",
+   "rinse_off": false,
+   "purposes": [
+    "exfoliation",
+    "acneCare"
+   ],
+   "key_actives": [
+    "salicylic"
+   ]
+  },
+  "Freshly Juiced Vitamin Drop": {
+   "form": "serum",
+   "rinse_off": false,
+   "purposes": [
+    "brightening"
+   ],
+   "key_actives": [
+    "vitamin_c"
+   ]
+  },
+  "Better Than Palette 00 Light & Glitter Garden": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Better Than Palette 01 Pampas Garden": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Better Than Palette 02 Mahogany Garden": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Better Than Palette 03 Rosebud Garden": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Better Than Palette 07 Berry Fuchsia Garden": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Ink Mood Glowy Tint 03 Rose In Mind": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Juicy Lasting Tint 01 Pomelo Skin": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Mood Recipe Face Blush": {
+   "form": "makeup",
+   "rinse_off": null,
+   "purposes": [],
+   "key_actives": []
+  },
+  "Dive-In Serum": {
+   "form": "serum",
+   "rinse_off": false,
+   "purposes": [
+    "hydration"
+   ],
+   "key_actives": [
+    "hyaluronic"
+   ]
+  },
+  "Madagascar Centella Ampoule": {
+   "form": "ampoule",
+   "rinse_off": false,
+   "purposes": [
+    "soothing"
+   ],
+   "key_actives": [
+    "centella"
+   ]
+  },
+  "Glow Serum: Propolis + Niacinamide": {
+   "form": "serum",
+   "rinse_off": false,
+   "purposes": [
+    "soothing",
+    "brightening",
+    "hydration"
+   ],
+   "key_actives": [
+    "niacinamide"
+   ]
+  },
+  "Hyaluronic Acid Toner": {
+   "form": "toner",
+   "rinse_off": false,
+   "purposes": [
+    "hydration"
+   ],
+   "key_actives": [
+    "hyaluronic"
+   ]
+  },
+  "1025 Dokdo Toner": {
+   "form": "toner",
+   "rinse_off": false,
+   "purposes": [
+    "soothing",
+    "hydration"
+   ],
+   "key_actives": []
+  },
+  "Lip Sleeping Mask": {
+   "form": "lipCare",
+   "rinse_off": false,
+   "purposes": [
+    "hydration"
+   ],
+   "key_actives": []
+  },
+  "Low pH Good Morning Gel Cleanser": {
+   "form": "cleanser",
+   "rinse_off": true,
+   "purposes": [
+    "cleansing"
+   ],
+   "key_actives": []
+  },
+  "Ceramidin Cream": {
+   "form": "cream",
+   "rinse_off": false,
+   "purposes": [
+    "barrierRepair"
+   ],
+   "key_actives": [
+    "ceramide"
+   ]
+  }
+ }
+}
