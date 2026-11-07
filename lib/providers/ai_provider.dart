@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/ai/ai_config.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 
 enum AiStatus { unknown, checking, online, offline }
 
@@ -74,11 +75,21 @@ class AiProvider extends ChangeNotifier {
   /// The user has been asked about [shareProfile] once (first chat message).
   bool profileAsked = false;
 
+  /// The text of chat messages may be sent to the AI (Google Gemini). Asked
+  /// before the first message; without it the chat sends nothing.
+  bool shareChat = false;
+
+  /// The user has been asked about [shareChat].
+  bool chatAsked = false;
+
   static const _kUrl = 'ai_base_url';
   static const _kToken = 'ai_app_token';
   static const _kShareProfile = 'ai_share_profile';
   static const _kSharePhotos = 'ai_share_photos';
   static const _kProfileAsked = 'ai_profile_asked';
+  static const _kShareChat = 'ai_share_chat';
+  static const _kChatAsked = 'ai_chat_asked';
+  static const _kConsentVersion = 'ai_consent_version';
 
   /// Photos may be sent only when the build allows it AND the proxy said so
   /// explicitly. Unknown means no: the photo is never sent "just in case".
@@ -118,6 +129,25 @@ class AiProvider extends ChangeNotifier {
       shareProfile = saved[_kShareProfile] == '1';
       sharePhotos = saved[_kSharePhotos] == '1';
       profileAsked = saved[_kProfileAsked] == '1';
+      shareChat = saved[_kShareChat] == '1';
+      chatAsked = saved[_kChatAsked] == '1';
+      // the wording or the recipients changed since the user agreed: the old
+      // consent no longer counts, everyone is asked again
+      if (int.tryParse(saved[_kConsentVersion] ?? '') !=
+          AiDisclosure.consentVersion) {
+        shareProfile = sharePhotos = profileAsked = false;
+        shareChat = chatAsked = false;
+        for (final k in [
+          _kShareProfile,
+          _kSharePhotos,
+          _kProfileAsked,
+          _kShareChat,
+          _kChatAsked,
+        ]) {
+          await _repo.set(k, '0');
+        }
+        await _repo.set(_kConsentVersion, '${AiDisclosure.consentVersion}');
+      }
     } catch (e) {
       debugPrint('ai settings load failed: $e');
     }
@@ -136,6 +166,8 @@ class AiProvider extends ChangeNotifier {
     shareProfile = false;
     sharePhotos = false;
     profileAsked = false;
+    shareChat = false;
+    chatAsked = false;
     notifyListeners();
   }
 
@@ -160,6 +192,15 @@ class AiProvider extends ChangeNotifier {
     notifyListeners();
     await _repo.set(_kShareProfile, value ? '1' : '0');
     await _repo.set(_kProfileAsked, '1');
+  }
+
+  Future<void> setShareChat(bool value) async {
+    shareChat = value;
+    chatAsked = true;
+    notifyListeners();
+    await _repo.set(_kShareChat, value ? '1' : '0');
+    await _repo.set(_kChatAsked, '1');
+    await _repo.set(_kConsentVersion, '${AiDisclosure.consentVersion}');
   }
 
   Future<void> setSharePhotos(bool value) async {

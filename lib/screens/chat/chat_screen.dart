@@ -8,6 +8,7 @@ import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 import 'package:cosmetix/widgets/product_mini_card.dart';
@@ -91,15 +92,37 @@ class _ChatScreenState extends State<ChatScreen> {
       );
       return;
     }
+    if (!ai.chatAsked) {
+      // privacy: the text of the messages goes to Google Gemini through the
+      // Cosmetix server; asked once, can be withdrawn in Settings
+      final ok = await confirmDialog(
+        context,
+        title: tr('Отправлять сообщения в ИИ?'),
+        message: AiDisclosure.chatConsent(ai.dataUse, tr),
+        confirmLabel: tr('Разрешить'),
+      );
+      if (!mounted) return;
+      await ai.setShareChat(ok);
+      if (!mounted) return;
+    }
+    if (!ai.shareChat) {
+      FocusManager.instance.primaryFocus?.unfocus();
+      showMessage(
+        context,
+        tr(
+          'Без согласия на отправку сообщений ИИ-чат не отвечает. Включить можно в Настройках.',
+        ),
+        type: MessageType.info,
+      );
+      return;
+    }
     if (!ai.profileAsked) {
       // privacy: the Beauty profile and blacklist leave the phone only if the
       // user agrees (asked once, can be changed in Settings)
       final ok = await confirmDialog(
         context,
         title: tr('Учитывать ваши данные?'),
-        message: tr(
-          'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер ИИ. Фото и контакты не отправляются. Это можно изменить в Настройках.',
-        ),
+        message: AiDisclosure.profileConsent(tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!mounted) return;
@@ -430,6 +453,9 @@ class _OfflineBanner extends StatelessWidget {
     AiFailure.notConfigured => tr('Адрес сервера ИИ не задан'),
     AiFailure.unavailable => tr('ИИ-помощник сейчас недоступен'),
     AiFailure.ageRestricted => tr('ИИ-помощник доступен с 18 лет'),
+    AiFailure.consentRequired => tr(
+      'Нужно согласие на отправку сообщений в ИИ',
+    ),
   };
 
   String get _hint => switch (failure) {
@@ -442,6 +468,9 @@ class _OfflineBanner extends StatelessWidget {
     ),
     AiFailure.ageRestricted => tr(
       'Укажите год рождения в профиле. Остальные функции работают.',
+    ),
+    AiFailure.consentRequired => tr(
+      'Включите его в Кабинет → Настройки → ИИ-ассистент.',
     ),
     _ => tr('Остальные функции приложения работают.'),
   };
@@ -479,7 +508,8 @@ class _OfflineBanner extends StatelessWidget {
             ),
           ),
           if (failure != AiFailure.notConfigured &&
-              failure != AiFailure.ageRestricted)
+              failure != AiFailure.ageRestricted &&
+              failure != AiFailure.consentRequired)
             TextButton(onPressed: onRetry, child: Text(tr('Повторить'))),
         ],
       ),

@@ -1609,4 +1609,33 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Photo analysis is switched off right now. The test works from your answers, no photo is needed.',
   'Сервер отключил анализ по фото: фото не отправляются.':
       'The server has switched photo analysis off: photos are not sent.',
+  'Google не использует отправленное для улучшения своих продуктов; запросы хранятся ограниченное время только для выявления нарушений.':
+      'Google does not use what is sent to improve its products; requests are kept for a limited time only to detect abuse.',
+  'Сейчас сервер работает на бесплатном тарифе Google: Google может использовать отправленное для улучшения своих продуктов, и это могут просматривать люди.':
+      'The server currently runs on Google\'s free tier: Google may use what is sent to improve its products, and people may review it.',
+  'Как Google использует отправленное, сервер не сообщил: считайте, что это может быть использовано и просмотрено людьми.':
+      'The server did not say how Google uses what is sent: assume it may be used and reviewed by people.',
+  'Фото будет отправлено на сервер Cosmetix и через него в сервис Google Gemini, чтобы оценить цвет кожи. Приложение не сохраняет фото и удаляет его с телефона после анализа.':
+      'The photo will be sent to the Cosmetix server and through it to Google Gemini to estimate your skin colour. The app does not keep the photo and deletes it from the phone after the analysis.',
+  'Результат это подсказка, а не измерение и не диагноз. Согласие можно отозвать в Настройках.':
+      'The result is a hint, not a measurement or a diagnosis. You can withdraw your consent in Settings.',
+  'Ваши сообщения в чате будут отправляться на сервер Cosmetix и через него в сервис Google Gemini. Не пишите там личные данные.':
+      'Your chat messages will be sent to the Cosmetix server and through it to Google Gemini. Do not write personal data there.',
+  'Согласие можно отозвать в Настройках.':
+      'You can withdraw your consent in Settings.',
+  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер Cosmetix и в Google Gemini. Фото и контакты не отправляются. Это можно изменить в Настройках.':
+      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the Cosmetix server and to Google Gemini. Photos and contacts are not sent. You can change this in Settings.',
+  'Отправлять сообщения в ИИ?': 'Send messages to the AI?',
+  'Без согласия на отправку сообщений ИИ-чат не отвечает. Включить можно в Настройках.':
+      'Without consent to send messages the AI chat does not answer. You can turn it on in Settings.',
+  'Нужно согласие на отправку сообщений в ИИ':
+      'Consent to send messages to the AI is needed',
+  'Включите его в Кабинет → Настройки → ИИ-ассистент.':
+      'Turn it on in Profile → Settings → AI assistant.',
+  'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.':
+      'The photo goes to the AI server only after your consent. Cosmetix does not keep it.',
+  'Отправлять ИИ сообщения чата': 'Send chat messages to the AI',
+  'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.':
+      'Data goes to the Cosmetix server and to Google Gemini only after your consent.',
+  'Отправить профиль в ИИ?': 'Send the profile to the AI?',
 };

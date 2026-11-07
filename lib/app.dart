@@ -178,7 +178,10 @@ class _CosmetixAppState extends State<CosmetixApp> {
               create: (_) => ProductClassifier(_ai.client, _products, _safety),
             ),
             Provider<RecommendationRefiner>(
-              create: (_) => RecommendationRefiner(_ai.client),
+              create: (_) => RecommendationRefiner(
+                _ai.client,
+                profileAllowed: () => _ai.shareProfile,
+              ),
             ),
             ChangeNotifierProvider(create: (_) => NavProvider()),
             ChangeNotifierProvider<CatalogProvider>.value(
@@ -198,6 +201,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
                 ChatRepository(widget.helper),
                 AssistantService(_reco, _ai.client, stores: _storeContext),
                 shareProfile: () => _ai.shareProfile,
+                chatAllowed: () => _ai.shareChat,
               ),
             ),
           ],
