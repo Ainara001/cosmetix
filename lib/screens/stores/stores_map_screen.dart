@@ -126,6 +126,7 @@ class _StoresMapScreenState extends State<StoresMapScreen> {
       StockLevel.inStock => AppColors.success,
       StockLevel.low => AppColors.warning,
       StockLevel.out => const Color(0xFF9A9A9A),
+      StockLevel.unknown => context.pal.accent,
     };
   }
 
@@ -670,6 +671,11 @@ class _StoreCard extends StatelessWidget {
         const Color(0xFF9A6A12),
         const Color(0xFFFBF0D9),
         trf('Мало · {v0} шт.', {'v0': o!.qty}),
+      ),
+      StockLevel.unknown => (
+        context.pal.subtext,
+        context.pal.field,
+        tr('Наличие не проверено'),
       ),
       StockLevel.out => (
         AppColors.sale,

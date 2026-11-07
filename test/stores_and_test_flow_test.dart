@@ -14,6 +14,7 @@ import 'package:cosmetix/database/store_data.dart';
 import 'package:cosmetix/models/ai_models.dart';
 import 'package:cosmetix/models/beauty_profile.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/models/store_offer.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/location_provider.dart';
 import 'package:cosmetix/repositories/cart_repository.dart';
@@ -39,6 +40,7 @@ StorePrice _offer({bool inStock = true, int? qty, String hours = ''}) =>
       rating: 0,
       price: 1000,
       inStock: inStock,
+      availability: inStock ? Availability.inStock : Availability.outOfStock,
       qty: qty,
       hours: hours,
     );
@@ -86,18 +88,32 @@ void main() {
       expect(podruzhka.every((s) => s.source.contains('не проверен')), isTrue);
     });
 
-    test('every product has an offer in every shop, marked as demo', () async {
-      final prices = await repo.getStorePrices(12);
-      expect(prices.length, 13);
-      expect(prices.every((p) => p.demo), isTrue);
-      expect(prices.every((p) => p.hasPosition), isTrue);
-      // some shops have it, some do not, some have only a few
-      expect(prices.any((p) => p.level == StockLevel.out), isTrue);
-      expect(prices.any((p) => p.level == StockLevel.inStock), isTrue);
-      // an out-of-stock shop has no units, an in-stock shop has some
-      for (final p in prices) {
-        expect(p.inStock, (p.qty ?? 0) > 0, reason: p.address);
-      }
+    test(
+      'offers come only from verified shop offers, never from the demo rows',
+      () async {
+        final prices = await repo.getStorePrices(12);
+        expect(prices.length, 13); // the test fixture verifies every demo row
+        expect(prices.every((p) => !p.demo), isTrue);
+        expect(prices.every((p) => p.hasPosition), isTrue);
+        expect(prices.any((p) => p.level == StockLevel.out), isTrue);
+        expect(prices.any((p) => p.level == StockLevel.inStock), isTrue);
+        expect(prices.every((p) => p.updatedAt != null), isTrue);
+      },
+    );
+
+    test('without verified offers there is no price at all', () async {
+      final saved = DatabaseHelper.afterSeed;
+      DatabaseHelper.afterSeed = null;
+      addTearDown(() => DatabaseHelper.afterSeed = saved);
+      final bare = DatabaseHelper(path: inMemoryDatabasePath);
+      addTearDown(bare.close);
+      final r = ProductRepository(bare);
+      expect(await r.getStorePrices(12), isEmpty);
+      final p = (await r.getById(12, 1))!;
+      expect(p.price, 0, reason: 'the seed price is a demo value, not shown');
+      expect(p.hasPrice, isFalse);
+      expect(p.availability, Availability.unknown);
+      expect(p.inStock, isTrue, reason: 'unknown is not out of stock');
     });
 
     test('the demo data is stable: the same on every install', () async {
@@ -280,7 +296,7 @@ void main() {
       expect(text, contains('2.4 km'));
       expect(text, contains('few left (2 pcs)'));
       expect(text, contains('out of stock'));
-      expect(text, contains('[demo data]'));
+      expect(text, isNot(contains('[demo data]')));
       expect(text, contains('пр. Сарыарка, 15'));
     });
 
@@ -611,10 +627,10 @@ void main() {
         await t.pump(const Duration(milliseconds: 100));
       }
       expect(find.text('Где купить'), findsOneWidget);
-      // demo note, location note
+      // no demo note: the offers on the screen are verified ones
       expect(
         find.textContaining('цены и наличие демонстрационные'),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.text('Расстояния считаются от вашего положения'),
@@ -623,7 +639,7 @@ void main() {
       // the first shop is at the user's position: 0 m, listed first
       expect(find.text('Диона'), findsWidgets);
       expect(find.textContaining('0 м от вас'), findsWidgets);
-      expect(find.text('демо-данные'), findsWidgets);
+      expect(find.text('демо-данные'), findsNothing);
       // filter by chain: only that chain's shops stay in the list
       expect(find.text('Диона'), findsWidgets);
       await t.tap(

@@ -28,7 +28,11 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  String priceText(int tenge) => Formatters.price(tenge, currency);
+  /// A price in the chosen currency; "price not confirmed" for 0 (no verified
+  /// shop price): the app never shows a made-up amount.
+  String priceText(int tenge) => tenge <= 0
+      ? tr('Цена не подтверждена')
+      : Formatters.price(tenge, currency);
 
   Future<void> setPush(bool value) async {
     pushEnabled = value;

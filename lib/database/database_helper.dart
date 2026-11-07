@@ -15,10 +15,16 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 16;
+  static const dbVersion = 17;
 
   final String? path;
   Database? _db;
+
+  /// TESTS ONLY: runs after the demo data is created (fresh install and the
+  /// demo reset). The tests that exercise the cart and the shop screens use it
+  /// to add verified shop offers; the app itself never sets it, so a real
+  /// install has NO shop prices until a person verifies some.
+  static Future<void> Function(DatabaseExecutor db)? afterSeed;
 
   Future<Database> get database async => _db ??= await _open();
 
@@ -43,6 +49,7 @@ class DatabaseHelper {
     }
     await _migrate(db, 3, version);
     await SeedData.insertAll(db);
+    await afterSeed?.call(db);
   }
 
   /// Safe upgrade: runs the migrations one by one, user data is never dropped.
@@ -173,6 +180,14 @@ class DatabaseHelper {
       }
       await SeedData.applyCatalogStructure(db);
     },
+    // real offers of shops: only prices, stock and links that a person checked
+    // (with the source, the way and the time). A new table only; the old
+    // `product_prices` rows (demo values) stay in the file but are not shown.
+    17: (db) async {
+      for (final sql in _schemaV17) {
+        await db.execute(sql);
+      }
+    },
   };
 
   static Future<void> _addColumn(
@@ -201,6 +216,7 @@ class DatabaseHelper {
         await txn.execute("DELETE FROM sqlite_sequence WHERE name = '$table'");
       }
       await SeedData.insertAll(txn);
+      await afterSeed?.call(txn);
     });
     await AppPaths.deletePhotos();
   }
@@ -219,6 +235,7 @@ class DatabaseHelper {
     'products',
     'product_prices',
     'product_shades',
+    'store_offers',
     'product_shade_pans',
     'product_variant_facts',
     'product_lines',
@@ -237,6 +254,52 @@ class DatabaseHelper {
     'care_steps',
     'care_logs',
     'reaction_history',
+  ];
+
+  /// Schema version 17: real offers of shops.
+  ///
+  /// One row = what is known about ONE product in ONE shop of a city, as of
+  /// `checked_at`. Nothing here is a default or a guess:
+  /// * `price` is NULL when the price was not confirmed;
+  /// * `availability` is `unknown` unless it was really checked;
+  /// * `url_kind` says whether the link opens the product (`product`), only a
+  ///   search on the shop's site (`search`) or there is no link (`none`);
+  /// * `source` says where the information comes from, `method` how it was
+  ///   obtained, `verification` how far it can be trusted. The app shows only
+  ///   `verified` offers.
+  static const _schemaV17 = [
+    '''
+CREATE TABLE IF NOT EXISTS store_offers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  store_id INTEGER NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+  city TEXT NOT NULL DEFAULT 'Астана',
+  price INTEGER CHECK (price IS NULL OR price > 0),
+  old_price INTEGER CHECK (old_price IS NULL OR old_price > 0),
+  availability TEXT NOT NULL DEFAULT 'unknown' CHECK (availability IN
+    ('in_stock', 'out_of_stock', 'unknown')),
+  url TEXT,
+  url_kind TEXT NOT NULL DEFAULT 'none' CHECK (url_kind IN
+    ('product', 'search', 'none')),
+  volume_text TEXT,
+  variant_text TEXT,
+  source TEXT NOT NULL CHECK (length(trim(source)) > 0),
+  method TEXT NOT NULL CHECK (method IN
+    ('manual_visit', 'manual_site', 'partner_feed', 'official_api',
+     'import_file')),
+  verification TEXT NOT NULL DEFAULT 'unverified' CHECK (verification IN
+    ('verified', 'unverified', 'disputed')),
+  checked_at INTEGER NOT NULL,
+  checked_by TEXT,
+  note TEXT,
+  UNIQUE (product_id, store_id),
+  CHECK (url_kind = 'none' OR url IS NOT NULL),
+  CHECK (url IS NULL OR url LIKE 'https://%' OR url LIKE 'http://%'),
+  CHECK (old_price IS NULL OR price IS NULL OR old_price > price),
+  CHECK (verification <> 'verified' OR price IS NOT NULL OR
+         availability <> 'unknown' OR url_kind = 'product')
+)''',
+    'CREATE INDEX IF NOT EXISTS idx_offers_product ON store_offers(product_id)',
   ];
 
   /// Schema version 16: the structure of cosmetic products.
