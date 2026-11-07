@@ -127,6 +127,17 @@ Future<void> main() async {
     await _settle(t);
   }
 
+  /// The AI consultant is for adults (the age gate): the demo account has no
+  /// year of birth, so the chat tests give it one before signing in.
+  Future<void> makeAdult(WidgetTester t, DatabaseHelper h) => t.runAsync(
+    () async => (await h.database).update(
+      'users',
+      {'birth_year': 1990},
+      where: 'email = ?',
+      whereArgs: [SeedData.demoEmail],
+    ),
+  );
+
   NavigatorState nav(WidgetTester t) =>
       t.state<NavigatorState>(find.byType(Navigator).first);
 
@@ -225,11 +236,22 @@ Future<void> main() async {
     await launch(t);
     await loginDemo(t);
     await open(t, AppRoutes.colorTest);
-    // 5 questions: the first option every time
-    for (var step = 0; step < 5; step++) {
-      await t.tap(find.byType(AppCard).first);
+    // the colour test: the first answer every time, until the last step offers
+    // the way to the undertone test (the number of steps is not fixed here)
+    for (var step = 0; step < 12; step++) {
+      // the first card of a step can be the "let the AI decide from a photo"
+      // banner: the answers are the cards after it
+      final banner = find
+          .textContaining('Не знаете ответов')
+          .evaluate()
+          .isNotEmpty;
+      await t.tap(find.byType(AppCard).at(banner ? 1 : 0));
       await _settle(t, 2);
-      await _tap(t, find.text(step == 4 ? 'К тесту на подтон' : 'Далее'));
+      if (find.text('К тесту на подтон').evaluate().isNotEmpty) {
+        await _tap(t, find.text('К тесту на подтон'));
+        break;
+      }
+      await _tap(t, find.text('Далее'));
     }
     // undertone test
     await _until(t, find.text('Тест на подтон кожи'));
@@ -239,9 +261,15 @@ Future<void> main() async {
     await _until(t, find.text('Тест: ваша кожа'));
     await _tap(t, find.byIcon(Icons.radio_button_off).first);
     await _tap(t, find.text('Далее'));
-    // optional photo step is skipped
-    await _until(t, find.text('Пропустить'));
-    await _tap(t, find.text('Пропустить'));
+    // optional photo step is skipped. A user whose age is not given (the demo
+    // account) gets "continue without the photo" instead (the age gate)
+    final skip = find.byWidgetPredicate(
+      (w) =>
+          w is Text &&
+          (w.data == 'Пропустить' || w.data == 'Продолжить без фото'),
+    );
+    await _until(t, skip);
+    await _tap(t, skip.first);
     await _see(t, find.text('Подобрать косметику для меня'));
     expect(t.takeException(), isNull);
   });
@@ -318,13 +346,15 @@ Future<void> main() async {
   testWidgets('14. a question to the AI consultant (fake proxy)', (t) async {
     // [#1] is how the assistant marks a catalog product (shown as a card)
     ai.chatAnswer = 'Это крем подойдёт для сухой кожи. [#1]';
-    await launch(t);
+    final h = await launch(t);
+    await makeAdult(t, h);
     await loginDemo(t);
     final ctx = t.element(find.byType(Scaffold).first);
     await t.runAsync(() async {
       final provider = ctx.read<AiProvider>();
       await provider.update(baseUrl: ai.url);
       await provider.setShareProfile(true); // consent was given
+      await provider.setShareChat(true); // and for the chat messages
     });
     await _tap(t, find.text('ИИ Чат').last);
     await t.enterText(find.byType(TextField).last, 'Какой крем выбрать?');
@@ -339,13 +369,15 @@ Future<void> main() async {
   });
 
   testWidgets('15. the AI being unavailable is handled', (t) async {
-    await launch(t);
+    final h = await launch(t);
+    await makeAdult(t, h);
     await loginDemo(t);
     final ctx = t.element(find.byType(Scaffold).first);
     await t.runAsync(() async {
       final provider = ctx.read<AiProvider>();
       await provider.update(baseUrl: 'http://127.0.0.1:1');
       await provider.setShareProfile(false);
+      await provider.setShareChat(true); // the question itself may be sent
     });
     await _tap(t, find.text('ИИ Чат').last);
     await t.enterText(find.byType(TextField).last, 'Привет');
