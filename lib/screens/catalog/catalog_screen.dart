@@ -8,6 +8,7 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product_filter.dart';
 import 'package:cosmetix/providers/ai_provider.dart';
+import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/routes/app_routes.dart';
@@ -62,6 +63,28 @@ class _CatalogScreenState extends State<CatalogScreen> {
   /// catalog works the same without it.
   Future<void> _refineWithAi(CatalogProvider catalog) async {
     final ai = context.read<AiProvider>();
+    if (!ai.ageAllowed) {
+      showMessage(
+        context,
+        tr(
+          'Уточнение с помощью ИИ доступно с 18 лет. Укажите год рождения в профиле.',
+        ),
+        type: MessageType.info,
+      );
+      return;
+    }
+    if (!ai.shareProfile) {
+      // the request carries the Beauty profile: ask first, like the chat does
+      final ok = await confirmDialog(
+        context,
+        title: tr('Отправить профиль в ИИ?'),
+        message: AiDisclosure.profileConsent(tr),
+        confirmLabel: tr('Разрешить'),
+      );
+      if (!mounted) return;
+      await ai.setShareProfile(ok);
+      if (!ok || !mounted) return;
+    }
     final refiner = context.read<RecommendationRefiner>();
     setState(() => _aiBusy = true);
     final ok = await catalog.refineWithAi(refiner);

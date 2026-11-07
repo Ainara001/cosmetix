@@ -7,9 +7,15 @@ import 'package:cosmetix/services/ai/ai_client.dart';
 /// blacklist filter and the local scoring, and it can only reorder them: ids
 /// it makes up are dropped, so it can never bring back an excluded product.
 class RecommendationRefiner {
-  RecommendationRefiner(this._client);
+  RecommendationRefiner(this._client, {bool Function()? profileAllowed})
+    : _profileAllowed = profileAllowed ?? (() => true);
 
   final AiClient _client;
+
+  /// The request carries the Beauty profile (skin type, tone, undertone, colour
+  /// type, concerns), so it needs the same consent as the profile in the chat.
+  /// Without it nothing is sent. Wired in `app.dart`; tests default to allowed.
+  final bool Function() _profileAllowed;
 
   static const maxItems = 12;
 
@@ -18,6 +24,11 @@ class RecommendationRefiner {
     required BeautyProfile profile,
     required List<Recommendation> candidates,
   }) async {
+    if (!_profileAllowed()) {
+      throw const AiNotAllowed(
+        'No consent to send the Beauty profile to the AI',
+      );
+    }
     final top = candidates.take(maxItems).toList();
     if (top.length < 2) return [for (final r in candidates) r.product.id];
     final lines = [

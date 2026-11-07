@@ -6,11 +6,31 @@ import 'package:cosmetix/services/ai/ai_client.dart';
 import 'package:cosmetix/services/assistant_service.dart';
 
 /// Why the AI could not answer (decides which message the chat shows).
-enum AiFailure { unavailable, notConfigured, timeout, rateLimited }
+enum AiFailure {
+  unavailable,
+  notConfigured,
+  timeout,
+  rateLimited,
+
+  /// The remote AI is not offered to this user (under 18 or age unknown).
+  ageRestricted,
+
+  /// The user has not agreed to send chat messages to the AI: nothing was sent.
+  consentRequired,
+}
 
 class ChatProvider extends ChangeNotifier {
-  ChatProvider(this._repo, this._assistant, {bool Function()? shareProfile})
-    : _shareProfile = shareProfile ?? (() => false);
+  ChatProvider(
+    this._repo,
+    this._assistant, {
+    bool Function()? shareProfile,
+    bool Function()? chatAllowed,
+  }) : _shareProfile = shareProfile ?? (() => false),
+       _chatAllowed = chatAllowed ?? (() => true);
+
+  /// Whether the user agreed to send chat messages to the AI. Without it the
+  /// message is not even saved as a question: nothing is sent.
+  final bool Function() _chatAllowed;
 
   final ChatRepository _repo;
   final AssistantService _assistant;
@@ -56,6 +76,13 @@ class ChatProvider extends ChangeNotifier {
     final userId = _userId;
     final clean = text.trim();
     if (userId == null || clean.isEmpty || typing) return;
+    if (!_chatAllowed()) {
+      aiUnavailable = true;
+      aiError = 'No consent to send chat messages to the AI';
+      aiFailure = AiFailure.consentRequired;
+      notifyListeners();
+      return;
+    }
     await _repo.add(userId, clean, isUser: true);
     messages = await _repo.messages(userId);
     _lastQuestion = clean;
@@ -97,6 +124,7 @@ class ChatProvider extends ChangeNotifier {
       aiUnavailable = true;
       aiError = e.message;
       aiFailure = switch (e) {
+        AiNotAllowed() => AiFailure.ageRestricted,
         AiRateLimited() => AiFailure.rateLimited,
         AiTimeout() => AiFailure.timeout,
         AiUnavailable(message: 'The AI server address is not set') =>

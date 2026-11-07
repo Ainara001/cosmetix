@@ -135,18 +135,6 @@ class ColorResultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(photoLine, style: AppTextStyles.subtitle),
-                  if (result.photoUsed && p.confidence != null)
-                    Text(
-                      trf('Уверенность анализа фото: {n}%', {
-                        'n': (p.confidence! * 100).round(),
-                      }),
-                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
-                    ),
-                  for (final o in result.observations)
-                    Text(
-                      '• $o',
-                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
-                    ),
                 ],
               ),
             ),
