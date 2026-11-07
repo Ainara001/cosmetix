@@ -1583,6 +1583,16 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Примерить': 'Try on',
   'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
       'Try-on is not available: the catalog has no colour data for this shade.',
+  'Цена не подтверждена': 'Price not confirmed',
+  'НАЛИЧИЕ НЕ ПРОВЕРЕНО': 'STOCK NOT CHECKED',
+  'Наличие не проверено': 'Stock not checked',
+  'Проверенных цен в магазинах пока нет. Мы показываем только цены, которые проверены вручную, с датой проверки.':
+      'There are no verified shop prices yet. We show only prices that were checked by hand, with the date of the check.',
+  'Проверено {d}': 'Checked {d}',
+  'Цена на момент последней проверки: {d}': 'Price at the last check: {d}',
+  'Посмотреть товар в магазине': 'View the product in the shop',
+  'Поиск в магазине': 'Search in the shop',
+  'Цена на {d}': 'Price on {d}',
   'Это подсказка для подбора косметики, а не измерение и не диагноз. Цветотип по фото ориентировочный: если ответы анкеты и фото расходятся, решайте сами.':
       'This is a hint for choosing cosmetics, not a measurement and not a diagnosis. The colour type from a photo is approximate: if your answers and the photo disagree, decide for yourself.',
   'Что стоит знать об анализе по фото': 'What to know about photo analysis',

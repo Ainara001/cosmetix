@@ -1,4 +1,5 @@
 import 'package:cosmetix/core/i18n/tr.dart';
+import 'package:cosmetix/models/store_offer.dart';
 
 class Product {
   const Product({
@@ -9,7 +10,6 @@ class Product {
     required this.zone,
     required this.price,
     this.oldPrice,
-    required this.inStock,
     required this.art,
     required this.color,
     required this.description,
@@ -23,16 +23,37 @@ class Product {
     this.isFavorite = false,
     this.featured = false,
     this.trending = false,
-  });
+    bool inStock = true,
+    Availability? availability,
+    this.priceCheckedAt,
+  }) : availability =
+           availability ??
+           (inStock ? Availability.unknown : Availability.outOfStock);
 
   final int id;
   final String brand;
   final String name;
   final String category;
   final String zone;
+
+  /// The lowest VERIFIED shop price in tenge; 0 when no verified price exists
+  /// (the screens then say "price not confirmed"). It is never the demo value
+  /// of the seed.
   final int price;
   final int? oldPrice;
-  final bool inStock;
+
+  /// False only when a verified offer says the product is out of stock;
+  /// "unknown" is not "out of stock" (so recommendations keep such products).
+  bool get inStock => availability != Availability.outOfStock;
+
+  /// What the verified offers say about stock: in stock, out of stock, or
+  /// unknown (nothing checked).
+  final Availability availability;
+
+  /// When the shown price was checked (epoch ms); null without a price.
+  final int? priceCheckedAt;
+
+  bool get hasPrice => price > 0;
   final String art;
   final int color;
   final String description;
@@ -75,7 +96,6 @@ class Product {
     zone: zone,
     price: price,
     oldPrice: oldPrice,
-    inStock: inStock,
     art: art,
     color: color,
     description: description,
@@ -89,6 +109,8 @@ class Product {
     isFavorite: isFavorite ?? this.isFavorite,
     featured: featured,
     trending: trending,
+    availability: availability,
+    priceCheckedAt: priceCheckedAt,
   );
 
   factory Product.fromMap(Map<String, Object?> m) => Product(
@@ -97,9 +119,17 @@ class Product {
     name: m['name'] as String,
     category: m['category'] as String? ?? '',
     zone: m['zone'] as String? ?? '',
-    price: m['price'] as int,
-    oldPrice: m['old_price'] as int?,
-    inStock: (m['in_stock'] as int? ?? 1) == 1,
+    // only a verified shop price is a price; the seed's demo value is ignored
+    price: m['verified_price'] as int? ?? 0,
+    oldPrice: m['verified_old_price'] as int?,
+    availability:
+        (m['offers_out_of_stock'] as int? ?? 0) > 0 &&
+            (m['offers_in_stock'] as int? ?? 0) == 0
+        ? Availability.outOfStock
+        : (m['offers_in_stock'] as int? ?? 0) > 0
+        ? Availability.inStock
+        : Availability.unknown,
+    priceCheckedAt: m['verified_checked_at'] as int?,
     art: m['art'] as String? ?? 'bottle',
     color: m['color'] as int? ?? 0xFFF4B6C2,
     description: m['description'] as String? ?? '',
@@ -119,7 +149,7 @@ class Product {
 String? _nonEmpty(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
 
 /// Stock of a product in a shop.
-enum StockLevel { inStock, low, out }
+enum StockLevel { inStock, low, out, unknown }
 
 /// Price of one product in one store.
 class StorePrice {
@@ -136,9 +166,13 @@ class StorePrice {
     this.chain = '',
     this.hours = '',
     this.qty,
-    this.demo = true,
+    this.demo = false,
     this.updatedAt,
     this.locationSource = '',
+    this.availability = Availability.unknown,
+    this.url,
+    this.urlKind = UrlKind.none,
+    this.sourceText = '',
   });
 
   final int storeId;
@@ -168,10 +202,22 @@ class StorePrice {
   /// Where the shop's position comes from.
   final String locationSource;
 
+  /// Stock as checked: `unknown` is not `out of stock`.
+  final Availability availability;
+
+  /// Link to the product (or only to a search) on the shop's site, if any.
+  final String? url;
+  final UrlKind urlKind;
+
+  /// Where the price comes from (shown with the check date).
+  final String sourceText;
+
   bool get hasPosition => lat != null && lng != null;
 
   /// A few units left (3 or fewer).
-  StockLevel get level => !inStock
+  StockLevel get level => availability == Availability.unknown
+      ? StockLevel.unknown
+      : !inStock
       ? StockLevel.out
       : (qty != null && qty! <= 3 ? StockLevel.low : StockLevel.inStock);
 
@@ -192,6 +238,10 @@ class StorePrice {
     demo: demo,
     updatedAt: updatedAt,
     locationSource: locationSource,
+    availability: availability,
+    url: url,
+    urlKind: urlKind,
+    sourceText: sourceText,
   );
 
   String get distanceLabel => distanceM >= 1000
@@ -210,15 +260,21 @@ class StorePrice {
     address: m['address'] as String,
     rating: (m['rating'] as num).toDouble(),
     price: m['price'] as int,
-    inStock: (m['in_stock'] as int? ?? 1) == 1,
+    inStock:
+        Availability.of(m['availability'] as String?) !=
+        Availability.outOfStock,
     lat: (m['lat'] as num?)?.toDouble(),
     lng: (m['lng'] as num?)?.toDouble(),
     chain: m['chain'] as String? ?? '',
     hours: m['hours'] as String? ?? '',
     qty: m['qty'] as int?,
-    demo: (m['offer_source'] as String? ?? 'demo') == 'demo',
+    demo: false,
     updatedAt: m['updated_at'] as int?,
     locationSource: m['loc_source'] as String? ?? '',
+    availability: Availability.of(m['availability'] as String?),
+    url: m['url'] as String?,
+    urlKind: UrlKind.of(m['url_kind'] as String?),
+    sourceText: m['offer_source'] as String? ?? '',
   );
 }
 

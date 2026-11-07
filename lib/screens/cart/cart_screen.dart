@@ -329,20 +329,33 @@ class _CartScreenState extends State<CartScreen> {
                               color: pal.subtext,
                             ),
                           ),
-                          Text(
-                            fmt(cart.payable),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
+                          if (cart.payable > 0) ...[
+                            Text(
+                              fmt(cart.payable),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
-                          ),
-                          Text(
-                            trf('+{v0} бонусов', {'v0': cart.bonus}),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: context.pal.accent,
+                            Text(
+                              trf('+{v0} бонусов', {'v0': cart.bonus}),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: context.pal.accent,
+                              ),
                             ),
-                          ),
+                          ] else
+                            // no verified price in the cart: no amount
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 120),
+                              child: Text(
+                                tr('Цена не подтверждена'),
+                                style: AppTextStyles.small.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: pal.subtext,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                       const SizedBox(width: 16),
