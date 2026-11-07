@@ -11,6 +11,7 @@ import 'package:cosmetix/features/virtual_makeup/engine/blemish_suggester.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/color_math.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/color_transfer_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/makeup_backend.dart';
+import 'package:cosmetix/features/virtual_makeup/engine/pigment_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/polygon_raster.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/protection_mask.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/rgba_image.dart';
@@ -48,18 +49,6 @@ double _detail(List<double> l, int w, int h, bool Function(int x, int y) mask) {
     }
   }
   return e;
-}
-
-int _samePixels(RgbaImage a, RgbaImage b) {
-  var n = 0;
-  for (var i = 0; i < a.width * a.height; i++) {
-    if (a.pixels[i * 4] == b.pixels[i * 4] &&
-        a.pixels[i * 4 + 1] == b.pixels[i * 4 + 1] &&
-        a.pixels[i * 4 + 2] == b.pixels[i * 4 + 2]) {
-      n++;
-    }
-  }
-  return n;
 }
 
 void main() {
@@ -263,201 +252,222 @@ void main() {
     });
   });
 
-  group('the colour-transfer engine keeps the contract', () {
-    final f = SyntheticFace.build();
-    final face = PreparedFace.from(f.image, f.points);
-    const look = MakeupLook();
+  for (final (engineName, backend) in <(String, SyncMakeupBackend)>[
+    ('colour-transfer', const ColorTransferBackend()),
+    ('pigment', const PigmentBackend()),
+  ]) {
+    group('the $engineName engine keeps the contract', () {
+      final f = SyntheticFace.build();
+      final face = PreparedFace.from(f.image, f.points);
+      const look = MakeupLook();
 
-    test(
-      'intensity 0 or nothing enabled: the photo comes back byte for byte',
-      () {
-        final off = const MakeupLook(
-          lips: ZoneLook(color: Color(0xFFB03A48), intensity: 0),
-          eyeshadow: ZoneLook(color: Color(0xFF8A6A7A), enabled: false),
-          blush: ZoneLook(color: Color(0xFFE08A8A), intensity: 0),
-        );
-        final out = _backend.renderSync(MakeupRequest(face: face, look: off));
-        expect(out.pixels, orderedEquals(face.image.pixels));
-      },
-    );
+      test(
+        'intensity 0 or nothing enabled: the photo comes back byte for byte',
+        () {
+          final off = const MakeupLook(
+            lips: ZoneLook(color: Color(0xFFB03A48), intensity: 0),
+            eyeshadow: ZoneLook(color: Color(0xFF8A6A7A), enabled: false),
+            blush: ZoneLook(color: Color(0xFFE08A8A), intensity: 0),
+          );
+          final out = backend.renderSync(MakeupRequest(face: face, look: off));
+          expect(out.pixels, orderedEquals(face.image.pixels));
+        },
+      );
 
-    test('the result is a copy: the original photo is never touched', () {
-      final before = Uint8List.fromList(face.image.pixels);
-      final out = _backend.renderSync(MakeupRequest(face: face, look: look));
-      expect(identical(out.pixels, face.image.pixels), isFalse);
-      expect(face.image.pixels, orderedEquals(before));
-    });
+      test('the result is a copy: the original photo is never touched', () {
+        final before = Uint8List.fromList(face.image.pixels);
+        final out = backend.renderSync(MakeupRequest(face: face, look: look));
+        expect(identical(out.pixels, face.image.pixels), isFalse);
+        expect(face.image.pixels, orderedEquals(before));
+      });
 
-    test('pixels outside every zone are not changed', () {
-      final out = _backend.renderSync(MakeupRequest(face: face, look: look));
-      final lips = face.masks.lips,
-          eyes = face.masks.eyeshadow,
-          blush = face.masks.blush;
-      var outsideChanged = 0, changed = 0;
-      for (var y = 0; y < out.height; y++) {
-        for (var x = 0; x < out.width; x++) {
-          final o = (y * out.width + x) * 4;
-          final diff =
-              out.pixels[o] != face.image.pixels[o] ||
-              out.pixels[o + 1] != face.image.pixels[o + 1] ||
-              out.pixels[o + 2] != face.image.pixels[o + 2];
-          if (!diff) continue;
-          changed++;
-          if (lips.at(x, y) + eyes.at(x, y) + blush.at(x, y) <= 0) {
-            outsideChanged++;
+      test('pixels outside every zone are not changed', () {
+        final out = backend.renderSync(MakeupRequest(face: face, look: look));
+        final lips = face.masks.lips,
+            eyes = face.masks.eyeshadow,
+            blush = face.masks.blush;
+        var outsideChanged = 0, changed = 0;
+        for (var y = 0; y < out.height; y++) {
+          for (var x = 0; x < out.width; x++) {
+            final o = (y * out.width + x) * 4;
+            final diff =
+                out.pixels[o] != face.image.pixels[o] ||
+                out.pixels[o + 1] != face.image.pixels[o + 1] ||
+                out.pixels[o + 2] != face.image.pixels[o + 2];
+            if (!diff) continue;
+            changed++;
+            if (lips.at(x, y) + eyes.at(x, y) + blush.at(x, y) <= 0) {
+              outsideChanged++;
+            }
           }
         }
-      }
-      expect(changed, greaterThan(2000), reason: 'the makeup must be visible');
-      expect(outsideChanged, 0);
-    });
-
-    test('lipstick: the lips move toward the colour, the skin does not', () {
-      final out = _backend.renderSync(MakeupRequest(face: face, look: look));
-      Lab at(RgbaImage i, int x, int y) {
-        final o = (y * i.width + x) * 4;
-        return ColorMath.rgbToLab(
-          i.pixels[o],
-          i.pixels[o + 1],
-          i.pixels[o + 2],
-        );
-      }
-
-      final target = ColorMath.colorToLab(look.lips.color);
-      final b = at(face.image, 240, 446), a = at(out, 240, 446);
-      double dist(Lab p) => math.sqrt(
-        math.pow(p.a - target.a, 2) + math.pow(p.b - target.b, 2).toDouble(),
-      );
-      expect(dist(a), lessThan(dist(b)));
-      final skinBefore = at(face.image, 240, 330),
-          skinAfter = at(out, 240, 330);
-      expect(skinAfter.a, closeTo(skinBefore.a, 0.5));
-    });
-
-    test('a stronger intensity changes the picture more', () {
-      int diffs(double k) {
-        final l = MakeupLook(
-          lips: ZoneLook(color: const Color(0xFFB03A48), intensity: k),
-          blush: const ZoneLook(color: Color(0xFFE08A8A), enabled: false),
-          eyeshadow: const ZoneLook(color: Color(0xFF8A6A7A), enabled: false),
-        );
-        final o = _backend.renderSync(MakeupRequest(face: face, look: l));
-        return face.image.width * face.image.height -
-            _samePixels(o, face.image);
-      }
-
-      expect(diffs(0.2), lessThan(diffs(1)));
-    });
-
-    test('NO SMOOTHING: the fine detail of the lips and the cheeks stays', () {
-      final out = _backend.renderSync(MakeupRequest(face: face, look: look));
-      final lb = _lightness(face.image), la = _lightness(out);
-      for (final (name, patch) in [
-        ('lips', face.masks.lips),
-        ('blush', face.masks.blush),
-        ('eyeshadow', face.masks.eyeshadow),
-      ]) {
-        bool inZone(int x, int y) => patch.at(x, y) > 0.5;
-        final before = _detail(lb, out.width, out.height, inZone);
-        final after = _detail(la, out.width, out.height, inZone);
-        expect(before, greaterThan(0));
-        expect(after / before, inInclusiveRange(0.9, 1.15), reason: name);
-      }
-    });
-
-    test('acne, a scar and redness stay visible under the makeup', () {
-      // the cheeks carry the red dots and the red patch
-      final out = _backend.renderSync(MakeupRequest(face: face, look: look));
-      Lab at(RgbaImage i, Offset p) {
-        final o = (p.dy.round() * i.width + p.dx.round()) * 4;
-        return ColorMath.rgbToLab(
-          i.pixels[o],
-          i.pixels[o + 1],
-          i.pixels[o + 2],
-        );
-      }
-
-      for (final d in f.dots) {
-        if (face.masks.blush.at(d.dx.round(), d.dy.round()) < 0.3) continue;
-        final ring = Offset(d.dx + 9, d.dy); // skin next to the dot
-        final before = at(face.image, d).a - at(face.image, ring).a;
-        final after = at(out, d).a - at(out, ring).a;
         expect(
-          before,
-          greaterThan(3),
-          reason: 'the dot is redder than the skin',
+          changed,
+          greaterThan(2000),
+          reason: 'the makeup must be visible',
         );
-        expect(
-          after,
-          greaterThan(before * 0.8),
-          reason: 'and still is after makeup',
-        );
-      }
-    });
+        expect(outsideChanged, 0);
+      });
 
-    test('protection: protected pixels are returned byte for byte', () {
-      final prot = ProtectionMask(SyntheticFace.width, SyntheticFace.height);
-      for (final d in f.dots) {
-        prot.dab(d.dx, d.dy, 8, hardness: 1);
-      }
-      final out = _backend.renderSync(
-        MakeupRequest(face: face, look: look, protection: prot),
-      );
-      var protectedPixels = 0;
-      for (var y = 0; y < out.height; y++) {
-        for (var x = 0; x < out.width; x++) {
-          if (prot.at(x, y) < 1) continue;
-          protectedPixels++;
-          final o = (y * out.width + x) * 4;
+      test('lipstick: the lips move toward the colour, the skin does not', () {
+        final out = backend.renderSync(MakeupRequest(face: face, look: look));
+        Lab at(RgbaImage i, int x, int y) {
+          final o = (y * i.width + x) * 4;
+          return ColorMath.rgbToLab(
+            i.pixels[o],
+            i.pixels[o + 1],
+            i.pixels[o + 2],
+          );
+        }
+
+        final target = ColorMath.colorToLab(look.lips.color);
+        final b = at(face.image, 240, 446), a = at(out, 240, 446);
+        double dist(Lab p) => math.sqrt(
+          math.pow(p.a - target.a, 2) + math.pow(p.b - target.b, 2).toDouble(),
+        );
+        expect(dist(a), lessThan(dist(b)));
+        final skinBefore = at(face.image, 240, 330),
+            skinAfter = at(out, 240, 330);
+        expect(skinAfter.a, closeTo(skinBefore.a, 0.5));
+      });
+
+      test('a stronger intensity changes the picture more', () {
+        // the total change of all colour values grows with the intensity
+        int change(double k) {
+          final l = MakeupLook(
+            lips: ZoneLook(color: const Color(0xFFB03A48), intensity: k),
+            blush: const ZoneLook(color: Color(0xFFE08A8A), enabled: false),
+            eyeshadow: const ZoneLook(color: Color(0xFF8A6A7A), enabled: false),
+          );
+          final o = backend.renderSync(MakeupRequest(face: face, look: l));
+          var sum = 0;
+          for (var i = 0; i < o.pixels.length; i++) {
+            if (i % 4 == 3) continue;
+            sum += (o.pixels[i] - face.image.pixels[i]).abs();
+          }
+          return sum;
+        }
+
+        expect(change(0.2), lessThan(change(0.6)));
+        expect(change(0.6), lessThan(change(1)));
+      });
+
+      test('NO SMOOTHING: the fine detail of the lips and the cheeks stays', () {
+        final out = backend.renderSync(MakeupRequest(face: face, look: look));
+        final lb = _lightness(face.image), la = _lightness(out);
+        for (final (name, patch) in [
+          ('lips', face.masks.lips),
+          ('blush', face.masks.blush),
+          ('eyeshadow', face.masks.eyeshadow),
+        ]) {
+          bool inZone(int x, int y) => patch.at(x, y) > 0.5;
+          final before = _detail(lb, out.width, out.height, inZone);
+          final after = _detail(la, out.width, out.height, inZone);
+          expect(before, greaterThan(0));
+          // the first engine keeps the lightness texture exactly; the pigment engine
+          // keeps its relative contrast and follows the change of lightness in a
+          // limited way (see PigmentParams.textureMin/Max), so its band is wider
+          final band = backend is PigmentBackend
+              ? inInclusiveRange(0.8, 1.3)
+              : inInclusiveRange(0.9, 1.15);
+          expect(after / before, band, reason: name);
+        }
+      });
+
+      test('acne, a scar and redness stay visible under the makeup', () {
+        // the cheeks carry the red dots and the red patch
+        final out = backend.renderSync(MakeupRequest(face: face, look: look));
+        Lab at(RgbaImage i, Offset p) {
+          final o = (p.dy.round() * i.width + p.dx.round()) * 4;
+          return ColorMath.rgbToLab(
+            i.pixels[o],
+            i.pixels[o + 1],
+            i.pixels[o + 2],
+          );
+        }
+
+        for (final d in f.dots) {
+          if (face.masks.blush.at(d.dx.round(), d.dy.round()) < 0.3) continue;
+          final ring = Offset(d.dx + 9, d.dy); // skin next to the dot
+          final before = at(face.image, d).a - at(face.image, ring).a;
+          final after = at(out, d).a - at(out, ring).a;
           expect(
-            out.pixels.sublist(o, o + 3),
-            orderedEquals(face.image.pixels.sublist(o, o + 3)),
+            before,
+            greaterThan(3),
+            reason: 'the dot is redder than the skin',
+          );
+          expect(
+            after,
+            greaterThan(before * 0.8),
+            reason: 'and still is after makeup',
           );
         }
-      }
-      expect(protectedPixels, greaterThan(500));
-    });
+      });
 
-    test('protecting everything gives back the whole photo', () {
-      final prot = ProtectionMask(SyntheticFace.width, SyntheticFace.height);
-      prot.data.fillRange(0, prot.data.length, 255);
-      final out = _backend.renderSync(
-        MakeupRequest(face: face, look: look, protection: prot),
-      );
-      expect(out.pixels, orderedEquals(face.image.pixels));
-    });
-
-    test(
-      'contract: it says what it cannot do and refuses a reference photo',
-      () {
-        expect(_backend.capabilities.supportsReference, isFalse);
-        expect(_backend.capabilities.runsOnDevice, isTrue);
-        expect(
-          () => _backend.renderSync(
-            MakeupRequest(face: face, look: look, reference: face.image),
-          ),
-          throwsUnsupportedError,
+      test('protection: protected pixels are returned byte for byte', () {
+        final prot = ProtectionMask(SyntheticFace.width, SyntheticFace.height);
+        for (final d in f.dots) {
+          prot.dab(d.dx, d.dy, 8, hardness: 1);
+        }
+        final out = backend.renderSync(
+          MakeupRequest(face: face, look: look, protection: prot),
         );
-      },
-    );
-
-    test(
-      'a render takes well under a second on this machine (not a phone claim)',
-      () {
-        final sw = Stopwatch()..start();
-        for (var i = 0; i < 5; i++) {
-          _backend.renderSync(
-            MakeupRequest(
-              face: PreparedFace.from(f.image, f.points),
-              look: look,
-            ),
-          );
+        var protectedPixels = 0;
+        for (var y = 0; y < out.height; y++) {
+          for (var x = 0; x < out.width; x++) {
+            if (prot.at(x, y) < 1) continue;
+            protectedPixels++;
+            final o = (y * out.width + x) * 4;
+            expect(
+              out.pixels.sublist(o, o + 3),
+              orderedEquals(face.image.pixels.sublist(o, o + 3)),
+            );
+          }
         }
-        sw.stop();
-        expect(sw.elapsedMilliseconds / 5, lessThan(1000));
-      },
-    );
-  });
+        expect(protectedPixels, greaterThan(500));
+      });
+
+      test('protecting everything gives back the whole photo', () {
+        final prot = ProtectionMask(SyntheticFace.width, SyntheticFace.height);
+        prot.data.fillRange(0, prot.data.length, 255);
+        final out = backend.renderSync(
+          MakeupRequest(face: face, look: look, protection: prot),
+        );
+        expect(out.pixels, orderedEquals(face.image.pixels));
+      });
+
+      test(
+        'contract: it says what it cannot do and refuses a reference photo',
+        () {
+          expect(backend.capabilities.supportsReference, isFalse);
+          expect(backend.capabilities.runsOnDevice, isTrue);
+          expect(
+            () => backend.renderSync(
+              MakeupRequest(face: face, look: look, reference: face.image),
+            ),
+            throwsUnsupportedError,
+          );
+        },
+      );
+
+      test(
+        'a render takes well under a second on this machine (not a phone claim)',
+        () {
+          final sw = Stopwatch()..start();
+          for (var i = 0; i < 5; i++) {
+            backend.renderSync(
+              MakeupRequest(
+                face: PreparedFace.from(f.image, f.points),
+                look: look,
+              ),
+            );
+          }
+          sw.stop();
+          expect(sw.elapsedMilliseconds / 5, lessThan(1000));
+        },
+      );
+    });
+  }
 
   group('protection mask counter', () {
     double counted(ProtectionMask m) =>

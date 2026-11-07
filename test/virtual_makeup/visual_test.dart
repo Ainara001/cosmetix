@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:cosmetix/features/virtual_makeup/domain/makeup_look.dart';
-import 'package:cosmetix/features/virtual_makeup/engine/color_transfer_backend.dart';
+import 'package:cosmetix/features/virtual_makeup/engine/pigment_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/makeup_backend.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/protection_mask.dart';
 import 'package:cosmetix/features/virtual_makeup/engine/rgba_image.dart';
@@ -13,7 +13,7 @@ import 'package:cosmetix/features/virtual_makeup/ui/photo_io.dart';
 
 import 'synthetic_face.dart';
 
-const _backend = ColorTransferBackend();
+const _backend = PigmentBackend();
 
 /// Box-average downscale by an integer [k]: a small picture that is stable to
 /// compare and small enough to keep in the repository.

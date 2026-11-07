@@ -74,6 +74,23 @@ class ColorMath {
 
   static int _byte(double v) => (v * 255).round().clamp(0, 255);
 
+  /// An sRGB byte as linear light, 0..1 (the space where colours MIX like
+  /// light does).
+  static double srgbByteToLinear(int v) => _toLinear[v];
+
+  /// The lightness L* (0..100) of a linear-light luminance Y (0..1).
+  static double lightnessOfLuminance(double y) {
+    final t = y.clamp(0.0, 1.0);
+    return t > _eps ? 116 * math.pow(t, 1 / 3).toDouble() - 16 : _kappa * t;
+  }
+
+  /// An sRGB channel in 0..1 (a Flutter colour channel) as linear light.
+  static double srgbToLinear(double c) => _srgbToLinear(c.clamp(0.0, 1.0));
+
+  /// Linear light to an sRGB byte (clamped to the displayable range).
+  static int linearToSrgbByte(double linear) =>
+      _byte(_linearToSrgb(linear.clamp(0.0, 1.0)));
+
   static Lab colorToLab(Color c) =>
       rgbToLab((c.r * 255).round(), (c.g * 255).round(), (c.b * 255).round());
 

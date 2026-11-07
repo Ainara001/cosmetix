@@ -8,7 +8,7 @@ import '../catalog/try_on_item.dart';
 import '../domain/face_quality.dart';
 import '../domain/makeup_look.dart';
 import '../engine/blemish_suggester.dart';
-import '../engine/color_transfer_backend.dart';
+import '../engine/pigment_backend.dart';
 import '../engine/makeup_backend.dart';
 import '../engine/protection_mask.dart';
 import '../landmarks/face_landmark_provider.dart';
@@ -32,7 +32,7 @@ class VirtualMakeupController extends ChangeNotifier {
     required this.landmarks,
     this.ownsLandmarks = true,
     this.catalog,
-    this.backend = const ColorTransferBackend(),
+    this.backend = const PigmentBackend(),
     this.maxSide = 1280,
     this.debounce = const Duration(milliseconds: 60),
   });

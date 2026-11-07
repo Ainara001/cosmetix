@@ -91,3 +91,9 @@ abstract interface class MakeupBackend {
 
   Future<RgbaImage> render(MakeupRequest request);
 }
+
+/// A backend that can also render at once (no await): the app, the tests and the
+/// evaluation tool use this to compare engines on the same photos.
+abstract interface class SyncMakeupBackend implements MakeupBackend {
+  RgbaImage renderSync(MakeupRequest request);
+}
