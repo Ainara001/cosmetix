@@ -1034,19 +1034,41 @@ void main() {
         .where((f) => f.path.endsWith('.dart'))
         .toList();
 
-    test('no screen, provider or repository uses it yet', () {
-      final users = [
-        for (final f in dartFiles)
-          if (!f.path.contains('lib/services/server/') &&
-              f.readAsStringSync().contains('services/server/'))
-            f.path,
-      ];
-      expect(
-        users,
-        isEmpty,
-        reason: 'wiring needs the approved data rules first',
-      );
-    });
+    test(
+      'only the public price sync uses it, and only the plain HTTP client',
+      () {
+        // The profile / event layer (CosmetixServer, consent, device state) is
+        // still not wired: that needs the approved data rules first. The price
+        // sync reads a PUBLIC snapshot with a plain GET and sends nothing about
+        // the user, so it may use ServerHttp and the exceptions, nothing else.
+        final allowed = {
+          'lib/app.dart',
+          'lib/services/offer_sync_service.dart',
+        };
+        final users = [
+          for (final f in dartFiles)
+            if (!f.path.contains('lib/services/server/') &&
+                f.readAsStringSync().contains('services/server/'))
+              f.path,
+        ];
+        expect(users.toSet().difference(allowed), isEmpty);
+        for (final f in users) {
+          final text = File(f).readAsStringSync();
+          for (final banned in const [
+            'cosmetix_server.dart',
+            'server_consent.dart',
+            'server_state',
+          ]) {
+            expect(text.contains(banned), isFalse, reason: '$f uses $banned');
+          }
+        }
+        final sync = File(
+          'lib/services/offer_sync_service.dart',
+        ).readAsStringSync();
+        expect(sync.contains("'POST'"), isFalse);
+        expect(sync.contains('json:'), isFalse, reason: 'nothing is sent');
+      },
+    );
 
     test('no hardware or advertising identifiers anywhere in it', () {
       final banned = RegExp(

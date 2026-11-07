@@ -33,6 +33,7 @@ import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
+import 'package:cosmetix/widgets/product_kind_card.dart';
 import 'package:cosmetix/widgets/product_mini_card.dart';
 import 'package:cosmetix/widgets/routine_issues_card.dart';
 import 'package:cosmetix/widgets/product_art.dart';
@@ -579,6 +580,10 @@ class _ProductBodyState extends State<_ProductBody> {
                           },
                         ),
                       _CountryLine(product: product),
+                      if (ProductKindCard.applies(product)) ...[
+                        SectionTitle(tr('Что это за средство')),
+                        ProductKindCard(product: product),
+                      ],
                       if (product.inci.isNotEmpty) ...[
                         SectionTitle(tr('Полный состав (INCI)')),
                         AppCard(

@@ -16,6 +16,7 @@ import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/widgets/offer_sync_status.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 import 'package:cosmetix/widgets/product_art.dart';
 
@@ -36,7 +37,11 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
   @override
   void initState() {
     super.initState();
-    context
+    _loadPrices();
+  }
+
+  Future<void> _loadPrices() {
+    return context
         .read<CatalogProvider>()
         .storePrices(widget.productId)
         .then((v) {
@@ -190,7 +195,9 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
+                OfferSyncStatus(onRefreshed: _loadPrices),
+                const SizedBox(height: 4),
                 CustomButton(
                   label: tr('Показать на карте'),
                   icon: Icons.map_outlined,

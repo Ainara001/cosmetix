@@ -9,6 +9,10 @@ import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/providers/offer_sync_provider.dart';
+import 'package:cosmetix/repositories/offer_sync_repository.dart';
+import 'package:cosmetix/services/offer_sync_service.dart';
+import 'package:cosmetix/services/server/server_http.dart';
 import 'package:cosmetix/providers/care_provider.dart';
 import 'package:cosmetix/providers/chat_provider.dart';
 import 'package:cosmetix/providers/nav_provider.dart';
@@ -69,6 +73,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
   late final SafetyProvider _safetyProvider;
   late final CatalogProvider _catalogProvider;
   late final AiProvider _ai;
+  late final OfferSyncProvider _offerSync;
   late final LocationProvider _location;
   late final CareProvider _care;
   late final RecommendationService _reco;
@@ -101,7 +106,30 @@ class _CosmetixAppState extends State<CosmetixApp> {
           '${_historySignature()}',
       sources: [_auth, _safetyProvider, _care],
     );
-    _init = Future.wait([_auth.restoreSession(), _settings.load(), _ai.load()]);
+    // prices of the shops: a plain GET of the server's public snapshot, only when
+    // a server address is set; no user data is sent
+    final syncRepo = OfferSyncRepository(h);
+    _offerSync = OfferSyncProvider(
+      OfferSyncService(
+        ServerHttp(() => _ai.config),
+        syncRepo,
+        configured: () => _ai.config.isConfigured,
+      ),
+      syncRepo,
+      configured: () => _ai.config.isConfigured,
+    );
+    _offerSync.onApplied = () {
+      final u = _auth.user;
+      if (u != null) _catalogProvider.load(u.id);
+    };
+    _init = Future.wait([
+      _auth.restoreSession(),
+      _settings.load(),
+      _ai.load(),
+      _offerSync.load(),
+    ]).then((_) {
+      if (_ai.config.isConfigured) _offerSync.sync();
+    });
   }
 
   /// Shops, distances and offers for the AI (distances only when the position
@@ -169,6 +197,7 @@ class _CosmetixAppState extends State<CosmetixApp> {
             ChangeNotifierProvider<AuthProvider>.value(value: _auth),
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
             ChangeNotifierProvider<AiProvider>.value(value: _ai),
+            ChangeNotifierProvider<OfferSyncProvider>.value(value: _offerSync),
             ChangeNotifierProvider<LocationProvider>.value(value: _location),
             Provider<AvatarService>(create: (_) => AvatarService()),
             Provider<IngredientOcr>.value(value: widget.ocr),

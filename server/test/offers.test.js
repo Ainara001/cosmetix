@@ -140,6 +140,24 @@ test('shop offers: manual entry in the admin panel', { skip: SKIP }, async (t) =
     assert.ok(audit.some((a) => a.changes.offerDeleted));
   });
 
+  await t.test('the public snapshot has only verified offers, matched by names', async () => {
+    await put(ok({ productId: 2, storeId: 1, price: 4100, oldPrice: 5000, verification: 'verified' }), hdr);
+    await put(ok({ productId: 3, storeId: 2, verification: 'unverified' }), hdr);
+    const snap = await app.call('/v1/catalog/offers');
+    assert.equal(snap.status, 200);
+    assert.ok(snap.data.generatedAt);
+    const items = snap.data.items;
+    assert.ok(items.every((i) => i.verification === 'verified'));
+    assert.ok(items.every((i) => i.brand && i.productName && i.storeName && i.storeAddress));
+    assert.ok(items.some((i) => i.productId === 2 && i.price === 4100 && i.oldPrice === 5000));
+    assert.ok(!items.some((i) => i.productId === 3));
+    // a withdrawn offer leaves the snapshot
+    const id = items.find((i) => i.productId === 2).id;
+    await app.call(`/admin/api/offers/${id}`, { method: 'DELETE', headers: hdr });
+    const after = (await app.call('/v1/catalog/offers')).data.items;
+    assert.ok(!after.some((i) => i.id === id));
+  });
+
   await t.test('the database itself refuses what validation refuses', async () => {
     const insert = (cols) => {
       const base = { product_id: 1, store_id: 5, source: 's', method: 'manual_visit', checked_at: new Date() };
