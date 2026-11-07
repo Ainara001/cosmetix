@@ -12,7 +12,7 @@
 3. В панели Render ввести значения для `APP_TOKEN` (любая длинная случайная строка) и,
    если нужен ИИ, `GEMINI_API_KEY`. **Фото в Gemini не отправляются**
    (`PHOTO_ANALYSIS=off`, `GEMINI_BILLING=free`).
-4. После запуска `GET https://<имя>.onrender.com/health` должен ответить `ok`; миграции
+4. После запуска `GET https://<имя>.onrender.com/health` должен ответить JSON с `"ok": true`; миграции
    применяются при старте (`AUTO_MIGRATE=1`).
 5. Сборка приложения с адресом сервера:
    `flutter build ios --simulator --dart-define=AI_BASE_URL=https://<имя>.onrender.com --dart-define=AI_APP_TOKEN=<токен>`
