@@ -2,6 +2,8 @@ import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/widgets/app_card.dart';
+import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/widgets/pill_segments.dart';
 import 'package:flutter/material.dart';
 
 import 'virtual_makeup_controller.dart';
@@ -48,21 +50,21 @@ class MaskEditorPanel extends StatelessWidget {
             style: AppTextStyles.small,
           ),
           const SizedBox(height: 10),
-          SegmentedButton<bool>(
+          PillSegments<bool>(
             segments: [
-              ButtonSegment(
+              PillSegment(
                 value: false,
-                icon: const Icon(Icons.brush_outlined),
-                label: Text(tr('Кисть')),
+                icon: Icons.brush_outlined,
+                label: tr('Кисть'),
               ),
-              ButtonSegment(
+              PillSegment(
                 value: true,
-                icon: const Icon(Icons.cleaning_services_outlined),
-                label: Text(tr('Ластик')),
+                icon: Icons.cleaning_services_outlined,
+                label: tr('Ластик'),
               ),
             ],
-            selected: {erase},
-            onSelectionChanged: (v) => onErase(v.first),
+            selected: erase,
+            onChanged: onErase,
           ),
           Row(
             children: [
@@ -81,23 +83,38 @@ class MaskEditorPanel extends StatelessWidget {
           Wrap(
             spacing: 8,
             children: [
-              OutlinedButton.icon(
-                key: const Key('vm-undo'),
-                onPressed: m != null && m.canUndo ? c.undo : null,
-                icon: const Icon(Icons.undo),
-                label: Text(tr('Отменить')),
+              SizedBox(
+                width: 150,
+                child: CustomButton(
+                  key: const Key('vm-undo'),
+                  compact: true,
+                  outlined: true,
+                  onPressed: m != null && m.canUndo ? c.undo : null,
+                  icon: Icons.undo,
+                  label: tr('Отменить'),
+                ),
               ),
-              OutlinedButton.icon(
-                key: const Key('vm-redo'),
-                onPressed: m != null && m.canRedo ? c.redo : null,
-                icon: const Icon(Icons.redo),
-                label: Text(tr('Вернуть')),
+              SizedBox(
+                width: 150,
+                child: CustomButton(
+                  key: const Key('vm-redo'),
+                  compact: true,
+                  outlined: true,
+                  onPressed: m != null && m.canRedo ? c.redo : null,
+                  icon: Icons.redo,
+                  label: tr('Вернуть'),
+                ),
               ),
-              OutlinedButton.icon(
-                key: const Key('vm-clear'),
-                onPressed: m != null && !m.isEmpty ? c.clearProtection : null,
-                icon: const Icon(Icons.delete_outline),
-                label: Text(tr('Очистить')),
+              SizedBox(
+                width: 150,
+                child: CustomButton(
+                  key: const Key('vm-clear'),
+                  compact: true,
+                  outlined: true,
+                  onPressed: m != null && !m.isEmpty ? c.clearProtection : null,
+                  icon: Icons.delete_outline,
+                  label: tr('Очистить'),
+                ),
               ),
             ],
           ),
@@ -117,11 +134,13 @@ class MaskEditorPanel extends StatelessWidget {
             style: AppTextStyles.small.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 8),
-          OutlinedButton.icon(
+          CustomButton(
             key: const Key('vm-suggest'),
+            compact: true,
+            outlined: true,
             onPressed: c.suggest,
-            icon: const Icon(Icons.auto_awesome_outlined),
-            label: Text(tr('Подсказать участки')),
+            icon: Icons.auto_awesome_outlined,
+            label: tr('Подсказать участки'),
           ),
           if (s != null) ...[
             const SizedBox(height: 8),
@@ -152,10 +171,14 @@ class MaskEditorPanel extends StatelessWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  FilledButton(
-                    key: const Key('vm-suggest-accept'),
-                    onPressed: c.acceptSuggestion,
-                    child: Text(tr('Защитить')),
+                  SizedBox(
+                    width: 150,
+                    child: CustomButton(
+                      key: const Key('vm-suggest-accept'),
+                      compact: true,
+                      onPressed: c.acceptSuggestion,
+                      label: tr('Защитить'),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   TextButton(

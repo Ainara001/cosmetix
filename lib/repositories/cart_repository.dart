@@ -1,4 +1,5 @@
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/repositories/offer_sql.dart';
 import 'package:cosmetix/models/cart_models.dart';
 
 class CartRepository {
@@ -30,11 +31,12 @@ class CartRepository {
     final rows = await db.rawQuery(
       '''
 SELECT c.id AS cart_id, c.quantity, c.store_id,
-       COALESCE(pp.price, p.price) AS unit_price,
-       COALESCE(s.name, '') AS store_name, p.*
+       COALESCE(o.price, 0) AS unit_price,
+       COALESCE(s.name, '') AS store_name, p.*, $verifiedOfferColumns
 FROM cart_items c
 JOIN products p ON p.id = c.product_id
-LEFT JOIN product_prices pp ON pp.product_id = c.product_id AND pp.store_id = c.store_id
+LEFT JOIN store_offers o ON o.product_id = c.product_id
+  AND o.store_id = c.store_id AND o.verification = 'verified'
 LEFT JOIN stores s ON s.id = c.store_id
 WHERE c.user_id = ? ORDER BY c.id DESC''',
       [userId],

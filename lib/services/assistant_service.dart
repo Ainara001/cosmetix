@@ -304,7 +304,7 @@ class AssistantService {
         if (shareProfile ||
             !RecommendationService.isBlacklisted(c, ctx.blacklist))
           '- [#${c.product.id}] ${c.product.brand} ${c.product.name} (${c.product.category}, '
-              '${Formatters.price(c.product.price)})'
+              '${_priceForAi(c.product.price)})'
               '${_actives(c.product)}'
               '${fits[c.product.id] == null ? '' : _fits(fits[c.product.id]!)}'
               '${shareProfile && RecommendationService.isBlacklisted(c, ctx.blacklist) ? ' [CONTAINS BLACKLISTED INGREDIENT - never recommend]' : ''}',
@@ -381,6 +381,7 @@ ${catalogLines.join('\n')}''';
       out.writeln('- ${where(x)}${st.isEmpty ? '' : ' ($st)'}');
     }
     String stockOf(StorePrice o) => switch (o.level) {
+      StockLevel.unknown => 'stock not checked',
       StockLevel.out => 'out of stock',
       StockLevel.low => 'few left (${o.qty} pcs)',
       StockLevel.inStock =>
@@ -388,7 +389,7 @@ ${catalogLines.join('\n')}''';
     };
     String offerLine(StorePrice o) =>
         '${o.storeName}, ${o.address}${dist ? ', ${km(o.distanceM)}' : ''}: '
-        '${Formatters.price(o.price)}, ${stockOf(o)}${o.demo ? ' [demo data]' : ''}';
+        '${_priceForAi(o.price)}, ${stockOf(o)}${o.demo ? ' [demo data]' : ''}';
     if (s.offers.length <= 2) {
       // one or two products: every shop, nothing left to guess
       for (final e in s.offers.entries) {
@@ -544,7 +545,7 @@ ${catalogLines.join('\n')}''';
     );
     final match = ranked.isEmpty ? null : ranked.first.matchPercent;
     return '''
-- ${p.brand} ${p.name} (${p.category}), ${Formatters.price(p.price)}${p.inStock ? '' : ', out of stock'}
+- ${p.brand} ${p.name} (${p.category}), ${_priceForAi(p.price)}${p.inStock ? '' : ', out of stock'}
   description: ${p.description}
   ingredients: ${c.ingredients.isEmpty ? 'unknown' : c.ingredients.map((i) => '${i.name}${i.isAllergen ? ' (allergen)' : ''}').join(', ')}
 ${p.inci.isEmpty ? '' : '  full INCI list (published by ${Uri.tryParse(p.sourceUrl)?.host ?? 'the source'}): ${p.inci.length > 700 ? '${p.inci.substring(0, 700)}...' : p.inci}\n'}  base: ${_baseOf(c)}
@@ -555,3 +556,7 @@ ${shareProfile ? '''
   match: ${match == null ? 'excluded (blacklist)' : '$match%'}${ranked.isEmpty ? '' : _fits(ranked.first)}''' : ''}''';
   }
 }
+
+/// A price for the AI prompt: only a verified shop price is a number.
+String _priceForAi(int tenge) =>
+    tenge <= 0 ? 'price not confirmed' : Formatters.price(tenge);

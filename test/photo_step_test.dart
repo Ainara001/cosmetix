@@ -55,6 +55,12 @@ void main() {
     addTearDown(t.view.reset);
     final helper = DatabaseHelper(path: inMemoryDatabasePath);
     addTearDown(() => t.runAsync(helper.close));
+    // a phone-sized screen: since the 'what to know' card of the photo step
+    // (PR #34) the buttons are further down than the default 800x600 test
+    // surface builds them
+    t.view.physicalSize = const Size(1080, 3600);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
     await t.pumpWidget(
       MultiProvider(
         providers: [

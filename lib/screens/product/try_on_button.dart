@@ -8,6 +8,8 @@ import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/features/virtual_makeup/virtual_makeup.dart';
 import 'package:cosmetix/repositories/try_on_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
+import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/widgets/shade_widgets.dart';
 
 /// "Try on" on a product page. Shown only when the catalog knows the colour of
 /// THIS product (shade); when the product is a makeup product without a known
@@ -51,28 +53,55 @@ class _TryOnButtonState extends State<TryOnButton> {
         final item = snap.data;
         if (item == null) return const SizedBox.shrink();
         if (!item.canTryOn) {
+          // the button is there but off, with one short reason: the app does not
+          // try on a colour nobody knows
           return Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Text(
-              tr(
-                'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.',
-              ),
-              key: const Key('try-on-unavailable'),
-              style: AppTextStyles.small.copyWith(color: context.pal.subtext),
+            padding: const EdgeInsets.only(top: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomButton(
+                  key: const Key('try-on-button-off'),
+                  label: tr('Примерить'),
+                  icon: Icons.face_retouching_natural,
+                  outlined: true,
+                  onPressed: null,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  tr(
+                    'Примерка недоступна: цвет этого оттенка ещё не известен.',
+                  ),
+                  key: const Key('try-on-unavailable'),
+                  style: AppTextStyles.small.copyWith(
+                    color: context.pal.subtext,
+                  ),
+                ),
+              ],
             ),
           );
         }
         return Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: OutlinedButton.icon(
-            key: const Key('try-on-button'),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              AppRoutes.virtualMakeup,
-              arguments: item.productId,
-            ),
-            icon: const Icon(Icons.face_retouching_natural),
-            label: Text(tr('Примерить')),
+          padding: const EdgeInsets.only(top: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomButton(
+                key: const Key('try-on-button'),
+                label: tr('Примерить'),
+                icon: Icons.face_retouching_natural,
+                outlined: true,
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.virtualMakeup,
+                  arguments: item.productId,
+                ),
+              ),
+              if (item.isApproximate) ...[
+                const SizedBox(height: 8),
+                const ApproxNote(key: Key('try-on-approx'), compact: true),
+              ],
+            ],
           ),
         );
       },

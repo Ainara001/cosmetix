@@ -45,6 +45,14 @@ void main() {
         birthYear: 1990,
       );
       await users.setCurrentUser(u.id);
+      // an adult: since the age gate (PR #28) a user of unknown age gets an
+      // explanation instead of the photo step this test looks at
+      await (await helper.database).update(
+        'users',
+        {'birth_year': 1990},
+        where: 'id = ?',
+        whereArgs: [u.id],
+      );
     });
     await t.pumpWidget(CosmetixApp(helper: helper));
     await pumpUntil(t, find.text('Кабинет'));

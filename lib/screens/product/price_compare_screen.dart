@@ -6,6 +6,7 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/ui_helpers.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/widgets/offer_widgets.dart';
 import 'package:cosmetix/providers/cart_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
 import 'package:cosmetix/providers/location_provider.dart';
@@ -15,6 +16,7 @@ import 'package:cosmetix/providers/settings_provider.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/common_widgets.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
+import 'package:cosmetix/widgets/offer_sync_status.dart';
 import 'package:cosmetix/widgets/page_scaffold.dart';
 import 'package:cosmetix/widgets/product_art.dart';
 
@@ -35,7 +37,11 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
   @override
   void initState() {
     super.initState();
-    context
+    _loadPrices();
+  }
+
+  Future<void> _loadPrices() {
+    return context
         .read<CatalogProvider>()
         .storePrices(widget.productId)
         .then((v) {
@@ -189,7 +195,9 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
+                OfferSyncStatus(onRefreshed: _loadPrices),
+                const SizedBox(height: 4),
                 CustomButton(
                   label: tr('Показать на карте'),
                   icon: Icons.map_outlined,
@@ -293,10 +301,15 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                                   ),
                               ],
                             ),
+                            OfferCheckedText(checkedAt: p.updatedAt),
+                            OfferLink(offer: p),
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
                               child: Text(
                                 switch (p.level) {
+                                  StockLevel.unknown => tr(
+                                    'Наличие не проверено',
+                                  ),
                                   StockLevel.out => tr('Нет в наличии'),
                                   StockLevel.low => trf('Мало · {v0} шт.', {
                                     'v0': p.qty,
@@ -310,6 +323,7 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
                                 },
                                 style: AppTextStyles.caption.copyWith(
                                   color: switch (p.level) {
+                                    StockLevel.unknown => pal.subtext,
                                     StockLevel.out => AppColors.sale,
                                     StockLevel.low => const Color(0xFF9A6A12),
                                     StockLevel.inStock => AppColors.success,

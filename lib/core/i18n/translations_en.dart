@@ -1583,6 +1583,27 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Примерить': 'Try on',
   'Примерка недоступна: в каталоге нет данных о цвете этого оттенка.':
       'Try-on is not available: the catalog has no colour data for this shade.',
+  'Цвета палетки': 'Palette colours',
+  'Ячейка {n}': 'Cell {n}',
+  'Цена не подтверждена': 'Price not confirmed',
+  'НАЛИЧИЕ НЕ ПРОВЕРЕНО': 'STOCK NOT CHECKED',
+  'Наличие не проверено': 'Stock not checked',
+  'Проверенных цен в магазинах пока нет. Мы показываем только цены, которые проверены вручную, с датой проверки.':
+      'There are no verified shop prices yet. We show only prices that were checked by hand, with the date of the check.',
+  'Проверено {d}': 'Checked {d}',
+  'Цена на момент последней проверки: {d}': 'Price at the last check: {d}',
+  'Посмотреть товар в магазине': 'View the product in the shop',
+  'Поиск в магазине': 'Search in the shop',
+  'Цена на {d}': 'Price on {d}',
+  'Это подсказка для подбора косметики, а не измерение и не диагноз. Цветотип по фото ориентировочный: если ответы анкеты и фото расходятся, решайте сами.':
+      'This is a hint for choosing cosmetics, not a measurement and not a diagnosis. The colour type from a photo is approximate: if your answers and the photo disagree, decide for yourself.',
+  'Что стоит знать об анализе по фото': 'What to know about photo analysis',
+  'Это подсказка по цвету, а не измерение и не диагноз.':
+      'This is a colour hint, not a measurement and not a diagnosis.',
+  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.':
+      'The result depends on light and camera; make-up, glasses and filters distort it.',
+  'Приложение не определяет акне, рубцы или покраснения.':
+      'The app does not detect acne, scars or redness.',
   'ИИ-помощник доступен с 18 лет. Укажите год рождения в профиле.':
       'The AI assistant is available from the age of 18. Enter your year of birth in the profile.',
   'ИИ-помощник доступен с 18 лет.':
@@ -1642,15 +1663,6 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.':
       'Data goes to the Cosmetix server and to Google Gemini only after your consent.',
   'Отправить профиль в ИИ?': 'Send the profile to the AI?',
-  'Это подсказка для подбора косметики, а не измерение и не диагноз. Цветотип по фото ориентировочный: если ответы анкеты и фото расходятся, решайте сами.':
-      'This is a hint for choosing cosmetics, not a measurement and not a diagnosis. The colour type from a photo is approximate: if your answers and the photo disagree, decide for yourself.',
-  'Что стоит знать об анализе по фото': 'What to know about photo analysis',
-  'Это подсказка по цвету, а не измерение и не диагноз.':
-      'This is a colour hint, not a measurement and not a diagnosis.',
-  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.':
-      'The result depends on light and camera; make-up, glasses and filters distort it.',
-  'Приложение не определяет акне, рубцы или покраснения.':
-      'The app does not detect acne, scars or redness.',
   'Не удалось открыть фото. Файл повреждён или это не картинка.':
       'Could not open the photo. The file is damaged or it is not a picture.',
   'Не удалось проверить фото. Попробуйте другое.':
@@ -1689,4 +1701,46 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Фото можно использовать, но результат может быть неточным':
       'The photo can be used, but the result may be inaccurate',
   'Использовать это фото': 'Use this photo',
+  'Обновляем цены…': 'Updating prices…',
+  'Не удалось обновить цены. Показаны сохранённые, с датой проверки.':
+      'Could not update the prices. The saved ones are shown with the date they were checked.',
+  'Сервер цен не подключён.': 'The price server is not connected.',
+  'Цены с сервера ещё не загружались.': 'Prices have not been loaded from the server yet.',
+  'Цены обновлены: {d}': 'Prices updated: {d}',
+  'Обновить цены': 'Refresh prices',
+  'Крем': 'Cream',
+  'Гель': 'Gel',
+  'Сыворотка': 'Serum',
+  'Тонер': 'Toner',
+  'Эссенция': 'Essence',
+  'Ампула': 'Ampoule',
+  'Лосьон / эмульсия': 'Lotion / emulsion',
+  'Очищающее средство': 'Cleanser',
+  'Мицеллярная вода': 'Micellar water',
+  'Очищающее масло': 'Cleansing oil',
+  'Маска': 'Mask',
+  'Солнцезащитное средство': 'Sunscreen',
+  'Пилинг / эксфолиант': 'Peeling / exfoliant',
+  'Уход за губами': 'Lip care',
+  'Шампунь': 'Shampoo',
+  'Набор': 'Set',
+  'Очищение': 'Cleansing',
+  'Увлажнение': 'Hydration',
+  'Восстановление барьера': 'Barrier repair',
+  'Уход при акне': 'Acne care',
+  'Отшелушивание': 'Exfoliation',
+  'Защита от солнца': 'Sun protection',
+  'Уход при покраснении': 'Redness care',
+  'Выравнивание тона': 'Tone evening',
+  'Успокоение': 'Soothing',
+  'Контроль жирности': 'Oil control',
+  'Тип': 'Type',
+  'Применение': 'Use',
+  'смывается': 'rinsed off',
+  'остаётся на коже': 'stays on the skin',
+  'Назначение': 'Purpose',
+  'В начале состава': 'Near the top of the INCI list',
+  'Тип или назначение не подтверждены: ждёт проверки специалистом.': 'Type or purpose is not confirmed: waiting for a specialist to check.',
+  'Определено автоматически по названию и составу; это не описание производителя.': 'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
+  'Что это за средство': 'What this product is',
 };

@@ -12,7 +12,12 @@ class TryOnRepository implements TryOnCatalog {
   final DatabaseHelper _helper;
 
   static const _select = '''
-SELECT p.id AS product_id, p.brand, p.name, p.art, p.price, p.in_stock,
+SELECT p.id AS product_id, p.brand, p.name, p.art,
+       COALESCE((SELECT MIN(o.price) FROM store_offers o
+         WHERE o.product_id = p.id AND o.verification = 'verified'
+           AND o.price IS NOT NULL), 0) AS price,
+       NOT EXISTS (SELECT 1 FROM store_offers o WHERE o.product_id = p.id
+         AND o.verification = 'verified' AND o.availability = 'out_of_stock') AS in_stock,
        s.kind, s.line_key, s.shade_code, s.shade_name, s.colour,
        s.colour_source, s.colour_status, s.finish
 FROM product_shades s JOIN products p ON p.id = s.product_id''';
@@ -21,11 +26,53 @@ FROM product_shades s JOIN products p ON p.id = s.product_id''';
   Future<TryOnItem?> item(int productId) async {
     final db = await _helper.database;
     final rows = await db.rawQuery('$_select WHERE p.id = ?', [productId]);
-    return rows.isEmpty ? null : _fromRow(rows.first);
+    if (rows.isEmpty) return null;
+    final base = _fromRow(rows.first);
+    if (base.canTryOn) return base;
+    // a palette has no colour of its own: its first cell with a known colour
+    final cells = await _cells(base);
+    return cells.isEmpty ? base : cells.first;
+  }
+
+  /// The cells of a palette whose colour is known, as items of their own.
+  Future<List<TryOnItem>> _cells(TryOnItem palette) async {
+    final db = await _helper.database;
+    final rows = await db.query(
+      'product_shade_pans',
+      where: 'product_id = ? AND colour IS NOT NULL',
+      whereArgs: [palette.productId],
+      orderBy: 'position',
+    );
+    return [
+      for (final r in rows)
+        TryOnItem(
+          productId: palette.productId,
+          brand: palette.brand,
+          name: palette.name,
+          kind: palette.kind,
+          lineKey: palette.lineKey,
+          shadeCode: palette.shadeCode,
+          shadeName: palette.shadeName,
+          colour: Color(r['colour']! as int),
+          colourSource: r['colour_source'] as String?,
+          status: r['colour_status']! as String,
+          finish: (r['finish'] as String?) ?? palette.finish,
+          photo: palette.photo,
+          price: palette.price,
+          inStock: palette.inStock,
+          panKey: r['pan_key']! as String,
+          panPosition: r['position']! as int,
+        ),
+    ];
   }
 
   @override
   Future<List<TryOnItem>> sameLine(TryOnItem item) async {
+    if (item.panKey != null) {
+      // the cells of this palette (a single measured cell is not a choice)
+      final cells = await _cells(item);
+      return cells.length < 2 ? const [] : cells;
+    }
     final line = item.lineKey;
     if (line == null) return const [];
     final db = await _helper.database;

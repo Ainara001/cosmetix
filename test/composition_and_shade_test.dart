@@ -270,7 +270,7 @@ void main() {
       test('the catalog really stores the shades (DB v8+)', () {
         final withShade = candidates.where((c) => c.product.shade != null);
         expect(withShade.length, 16);
-        expect(DatabaseHelper.dbVersion, 15);
+        expect(DatabaseHelper.dbVersion, 18);
       });
 
       test('a Spring person: coral tint fits, wine tint is flagged', () {

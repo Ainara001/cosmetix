@@ -27,6 +27,7 @@
       <nav id="tabs">
         <button data-tab="overview" class="active">Обзор</button>
         <button data-tab="products">Товары</button>
+        <button data-tab="offers">Цены в магазинах</button>
         <button data-tab="logins">Входы</button>
         <button data-tab="events">События</button>
         <button data-tab="users">Устройства</button>
@@ -48,6 +49,28 @@
           <tbody></tbody>
         </table>
         <div id="p-pager" class="pager"></div>
+      </section>
+
+      <section id="tab-offers" hidden>
+        <p class="hint">Вводите только то, что проверили сами: цену на полке или на странице магазина. Неизвестное оставьте пустым: приложение покажет «Цена не подтверждена». Источник, способ и время проверки обязательны. Автоматический сбор здесь не используется.</p>
+        <form id="o-form" class="card">
+          <label>Товар (номер из вкладки «Товары»)<input name="productId" type="number" min="1" required></label>
+          <label>Магазин<select name="storeId" id="o-store" required></select></label>
+          <label>Цена, тг (пусто = не подтверждена)<input name="price" type="number" min="1" max="10000000"></label>
+          <label>Старая цена, тг (только если подтверждена)<input name="oldPrice" type="number" min="1" max="10000000"></label>
+          <label>Наличие<select name="availability"><option value="unknown">не проверено</option><option value="in_stock">в наличии</option><option value="out_of_stock">нет в наличии</option></select></label>
+          <label>Ссылка на товар (пусто, если нет)<input name="url" type="url" maxlength="1000" placeholder="адрес страницы товара"></label>
+          <label>Куда ведёт ссылка<select name="urlKind"><option value="none">нет ссылки</option><option value="product">на карточку товара</option><option value="search">только на поиск магазина</option></select></label>
+          <label>Источник (где увидели)<input name="source" maxlength="300" required placeholder="например: ценник на полке, Диона, пр. Сарыарка 15"></label>
+          <label>Способ<select name="method"><option value="manual_visit">в магазине</option><option value="manual_site">на сайте магазина</option></select></label>
+          <label>Статус<select name="verification"><option value="verified">проверено, показывать</option><option value="unverified">не проверено, не показывать</option><option value="disputed">спорно, не показывать</option></select></label>
+          <label>Когда проверено<input name="checkedAt" type="datetime-local" required></label>
+          <label>Заметка<input name="note" maxlength="500"></label>
+          <button type="submit">Сохранить</button>
+          <p id="o-error" class="error" role="alert"></p>
+        </form>
+        <h3>Введённые предложения</h3>
+        <table id="o-table"><thead><tr><th>Товар</th><th>Магазин</th><th>Цена</th><th>Наличие</th><th>Ссылка</th><th>Статус</th><th>Проверено</th><th></th></tr></thead><tbody></tbody></table>
       </section>
 
       <section id="tab-logins" hidden>

@@ -79,6 +79,7 @@ let currentTab = 'overview';
 const loaders = {
   overview: loadOverview,
   products: () => loadProducts(),
+  offers: loadOffers,
   logins: () => loadEvents('l', 'app_open'),
   events: () => loadEvents('e'),
   users: loadUsers,
@@ -274,3 +275,65 @@ async function loadAudit() {
 
 // ---------- start ----------
 start().catch(showLogin);
+
+// ---------- shop offers (manual entry) ----------
+const AVAIL = { in_stock: 'в наличии', out_of_stock: 'нет в наличии', unknown: 'не проверено' };
+const KIND = { product: 'на товар', search: 'только поиск', none: '—' };
+const VERIF = { verified: 'показывается', unverified: 'скрыто', disputed: 'спорно' };
+
+async function loadOffers() {
+  const [stores, offers] = await Promise.all([api('GET', '/stores'), api('GET', '/offers')]);
+  const sel = $('#o-store');
+  if (sel.options.length === 0) {
+    for (const s of stores.items) sel.append(el('option', { value: s.id }, `${s.name}, ${s.address}`));
+  }
+  const f = $('#o-form').elements;
+  if (!f.checkedAt.value) {
+    const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+    f.checkedAt.value = d.toISOString().slice(0, 16);
+  }
+  $('#o-table tbody').replaceChildren(
+    ...(offers.items.length
+      ? offers.items.map((o) =>
+          el('tr', {},
+            el('td', {}, o.productId),
+            el('td', {}, o.storeName),
+            el('td', {}, o.price === null ? 'не подтверждена' : `${o.price} тг`),
+            el('td', {}, AVAIL[o.availability]),
+            el('td', {}, KIND[o.urlKind]),
+            el('td', {}, VERIF[o.verification]),
+            el('td', {}, `${fmtDate(o.checkedAt)}, ${o.method === 'manual_visit' ? 'в магазине' : 'на сайте'}`),
+            el('td', {}, el('button', { type: 'button', class: 'link', onclick: async () => {
+              if (!confirm('Убрать это предложение?')) return;
+              await api('DELETE', `/offers/${o.id}`);
+              await loadOffers();
+            } }, 'Убрать'))))
+      : [el('tr', {}, el('td', { colspan: 8 }, 'Предложений пока нет: приложение не показывает цен.'))]),
+  );
+}
+
+$('#o-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target.elements;
+  const num = (v) => (v === '' ? null : Number(v));
+  $('#o-error').textContent = '';
+  try {
+    await api('PUT', '/offers', {
+      productId: Number(f.productId.value),
+      storeId: Number(f.storeId.value),
+      price: num(f.price.value),
+      oldPrice: num(f.oldPrice.value),
+      availability: f.availability.value,
+      url: f.url.value.trim() || null,
+      urlKind: f.urlKind.value,
+      source: f.source.value,
+      method: f.method.value,
+      verification: f.verification.value,
+      checkedAt: new Date(f.checkedAt.value).toISOString(),
+      note: f.note.value || null,
+    });
+    await loadOffers();
+  } catch (err) {
+    $('#o-error').textContent = err.message;
+  }
+});

@@ -1,5 +1,7 @@
 import 'dart:ui' show Color;
 
+import 'package:cosmetix/core/i18n/tr.dart';
+
 import '../domain/makeup_look.dart';
 
 /// Three different things, never mixed up:
@@ -25,6 +27,8 @@ class TryOnItem {
     required this.photo,
     required this.price,
     required this.inStock,
+    this.panKey,
+    this.panPosition,
   });
 
   /// The catalog product (and the shade: one product is one shade).
@@ -55,10 +59,21 @@ class TryOnItem {
   final int price;
   final bool inStock;
 
+  /// Set when this item is ONE CELL of a palette product: the id of the cell
+  /// and its number. The colour is then the colour of that cell (only cells
+  /// whose colour is known become items); [productId] is still the palette.
+  final String? panKey;
+  final int? panPosition;
+
+  /// "Ячейка 3" for a cell of a palette, null for any other item.
+  String? get cellLabel =>
+      panPosition == null ? null : trf('Ячейка {n}', {'n': panPosition});
+
   bool get canTryOn => colour != null;
 
   /// The colour is not the manufacturer's own value: the screen says so.
-  bool get isApproximate => status != 'manufacturer';
+  bool get isApproximate =>
+      status != 'manufacturer' && status != 'measured_swatch';
 
   /// The product name without the shade it ends with: "Ink Mood Glowy Tint 30
   /// Happy Berry" -> "Ink Mood Glowy Tint". The full [name] when the shade is not
@@ -79,10 +94,12 @@ class TryOnItem {
 
   @override
   bool operator ==(Object other) =>
-      other is TryOnItem && other.productId == productId;
+      other is TryOnItem &&
+      other.productId == productId &&
+      other.panKey == panKey;
 
   @override
-  int get hashCode => productId.hashCode;
+  int get hashCode => Object.hash(productId, panKey);
 }
 
 /// Where the try-on gets its products. The app implements it with the local

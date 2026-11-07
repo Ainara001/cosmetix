@@ -55,7 +55,7 @@ void main() {
 
     test('the only app code it uses is the shared look and feel', () {
       final allowed = RegExp(
-        r"package:cosmetix/(core/i18n/tr|core/theme/app_colors|core/theme/app_text_styles|core/utils/ui_helpers|widgets/app_card|widgets/page_scaffold)\.dart",
+        r"package:cosmetix/(core/i18n/tr|core/theme/app_colors|core/theme/app_text_styles|core/utils/ui_helpers|widgets/app_card|widgets/custom_button|widgets/pill_segments|widgets/common_widgets|widgets/page_scaffold)\.dart",
       );
       for (final f in _moduleFiles()) {
         for (final m in RegExp(

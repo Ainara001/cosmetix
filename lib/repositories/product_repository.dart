@@ -6,7 +6,10 @@ import 'package:cosmetix/models/recommendation.dart';
 import 'package:cosmetix/models/safety_models.dart';
 
 import 'package:cosmetix/database/database_helper.dart';
+import 'package:cosmetix/models/palette_models.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/repositories/catalog_structure_repository.dart';
+import 'package:cosmetix/repositories/offer_sql.dart';
 
 class ProductRepository {
   ProductRepository(this._helper);
@@ -16,7 +19,7 @@ class ProductRepository {
   static const _selectWithFav = '''
 SELECT p.*, EXISTS(
   SELECT 1 FROM favorites f WHERE f.product_id = p.id AND f.user_id = ?
-) AS is_fav FROM products p''';
+) AS is_fav, $verifiedOfferColumns FROM products p''';
 
   Future<List<Product>> getAll(int userId) async {
     final db = await _helper.database;
@@ -27,6 +30,10 @@ SELECT p.*, EXISTS(
     return rows.map(Product.fromMap).toList();
   }
 
+  /// Line / variant / palette facts of every product that has them (DB v16).
+  Future<Map<int, VariantSummary>> structure() =>
+      CatalogStructureRepository(_helper).summaries();
+
   Future<Product?> getById(int id, int userId) async {
     final db = await _helper.database;
     final rows = await db.rawQuery('$_selectWithFav WHERE p.id = ?', [
@@ -36,15 +43,20 @@ SELECT p.*, EXISTS(
     return rows.isEmpty ? null : Product.fromMap(rows.first);
   }
 
+  /// The VERIFIED offers of a product with a price (the demo rows of
+  /// `product_prices` are not read). Each carries when it was checked, where
+  /// the information comes from and the link when there is one.
   Future<List<StorePrice>> getStorePrices(int productId) async {
     final db = await _helper.database;
     final rows = await db.rawQuery(
       '''
-SELECT pp.store_id, pp.price, pp.in_stock, pp.qty, pp.source AS offer_source,
-  pp.updated_at, s.name, s.distance_m, s.address, s.rating, s.lat, s.lng,
+SELECT o.store_id, o.price, o.availability, o.checked_at AS updated_at,
+  o.source AS offer_source, o.method, o.url, o.url_kind, o.old_price,
+  s.name, s.distance_m, s.address, s.rating, s.lat, s.lng,
   s.chain, s.hours, s.source AS loc_source
-FROM product_prices pp JOIN stores s ON s.id = pp.store_id
-WHERE pp.product_id = ? ORDER BY pp.price''',
+FROM store_offers o JOIN stores s ON s.id = o.store_id
+WHERE o.product_id = ? AND o.verification = 'verified' AND o.price IS NOT NULL
+ORDER BY o.price''',
       [productId],
     );
     return rows.map(StorePrice.fromMap).toList();

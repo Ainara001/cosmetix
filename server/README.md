@@ -208,3 +208,15 @@ Each test file creates its own schema (`t_<random>`) in that database and drops
 it at the end, so nothing else there is touched. **Without `TEST_DATABASE_URL`
 those tests are skipped** (the run says so: "skipped"), so a green run without
 it does not cover the database part.
+
+## Shop offers (manual entry)
+
+`migrations/002_store_offers.sql` adds `store_offers`: what a person checked about one product in one shop
+(price, old price, stock only if really checked, link and what it opens, source, method, trust level, check
+time). The demo rows of `prices` are never shown as prices.
+
+* Admin panel, tab "Цены в магазинах": enter an offer by hand. Source, method and check time are required;
+  an unknown price or stock stays unknown. Every change and removal is written to `admin_audit`.
+* App API: `GET /v1/products/:id/offers` returns only `verified` offers.
+* No automatic collection exists here. A shop gets one only when its published conditions allow it
+  (see `docs/data-sources-terms.md`); none does today.

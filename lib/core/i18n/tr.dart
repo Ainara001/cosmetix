@@ -1,3 +1,4 @@
+import 'package:cosmetix/core/i18n/translations_catalog.dart';
 import 'package:cosmetix/core/i18n/translations_en.dart';
 import 'package:cosmetix/core/i18n/translations_kk.dart';
 
@@ -28,8 +29,8 @@ AppLang currentLang = AppLang.ru;
 /// Translates a Russian UI string. Unknown strings stay as they are.
 String tr(String ru) => switch (currentLang) {
   AppLang.ru => ru,
-  AppLang.en => translationsEn[ru] ?? ru,
-  AppLang.kk => translationsKk[ru] ?? ru,
+  AppLang.en => translationsEn[ru] ?? catalogEn[ru] ?? ru,
+  AppLang.kk => translationsKk[ru] ?? catalogKk[ru] ?? ru,
 };
 
 /// Translates a template with `{name}` placeholders and fills them in.

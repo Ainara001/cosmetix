@@ -18,10 +18,24 @@ ProductCard lineCard(
   Widget? footer,
 }) {
   final shades = catalog.shadesOf(p);
+  final palette = catalog.isPalette(p);
+  final cells = catalog.structureOf(p)?.panCount;
   return ProductCard(
     product: p,
     title: shades.isEmpty ? null : catalog.listName(p),
-    shades: [for (final s in shades) Color(s.shade ?? s.color)],
+    // a palette is told by its number of variants and cells, not by one colour
+    // dot per variant (those dots were estimates of the pack colour)
+    subtitle: shades.isEmpty
+        ? null
+        : palette
+        ? [
+            trf('Вариантов: {n}', {'n': shades.length}),
+            if (cells != null) trf('цветов: {n}', {'n': cells}),
+          ].join(' · ')
+        : trf('Оттенков: {n}', {'n': shades.length}),
+    shades: palette
+        ? const []
+        : [for (final s in shades) Color(s.shade ?? s.color)],
     footer: footer,
     onTap: onTap,
     onFavorite: onFavorite,
@@ -38,6 +52,7 @@ class ProductCard extends StatelessWidget {
     this.priceOverride,
     this.footer,
     this.title,
+    this.subtitle,
     this.shades = const [],
   });
 
@@ -53,6 +68,9 @@ class ProductCard extends StatelessWidget {
 
   /// Shown instead of the product name (the line of a product with shades).
   final String? title;
+
+  /// A second, quieter line under the name ("Вариантов: 6 · цветов: 10").
+  final String? subtitle;
 
   /// Colours of all shades of the line: small dots on the photo.
   final List<Color> shades;
@@ -171,16 +189,17 @@ class ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 10, color: pal.subtext),
                     ),
-                    // always three lines tall (long names such as "Better Than
+                    // the name and the quiet line under it are always three
+                    // lines tall together (long names such as "Better Than
                     // Palette 05 Shade & Shadow Garden" are not cut in the
                     // middle of a word), so the photos in a row match
                     SizedBox(
                       height: MediaQuery.textScalerOf(
                         context,
-                      ).scale(12.5 * 1.2 * 3),
+                      ).scale(12.5 * 1.2 * (subtitle == null ? 3 : 2)),
                       child: Text(
                         tr(title ?? product.name),
-                        maxLines: 3,
+                        maxLines: subtitle == null ? 3 : 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 12.5,
@@ -189,6 +208,22 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (subtitle != null)
+                      SizedBox(
+                        height: MediaQuery.textScalerOf(
+                          context,
+                        ).scale(11 * 1.2),
+                        child: Text(
+                          subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            height: 1.2,
+                            color: pal.subtext,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 3),
                     Wrap(
                       spacing: 6,
@@ -196,11 +231,17 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Text(
                           fmt(price),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: sale ? AppColors.sale : pal.text,
-                          ),
+                          style: price <= 0
+                              ? TextStyle(
+                                  fontSize: 11,
+                                  height: 1.2,
+                                  color: pal.subtext,
+                                )
+                              : TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: sale ? AppColors.sale : pal.text,
+                                ),
                         ),
                         if (sale)
                           Text(
