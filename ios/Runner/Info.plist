@@ -5,7 +5,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Фото для отзыва, аватара профиля и необязательного улучшения бьюти-анализа</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Снимок для отзыва, аватара профиля и необязательного улучшения бьюти-анализа</string>
+	<string>Снимок для отзыва, аватара профиля и необязательного улучшения бьюти-анализа. Подсказки при съёмке лица считаются на телефоне, кадры никуда не отправляются.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Чтобы показать ближайшие магазины и расстояние до них. Положение остаётся на телефоне.</string>
 	<key>NSLocalNetworkUsageDescription</key>

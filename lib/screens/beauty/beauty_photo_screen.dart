@@ -19,6 +19,7 @@ import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/screens/beauty/photo_issue_text.dart';
+import 'package:cosmetix/screens/beauty/smart_capture_screen.dart';
 import 'package:cosmetix/services/photo_check/photo_check.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -29,7 +30,12 @@ enum _Step { intro, preview, checking, rejected, warned, analyzing, failed }
 /// Beauty Test, last step (OPTIONAL): a photo can improve the result. The
 /// test always finishes without it.
 class BeautyPhotoScreen extends StatefulWidget {
-  const BeautyPhotoScreen({super.key, required this.args, this.picker});
+  const BeautyPhotoScreen({
+    super.key,
+    required this.args,
+    this.picker,
+    this.captureCamera,
+  });
 
   final BeautyPhotoArgs args;
 
@@ -37,6 +43,10 @@ class BeautyPhotoScreen extends StatefulWidget {
   /// user cancelled. Null = the phone's camera / gallery (image_picker); tests
   /// pass a fake.
   final Future<String?> Function(ImageSource source)? picker;
+
+  /// The smart camera's camera. Null = the iPhone's front camera; tests pass
+  /// a fake. Not used when [picker] is set.
+  final CaptureCamera Function()? captureCamera;
 
   @override
   State<BeautyPhotoScreen> createState() => _BeautyPhotoScreenState();
@@ -85,12 +95,33 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   Future<void> _pick(ImageSource source) async {
     try {
       // the picker downsizes: we never send a 10-20 MB original
-      final String? path;
-      if (widget.picker != null) {
-        path = await widget.picker!(source);
-      } else {
+      String? path;
+      var from = source;
+      if (widget.picker == null &&
+          source == ImageSource.camera &&
+          (widget.captureCamera != null || DeviceCaptureCamera.supported)) {
+        // the smart camera: face guide and hints, frames stay on the phone
+        final r = await SmartCaptureScreen.open(
+          context,
+          camera: widget.captureCamera?.call(),
+        );
+        if (!mounted) return;
+        switch (r) {
+          case null:
+            return;
+          case CapturedPhoto(path: final p):
+            path = p;
+          case UseGallery():
+            from = ImageSource.gallery;
+          case CameraNotAvailable():
+            break; // e.g. the simulator: the system camera picker
+        }
+      }
+      if (path == null && widget.picker != null) {
+        path = await widget.picker!(from);
+      } else if (path == null) {
         final x = await ImagePicker().pickImage(
-          source: source,
+          source: from,
           maxWidth: 1024,
           maxHeight: 1024,
           imageQuality: 80,

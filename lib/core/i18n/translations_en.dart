@@ -1746,6 +1746,24 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Определено автоматически по названию и составу; это не описание производителя.':
       'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
   'Что это за средство': 'What this product is',
+  // ---- Smart Face Capture ----
+  'Поместите лицо в овал': 'Place your face in the oval',
+  'Расположите лицо по центру': 'Center your face',
+  'Поднесите телефон ближе': 'Bring the phone closer',
+  'Немного отодвиньте телефон': 'Move the phone a little further away',
+  'Посмотрите прямо в камеру': 'Look straight into the camera',
+  'Держите голову ровно': 'Keep your head level',
+  'Добавьте освещения': 'Add more light',
+  'Не двигайтесь': 'Hold still',
+  'Можно сделать фото': 'You can take the photo',
+  'Нет доступа к камере. Разрешите его в Настройках iPhone или выберите фото из галереи.':
+      'No access to the camera. Allow it in the iPhone Settings or choose a photo from the gallery.',
+  'Камера не запустилась. Выберите фото из галереи.':
+      'The camera did not start. Choose a photo from the gallery.',
+  'Закрыть': 'Close',
+  'Скрыть точки лица': 'Hide face points',
+  'Показать точки лица': 'Show face points',
+  'Запускаем камеру…': 'Starting the camera…',
 
   // ---- Care picker (no AI) ----
   'Подбор ухода': 'Care picker',
@@ -1767,22 +1785,35 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Антивозрастной уход': 'Anti-ageing care',
   'Восстановление липидов': 'Lipid restoration',
   // ---- Care selection: why a product was left out ----
-  'LHA может раздражать чувствительную кожу.': 'LHA may irritate sensitive skin.',
-  'LHA — производное салициловой кислоты, концентрацию по составу не узнать: при беременности спросите врача.': 'LHA is a salicylic acid derivative and its strength cannot be told from the ingredient list: during pregnancy, ask a doctor.',
-  'PHA может раздражать чувствительную кожу.': 'PHA may irritate sensitive skin.',
-  'Бензоилпероксид может раздражать чувствительную кожу.': 'Benzoyl peroxide may irritate sensitive skin.',
-  'Гликолевая кислота может раздражать чувствительную кожу.': 'Glycolic acid may irritate sensitive skin.',
+  'LHA может раздражать чувствительную кожу.':
+      'LHA may irritate sensitive skin.',
+  'LHA — производное салициловой кислоты, концентрацию по составу не узнать: при беременности спросите врача.':
+      'LHA is a salicylic acid derivative and its strength cannot be told from the ingredient list: during pregnancy, ask a doctor.',
+  'PHA может раздражать чувствительную кожу.':
+      'PHA may irritate sensitive skin.',
+  'Бензоилпероксид может раздражать чувствительную кожу.':
+      'Benzoyl peroxide may irritate sensitive skin.',
+  'Гликолевая кислота может раздражать чувствительную кожу.':
+      'Glycolic acid may irritate sensitive skin.',
   'Дороже бюджета': 'Over the budget',
-  'Концентрацию салициловой кислоты по составу не узнать, а при беременности допустима только низкая: спросите врача.': 'The strength of salicylic acid cannot be told from the ingredient list, and during pregnancy only a low one is acceptable: ask a doctor.',
-  'Миндальная кислота может раздражать чувствительную кожу.': 'Mandelic acid may irritate sensitive skin.',
+  'Концентрацию салициловой кислоты по составу не узнать, а при беременности допустима только низкая: спросите врача.':
+      'The strength of salicylic acid cannot be told from the ingredient list, and during pregnancy only a low one is acceptable: ask a doctor.',
+  'Миндальная кислота может раздражать чувствительную кожу.':
+      'Mandelic acid may irritate sensitive skin.',
   'Не подходит по возрасту': 'Not suitable for the age',
   'Нет подходящих активов': 'No suitable active ingredients',
   'Нет проверенной цены': 'No verified price',
-  'Отдушка может раздражать чувствительную кожу.': 'Fragrance may irritate sensitive skin.',
-  'При беременности ретиноиды не используют: спросите врача.': 'Retinoids are not used during pregnancy: ask a doctor.',
-  'Ретиноиды могут раздражать чувствительную кожу.': 'Retinoids may irritate sensitive skin.',
-  'Салициловая кислота может раздражать чувствительную кожу.': 'Salicylic acid may irritate sensitive skin.',
-  'Спирт может раздражать чувствительную кожу.': 'Alcohol may irritate sensitive skin.',
-  'Чистый витамин C может пощипывать чувствительную кожу.': 'Pure vitamin C may sting sensitive skin.',
+  'Отдушка может раздражать чувствительную кожу.':
+      'Fragrance may irritate sensitive skin.',
+  'При беременности ретиноиды не используют: спросите врача.':
+      'Retinoids are not used during pregnancy: ask a doctor.',
+  'Ретиноиды могут раздражать чувствительную кожу.':
+      'Retinoids may irritate sensitive skin.',
+  'Салициловая кислота может раздражать чувствительную кожу.':
+      'Salicylic acid may irritate sensitive skin.',
+  'Спирт может раздражать чувствительную кожу.':
+      'Alcohol may irritate sensitive skin.',
+  'Чистый витамин C может пощипывать чувствительную кожу.':
+      'Pure vitamin C may sting sensitive skin.',
   'Не вошли в подбор': 'Left out of the selection',
 };
