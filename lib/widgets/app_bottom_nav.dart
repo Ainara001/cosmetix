@@ -35,9 +35,10 @@ class AppBottomNav extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: SizedBox(
-          // grows with the system font size so the labels never overflow
-          height: 62 + (MediaQuery.textScalerOf(context).scale(11) - 11) * 2,
+        child: ConstrainedBox(
+          // the items size themselves, so the labels never overflow at any
+          // system font size (a fixed height clipped the labels at 2x)
+          constraints: const BoxConstraints(minHeight: 62),
           child: Row(
             children: [
               for (var i = 0; i < _items.length; i++)
@@ -80,6 +81,7 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = active ? context.pal.accent : context.pal.subtext;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Badge(
