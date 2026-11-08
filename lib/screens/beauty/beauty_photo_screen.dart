@@ -189,7 +189,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       final ok = await confirmDialog(
         context,
         title: tr('Отправить фото в ИИ?'),
-        message: AiDisclosure.photoConsent(ai.dataUse, tr),
+        message: AiDisclosure.photoConsent(ai.dataUse, ai.mode, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!ok || !mounted) return;
