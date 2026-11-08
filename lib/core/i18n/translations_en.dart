@@ -9,11 +9,11 @@ Cosmetix stores data on your device in a local SQLite database: name, email, con
 The data is needed to pick cosmetics for your skin type and color type, warn about unwanted ingredients and show your purchase history.
 
 3. Optional AI features: what is sent and to whom
-The AI chat, photo analysis and AI refinement of the picks send data to the Cosmetix server and through it to the Google Gemini service. Nothing is sent without your consent, and the app works without AI. AI features are available only to users who have entered a year of birth and are 18 or older.
+The AI chat, photo analysis and AI refinement of the picks send data to the Cosmetix server and through it to the selected AI service (Google Gemini or Anthropic Claude, depending on the server configuration). Nothing is sent without your consent, and the app works without AI. AI features are available only to users who have entered a year of birth and are 18 or older.
 • Chat: the text of your messages. Do not write personal data in the chat.
 • Beauty profile and blacklist: only if you allowed it separately. The AI refinement also sends the Beauty profile (skin type, tone, undertone, color type, skin concerns) and a list of products.
 • Photo: only at the "Photo" step of the beauty test and after your consent. The app does not keep the photo and deletes it from the phone after the analysis.
-The Cosmetix server does not record message texts or photos. How Google uses what is sent depends on the server's mode: on the free tier Google may use the data to improve its products and people may review it; on the paid tier Google does not use it for that but keeps requests for a limited time to detect abuse. The current mode is shown in Settings, in the AI assistant section.
+The Cosmetix server does not record message texts or photos. How the AI provider uses what is sent depends on the provider and the server's mode: on the free Gemini tier Google may use the data to improve its products and people may review it; on the paid Gemini tier Google does not use it for that but keeps requests for a limited time to detect abuse; Claude's processing terms are not separately confirmed, so assume the data may be used and reviewed by people. The current provider and mode are shown in Settings, in the AI assistant section.
 AI results are hints, not measurements and not a diagnosis.
 
 4. Managing data
@@ -28,7 +28,7 @@ Cosmetix is a study app for comparing cosmetics prices, analyzing ingredients an
 Recommendations on ingredients and color type are for reference only and do not replace a consultation with a dermatologist or cosmetologist.
 
 3. Prices and availability
-Prices and product availability in stores are demonstration data and may differ from real ones.
+Prices and product availability in stores may be unconfirmed. A confirmed offer is marked with its check date and source; a price without a check or a demo price is marked as such. Check the price and availability with the shop before you visit.
 
 4. Orders
 Placing an order in the app is a local simulation: no payment is made and no goods are delivered.
@@ -1634,22 +1634,22 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Photo analysis is switched off right now. The test works from your answers, no photo is needed.',
   'Сервер отключил анализ по фото: фото не отправляются.':
       'The server has switched photo analysis off: photos are not sent.',
-  'Google не использует отправленное для улучшения своих продуктов; запросы хранятся ограниченное время только для выявления нарушений.':
-      'Google does not use what is sent to improve its products; requests are kept for a limited time only to detect abuse.',
-  'Сейчас сервер работает на бесплатном тарифе Google: Google может использовать отправленное для улучшения своих продуктов, и это могут просматривать люди.':
-      'The server currently runs on Google\'s free tier: Google may use what is sent to improve its products, and people may review it.',
-  'Как Google использует отправленное, сервер не сообщил: считайте, что это может быть использовано и просмотрено людьми.':
-      'The server did not say how Google uses what is sent: assume it may be used and reviewed by people.',
-  'Фото будет отправлено на сервер Cosmetix и через него в сервис Google Gemini, чтобы оценить цвет кожи. Приложение не сохраняет фото и удаляет его с телефона после анализа.':
-      'The photo will be sent to the Cosmetix server and through it to Google Gemini to estimate your skin colour. The app does not keep the photo and deletes it from the phone after the analysis.',
+  '{provider} не использует отправленное для улучшения своих продуктов; запросы хранятся ограниченное время только для выявления нарушений.':
+      '{provider} does not use what is sent to improve its products; requests are kept for a limited time only to detect abuse.',
+  'Сейчас сервер работает на бесплатном тарифе {provider}: {provider} может использовать отправленное для улучшения своих продуктов, и это могут просматривать люди.':
+      'The server currently runs on {provider}\'s free tier: {provider} may use what is sent to improve its products, and people may review it.',
+  'Как {provider} использует отправленное, сервер не сообщил: считайте, что это может быть использовано и просмотрено людьми.':
+      'The server did not say how {provider} uses what is sent: assume it may be used and reviewed by people.',
+  'Фото будет отправлено на сервер Cosmetix и через него в сервис {provider}, чтобы оценить цвет кожи. Приложение не сохраняет фото и удаляет его с телефона после анализа.':
+      'The photo will be sent to the Cosmetix server and through it to {provider} to estimate your skin colour. The app does not keep the photo and deletes it from the phone after the analysis.',
   'Результат это подсказка, а не измерение и не диагноз. Согласие можно отозвать в Настройках.':
       'The result is a hint, not a measurement or a diagnosis. You can withdraw your consent in Settings.',
-  'Ваши сообщения в чате будут отправляться на сервер Cosmetix и через него в сервис Google Gemini. Не пишите там личные данные.':
-      'Your chat messages will be sent to the Cosmetix server and through it to Google Gemini. Do not write personal data there.',
+  'Ваши сообщения в чате будут отправляться на сервер Cosmetix и через него в сервис {provider}. Не пишите там личные данные.':
+      'Your chat messages will be sent to the Cosmetix server and through it to {provider}. Do not write personal data there.',
   'Согласие можно отозвать в Настройках.':
       'You can withdraw your consent in Settings.',
-  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер Cosmetix и в Google Gemini. Фото и контакты не отправляются. Это можно изменить в Настройках.':
-      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the Cosmetix server and to Google Gemini. Photos and contacts are not sent. You can change this in Settings.',
+  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер Cosmetix и в {provider}. Фото и контакты не отправляются. Это можно изменить в Настройках.':
+      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the Cosmetix server and to {provider}. Photos and contacts are not sent. You can change this in Settings.',
   'Отправлять сообщения в ИИ?': 'Send messages to the AI?',
   'Без согласия на отправку сообщений ИИ-чат не отвечает. Включить можно в Настройках.':
       'Without consent to send messages the AI chat does not answer. You can turn it on in Settings.',
@@ -1660,8 +1660,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.':
       'The photo goes to the AI server only after your consent. Cosmetix does not keep it.',
   'Отправлять ИИ сообщения чата': 'Send chat messages to the AI',
-  'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.':
-      'Data goes to the Cosmetix server and to Google Gemini only after your consent.',
+  'Данные уходят на сервер Cosmetix и в выбранный сервис ИИ только после вашего согласия.':
+      'Data goes to the Cosmetix server and to the selected AI service only after your consent.',
   'Отправить профиль в ИИ?': 'Send the profile to the AI?',
   'Не удалось открыть фото. Файл повреждён или это не картинка.':
       'Could not open the photo. The file is damaged or it is not a picture.',
