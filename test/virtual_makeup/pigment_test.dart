@@ -316,4 +316,109 @@ void main() {
     final after = ratio(out, 30, 20) / ratio(out, 20, 20);
     expect(after, closeTo(before, before * 0.12));
   });
+
+  group('stage 7 regressions', () {
+    double chroma(Lab c) => math.sqrt(c.a * c.a + c.b * c.b);
+
+    PreparedFace withZone(PreparedFace f, MakeupZone zone) => PreparedFace(
+      image: f.image,
+      points: f.points,
+      masks: ZoneMasks(
+        lips: zone == MakeupZone.lips ? f.masks.lips : MaskPatch(0, 0, 0, 0),
+        eyeshadow: zone == MakeupZone.eyeshadow
+            ? f.masks.lips
+            : MaskPatch(0, 0, 0, 0),
+        blush: zone == MakeupZone.blush ? f.masks.lips : MaskPatch(0, 0, 0, 0),
+        skin: f.masks.skin,
+      ),
+      quality: f.quality,
+    );
+
+    RgbaImage render(
+      PreparedFace f,
+      MakeupZone zone,
+      Color color, {
+      double k = 1,
+    }) => _backend.renderSync(
+      MakeupRequest(
+        face: f,
+        look: MakeupLook(
+          lips: zone == MakeupZone.lips
+              ? ZoneLook(color: color, intensity: k)
+              : _off,
+          eyeshadow: zone == MakeupZone.eyeshadow
+              ? ZoneLook(color: color, intensity: k)
+              : _off,
+          blush: zone == MakeupZone.blush
+              ? ZoneLook(color: color, intensity: k)
+              : _off,
+        ),
+      ),
+    );
+
+    test('a shadowed upper lip takes the lipstick colour, not grey', () {
+      final t = _flat(180, 60, 55); // red lips
+      // the upper lip is in shadow: darker and less saturated
+      for (var y = 5; y < 22; y++) {
+        for (var x = 5; x < 55; x++) {
+          final o = (y * 60 + x) * 4;
+          t.image.pixels[o] = 105;
+          t.image.pixels[o + 1] = 80;
+          t.image.pixels[o + 2] = 78;
+        }
+      }
+      final fresh = withZone(t.face, MakeupZone.lips);
+      final out = render(fresh, MakeupZone.lips, const Color(0xFFC2185B));
+      final before = _at(t.image, 30, 10); // in the shadowed upper lip
+      final after = _at(out, 30, 10);
+      final lower = _at(out, 30, 28); // the normal lower lip
+      expect(
+        chroma(after),
+        greaterThan(chroma(before)),
+        reason: 'gains colour',
+      );
+      expect(chroma(after), greaterThan(8), reason: 'does not turn grey');
+      expect(after.l, lessThan(lower.l), reason: 'the shadow is kept');
+    });
+
+    test('dark spots near the mouth keep their hue under blush', () {
+      final t = _flat(215, 160, 135); // skin
+      // a dark spot (a mole) near the mouth
+      for (var y = 20; y < 23; y++) {
+        for (var x = 28; x < 31; x++) {
+          final o = (y * 60 + x) * 4;
+          t.image.pixels[o] = 90;
+          t.image.pixels[o + 1] = 55;
+          t.image.pixels[o + 2] = 50;
+        }
+      }
+      final face = withZone(t.face, MakeupZone.blush);
+      final out = render(
+        face,
+        MakeupZone.blush,
+        const Color(0xFFE08A8A),
+        k: 0.6,
+      );
+      final after = _at(out, 29, 21);
+      final around = _at(out, 20, 21);
+      expect(after.l, lessThan(around.l), reason: 'the spot stays dark');
+      expect(after.a, greaterThan(0), reason: 'still on the red side');
+      expect(after.b, greaterThan(-4), reason: 'did not turn blue');
+    });
+
+    test('a saturated eyeshadow reads on dark skin at full intensity', () {
+      final t = _flat(80, 55, 45); // dark brown skin
+      final face = withZone(t.face, MakeupZone.eyeshadow);
+      final out = render(face, MakeupZone.eyeshadow, const Color(0xFF6A1B9A));
+      final before = _at(t.image, 30, 20);
+      final after = _at(out, 30, 20);
+      expect(
+        chroma(after),
+        greaterThan(chroma(before) * 3),
+        reason: 'shows up',
+      );
+      expect(after.a, greaterThan(8), reason: 'purple a*');
+      expect(after.b, lessThan(-4), reason: 'purple b*');
+    });
+  });
 }
