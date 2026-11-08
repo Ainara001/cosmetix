@@ -1,6 +1,6 @@
 import 'dart:ui' show Offset;
 
-import 'package:mediapipe_face_mesh/mediapipe_face_mesh.dart';
+import 'package:cosmetix/core/face/mediapipe_face_engine.dart';
 
 import 'package:cosmetix/services/photo_check/photo_pixels.dart';
 
@@ -15,59 +15,25 @@ abstract interface class PhotoFaceFinder {
   Future<void> dispose();
 }
 
-/// BlazeFace (detector) and FaceMesh V2 (478 points) from the `mediapipe_face_mesh`
-/// package that the app already contains (Apache 2.0 models, see
-/// docs/mediapipe-models-license-audit.md). They run on the phone: the photo does not
-/// leave it. This file is its own small adapter; it does not use the virtual try-on code.
+/// The photo check's face finder: a thin wrapper over the shared
+/// [MediaPipeFaceEngine] (BlazeFace + FaceMesh V2, on the phone: the photo does
+/// not leave it).
 class MediaPipePhotoFaceFinder implements PhotoFaceFinder {
-  MediaPipePhotoFaceFinder({this.maxFaces = 5});
+  MediaPipePhotoFaceFinder({int maxFaces = 5})
+    : _engine = MediaPipeFaceEngine(maxFaces: maxFaces);
 
-  final int maxFaces;
-  FaceDetectorProcessor? _detector;
-  FaceMeshProcessor? _mesh;
-  FaceMeshInferencePipeline? _pipeline;
-
-  Future<FaceMeshInferencePipeline> _ready() async {
-    final existing = _pipeline;
-    if (existing != null) return existing;
-    final detector = await FaceDetectorProcessor.create(maxResults: maxFaces);
-    final mesh = await FaceMeshProcessor.create();
-    _detector = detector;
-    _mesh = mesh;
-    return _pipeline = FaceMeshInferencePipeline(
-      detector: detector,
-      mesh: mesh,
-      enableLandmarkTracking:
-          false, // one still photo: no tracking, no smoothing
-      landmarkSmoothing: null,
-    );
-  }
+  final MediaPipeFaceEngine _engine;
 
   @override
-  Future<List<List<Offset>>> find(PhotoPixels photo) async {
-    final pipeline = await _ready();
-    final frame = FaceMeshImage(
-      pixels: photo.rgba,
-      width: photo.width,
-      height: photo.height,
-    );
-    final result = pipeline.processMultiFace(frame, maxMeshFaces: maxFaces);
-    return [
-      for (final face in result.faces)
-        if (face.mesh.landmarks.length >= 478)
-          [
-            for (final p in face.mesh.landmarks)
-              Offset(p.x * photo.width, p.y * photo.height),
-          ],
-    ];
-  }
+  Future<List<List<Offset>>> find(PhotoPixels photo) async => [
+    for (final face in await _engine.detect(
+      photo.rgba,
+      photo.width,
+      photo.height,
+    ))
+      face.points.points,
+  ];
 
   @override
-  Future<void> dispose() async {
-    _detector?.close();
-    _mesh?.close();
-    _detector = null;
-    _mesh = null;
-    _pipeline = null;
-  }
+  Future<void> dispose() => _engine.dispose();
 }
