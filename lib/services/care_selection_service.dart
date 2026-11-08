@@ -170,14 +170,19 @@ class CareSelectionService {
     ],
   };
 
-  // Actives a conservative rule excludes, with the reason (Russian source).
+  // Pregnancy (and planning one): actives left out, with the reason (Russian
+  // source). Sources: AAFP, "Common Skin Conditions During Pregnancy" (2023):
+  // topical retinoids are avoided; benzoyl peroxide and azelaic acid are
+  // preferred options for acne, so they are NOT excluded. MotherToBaby,
+  // "Topical acne treatments" (2023): salicylic acid only at low strength
+  // (about 2% or less); the INCI list does not give the strength, so it is
+  // not offered rather than guessed.
   static const Map<String, String> _pregnancyAvoid = {
     'retinoid': 'При беременности ретиноиды не используют: спросите врача.',
     'salicylic':
-        'При беременности салициловую кислоту не предлагаем: спросите врача.',
-    'lha': 'При беременности LHA не предлагаем: спросите врача.',
-    'benzoyl':
-        'При беременности бензоилпероксид не предлагаем: спросите врача.',
+        'Концентрацию салициловой кислоты по составу не узнать, а при беременности допустима только низкая: спросите врача.',
+    'lha':
+        'LHA — производное салициловой кислоты, концентрацию по составу не узнать: при беременности спросите врача.',
   };
 
   static const Map<String, String> _sensitiveAvoid = {
