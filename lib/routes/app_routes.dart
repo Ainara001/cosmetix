@@ -20,6 +20,7 @@ import 'package:cosmetix/screens/care/bag_form_screen.dart';
 import 'package:cosmetix/screens/care/bag_screen.dart';
 import 'package:cosmetix/screens/care/care_history_screen.dart';
 import 'package:cosmetix/screens/care/care_screen.dart';
+import 'package:cosmetix/screens/care/care_selection_screen.dart';
 import 'package:cosmetix/screens/care/skin_marks_screen.dart';
 import 'package:cosmetix/screens/cart/order_success_screen.dart';
 import 'package:cosmetix/screens/cart/orders_screen.dart';
@@ -83,6 +84,7 @@ class AppRoutes {
   static const care = '/care';
   static const careHistory = '/care-history';
   static const skinMarks = '/skin-marks';
+  static const careSelection = '/care-selection';
 
   static Route<dynamic> onGenerate(RouteSettings s) {
     final a = s.arguments;
@@ -156,6 +158,8 @@ class AppRoutes {
         );
       case care:
         page = const CareScreen();
+      case careSelection:
+        page = const CareSelectionScreen();
       case careHistory:
         page = const CareHistoryScreen();
       case skinMarks:

@@ -2,6 +2,7 @@
 
 const { HttpError } = require('../http-error');
 const { bad, intParam, optString, requireObject } = require('../validate');
+const { rowsOf } = require('../offer_import');
 const { requireAdmin } = require('./admin');
 
 const AVAILABILITY = ['in_stock', 'out_of_stock', 'unknown'];
@@ -215,6 +216,61 @@ function registerOffers(router, { now = () => Date.now() } = {}) {
     } finally {
       client.release();
     }
+  });
+
+  // Batch import from a JSON array or a CSV string. Every row is validated on
+  // its own: a bad row is rejected with its reason and does not fail the rest.
+  // Rows enter as `unverified` unless they say otherwise; the run is logged.
+  router.add('POST', '/admin/api/offers/import', async ({ db, req, body }) => {
+    const admin = await requireAdmin(db, req);
+    const raw = await body();
+    const data = raw && raw.data !== undefined ? raw.data : raw;
+    const rows = rowsOf(data);
+    if (!Array.isArray(rows) || rows.length === 0) {
+      throw new HttpError(400, 'bad_request', 'Nothing to import');
+    }
+    const imported = [];
+    const rejected = [];
+    for (let i = 0; i < rows.length; i++) {
+      try {
+        const o = parseOffer(rows[i], now());
+        let r;
+        try {
+          r = await db.query(
+            `INSERT INTO store_offers
+               (product_id, store_id, city, price, old_price, availability, url, url_kind,
+                volume_text, variant_text, source, method, verification, checked_at, checked_by, note)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+             ON CONFLICT (product_id, store_id) DO UPDATE SET
+               city = EXCLUDED.city, price = EXCLUDED.price, old_price = EXCLUDED.old_price,
+               availability = EXCLUDED.availability, url = EXCLUDED.url, url_kind = EXCLUDED.url_kind,
+               volume_text = EXCLUDED.volume_text, variant_text = EXCLUDED.variant_text,
+               source = EXCLUDED.source, method = EXCLUDED.method, verification = EXCLUDED.verification,
+               checked_at = EXCLUDED.checked_at, checked_by = EXCLUDED.checked_by, note = EXCLUDED.note,
+               updated_at = now()
+             RETURNING id`,
+            [o.productId, o.storeId, o.city, o.price, o.oldPrice, o.availability, o.url, o.urlKind,
+              o.volumeText, o.variantText, o.source, o.method, o.verification, o.checkedAt,
+              admin.username, o.note],
+          );
+        } catch (e) {
+          if (e.code === '23503') throw new Error('Product or shop not found');
+          throw e;
+        }
+        imported.push({ id: Number(r.rows[0].id), productId: o.productId, storeId: o.storeId });
+      } catch (e) {
+        rejected.push({ row: i + 1, reason: e.message || String(e) });
+      }
+    }
+    if (imported.length) {
+      await db.query(
+        'INSERT INTO admin_audit (admin_id, username, product_id, changes) VALUES ($1,$2,$3,$4)',
+        [admin.id, admin.username, null, JSON.stringify({
+          offerImport: { imported: imported.length, rejected: rejected.length },
+        })],
+      );
+    }
+    return { imported: imported.length, rejected };
   });
 
   router.add('DELETE', '/admin/api/offers/:id', async ({ db, req, params }) => {

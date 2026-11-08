@@ -19,6 +19,7 @@ import 'package:cosmetix/services/ai/ai_disclosure.dart';
 import 'package:cosmetix/services/ai/vision_analyzer.dart';
 import 'package:cosmetix/services/beauty_test_flow.dart';
 import 'package:cosmetix/screens/beauty/photo_issue_text.dart';
+import 'package:cosmetix/screens/beauty/smart_capture_screen.dart';
 import 'package:cosmetix/services/photo_check/photo_check.dart';
 import 'package:cosmetix/widgets/app_card.dart';
 import 'package:cosmetix/widgets/custom_button.dart';
@@ -29,7 +30,12 @@ enum _Step { intro, preview, checking, rejected, warned, analyzing, failed }
 /// Beauty Test, last step (OPTIONAL): a photo can improve the result. The
 /// test always finishes without it.
 class BeautyPhotoScreen extends StatefulWidget {
-  const BeautyPhotoScreen({super.key, required this.args, this.picker});
+  const BeautyPhotoScreen({
+    super.key,
+    required this.args,
+    this.picker,
+    this.captureCamera,
+  });
 
   final BeautyPhotoArgs args;
 
@@ -37,6 +43,10 @@ class BeautyPhotoScreen extends StatefulWidget {
   /// user cancelled. Null = the phone's camera / gallery (image_picker); tests
   /// pass a fake.
   final Future<String?> Function(ImageSource source)? picker;
+
+  /// The smart camera's camera. Null = the iPhone's front camera; tests pass
+  /// a fake. Not used when [picker] is set.
+  final CaptureCamera Function()? captureCamera;
 
   @override
   State<BeautyPhotoScreen> createState() => _BeautyPhotoScreenState();
@@ -85,12 +95,33 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
   Future<void> _pick(ImageSource source) async {
     try {
       // the picker downsizes: we never send a 10-20 MB original
-      final String? path;
-      if (widget.picker != null) {
-        path = await widget.picker!(source);
-      } else {
+      String? path;
+      var from = source;
+      if (widget.picker == null &&
+          source == ImageSource.camera &&
+          (widget.captureCamera != null || DeviceCaptureCamera.supported)) {
+        // the smart camera: face guide and hints, frames stay on the phone
+        final r = await SmartCaptureScreen.open(
+          context,
+          camera: widget.captureCamera?.call(),
+        );
+        if (!mounted) return;
+        switch (r) {
+          case null:
+            return;
+          case CapturedPhoto(path: final p):
+            path = p;
+          case UseGallery():
+            from = ImageSource.gallery;
+          case CameraNotAvailable():
+            break; // e.g. the simulator: the system camera picker
+        }
+      }
+      if (path == null && widget.picker != null) {
+        path = await widget.picker!(from);
+      } else if (path == null) {
         final x = await ImagePicker().pickImage(
-          source: source,
+          source: from,
           maxWidth: 1024,
           maxHeight: 1024,
           imageQuality: 80,
@@ -189,7 +220,7 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       final ok = await confirmDialog(
         context,
         title: tr('Отправить фото в ИИ?'),
-        message: AiDisclosure.photoConsent(ai.dataUse, tr),
+        message: AiDisclosure.photoConsent(ai.dataUse, ai.mode, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!ok || !mounted) return;
@@ -323,150 +354,179 @@ class _BeautyPhotoScreenState extends State<BeautyPhotoScreen> {
       tr('Желательно без яркого макияжа'),
       tr('Смотрите прямо в камеру'),
     ];
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+    return Column(
       children: [
-        Text(
-          _needsPhoto
-              ? tr('ИИ определит цветотип по фото')
-              : tr('Улучшите результат с помощью фото'),
-          style: AppTextStyles.h2,
-        ),
-        const SizedBox(height: 6),
-        Text(
-          _needsPhoto
-              ? tr(
-                  'Вы пропустили много вопросов, поэтому ИИ посмотрит на фото и сам определит цветотип, подтон и тон кожи.',
-                )
-              : tr(
-                  'Фото — необязательный шаг. ИИ использует его только как дополнительную подсказку; ваши ответы важнее.',
-                ),
-          style: AppTextStyles.body.copyWith(color: pal.subtext),
-        ),
-        const SizedBox(height: 14),
-        AppCard(
-          color: context.pal.pinkSoft,
-          borderColor: Colors.transparent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             children: [
               Text(
-                tr('Как сделать хорошее фото'),
-                style: AppTextStyles.subtitle,
+                _needsPhoto
+                    ? tr('ИИ определит цветотип по фото')
+                    : tr('Улучшите результат с помощью фото'),
+                style: AppTextStyles.h2,
               ),
-              const SizedBox(height: 8),
-              for (final t in tips)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.check_circle_outline,
-                        size: 16,
-                        color: context.pal.accent,
+              const SizedBox(height: 6),
+              Text(
+                _needsPhoto
+                    ? tr(
+                        'Вы пропустили много вопросов, поэтому ИИ посмотрит на фото и сам определит цветотип, подтон и тон кожи.',
+                      )
+                    : tr(
+                        'Фото — необязательный шаг. ИИ использует его только как дополнительную подсказку; ваши ответы важнее.',
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(t, style: AppTextStyles.small)),
-                    ],
-                  ),
+                style: AppTextStyles.body.copyWith(color: pal.subtext),
+              ),
+              const SizedBox(height: 14),
+              AppCard(
+                color: context.pal.pinkSoft,
+                borderColor: Colors.transparent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('Как сделать хорошее фото'),
+                      style: AppTextStyles.subtitle,
+                    ),
+                    const SizedBox(height: 8),
+                    for (final t in tips)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              size: 16,
+                              color: context.pal.accent,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(t, style: AppTextStyles.small),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
+              ),
+              const SizedBox(height: 10),
+              AppCard(
+                color: context.pal.pinkSoft,
+                borderColor: Colors.transparent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('Что стоит знать об анализе по фото'),
+                      style: AppTextStyles.subtitle,
+                    ),
+                    const SizedBox(height: 8),
+                    for (final t in [
+                      tr(
+                        'Это подсказка по цвету, а не измерение и не диагноз.',
+                      ),
+                      tr(
+                        'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.',
+                      ),
+                      tr(
+                        'Приложение не определяет акне, рубцы или покраснения.',
+                      ),
+                    ])
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 16,
+                              color: context.pal.accent,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(t, style: AppTextStyles.small),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(Icons.lock_outline, size: 16, color: pal.subtext),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      tr(
+                        'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.',
+                      ),
+                      style: AppTextStyles.caption.copyWith(color: pal.subtext),
+                    ),
+                  ),
+                ],
+              ),
+              if (ai.photoAnalysisOff) ...[
+                const SizedBox(height: 10),
+                Text(
+                  tr(
+                    'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.',
+                  ),
+                  style: AppTextStyles.caption.copyWith(color: AppColors.sale),
+                ),
+              ] else if (!ai.isConfigured || ai.status == AiStatus.offline) ...[
+                const SizedBox(height: 10),
+                Text(
+                  tr(
+                    'ИИ-сервер сейчас недоступен — анализ фото не сработает, но тест можно завершить и без него.',
+                  ),
+                  style: AppTextStyles.caption.copyWith(color: AppColors.sale),
+                ),
+              ],
             ],
           ),
         ),
-        const SizedBox(height: 10),
-        AppCard(
-          color: context.pal.pinkSoft,
-          borderColor: Colors.transparent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr('Что стоит знать об анализе по фото'),
-                style: AppTextStyles.subtitle,
-              ),
-              const SizedBox(height: 8),
-              for (final t in [
-                tr('Это подсказка по цвету, а не измерение и не диагноз.'),
-                tr(
-                  'Результат зависит от света и камеры; макияж, очки и фильтры его искажают.',
-                ),
-                tr('Приложение не определяет акне, рубцы или покраснения.'),
-              ])
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 16,
-                        color: context.pal.accent,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(t, style: AppTextStyles.small)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
+        _actionBar(ai),
+      ],
+    );
+  }
+
+  /// The capture buttons stay pinned to the bottom so the "what to know"
+  /// card never pushes them off the screen, whatever the device or text scale.
+  Widget _actionBar(AiProvider ai) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.lock_outline, size: 16, color: pal.subtext),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                tr(
-                  'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.',
-                ),
-                style: AppTextStyles.caption.copyWith(color: pal.subtext),
+            if (!ai.photoAnalysisOff) ...[
+              CustomButton(
+                label: tr('Сделать фото'),
+                icon: Icons.photo_camera_outlined,
+                onPressed: () => _pick(ImageSource.camera),
               ),
-            ),
+              const SizedBox(height: 10),
+              CustomButton(
+                label: tr('Выбрать из галереи'),
+                icon: Icons.photo_library_outlined,
+                outlined: true,
+                onPressed: () => _pick(ImageSource.gallery),
+              ),
+            ],
+            if (_needsPhoto)
+              TextButton(
+                onPressed: _backToQuestions,
+                child: Text(tr('Вернуться к вопросам')),
+              )
+            else
+              TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
           ],
         ),
-        if (ai.photoAnalysisOff) ...[
-          const SizedBox(height: 10),
-          Text(
-            tr(
-              'Анализ по фото сейчас отключён. Тест работает по вашим ответам, фото не нужно.',
-            ),
-            style: AppTextStyles.caption.copyWith(color: AppColors.sale),
-          ),
-        ] else if (!ai.isConfigured || ai.status == AiStatus.offline) ...[
-          const SizedBox(height: 10),
-          Text(
-            tr(
-              'ИИ-сервер сейчас недоступен — анализ фото не сработает, но тест можно завершить и без него.',
-            ),
-            style: AppTextStyles.caption.copyWith(color: AppColors.sale),
-          ),
-        ],
-        const SizedBox(height: 20),
-        if (!ai.photoAnalysisOff) ...[
-          CustomButton(
-            label: tr('Сделать фото'),
-            icon: Icons.photo_camera_outlined,
-            onPressed: () => _pick(ImageSource.camera),
-          ),
-          const SizedBox(height: 10),
-          CustomButton(
-            label: tr('Выбрать из галереи'),
-            icon: Icons.photo_library_outlined,
-            outlined: true,
-            onPressed: () => _pick(ImageSource.gallery),
-          ),
-          const SizedBox(height: 6),
-        ],
-        if (_needsPhoto)
-          TextButton(
-            onPressed: _backToQuestions,
-            child: Text(tr('Вернуться к вопросам')),
-          )
-        else
-          TextButton(onPressed: _skip, child: Text(tr('Пропустить'))),
-      ],
+      ),
     );
   }
 

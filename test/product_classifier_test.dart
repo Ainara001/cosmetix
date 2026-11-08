@@ -57,6 +57,35 @@ void main() {
       },
     );
 
+    test(
+      'a shower gel or body wash is rinsed off, not a leave-on gel or cream',
+      () {
+        // found on the Open Beauty Facts sample (docs/classification-report.md)
+        for (final n in [
+          'Shower Gel pH 5.5 Skin-Neutral with Allantoin',
+          'Cream-Oil Shower pH 5.5',
+          'Shower Gel Soft Cream',
+          'Body Wash Coconut',
+          'Гель для душа Алоэ',
+        ]) {
+          final c = classifier.classify(
+            name: n,
+            category: 'Уход',
+            inci: 'Aqua, Sodium Laureth Sulfate, Glycerin',
+          );
+          expect(c.form, ProductForm.cleanser, reason: n);
+          expect(c.rinseOff, isTrue, reason: n);
+        }
+        // a body cream is still a cream
+        expect(
+          classifier
+              .classify(name: 'Body Cream Shea', category: 'Уход', inci: 'Aqua')
+              .form,
+          ProductForm.cream,
+        );
+      },
+    );
+
     test('a moisturising cream is a leave-on cream, not a cleanser', () {
       for (final n in [
         'Moisturizing Cream',

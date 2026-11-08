@@ -354,13 +354,7 @@ void main() {
       },
     );
 
-    for (final (text, skip) in [
-      (1.0, null),
-      // the shared bottom bar of main overflows by 3-6 px with large text;
-      // PR #45 fixes it (checked with #45 merged in: these pass)
-      (1.5, 'needs PR #45 (bottom bar height with large text)'),
-      (2.0, 'needs PR #45 (bottom bar height with large text)'),
-    ]) {
+    for (final text in [1.0, 1.5, 2.0]) {
       testWidgets('iPhone SE with ${text}x text: no overflow', (t) async {
         await open(t, size: const Size(375, 667), text: text);
         expect(t.takeException(), isNull);
@@ -368,7 +362,7 @@ void main() {
         await t.tap(find.byKey(const Key('feature-acne')));
         await t.pump();
         expect(t.takeException(), isNull);
-      }, skip: skip != null);
+      });
     }
   });
 
