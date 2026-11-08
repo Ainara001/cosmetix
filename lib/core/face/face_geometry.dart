@@ -70,8 +70,14 @@ class FaceGeometry {
   double get widthShare =>
       imageSize.width <= 0 ? 0 : faceWidth / imageSize.width;
 
-  /// Roll from the 3D pose when known, else from the eye line.
-  double get rollDegrees => pose?.rollDegrees ?? points.rollDegrees;
+  /// Roll from the 3D pose when known, else from the eye line, in -90..90:
+  /// a mirrored picture reverses the eye line, which is the same tilt.
+  double get rollDegrees {
+    final r = pose?.rollDegrees ?? points.rollDegrees;
+    if (r > 90) return r - 180;
+    if (r <= -90) return r + 180;
+    return r;
+  }
 
   /// Yaw from the 3D pose, null without it (use [yawRatio] then).
   double? get yawDegrees => pose?.yawDegrees;

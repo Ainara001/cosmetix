@@ -164,6 +164,18 @@ void main() {
       expect(g.rollDegrees, closeTo(15, 1.5));
     });
 
+    test('a mirrored picture has the same (small) roll, not 180 degrees', () {
+      final g = faceAt(const Offset(300, 400), 300, size: const Size(600, 800));
+      const t = FaceCoordinateTransform(
+        imageSize: Size(600, 800),
+        previewSize: Size(600, 800),
+        mirror: true,
+      );
+      final m = g.mapped(t.toPreview, const Size(600, 800));
+      expect(m.rollDegrees.abs(), lessThan(2));
+      expect(m.yawRatio, closeTo(1, 0.1));
+    });
+
     test('the try-on still sees the same FacePoints type (re-export)', () {
       final p = legacy.FacePoints(meshAt(const Offset(100, 100), 100));
       expect(p, isA<FacePoints>());
