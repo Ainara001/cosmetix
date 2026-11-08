@@ -78,7 +78,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       final ok = await confirmDialog(
         context,
         title: tr('Отправить профиль в ИИ?'),
-        message: AiDisclosure.profileConsent(tr),
+        message: AiDisclosure.profileConsent(ai.mode, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!mounted) return;

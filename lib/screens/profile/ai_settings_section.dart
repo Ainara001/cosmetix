@@ -214,12 +214,12 @@ class _AiSettingsSectionState extends State<AiSettingsSection> {
           const SizedBox(height: 6),
           Text(
             tr(
-              'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.',
+              'Данные уходят на сервер Cosmetix и в выбранный сервис ИИ только после вашего согласия.',
             ),
             style: AppTextStyles.caption.copyWith(color: pal.subtext),
           ),
           Text(
-            AiDisclosure.dataUse(ai.dataUse, tr),
+            AiDisclosure.dataUse(ai.dataUse, ai.mode, tr),
             style: AppTextStyles.caption.copyWith(color: pal.subtext),
           ),
           const SizedBox(height: 6),
