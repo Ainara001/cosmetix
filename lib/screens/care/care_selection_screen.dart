@@ -150,6 +150,7 @@ class _CareSelectionScreenState extends State<CareSelectionScreen> {
           icon: Icons.spa_outlined,
           title: tr('Подходящих товаров не найдено'),
         ),
+        ..._left(context, r),
       ];
     }
     return [
@@ -166,6 +167,32 @@ class _CareSelectionScreenState extends State<CareSelectionScreen> {
       ),
       const SizedBox(height: 12),
       for (final m in r.matches) _card(context, m),
+      ..._left(context, r),
+    ];
+  }
+
+  /// Why the other products were left out, grouped: the selection explains
+  /// itself, a missing price or a safety rule is not hidden.
+  List<Widget> _left(BuildContext context, CareSelectionResult r) {
+    if (r.exclusions.isEmpty) return const [];
+    final counts = <String, int>{};
+    for (final e in r.exclusions) {
+      counts[e.reason] = (counts[e.reason] ?? 0) + 1;
+    }
+    final sorted = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return [
+      const SizedBox(height: 12),
+      Text(tr('Не вошли в подбор'), style: AppTextStyles.bodyBold),
+      const SizedBox(height: 4),
+      for (final e in sorted)
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Text(
+            '${tr(e.key)} — ${e.value}',
+            style: AppTextStyles.caption.copyWith(color: context.pal.subtext),
+          ),
+        ),
     ];
   }
 

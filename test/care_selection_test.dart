@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
+import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/services/care_selection_service.dart';
 
@@ -62,7 +65,8 @@ void main() {
       },
     );
 
-    test('pregnancy excludes retinoids, salicylic acid, LHA and benzoyl', () {
+    test('pregnancy: no retinoids, no acids of unknown strength; '
+        'benzoyl peroxide and azelaic acid stay (AAFP 2023)', () {
       const need = CareNeed(
         skinType: SkinType.oily,
         concerns: {SkinConcern.acne},
@@ -73,13 +77,25 @@ void main() {
         _p(1, 'Water, Retinol', price: 5000),
         _p(2, 'Water, Salicylic Acid', price: 5000),
         _p(3, 'Water, Niacinamide, Zinc PCA', price: 5000),
+        _p(4, 'Water, Benzoyl Peroxide', price: 5000),
+        _p(5, 'Water, Azelaic Acid', price: 5000),
+        _p(6, 'Water, Capryloyl Salicylic Acid', price: 5000),
       ];
 
       final r = CareSelectionService.select(need, products);
 
-      expect(r.matches.map((m) => m.product.id), [3]);
-      final excluded = r.exclusions.map((e) => e.product.id).toSet();
-      expect(excluded, containsAll({1, 2}));
+      expect(r.matches.map((m) => m.product.id).toSet(), {3, 4, 5});
+      final reasons = {for (final e in r.exclusions) e.product.id: e.reason};
+      expect(reasons.keys, containsAll({1, 2, 6}));
+      expect(reasons[1], contains('ретиноиды'));
+      expect(reasons[2], contains('Концентрацию'));
+
+      // without pregnancy the same catalogue keeps retinol and salicylic acid
+      final free = CareSelectionService.select(
+        const CareNeed(skinType: SkinType.oily, concerns: {SkinConcern.acne}),
+        products,
+      );
+      expect(free.matches.map((m) => m.product.id), containsAll([2, 4, 5]));
     });
 
     test('sensitive skin excludes acids, alcohol and fragrance', () {
@@ -155,5 +171,29 @@ void main() {
       final target = CareSelectionService.targetActives(need);
       expect(target, containsAll({'niacinamide', 'salicylic', 'azelaic'}));
     });
+  });
+
+  test('every Russian string of the selection is translated (EN, KK)', () {
+    // read from the source: a new reason or label cannot be forgotten
+    final src = File('lib/services/care_selection_service.dart')
+        .readAsStringSync()
+        .replaceAll(RegExp(r"'\s*\n\s*'"), ''); // joined literals
+    final ru = {
+      for (final m in RegExp(r"'([^'\n]*[А-Яа-яЁё][^'\n]*)'").allMatches(src))
+        m[1]!,
+    };
+    expect(ru.length, greaterThan(20));
+    for (final lang in [AppLang.en, AppLang.kk]) {
+      currentLang = lang;
+      expect(
+        [
+          for (final s in ru)
+            if (tr(s) == s) s,
+        ],
+        isEmpty,
+        reason: '$lang',
+      );
+    }
+    currentLang = AppLang.ru;
   });
 }
