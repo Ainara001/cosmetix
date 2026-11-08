@@ -15,7 +15,7 @@ class DatabaseHelper {
   static const dbName = 'cosmetix.db';
 
   /// Increase this number and extend [_onUpgrade] when the schema changes.
-  static const dbVersion = 18;
+  static const dbVersion = 19;
 
   final String? path;
   Database? _db;
@@ -195,7 +195,25 @@ class DatabaseHelper {
       await _addColumn(db, 'store_offers', 'origin', "TEXT NOT NULL DEFAULT 'local'");
       await _addColumn(db, 'store_offers', 'synced_at', 'INTEGER');
     },
+    // the person's own marks on the face zones (what they see, not a
+    // diagnosis). A new table only.
+    19: (db) async {
+      await db.execute(_schemaV19);
+    },
   };
+
+  static const _schemaV19 = '''
+CREATE TABLE IF NOT EXISTS skin_zone_marks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  zone TEXT NOT NULL CHECK (zone IN
+    ('forehead', 'cheek_right', 'cheek_left', 'nose', 'chin')),
+  feature TEXT NOT NULL CHECK (feature IN
+    ('acne', 'comedones', 'redness', 'post_acne', 'pigmentation', 'scars',
+     'pores', 'texture')),
+  marked_at INTEGER NOT NULL,
+  UNIQUE (user_id, zone, feature)
+)''';
 
   static Future<void> _addColumn(
     Database db,
@@ -261,6 +279,7 @@ class DatabaseHelper {
     'care_steps',
     'care_logs',
     'reaction_history',
+    'skin_zone_marks',
   ];
 
   /// Schema version 17: real offers of shops.

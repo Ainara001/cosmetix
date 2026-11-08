@@ -1746,6 +1746,42 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Определено автоматически по названию и составу; это не описание производителя.':
       'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
   'Что это за средство': 'What this product is',
+  // ---- Face zones and skin marks ----
+  'Лоб': 'Forehead',
+  'Правая щека': 'Right cheek',
+  'Левая щека': 'Left cheek',
+  'Нос': 'Nose',
+  'Подбородок': 'Chin',
+  'Высыпания (акне)': 'Breakouts (acne)',
+  'Чёрные точки, комедоны': 'Blackheads, comedones',
+  'Покраснения': 'Redness',
+  'Следы после высыпаний': 'Marks left by breakouts',
+  'Пигментные пятна': 'Dark spots',
+  'Рубцы': 'Scars',
+  'Заметные поры': 'Visible pores',
+  'Неровная текстура': 'Uneven texture',
+  'Особенности кожи': 'Skin features',
+  'Выберите зону и отметьте, что вы на ней видите.':
+      'Choose a zone and mark what you see on it.',
+  'Отметить на своём фото': 'Mark on my photo',
+  'Вернуться к схеме': 'Back to the diagram',
+  'Фото только на экране: оно не сохраняется и никуда не отправляется.':
+      'The photo is only on the screen: it is not saved or sent anywhere.',
+  'В подборе ухода учтём: {v}':
+      'The care selection will take into account: {v}',
+  'Рубцы косметика не убирает: с ними лучше обратиться к дерматологу.':
+      'Cosmetics do not remove scars: it is better to see a dermatologist about them.',
+  'Сохранить отметки': 'Save the marks',
+  'Это ваши наблюдения, а не диагноз: приложение не определяет акне, рубцы или пигментацию по фото. Если высыпаний много, они болезненные или оставляют следы, обратитесь к дерматологу.':
+      'These are your observations, not a diagnosis: the app does not detect acne, scars or pigmentation from a photo. If there are many breakouts, they hurt or leave marks, see a dermatologist.',
+  'Схема лица: выберите зону кнопками ниже или касанием':
+      'Face diagram: choose a zone with the buttons below or by tapping',
+  'На фото нужно одно лицо, крупно и анфас. Можно отмечать на схеме.':
+      'The photo needs one face, close up and facing the camera. You can mark on the diagram instead.',
+  'Не удалось открыть фото. Можно отмечать на схеме.':
+      'Could not open the photo. You can mark on the diagram instead.',
+  'Отметки сохранены': 'Marks saved',
+  'Отметить особенности кожи': 'Mark skin features',
   // ---- Smart Face Capture ----
   'Поместите лицо в овал': 'Place your face in the oval',
   'Расположите лицо по центру': 'Center your face',

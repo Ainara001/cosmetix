@@ -173,7 +173,7 @@ void main() {
         final h = DatabaseHelper(path: '${tmp.path}/new.db');
         addTearDown(h.close);
         final db = await h.database;
-        expect(DatabaseHelper.dbVersion, 18);
+        expect(DatabaseHelper.dbVersion, 19); // v19: skin_zone_marks
         expect(
           (await db.rawQuery('PRAGMA user_version')).single['user_version'],
           DatabaseHelper.dbVersion,

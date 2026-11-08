@@ -257,7 +257,7 @@ void main() {
         final h = DatabaseHelper(path: '${tmp.path}/a.db');
         addTearDown(h.close);
         final db = await h.database;
-        expect(DatabaseHelper.dbVersion, 18);
+        expect(DatabaseHelper.dbVersion, 19); // v19: skin_zone_marks
         expect((await db.query('product_shades')).length, 15);
         final r = (await db.rawQuery(
           'SELECT p.name, s.* FROM product_shades s JOIN products p ON p.id = s.product_id '
