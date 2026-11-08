@@ -53,9 +53,12 @@ void main() {
       },
     );
 
+    // The shared face geometry (lib/core/face: pure geometry and the on-phone
+    // MediaPipe adapter) is allowed too: the try-on must see the same mesh
+    // as the photo check and the smart camera.
     test('the only app code it uses is the shared look and feel', () {
       final allowed = RegExp(
-        r"package:cosmetix/(core/i18n/tr|core/theme/app_colors|core/theme/app_text_styles|core/utils/ui_helpers|widgets/app_card|widgets/custom_button|widgets/pill_segments|widgets/common_widgets|widgets/page_scaffold)\.dart",
+        r"package:cosmetix/(core/face/[a-z_]+|core/i18n/tr|core/theme/app_colors|core/theme/app_text_styles|core/utils/ui_helpers|widgets/app_card|widgets/custom_button|widgets/pill_segments|widgets/common_widgets|widgets/page_scaffold)\.dart",
       );
       for (final f in _moduleFiles()) {
         for (final m in RegExp(
