@@ -1705,7 +1705,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Не удалось обновить цены. Показаны сохранённые, с датой проверки.':
       'Could not update the prices. The saved ones are shown with the date they were checked.',
   'Сервер цен не подключён.': 'The price server is not connected.',
-  'Цены с сервера ещё не загружались.': 'Prices have not been loaded from the server yet.',
+  'Цены с сервера ещё не загружались.':
+      'Prices have not been loaded from the server yet.',
   'Цены обновлены: {d}': 'Prices updated: {d}',
   'Обновить цены': 'Refresh prices',
   'Крем': 'Cream',
@@ -1740,7 +1741,29 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'остаётся на коже': 'stays on the skin',
   'Назначение': 'Purpose',
   'В начале состава': 'Near the top of the INCI list',
-  'Тип или назначение не подтверждены: ждёт проверки специалистом.': 'Type or purpose is not confirmed: waiting for a specialist to check.',
-  'Определено автоматически по названию и составу; это не описание производителя.': 'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
+  'Тип или назначение не подтверждены: ждёт проверки специалистом.':
+      'Type or purpose is not confirmed: waiting for a specialist to check.',
+  'Определено автоматически по названию и составу; это не описание производителя.':
+      'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
   'Что это за средство': 'What this product is',
+
+  // ---- Care picker (no AI) ----
+  'Подбор ухода': 'Care picker',
+  'Подберите уход под свою кожу без ИИ: ответьте на несколько вопросов.':
+      'Pick care for your skin without AI: answer a few questions.',
+  'Проблемы кожи': 'Skin concerns',
+  'Беременность или планирование': 'Pregnancy or planning one',
+  'Бюджет (₸)': 'Budget (₸)',
+  'Подобрать': 'Pick',
+  'Найдено товаров: {n}': 'Found products: {n}',
+  'Показываем только товары с проверенной ценой в пределах бюджета. Правила не заменяют консультацию врача.':
+      'Only products with a verified price within the budget are shown. The rules do not replace a doctor\'s advice.',
+  'К товару': 'To product',
+  'Противовоспалительное действие': 'Anti-inflammatory action',
+  'Отшелушивание и очищение пор': 'Exfoliation and pore clearing',
+  'Осветление постакне': 'Fading post-acne marks',
+  'Обновление кожи': 'Skin renewal',
+  'Успокоение и восстановление барьера': 'Soothing and barrier repair',
+  'Антивозрастной уход': 'Anti-ageing care',
+  'Восстановление липидов': 'Lipid restoration',
 };
