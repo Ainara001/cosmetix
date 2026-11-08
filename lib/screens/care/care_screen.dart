@@ -144,6 +144,14 @@ class _CareScreenState extends State<CareScreen> {
             ],
           ),
           const SizedBox(height: 12),
+          CustomButton(
+            label: tr('Подбор ухода'),
+            icon: Icons.spa_outlined,
+            outlined: true,
+            onPressed: () =>
+                Navigator.pushNamed(context, AppRoutes.careSelection),
+          ),
+          const SizedBox(height: 16),
           Text(
             _period == CarePeriod.morning
                 ? tr('Утренний уход')

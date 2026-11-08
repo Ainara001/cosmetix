@@ -14,8 +14,9 @@ import 'package:cosmetix/services/routine_checks.dart';
 import 'package:cosmetix/services/recommendation_service.dart';
 
 /// What the assistant knows about shops: the nearest ones and, for the
-/// products in question, the price and stock in every shop. Addresses are real,
-/// prices and stock are demo values (the prompt says so).
+/// products in question, the price and stock in every shop. Addresses are real;
+/// prices and stock are only what a person checked (a check date) or demo
+/// values (marked as such). The prompt tells the model which is which.
 class StoreContext {
   const StoreContext({
     required this.located,
@@ -331,7 +332,7 @@ Rules:
 - Never recommend a product that contains a blacklisted ingredient.
 - Catalog lines may have "has:" (acids and actives found in the INCI list; use it for ingredient questions) and "fits:" (reasons computed by the app from the user's Beauty Test, with the match %). Say in a few words why a product suits THIS person, using only those facts, in the answer language. Prefer a higher match. Never praise a shade whose fits say it is another palette's shade.
 - Mention only products that DO suit the user, never to say you do not recommend them; just say the other shades belong to another palette. EXCEPTION: when the user asks for alternatives or cheaper options, name 2-3 other products from the comparison, say in a few words how well each fits (use the fits facts) and compare their prices and distances.
-- Where to buy / nearest shop / cheapest / alternatives / in stock: use only SHOPS: name the shop, address, distance, price and stock. NEVER invent a price or a shop: a product without an availability line has no shop data, say so and point to its page. For "alternatives" or "cheaper" compare the products listed under "being compared" and say which one costs less, where, and how far it is. Always write the product name next to each price, never compare prices of different products as if they were the same product. Say prices and stock are demo values to confirm with the shop, never call them live. If the user asks about "the same product" or "it", it is the product from your previous answer.
+- Where to buy / nearest shop / cheapest / alternatives / in stock: use only SHOPS: name the shop, address, distance, price and stock. NEVER invent a price, a discount, a shop, a product or an ingredient. A product without an availability line has no shop data, say so and point to its page. A price with a check date was confirmed by a person on that date (say "checked on <date>"); a price without a date or marked demo is a demo value, say so; "price not confirmed" means there is no verified price, so say the current price is unknown. Stock is only "in stock", "out of stock" or "stock not checked": never turn an unknown stock into a claim. For "alternatives" or "cheaper" compare the products listed under "being compared" and say which one costs less, where, and how far it is. Always write the product name next to each price, never compare prices of different products as if they were the same product. If the user asks about "the same product" or "it", it is the product from your previous answer.
 - Safety: retinoids must not be layered with AHA/BHA/PHA acids or benzoyl peroxide, and are better apart from vitamin C (C in the morning, retinol in the evening); two acids at once are too much. Sensitive skin: add products one at a time and test 3-4 days on a small area first, not a whole line at once; acids, retinoids and vitamin C are NOT gentle: suggest them only with a patch test, never as mild. Foundation: a silicone foundation over an oil-rich cream slides, a water-based one over a silicone cream or primer beads: match the bases ("base:" facts). If "APP CHECK" lines are given, repeat them in your own words.
 - Short answers (under 120 words), plain text: no markdown.
 - Each recommended CATALOG product: its full name, then its marker like [#12] right after the name. A marker never stands alone and never follows "or"/"such as". Never invent a marker.
@@ -342,7 +343,7 @@ $profile
 
 USER BLACKLIST: $blacklistLine
 ${detail.isEmpty ? '' : '\nPRODUCT(S) IN QUESTION:\n$detail\n'}${pair.isEmpty ? '' : '\nAPP CHECK of these products together:\n$pair\n'}
-SHOPS (addresses real; prices and stock DEMO, not live):
+SHOPS (addresses real; a price with a check date was confirmed by a person on that date, a price without a date or marked demo is a demo value, "price not confirmed" means the current price is unknown):
 $shops
 
 CATALOG:
@@ -387,9 +388,15 @@ ${catalogLines.join('\n')}''';
       StockLevel.inStock =>
         o.qty == null ? 'in stock' : 'in stock (${o.qty} pcs)',
     };
-    String offerLine(StorePrice o) =>
-        '${o.storeName}, ${o.address}${dist ? ', ${km(o.distanceM)}' : ''}: '
-        '${_priceForAi(o.price)}, ${stockOf(o)}${o.demo ? ' [demo data]' : ''}';
+    String offerLine(StorePrice o) {
+      final price = o.demo
+          ? '${o.price > 0 ? _priceForAi(o.price) : 'price not confirmed'} [demo data]'
+          : o.price > 0
+          ? '${_priceForAi(o.price)}${o.updatedAt == null ? '' : ', checked ${_checkedDate(o.updatedAt!)}'}'
+          : 'price not confirmed';
+      return '${o.storeName}, ${o.address}${dist ? ', ${km(o.distanceM)}' : ''}: '
+          '$price, ${stockOf(o)}';
+    }
     if (s.offers.length <= 2) {
       // one or two products: every shop, nothing left to guess
       for (final e in s.offers.entries) {
@@ -560,3 +567,10 @@ ${shareProfile ? '''
 /// A price for the AI prompt: only a verified shop price is a number.
 String _priceForAi(int tenge) =>
     tenge <= 0 ? 'price not confirmed' : Formatters.price(tenge);
+
+/// "YYYY-MM-DD" of when a person last checked an offer, for the prompt.
+String _checkedDate(int epochMs) {
+  final d = DateTime.fromMillisecondsSinceEpoch(epochMs);
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${d.year}-${two(d.month)}-${two(d.day)}';
+}

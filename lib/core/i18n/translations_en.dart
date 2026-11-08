@@ -9,11 +9,11 @@ Cosmetix stores data on your device in a local SQLite database: name, email, con
 The data is needed to pick cosmetics for your skin type and color type, warn about unwanted ingredients and show your purchase history.
 
 3. Optional AI features: what is sent and to whom
-The AI chat, photo analysis and AI refinement of the picks send data to the Cosmetix server and through it to the Google Gemini service. Nothing is sent without your consent, and the app works without AI. AI features are available only to users who have entered a year of birth and are 18 or older.
+The AI chat, photo analysis and AI refinement of the picks send data to the Cosmetix server and through it to the selected AI service (Google Gemini or Anthropic Claude, depending on the server configuration). Nothing is sent without your consent, and the app works without AI. AI features are available only to users who have entered a year of birth and are 18 or older.
 • Chat: the text of your messages. Do not write personal data in the chat.
 • Beauty profile and blacklist: only if you allowed it separately. The AI refinement also sends the Beauty profile (skin type, tone, undertone, color type, skin concerns) and a list of products.
 • Photo: only at the "Photo" step of the beauty test and after your consent. The app does not keep the photo and deletes it from the phone after the analysis.
-The Cosmetix server does not record message texts or photos. How Google uses what is sent depends on the server's mode: on the free tier Google may use the data to improve its products and people may review it; on the paid tier Google does not use it for that but keeps requests for a limited time to detect abuse. The current mode is shown in Settings, in the AI assistant section.
+The Cosmetix server does not record message texts or photos. How the AI provider uses what is sent depends on the provider and the server's mode: on the free Gemini tier Google may use the data to improve its products and people may review it; on the paid Gemini tier Google does not use it for that but keeps requests for a limited time to detect abuse; Claude's processing terms are not separately confirmed, so assume the data may be used and reviewed by people. The current provider and mode are shown in Settings, in the AI assistant section.
 AI results are hints, not measurements and not a diagnosis.
 
 4. Managing data
@@ -28,7 +28,7 @@ Cosmetix is a study app for comparing cosmetics prices, analyzing ingredients an
 Recommendations on ingredients and color type are for reference only and do not replace a consultation with a dermatologist or cosmetologist.
 
 3. Prices and availability
-Prices and product availability in stores are demonstration data and may differ from real ones.
+Prices and product availability in stores may be unconfirmed. A confirmed offer is marked with its check date and source; a price without a check or a demo price is marked as such. Check the price and availability with the shop before you visit.
 
 4. Orders
 Placing an order in the app is a local simulation: no payment is made and no goods are delivered.
@@ -1634,22 +1634,22 @@ You are responsible for the accuracy of the data you provide and for keeping you
       'Photo analysis is switched off right now. The test works from your answers, no photo is needed.',
   'Сервер отключил анализ по фото: фото не отправляются.':
       'The server has switched photo analysis off: photos are not sent.',
-  'Google не использует отправленное для улучшения своих продуктов; запросы хранятся ограниченное время только для выявления нарушений.':
-      'Google does not use what is sent to improve its products; requests are kept for a limited time only to detect abuse.',
-  'Сейчас сервер работает на бесплатном тарифе Google: Google может использовать отправленное для улучшения своих продуктов, и это могут просматривать люди.':
-      'The server currently runs on Google\'s free tier: Google may use what is sent to improve its products, and people may review it.',
-  'Как Google использует отправленное, сервер не сообщил: считайте, что это может быть использовано и просмотрено людьми.':
-      'The server did not say how Google uses what is sent: assume it may be used and reviewed by people.',
-  'Фото будет отправлено на сервер Cosmetix и через него в сервис Google Gemini, чтобы оценить цвет кожи. Приложение не сохраняет фото и удаляет его с телефона после анализа.':
-      'The photo will be sent to the Cosmetix server and through it to Google Gemini to estimate your skin colour. The app does not keep the photo and deletes it from the phone after the analysis.',
+  '{provider} не использует отправленное для улучшения своих продуктов; запросы хранятся ограниченное время только для выявления нарушений.':
+      '{provider} does not use what is sent to improve its products; requests are kept for a limited time only to detect abuse.',
+  'Сейчас сервер работает на бесплатном тарифе {provider}: {provider} может использовать отправленное для улучшения своих продуктов, и это могут просматривать люди.':
+      'The server currently runs on {provider}\'s free tier: {provider} may use what is sent to improve its products, and people may review it.',
+  'Как {provider} использует отправленное, сервер не сообщил: считайте, что это может быть использовано и просмотрено людьми.':
+      'The server did not say how {provider} uses what is sent: assume it may be used and reviewed by people.',
+  'Фото будет отправлено на сервер Cosmetix и через него в сервис {provider}, чтобы оценить цвет кожи. Приложение не сохраняет фото и удаляет его с телефона после анализа.':
+      'The photo will be sent to the Cosmetix server and through it to {provider} to estimate your skin colour. The app does not keep the photo and deletes it from the phone after the analysis.',
   'Результат это подсказка, а не измерение и не диагноз. Согласие можно отозвать в Настройках.':
       'The result is a hint, not a measurement or a diagnosis. You can withdraw your consent in Settings.',
-  'Ваши сообщения в чате будут отправляться на сервер Cosmetix и через него в сервис Google Gemini. Не пишите там личные данные.':
-      'Your chat messages will be sent to the Cosmetix server and through it to Google Gemini. Do not write personal data there.',
+  'Ваши сообщения в чате будут отправляться на сервер Cosmetix и через него в сервис {provider}. Не пишите там личные данные.':
+      'Your chat messages will be sent to the Cosmetix server and through it to {provider}. Do not write personal data there.',
   'Согласие можно отозвать в Настройках.':
       'You can withdraw your consent in Settings.',
-  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер Cosmetix и в Google Gemini. Фото и контакты не отправляются. Это можно изменить в Настройках.':
-      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the Cosmetix server and to Google Gemini. Photos and contacts are not sent. You can change this in Settings.',
+  'Разрешить ИИ видеть ваш Beauty-профиль и чёрный список, чтобы советы были точнее? Они будут отправлены на сервер Cosmetix и в {provider}. Фото и контакты не отправляются. Это можно изменить в Настройках.':
+      'Allow the AI to see your Beauty profile and blacklist so the advice is more accurate? They will be sent to the Cosmetix server and to {provider}. Photos and contacts are not sent. You can change this in Settings.',
   'Отправлять сообщения в ИИ?': 'Send messages to the AI?',
   'Без согласия на отправку сообщений ИИ-чат не отвечает. Включить можно в Настройках.':
       'Without consent to send messages the AI chat does not answer. You can turn it on in Settings.',
@@ -1660,8 +1660,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Фото уходит на сервер ИИ только после вашего согласия. Cosmetix его не сохраняет.':
       'The photo goes to the AI server only after your consent. Cosmetix does not keep it.',
   'Отправлять ИИ сообщения чата': 'Send chat messages to the AI',
-  'Данные уходят на сервер Cosmetix и в Google Gemini только после вашего согласия.':
-      'Data goes to the Cosmetix server and to Google Gemini only after your consent.',
+  'Данные уходят на сервер Cosmetix и в выбранный сервис ИИ только после вашего согласия.':
+      'Data goes to the Cosmetix server and to the selected AI service only after your consent.',
   'Отправить профиль в ИИ?': 'Send the profile to the AI?',
   'Не удалось открыть фото. Файл повреждён или это не картинка.':
       'Could not open the photo. The file is damaged or it is not a picture.',
@@ -1705,7 +1705,8 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Не удалось обновить цены. Показаны сохранённые, с датой проверки.':
       'Could not update the prices. The saved ones are shown with the date they were checked.',
   'Сервер цен не подключён.': 'The price server is not connected.',
-  'Цены с сервера ещё не загружались.': 'Prices have not been loaded from the server yet.',
+  'Цены с сервера ещё не загружались.':
+      'Prices have not been loaded from the server yet.',
   'Цены обновлены: {d}': 'Prices updated: {d}',
   'Обновить цены': 'Refresh prices',
   'Крем': 'Cream',
@@ -1740,8 +1741,10 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'остаётся на коже': 'stays on the skin',
   'Назначение': 'Purpose',
   'В начале состава': 'Near the top of the INCI list',
-  'Тип или назначение не подтверждены: ждёт проверки специалистом.': 'Type or purpose is not confirmed: waiting for a specialist to check.',
-  'Определено автоматически по названию и составу; это не описание производителя.': 'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
+  'Тип или назначение не подтверждены: ждёт проверки специалистом.':
+      'Type or purpose is not confirmed: waiting for a specialist to check.',
+  'Определено автоматически по названию и составу; это не описание производителя.':
+      'Determined automatically from the name and the INCI list; it is not the manufacturer\'s description.',
   'Что это за средство': 'What this product is',
   // ---- Smart Face Capture ----
   'Поместите лицо в овал': 'Place your face in the oval',
@@ -1753,10 +1756,64 @@ You are responsible for the accuracy of the data you provide and for keeping you
   'Добавьте освещения': 'Add more light',
   'Не двигайтесь': 'Hold still',
   'Можно сделать фото': 'You can take the photo',
-  'Нет доступа к камере. Разрешите его в Настройках iPhone или выберите фото из галереи.': 'No access to the camera. Allow it in the iPhone Settings or choose a photo from the gallery.',
-  'Камера не запустилась. Выберите фото из галереи.': 'The camera did not start. Choose a photo from the gallery.',
+  'Нет доступа к камере. Разрешите его в Настройках iPhone или выберите фото из галереи.':
+      'No access to the camera. Allow it in the iPhone Settings or choose a photo from the gallery.',
+  'Камера не запустилась. Выберите фото из галереи.':
+      'The camera did not start. Choose a photo from the gallery.',
   'Закрыть': 'Close',
   'Скрыть точки лица': 'Hide face points',
   'Показать точки лица': 'Show face points',
   'Запускаем камеру…': 'Starting the camera…',
+
+  // ---- Care picker (no AI) ----
+  'Подбор ухода': 'Care picker',
+  'Подберите уход под свою кожу без ИИ: ответьте на несколько вопросов.':
+      'Pick care for your skin without AI: answer a few questions.',
+  'Проблемы кожи': 'Skin concerns',
+  'Беременность или планирование': 'Pregnancy or planning one',
+  'Бюджет (₸)': 'Budget (₸)',
+  'Подобрать': 'Pick',
+  'Найдено товаров: {n}': 'Found products: {n}',
+  'Показываем только товары с проверенной ценой в пределах бюджета. Правила не заменяют консультацию врача.':
+      'Only products with a verified price within the budget are shown. The rules do not replace a doctor\'s advice.',
+  'К товару': 'To product',
+  'Противовоспалительное действие': 'Anti-inflammatory action',
+  'Отшелушивание и очищение пор': 'Exfoliation and pore clearing',
+  'Осветление постакне': 'Fading post-acne marks',
+  'Обновление кожи': 'Skin renewal',
+  'Успокоение и восстановление барьера': 'Soothing and barrier repair',
+  'Антивозрастной уход': 'Anti-ageing care',
+  'Восстановление липидов': 'Lipid restoration',
+  // ---- Care selection: why a product was left out ----
+  'LHA может раздражать чувствительную кожу.':
+      'LHA may irritate sensitive skin.',
+  'LHA — производное салициловой кислоты, концентрацию по составу не узнать: при беременности спросите врача.':
+      'LHA is a salicylic acid derivative and its strength cannot be told from the ingredient list: during pregnancy, ask a doctor.',
+  'PHA может раздражать чувствительную кожу.':
+      'PHA may irritate sensitive skin.',
+  'Бензоилпероксид может раздражать чувствительную кожу.':
+      'Benzoyl peroxide may irritate sensitive skin.',
+  'Гликолевая кислота может раздражать чувствительную кожу.':
+      'Glycolic acid may irritate sensitive skin.',
+  'Дороже бюджета': 'Over the budget',
+  'Концентрацию салициловой кислоты по составу не узнать, а при беременности допустима только низкая: спросите врача.':
+      'The strength of salicylic acid cannot be told from the ingredient list, and during pregnancy only a low one is acceptable: ask a doctor.',
+  'Миндальная кислота может раздражать чувствительную кожу.':
+      'Mandelic acid may irritate sensitive skin.',
+  'Не подходит по возрасту': 'Not suitable for the age',
+  'Нет подходящих активов': 'No suitable active ingredients',
+  'Нет проверенной цены': 'No verified price',
+  'Отдушка может раздражать чувствительную кожу.':
+      'Fragrance may irritate sensitive skin.',
+  'При беременности ретиноиды не используют: спросите врача.':
+      'Retinoids are not used during pregnancy: ask a doctor.',
+  'Ретиноиды могут раздражать чувствительную кожу.':
+      'Retinoids may irritate sensitive skin.',
+  'Салициловая кислота может раздражать чувствительную кожу.':
+      'Salicylic acid may irritate sensitive skin.',
+  'Спирт может раздражать чувствительную кожу.':
+      'Alcohol may irritate sensitive skin.',
+  'Чистый витамин C может пощипывать чувствительную кожу.':
+      'Pure vitamin C may sting sensitive skin.',
+  'Не вошли в подбор': 'Left out of the selection',
 };

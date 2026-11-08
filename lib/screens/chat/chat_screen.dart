@@ -98,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final ok = await confirmDialog(
         context,
         title: tr('Отправлять сообщения в ИИ?'),
-        message: AiDisclosure.chatConsent(ai.dataUse, tr),
+        message: AiDisclosure.chatConsent(ai.dataUse, ai.mode, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!mounted) return;
@@ -122,7 +122,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final ok = await confirmDialog(
         context,
         title: tr('Учитывать ваши данные?'),
-        message: AiDisclosure.profileConsent(tr),
+        message: AiDisclosure.profileConsent(ai.mode, tr),
         confirmLabel: tr('Разрешить'),
       );
       if (!mounted) return;

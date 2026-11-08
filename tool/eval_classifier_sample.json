@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "name": "Gel Cleanser", "category": "Уход", "inci": "Water, Glycerin, Salicylic Acid", "trueForm": "cleanser", "truePurpose": "cleansing", "trueRinseOff": true },
+    { "name": "Moisturising Cream", "category": "Уход", "inci": "Water, Glycerin, Ceramide NP", "trueForm": "cream", "truePurpose": "hydration", "trueRinseOff": false },
+    { "name": "Sunscreen SPF 50", "category": "Уход", "inci": "Water, Zinc Oxide, Titanium Dioxide", "trueForm": "sunscreen", "truePurpose": "sunProtection", "trueRinseOff": false }
+  ]
+}

@@ -145,6 +145,11 @@ class ProductClassifier {
     } else if (has(const ['shampoo', 'шампунь'])) {
       // "Serum Shampoo" is a shampoo: the washing word wins over "serum"
       pick(ProductForm.shampoo, 'shampoo', rinse: true);
+    } else if (has(const ['shower', 'душа', 'душ']) ||
+        (has(const ['body', 'тела']) && has(const ['wash', 'мытья']))) {
+      // "Shower Gel", "Cream-Oil Shower", "Body Wash": washed off the body,
+      // not a leave-on gel or cream (found on the Open Beauty Facts sample)
+      pick(ProductForm.cleanser, 'shower / body wash', rinse: true);
     } else if (has(const ['micellar', 'мицеллярная', 'мицеллярка'])) {
       pick(ProductForm.micellar, 'micellar water', rinse: false);
     } else if (has(const [

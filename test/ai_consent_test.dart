@@ -27,9 +27,9 @@ void main() {
 
   group('what the user is told', () {
     test(
-      'free tier: says plainly that Google may use it and people may read it',
+      'free tier: says plainly that the provider may use it and people may read it',
       () {
-        final t = AiDisclosure.photoConsent('free');
+        final t = AiDisclosure.photoConsent('free', 'gemini');
         expect(t, contains('Google Gemini'));
         expect(t, contains('бесплатном тарифе'));
         expect(t, contains('просматривать люди'));
@@ -38,9 +38,9 @@ void main() {
     );
 
     test(
-      'paid tier: says Google does not use it to improve products, and that it logs briefly',
+      'paid tier: says the provider does not use it to improve products, and that it logs briefly',
       () {
-        final t = AiDisclosure.photoConsent('paid');
+        final t = AiDisclosure.photoConsent('paid', 'gemini');
         expect(t, contains('не использует'));
         expect(t, contains('ограниченное время'));
         expect(t, isNot(contains('бесплатном тарифе')));
@@ -49,28 +49,44 @@ void main() {
 
     test('unknown or missing: assume the worst', () {
       for (final mode in [null, 'unknown', 'none', 'whatever']) {
-        expect(AiDisclosure.photoConsent(mode), contains('считайте'));
+        expect(AiDisclosure.photoConsent(mode, 'gemini'), contains('считайте'));
       }
     });
 
+    test('the selected provider is named: Claude or Gemini, not mixed up', () {
+      expect(
+        AiDisclosure.photoConsent('free', 'claude'),
+        contains('Anthropic Claude'),
+      );
+      expect(
+        AiDisclosure.photoConsent('free', 'claude'),
+        isNot(contains('Google Gemini')),
+      );
+      expect(
+        AiDisclosure.chatConsent('paid', 'claude'),
+        contains('Anthropic Claude'),
+      );
+      expect(AiDisclosure.profileConsent('claude'), contains('Anthropic Claude'));
+    });
+
     test(
-      'every consent names Cosmetix and Google Gemini and promises a way out',
+      'every consent names Cosmetix and the provider and promises a way out',
       () {
         for (final t in [
-          AiDisclosure.photoConsent('paid'),
-          AiDisclosure.chatConsent('paid'),
-          AiDisclosure.profileConsent(),
+          AiDisclosure.photoConsent('paid', 'gemini'),
+          AiDisclosure.chatConsent('paid', 'gemini'),
+          AiDisclosure.profileConsent('gemini'),
         ]) {
           expect(t, contains('Cosmetix'));
           expect(t, contains('Google Gemini'));
           expect(t, contains('Настройках'));
         }
         expect(
-          AiDisclosure.chatConsent('free'),
+          AiDisclosure.chatConsent('free', 'gemini'),
           contains('Не пишите там личные данные'),
         );
         expect(
-          AiDisclosure.profileConsent(),
+          AiDisclosure.profileConsent('gemini'),
           contains('Фото и контакты не отправляются'),
         );
       },
@@ -78,7 +94,7 @@ void main() {
 
     test('the translator is applied to every sentence', () {
       final seen = <String>[];
-      AiDisclosure.photoConsent('free', (s) {
+      AiDisclosure.photoConsent('free', 'gemini', (s) {
         seen.add(s);
         return s.toUpperCase();
       });
