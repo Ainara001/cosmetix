@@ -47,6 +47,7 @@ dependencies:
   geolocator: ^14.1.2
   mediapipe_face_mesh: ^3.2.2
   url_launcher: ^6.3.3
+  camera: ^0.12.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
