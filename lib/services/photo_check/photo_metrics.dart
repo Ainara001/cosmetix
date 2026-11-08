@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' show Offset;
 
+import 'package:cosmetix/core/face/face_zones.dart';
 import 'package:cosmetix/services/photo_check/photo_pixels.dart';
 import 'package:cosmetix/services/photo_check/photo_rules.dart';
 
@@ -14,107 +15,13 @@ import 'package:cosmetix/services/photo_check/photo_rules.dart';
 class PhotoMeasure {
   PhotoMeasure._();
 
-  // landmark loops (MediaPipe Face Mesh indices); see tools/eval/face_zones.py
-  static const _forehead = [
-    54,
-    103,
-    67,
-    109,
-    10,
-    338,
-    297,
-    332,
-    284,
-    300,
-    293,
-    334,
-    296,
-    336,
-    9,
-    107,
-    66,
-    105,
-    63,
-    70,
-    21,
-  ];
-  static const _nose = [
-    193,
-    122,
-    196,
-    174,
-    217,
-    198,
-    209,
-    49,
-    64,
-    98,
-    97,
-    2,
-    326,
-    327,
-    294,
-    279,
-    429,
-    420,
-    437,
-    399,
-    419,
-    351,
-    417,
-  ];
-  static const _chin = [
-    32,
-    194,
-    83,
-    18,
-    313,
-    418,
-    262,
-    400,
-    377,
-    152,
-    148,
-    176,
-  ];
-  static const _cheekRight = [
-    116,
-    117,
-    118,
-    119,
-    100,
-    126,
-    209,
-    203,
-    206,
-    216,
-    212,
-    214,
-    135,
-    172,
-    58,
-    132,
-    93,
-  ];
-  static const _cheekLeft = [
-    345,
-    346,
-    347,
-    348,
-    329,
-    355,
-    429,
-    423,
-    426,
-    436,
-    432,
-    434,
-    364,
-    397,
-    288,
-    361,
-    323,
-  ];
+  // zone loops: the shared face zones (lib/core/face/face_zones.dart), the same
+  // as tools/eval/face_zones.py; the eye, lip and oval outlines below
+  static final _forehead = FaceZones.loops[FaceZone.forehead]!;
+  static final _nose = FaceZones.loops[FaceZone.nose]!;
+  static final _chin = FaceZones.loops[FaceZone.chin]!;
+  static final _cheekRight = FaceZones.loops[FaceZone.cheekRight]!;
+  static final _cheekLeft = FaceZones.loops[FaceZone.cheekLeft]!;
   static const _lips = [
     61,
     146,

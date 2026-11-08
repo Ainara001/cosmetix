@@ -204,6 +204,13 @@ class _CareScreenState extends State<CareScreen> {
             outlined: true,
             onPressed: () => Navigator.pushNamed(context, AppRoutes.bag),
           ),
+          const SizedBox(height: 10),
+          CustomButton(
+            label: tr('Отметить особенности кожи'),
+            icon: Icons.face_retouching_natural_outlined,
+            outlined: true,
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.skinMarks),
+          ),
           const SizedBox(height: 14),
           Text(
             tr(

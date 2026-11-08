@@ -24,6 +24,7 @@ import 'package:cosmetix/repositories/chat_repository.dart';
 import 'package:cosmetix/models/product.dart';
 import 'package:cosmetix/repositories/product_repository.dart';
 import 'package:cosmetix/repositories/review_repository.dart';
+import 'package:cosmetix/repositories/skin_marks_repository.dart';
 import 'package:cosmetix/repositories/safety_repository.dart';
 import 'package:cosmetix/repositories/settings_repository.dart';
 import 'package:cosmetix/repositories/user_repository.dart';
@@ -195,6 +196,9 @@ class _CosmetixAppState extends State<CosmetixApp> {
           providers: [
             Provider<DatabaseHelper>.value(value: widget.helper),
             Provider<ReviewRepository>.value(value: _reviews),
+            Provider<SkinMarksRepository>(
+              create: (_) => SkinMarksRepository(widget.helper),
+            ),
             ChangeNotifierProvider<AuthProvider>.value(value: _auth),
             ChangeNotifierProvider<SettingsProvider>.value(value: _settings),
             ChangeNotifierProvider<AiProvider>.value(value: _ai),
