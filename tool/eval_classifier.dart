@@ -41,6 +41,9 @@ Future<void> main(List<String> args) async {
   var rinseOk = 0, rinseWrong = 0, rinseUndetermined = 0;
   var needsReview = 0;
   final mismatches = <String>[];
+  // per form: tp / fp / fn (fn includes "undetermined")
+  final cTp = <String, int>{}, cFp = <String, int>{}, cFn = <String, int>{};
+  void inc(Map<String, int> m, String k) => m[k] = (m[k] ?? 0) + 1;
 
   for (final it in items) {
     if (it is! Map) continue;
@@ -56,12 +59,16 @@ Future<void> main(List<String> args) async {
     final trueForm = it['trueForm']?.toString();
     if (trueForm != null) {
       final pred = pc.form?.name;
-      if (pred == null)
+      if (pred == null) {
         formFn++;
-      else if (pred == trueForm)
+        inc(cFn, trueForm);
+      } else if (pred == trueForm) {
         formTp++;
-      else {
+        inc(cTp, trueForm);
+      } else {
         formFp++;
+        inc(cFp, pred);
+        inc(cFn, trueForm);
         mismatches.add('form: "${it['name']}" got $pred, want $trueForm');
       }
     }
@@ -114,6 +121,16 @@ Future<void> main(List<String> args) async {
   stdout.writeln(
     'needsReview (undetermined -> manual queue): ${pct(needsReview, n)}',
   );
+  final classes = {...cTp.keys, ...cFp.keys, ...cFn.keys}.toList()..sort();
+  if (classes.isNotEmpty) {
+    stdout.writeln('per form (n = labelled items of that form):');
+    for (final c in classes) {
+      final tp = cTp[c] ?? 0, fp = cFp[c] ?? 0, fn = cFn[c] ?? 0;
+      stdout.writeln(
+        '  ${c.padRight(12)} n ${(tp + fn).toString().padLeft(3)}  precision ${pct(tp, tp + fp).padLeft(6)}  recall ${pct(tp, tp + fn).padLeft(6)}',
+      );
+    }
+  }
   if (mismatches.isNotEmpty) {
     stdout.writeln('mismatches:');
     for (final m in mismatches) {
