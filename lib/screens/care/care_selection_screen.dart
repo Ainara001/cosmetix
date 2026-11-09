@@ -8,7 +8,9 @@ import 'package:cosmetix/core/theme/app_colors.dart';
 import 'package:cosmetix/core/theme/app_text_styles.dart';
 import 'package:cosmetix/core/utils/formatters.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/providers/auth_provider.dart';
 import 'package:cosmetix/providers/catalog_provider.dart';
+import 'package:cosmetix/repositories/skin_marks_repository.dart';
 import 'package:cosmetix/routes/app_routes.dart';
 import 'package:cosmetix/services/care_selection_service.dart';
 import 'package:cosmetix/services/ingredient_catalog.dart';
@@ -51,6 +53,25 @@ class _CareSelectionScreenState extends State<CareSelectionScreen> {
     super.initState();
     _skinType = widget.initialSkinType;
     _concerns.addAll(widget.initialConcerns);
+    if (widget.initialConcerns.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadMarked());
+    }
+  }
+
+  /// Pre-selects the concerns the user marked on the face zones screen.
+  Future<void> _loadMarked() async {
+    final SkinMarksRepository repo;
+    final AuthProvider auth;
+    try {
+      repo = context.read<SkinMarksRepository>();
+      auth = context.read<AuthProvider>();
+    } on ProviderNotFoundException {
+      return; // ponytail: screen used without the app's providers (tests)
+    }
+    if (auth.user == null) return;
+    final marked = (await repo.current(auth.userId)).concerns;
+    if (!mounted || marked.isEmpty || _result != null) return;
+    setState(() => _concerns.addAll(marked));
   }
 
   @override
