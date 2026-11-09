@@ -122,6 +122,14 @@ void main() {
     }
     expect(FaceZone.fromCode('ear'), isNull);
   });
+  test('no zone paints over eyes, brows or lips', () {
+    for (final loop in FaceZones.holeLoops) {
+      final c = mean(face.points.pick(loop));
+      for (final z in FaceZone.values) {
+        expect(zones.path(z).contains(c), isFalse, reason: '$z over $loop');
+      }
+    }
+  });
 }
 
 bool _inside(List<Offset> poly, Offset p) {
