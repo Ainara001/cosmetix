@@ -1,4 +1,4 @@
-import 'dart:ui' show Offset, Path, PathFillType, Rect;
+import 'dart:ui' show Offset, Path, PathOperation, Rect;
 
 import 'face_geometry.dart';
 import 'face_points.dart';
@@ -123,12 +123,19 @@ class FaceZones {
 
   /// The zone as a path with the holes cut out, for drawing.
   Path path(FaceZone z) {
-    final p = Path()
-      ..fillType = PathFillType.evenOdd
-      ..addPolygon(polygon(z), true);
+    // Cut holes with a real difference: even-odd filling would paint a hole
+    // that lies partly outside the zone (lips next to a cheek, brows below
+    // the forehead edge).
+    var p = Path()..addPolygon(polygon(z), true);
     final b = _bounds(polygon(z));
     for (final h in _holes) {
-      if (_bounds(h).overlaps(b)) p.addPolygon(h, true);
+      if (_bounds(h).overlaps(b)) {
+        p = Path.combine(
+          PathOperation.difference,
+          p,
+          Path()..addPolygon(h, true),
+        );
+      }
     }
     return p;
   }
