@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:cosmetix/core/beauty/beauty_codes.dart';
 import 'package:cosmetix/core/i18n/tr.dart';
 import 'package:cosmetix/core/theme/app_theme.dart';
+import 'package:cosmetix/core/face/face_zones.dart';
+import 'package:cosmetix/database/database_helper.dart';
 import 'package:cosmetix/models/product.dart';
+import 'package:cosmetix/models/skin_marks.dart';
+import 'package:cosmetix/providers/auth_provider.dart';
+import 'package:cosmetix/repositories/skin_marks_repository.dart';
+import 'package:cosmetix/repositories/user_repository.dart';
 import 'package:cosmetix/screens/care/care_selection_screen.dart';
+import 'package:cosmetix/widgets/common_widgets.dart';
 
 Product _p(int id, String inci, {int price = 5000, String name = 'Средство'}) =>
     Product(
@@ -132,6 +141,58 @@ void main() {
         'При беременности ретиноиды не используют: спросите врача. — 1',
       ),
       findsOneWidget,
+    );
+  });
+
+  testWidgets('concerns marked on the face zones are pre-selected', (t) async {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    t.view.physicalSize = const Size(1080, 3000);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    final helper = DatabaseHelper(path: inMemoryDatabasePath);
+    addTearDown(() => t.runAsync(helper.close));
+    final users = UserRepository(helper);
+    final marks = SkinMarksRepository(helper);
+    await t.runAsync(() async {
+      final u = await users.register(
+        firstName: 'Тест',
+        email: 'care${DateTime.now().microsecondsSinceEpoch}@test.kz',
+        password: 'Passw0rd1',
+      );
+      await users.setCurrentUser(u.id);
+      await marks.replace(u.id, {
+        const SkinZoneMark(FaceZone.chin, SkinFeature.acne),
+      });
+    });
+    final auth = AuthProvider(users);
+    await t.runAsync(auth.restoreSession);
+    await t.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthProvider>.value(value: auth),
+          Provider<SkinMarksRepository>.value(value: marks),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const CareSelectionScreen(products: []),
+        ),
+      ),
+    );
+    for (var i = 0; i < 5; i++) {
+      await t.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 30)),
+      );
+      await t.pump();
+    }
+    AppChip chip(String label) =>
+        t.widget<AppChip>(find.widgetWithText(AppChip, label));
+    expect(chip('Акне и высыпания').selected, isTrue);
+    expect(
+      chip(
+        tr(SkinConcern.values.firstWhere((c) => c != SkinConcern.acne).label),
+      ).selected,
+      isFalse,
     );
   });
 }
